@@ -7,13 +7,18 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
-
+import { AuthBlockComponent } from '@/blocks/AuthBlock/Component'
+import { LoginBlockComponent } from '@/blocks/LoginBlock/Component'
+import EntretienBlockComponent from './EntretienBlock/Component'
 const blockComponents = {
   archive: ArchiveBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  authBlock: AuthBlockComponent,
+  loginBlock: LoginBlockComponent,
+  entretienBlock: EntretienBlockComponent,
 }
 
 export const RenderBlocks: React.FC<{

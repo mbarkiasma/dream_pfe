@@ -49,11 +49,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
       }
     }
 
-    modifiedDoc.categories = populatedCategories.map((each) => ({
-      relationTo: 'categories',
-      categoryID: String(each.id),
-      title: each.title,
-    }))
+    // Categories field removed
   }
 
   return modifiedDoc

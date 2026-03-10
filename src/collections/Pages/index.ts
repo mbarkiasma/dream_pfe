@@ -12,10 +12,11 @@ import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
-
+import { AuthBlock } from '../../blocks/AuthBlock/config'
+import { LoginBlock } from '../../blocks/LoginBlock/config'
+import { EntretienBlock } from "../../blocks/EntretienBlock/config"
 import {
   MetaDescriptionField,
-  MetaImageField,
   MetaTitleField,
   OverviewField,
   PreviewField,
@@ -72,7 +73,7 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [AuthBlock, LoginBlock, CallToAction, Content, MediaBlock, Archive, FormBlock, EntretienBlock],
               required: true,
               admin: {
                 initCollapsed: true,
@@ -88,15 +89,10 @@ export const Pages: CollectionConfig<'pages'> = {
             OverviewField({
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
-              imagePath: 'meta.image',
             }),
             MetaTitleField({
               hasGenerateFn: true,
             }),
-            MetaImageField({
-              relationTo: 'media',
-            }),
-
             MetaDescriptionField({}),
             PreviewField({
               // if the `generateUrl` function is configured
