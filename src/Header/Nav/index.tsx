@@ -1,25 +1,46 @@
 'use client'
 
 import React from 'react'
-
 import type { Header as HeaderType } from '@/payload-types'
-
 import { CMSLink } from '@/components/Link'
-import Link from 'next/link'
-import { SearchIcon } from 'lucide-react'
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
 
+  if (!navItems.length) return null
+
+  const mainItems = navItems.slice(0, -2)
+  const loginItem = navItems[navItems.length - 2]
+  const signupItem = navItems[navItems.length - 1]
+
   return (
-    <nav className="flex gap-3 items-center">
-      {navItems.map(({ link }, i) => {
-        return <CMSLink key={i} {...link} appearance="link" />
-      })}
-      <Link href="/search">
-        <span className="sr-only">Search</span>
-        <SearchIcon className="w-5 text-primary" />
-      </Link>
+    <nav className="flex items-center gap-3">
+      <div className="hidden items-center gap-8 md:flex">
+        {mainItems.map(({ link }, i) => (
+          <CMSLink
+            key={i}
+            {...link}
+            appearance="link"
+            className="text-[15px] font-medium text-violet-900/80 transition hover:text-violet-600"
+          />
+        ))}
+      </div>
+
+      {loginItem?.link && (
+        <CMSLink
+          {...loginItem.link}
+          appearance="outline"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-white px-5 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
+        />
+      )}
+
+      {signupItem?.link && (
+        <CMSLink
+          {...signupItem.link}
+          appearance="default"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500 to-violet-400 px-6 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(139,92,246,0.25)] transition hover:from-violet-600 hover:to-violet-500"
+        />
+      )}
     </nav>
   )
 }

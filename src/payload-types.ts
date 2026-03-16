@@ -97,8 +97,14 @@ export interface Config {
     defaultIDType: string;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    header: Header;
+    footer: Footer;
+  };
+  globalsSelect: {
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -140,43 +146,6 @@ export interface UserAuthOperations {
 export interface Page {
   id: string;
   title: string;
-  hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
-    richText?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    links?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?: {
-              relationTo: 'pages';
-              value: string | Page;
-            } | null;
-            url?: string | null;
-            label: string;
-            /**
-             * Choose how the link should be rendered.
-             */
-            appearance?: ('default' | 'outline') | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-  };
   layout: (
     | {
         title: string;
@@ -216,6 +185,81 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'entretienBlock';
+      }
+    | {
+        title: string;
+        description: string;
+        primaryButton: {
+          label: string;
+          href: string;
+        };
+        secondaryButton?: {
+          label?: string | null;
+          href?: string | null;
+        };
+        badges?:
+          | {
+              label: string;
+              id?: string | null;
+            }[]
+          | null;
+        mockupTitle?: string | null;
+        mockupMessage?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'landingHero';
+      }
+    | {
+        title: string;
+        features: {
+          icon: 'moon' | 'sparkles' | 'messageCircle';
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'secondBlocAccueil';
+      }
+    | {
+        title: string;
+        features: {
+          icon: 'brain' | 'bot' | 'messageCircle' | 'clock' | 'heartHandshake' | 'video';
+          label: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'troisiemeBlocAccueil';
+      }
+    | {
+        title: string;
+        steps: {
+          icon: 'userPlus' | 'bot' | 'bookOpen';
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        testimonialName: string;
+        testimonialRole: string;
+        testimonialText: string;
+        rating: number;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'quatriemeBlocAccueil';
+      }
+    | {
+        title: string;
+        testimonials: {
+          name: string;
+          role: string;
+          review: string;
+          rating: number;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'cinquiemeBlocAccueil';
       }
   )[];
   meta?: {
@@ -843,27 +887,6 @@ export interface PayloadMigration {
  */
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
-  hero?:
-    | T
-    | {
-        type?: T;
-        richText?: T;
-        links?:
-          | T
-          | {
-              link?:
-                | T
-                | {
-                    type?: T;
-                    newTab?: T;
-                    reference?: T;
-                    url?: T;
-                    label?: T;
-                    appearance?: T;
-                  };
-              id?: T;
-            };
-      };
   layout?:
     | T
     | {
@@ -906,6 +929,98 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               title?: T;
+              id?: T;
+              blockName?: T;
+            };
+        landingHero?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              primaryButton?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondaryButton?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              badges?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              mockupTitle?: T;
+              mockupMessage?: T;
+              id?: T;
+              blockName?: T;
+            };
+        secondBlocAccueil?:
+          | T
+          | {
+              title?: T;
+              features?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        troisiemeBlocAccueil?:
+          | T
+          | {
+              title?: T;
+              features?:
+                | T
+                | {
+                    icon?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        quatriemeBlocAccueil?:
+          | T
+          | {
+              title?: T;
+              steps?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              testimonialName?: T;
+              testimonialRole?: T;
+              testimonialText?: T;
+              rating?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cinquiemeBlocAccueil?:
+          | T
+          | {
+              title?: T;
+              testimonials?:
+                | T
+                | {
+                    name?: T;
+                    role?: T;
+                    review?: T;
+                    rating?: T;
+                    id?: T;
+                  };
               id?: T;
               blockName?: T;
             };
@@ -1288,6 +1403,100 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: string;
+  navItems?:
+    | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: string | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: string;
+  navItems?:
+    | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: string | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  navItems?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  navItems?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

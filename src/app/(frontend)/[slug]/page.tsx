@@ -6,7 +6,8 @@ import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import { homeStatic } from '@/endpoints/seed/home-static'
-
+import { Header } from '@/Header/Component'
+import { Footer } from '@/Footer/Component'
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -67,17 +68,20 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { hero, layout } = page
 
   return (
-    <article className="pt-16 pb-24">
-      <PageClient />
-      {/* Allows redirects for valid pages too */}
-      <PayloadRedirects disableNotFound url={url} />
+  <article className="min-h-screen bg-[#f3eef8]">
+    <PageClient />
+    <PayloadRedirects disableNotFound url={url} />
 
-      {draft && <LivePreviewListener />}
+    {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
-    </article>
-  )
+    <Header />
+
+    {/* <RenderHero {...hero} /> */}
+    <RenderBlocks blocks={layout} />
+    <Footer />
+  </article>
+)
+  
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {

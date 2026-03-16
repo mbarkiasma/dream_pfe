@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React from 'react'
+import { MoonStar } from 'lucide-react'
 
 interface Props {
   className?: string
@@ -8,22 +9,17 @@ interface Props {
 }
 
 export const Logo = (props: Props) => {
-  const { loading: loadingFromProps, priority: priorityFromProps, className } = props
-
-  const loading = loadingFromProps || 'lazy'
-  const priority = priorityFromProps || 'low'
+  const { className } = props
 
   return (
-    /* eslint-disable @next/next/no-img-element */
-    <img
-      alt="Payload Logo"
-      width={193}
-      height={34}
-      loading={loading}
-      fetchPriority={priority}
-      decoding="async"
-      className={clsx('max-w-[9.375rem] w-full h-[34px]', className)}
-      src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-logo-light.svg"
-    />
+    <div className={clsx('flex items-center gap-2', className)}>
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100">
+        <MoonStar className="h-5 w-5 text-violet-600" />
+      </div>
+
+      <span className="text-3xl font-semibold tracking-tight text-violet-700">
+        Dream
+      </span>
+    </div>
   )
 }

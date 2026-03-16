@@ -15,6 +15,11 @@ import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { AuthBlock } from '../../blocks/AuthBlock/config'
 import { LoginBlock } from '../../blocks/LoginBlock/config'
 import { EntretienBlock } from "../../blocks/EntretienBlock/config"
+import { LandingHeroBlock } from '@/blocks/HeroBlock/config'
+import { SecondBlocAccueil } from '@/blocks/secondBlocAccueil/config'
+import { TroisiemeBlocAccueil } from '@/blocks/thirdBlocAccueil/config'
+import { QuatriemeBlocAccueil } from '@/blocks/quatriemeBlocAccueil/config'
+import { CinquiemeBlocAccueil } from '@/blocks/cinquiemeBlocAccueil/config'
 import {
   MetaDescriptionField,
   MetaTitleField,
@@ -64,16 +69,17 @@ export const Pages: CollectionConfig<'pages'> = {
     {
       type: 'tabs',
       tabs: [
-        {
-          fields: [hero],
-          label: 'Hero',
-        },
+        // {
+        //   fields: [hero],
+        //   label: 'Hero',
+        // },
         {
           fields: [
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [AuthBlock, LoginBlock, CallToAction, Content, MediaBlock, Archive, FormBlock, EntretienBlock],
+              blocks: [AuthBlock, LoginBlock, CallToAction, Content, MediaBlock, Archive, FormBlock, 
+                EntretienBlock,LandingHeroBlock, SecondBlocAccueil, TroisiemeBlocAccueil, QuatriemeBlocAccueil,CinquiemeBlocAccueil],
               required: true,
               admin: {
                 initCollapsed: true,

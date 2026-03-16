@@ -3,7 +3,8 @@ import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
-
+import { Header } from '@/Header/config'
+import { Footer } from '@/Footer/config'
 import { Pages } from './collections/Pages'
 import { Users } from './collections/Users'
 import { defaultLexical } from '@/fields/defaultLexical'
@@ -29,6 +30,7 @@ export default buildConfig({
     url: process.env.DATABASE_URL || '',
   }),
   collections: [Pages, Users],
+  globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),
   plugins,
   secret: process.env.PAYLOAD_SECRET,

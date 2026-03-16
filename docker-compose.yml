@@ -29,3 +29,14 @@ services:
 volumes:
   data:
   node_modules:
+services:
+
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - "3002:3000"
