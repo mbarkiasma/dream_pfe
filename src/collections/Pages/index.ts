@@ -20,6 +20,8 @@ import { SecondBlocAccueil } from '@/blocks/secondBlocAccueil/config'
 import { TroisiemeBlocAccueil } from '@/blocks/thirdBlocAccueil/config'
 import { QuatriemeBlocAccueil } from '@/blocks/quatriemeBlocAccueil/config'
 import { CinquiemeBlocAccueil } from '@/blocks/cinquiemeBlocAccueil/config'
+import { StudentDashboardBlock } from '@/blocks/StudentDashboardBlock/config'
+import { StudentDreamsBlock } from '@/blocks/StudentDreamsBlock/config'
 import {
   MetaDescriptionField,
   MetaTitleField,
@@ -78,8 +80,23 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [AuthBlock, LoginBlock, CallToAction, Content, MediaBlock, Archive, FormBlock, 
-                EntretienBlock,LandingHeroBlock, SecondBlocAccueil, TroisiemeBlocAccueil, QuatriemeBlocAccueil,CinquiemeBlocAccueil],
+              blocks: [
+                AuthBlock,
+                LoginBlock,
+                CallToAction,
+                Content,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                EntretienBlock,
+                LandingHeroBlock,
+                SecondBlocAccueil,
+                TroisiemeBlocAccueil,
+                QuatriemeBlocAccueil,
+                CinquiemeBlocAccueil,
+                StudentDashboardBlock,
+                StudentDreamsBlock,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,

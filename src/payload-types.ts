@@ -261,6 +261,8 @@ export interface Page {
         blockName?: string | null;
         blockType: 'cinquiemeBlocAccueil';
       }
+    | StudentDashboardBlock
+    | StudentDreamsBlock
   )[];
   meta?: {
     title?: string | null;
@@ -604,6 +606,28 @@ export interface Form {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StudentDashboardBlock".
+ */
+export interface StudentDashboardBlock {
+  title?: string | null;
+  welcomeMessage?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'studentDashboardBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StudentDreamsBlock".
+ */
+export interface StudentDreamsBlock {
+  title?: string | null;
+  description?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'studentDreamsBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1024,6 +1048,8 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        studentDashboardBlock?: T | StudentDashboardBlockSelect<T>;
+        studentDreamsBlock?: T | StudentDreamsBlockSelect<T>;
       };
   meta?:
     | T
@@ -1116,6 +1142,26 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StudentDashboardBlock_select".
+ */
+export interface StudentDashboardBlockSelect<T extends boolean = true> {
+  title?: T;
+  welcomeMessage?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StudentDreamsBlock_select".
+ */
+export interface StudentDreamsBlockSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
   id?: T;
   blockName?: T;
 }
