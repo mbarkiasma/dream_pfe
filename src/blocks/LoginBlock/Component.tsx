@@ -44,7 +44,7 @@ export const LoginBlockComponent = (props: Props) => {
 
     if (res.ok) {
       console.log("Login success", data)
-      window.location.href = "/dashboard"
+      window.location.href = "/dashboard/student"
     } else {
       alert("Email ou mot de passe incorrect")
     }

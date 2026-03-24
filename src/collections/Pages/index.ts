@@ -20,8 +20,6 @@ import { SecondBlocAccueil } from '@/blocks/secondBlocAccueil/config'
 import { TroisiemeBlocAccueil } from '@/blocks/thirdBlocAccueil/config'
 import { QuatriemeBlocAccueil } from '@/blocks/quatriemeBlocAccueil/config'
 import { CinquiemeBlocAccueil } from '@/blocks/cinquiemeBlocAccueil/config'
-import { StudentDashboardBlock } from '@/blocks/StudentDashboardBlock/config'
-import { StudentDreamsBlock } from '@/blocks/StudentDreamsBlock/config'
 import {
   MetaDescriptionField,
   MetaTitleField,
@@ -94,8 +92,6 @@ export const Pages: CollectionConfig<'pages'> = {
                 TroisiemeBlocAccueil,
                 QuatriemeBlocAccueil,
                 CinquiemeBlocAccueil,
-                StudentDashboardBlock,
-                StudentDreamsBlock,
               ],
               required: true,
               admin: {
