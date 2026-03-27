@@ -23,12 +23,6 @@ export default function StudentDashboardPage() {
               <p className="leading-7 text-slate-600">
                 Le dernier rêve enregistré par l’étudiant apparaîtra ici automatiquement après ajout.
               </p>
-
-              <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
-                  Aucun rêve
-                </span>
-              </div>
             </CardContent>
           </Card>
         </div>
@@ -43,12 +37,6 @@ export default function StudentDashboardPage() {
               <p className="leading-7 text-slate-600">
                 Les analyses générées s’afficheront ici automatiquement après traitement.
               </p>
-
-              <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
-                  En attente
-                </span>
-              </div>
             </CardContent>
           </Card>
 
@@ -61,12 +49,6 @@ export default function StudentDashboardPage() {
               <p className="leading-7 text-slate-600">
                 Les séances planifiées avec le psychologue ou le coach apparaîtront ici.
               </p>
-
-              <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
-                  Aucun rendez-vous
-                </span>
-              </div>
             </CardContent>
           </Card>
         </div>

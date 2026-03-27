@@ -1,14 +1,15 @@
 import { Card, CardContent } from '@/components/ui/card'
 
 const stats = [
-  { label: 'Mes rêves', value: '--' },
-  { label: 'Mes analyses', value: '--' },
-  { label: 'Rendez-vous', value: '--' },
+  { label: 'Étudiants assignés', value: '--' },
+  { label: 'Exercices actifs', value: '--' },
+  { label: 'Rendez-vous prévus', value: '--' },
+  { label: 'Cas à orienter', value: '--' },
 ]
 
-export function StudentStatsCards() {
+export function CoachStatsCards() {
   return (
-    <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {stats.map((item) => (
         <Card
           key={item.label}
