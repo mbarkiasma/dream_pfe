@@ -148,21 +148,6 @@ export interface Page {
   title: string;
   layout: (
     | {
-        title: string;
-        subtitle: string;
-        firstNamePlaceholder?: string | null;
-        lastNamePlaceholder?: string | null;
-        emailPlaceholder?: string | null;
-        passwordPlaceholder?: string | null;
-        buttonLabel: string;
-        bottomText?: string | null;
-        bottomLinkLabel?: string | null;
-        bottomLinkUrl?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'authBlock';
-      }
-    | {
         title?: string | null;
         subtitle?: string | null;
         emailPlaceholder?: string | null;
@@ -611,7 +596,11 @@ export interface Form {
  */
 export interface User {
   id: string;
-  name?: string | null;
+  firstName: string;
+  lastName: string;
+  role: 'etudiant' | 'coach' | 'psy';
+  magicLoginToken?: string | null;
+  magicLoginExpiresAt?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -890,22 +879,6 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        authBlock?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              firstNamePlaceholder?: T;
-              lastNamePlaceholder?: T;
-              emailPlaceholder?: T;
-              passwordPlaceholder?: T;
-              buttonLabel?: T;
-              bottomText?: T;
-              bottomLinkLabel?: T;
-              bottomLinkUrl?: T;
-              id?: T;
-              blockName?: T;
-            };
         loginBlock?:
           | T
           | {
@@ -1124,7 +1097,11 @@ export interface FormBlockSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  name?: T;
+  firstName?: T;
+  lastName?: T;
+  role?: T;
+  magicLoginToken?: T;
+  magicLoginExpiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

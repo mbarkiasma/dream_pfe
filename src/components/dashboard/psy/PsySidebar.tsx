@@ -1,13 +1,5 @@
 import Link from 'next/link'
-import {
-  CalendarDays,
-  FileText,
-  Home,
-  Moon,
-  NotebookPen,
-  User,
-  Users,
-} from 'lucide-react'
+import { CalendarDays, Home, User, Users } from 'lucide-react'
 import { LogoutButton } from '@/components/dashboard/student/Logout'
 
 const navItems = [
@@ -21,7 +13,11 @@ const navItems = [
     href: '/dashboard/psy/students',
     icon: Users,
   },
-
+  {
+    title: 'Rendez-vous',
+    href: '/dashboard/psy/rendez_vous',
+    icon: CalendarDays,
+  },
   {
     title: 'Mon profil',
     href: '/dashboard/psy/profil',
@@ -29,7 +25,7 @@ const navItems = [
   },
 ]
 
-export function PsychologueSidebar() {
+export function PsySidebar() {
   return (
     <aside className="hidden min-h-full w-24 flex-col items-center rounded-[32px] bg-gradient-to-b from-[#7c83fd] via-[#8b8ff8] to-[#a5b4fc] py-6 shadow-[0_20px_60px_rgba(124,131,253,0.25)] md:flex">
       <div className="flex flex-1 flex-col items-center justify-center gap-5">

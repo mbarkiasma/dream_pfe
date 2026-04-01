@@ -13,6 +13,7 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { Page } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
+
 const generateTitle: GenerateTitle<Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
 }
@@ -85,4 +86,6 @@ export const plugins: Plugin[] = [
       },
     },
   }),
+
+
 ]

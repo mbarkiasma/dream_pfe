@@ -7,14 +7,13 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
-import { AuthBlockComponent } from '@/blocks/AuthBlock/Component'
 import { LoginBlockComponent } from '@/blocks/LoginBlock/Component'
 import EntretienBlockComponent from './EntretienBlock/Component'
 import LandingHeroBlockComponent from '@/blocks/HeroBlock/Component'
 import { SecondBlocAccueilBlock } from '@/blocks/secondBlocAccueil/Component'
 import { TroisiemeBlocAccueilBlock } from '@/blocks/thirdBlocAccueil/Component'
 import { QuatriemeBlocAccueilBlock } from '@/blocks/quatriemeBlocAccueil/Component'
-import { CinquiemeBlocAccueilBlock } from '@/blocks/cinquiemeBlocAccueil/Component'
+import { CinquiemeBlocAccueilBlock } from '@/blocks/CinquiemeBlocAccueil/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -22,7 +21,6 @@ const blockComponents = {
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
-  authBlock: AuthBlockComponent,
   loginBlock: LoginBlockComponent,
   entretienBlock: EntretienBlockComponent,
   landingHero: LandingHeroBlockComponent,

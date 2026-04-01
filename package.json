@@ -22,6 +22,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "@payload-auth/better-auth-plugin": "^1.1.8",
     "@payloadcms/admin-bar": "3.79.0",
     "@payloadcms/db-mongodb": "3.79.0",
     "@payloadcms/live-preview-react": "3.79.0",
