@@ -5,13 +5,13 @@ import config from '@/payload.config'
 export default async function MagicLinkPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string | string[] }>
+  searchParams: Promise<{ email?: string | string[] }>
 }) {
   const params = await searchParams
-  const rawToken = params.token
-  const token = Array.isArray(rawToken) ? rawToken[0] : rawToken
+  const rawEmail = params.email
+  const email = Array.isArray(rawEmail) ? rawEmail[0] : rawEmail
 
-  if (!token) {
+  if (!email) {
     redirect('/login')
   }
 
@@ -20,18 +20,9 @@ export default async function MagicLinkPage({
   const result = await payload.find({
     collection: 'users',
     where: {
-      and: [
-        {
-          magicLoginToken: {
-            equals: token,
-          },
-        },
-        {
-          magicLoginExpiresAt: {
-            greater_than: new Date().toISOString(),
-          },
-        },
-      ],
+      email: {
+        equals: email.toLowerCase().trim(),
+      },
     },
     limit: 1,
     overrideAccess: true,
@@ -43,16 +34,6 @@ export default async function MagicLinkPage({
     redirect('/login')
   }
 
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: {
-      magicLoginToken: null,
-      magicLoginExpiresAt: null,
-    },
-    overrideAccess: true,
-  })
-
   if (user.role === 'coach') {
     redirect('/dashboard/coach')
   }
@@ -61,5 +42,7 @@ export default async function MagicLinkPage({
     redirect('/dashboard/psy')
   }
 
-  redirect('/dashboard/etudiant')
+  if (user.role === 'etudiant') {
+    redirect('/dashboard/student')
+  }
 }

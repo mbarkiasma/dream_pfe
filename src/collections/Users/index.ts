@@ -139,9 +139,9 @@ export const Users: CollectionConfig = {
             process.env.PAYLOAD_PUBLIC_SERVER_URL ||
             'http://localhost:3000'
 
-          const magicLink = `${appUrl}/magic-login/verify?token=${encodeURIComponent(
+            const magicLink = `${appUrl}/auth_magic-link?token=${encodeURIComponent(
             magicLoginToken,
-          )}`
+          )}&redirectTo=${encodeURIComponent(redirectTo)} `
 
           await fetch('http://localhost:5678/webhook/magic-link', {
             method: 'POST',
