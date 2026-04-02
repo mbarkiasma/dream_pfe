@@ -19,6 +19,7 @@ import { SecondBlocAccueil } from '@/blocks/secondBlocAccueil/config'
 import { TroisiemeBlocAccueil } from '@/blocks/thirdBlocAccueil/config'
 import { QuatriemeBlocAccueil } from '@/blocks/quatriemeBlocAccueil/config'
 import { CinquiemeBlocAccueil } from '@/blocks/CinquiemeBlocAccueil/config'
+import { RoleCards } from '@/blocks/RoleCards/config'
 import {
   MetaDescriptionField,
   MetaTitleField,
@@ -90,6 +91,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 TroisiemeBlocAccueil,
                 QuatriemeBlocAccueil,
                 CinquiemeBlocAccueil,
+                RoleCards,
               ],
               required: true,
               admin: {

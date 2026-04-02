@@ -14,6 +14,7 @@ import { SecondBlocAccueilBlock } from '@/blocks/secondBlocAccueil/Component'
 import { TroisiemeBlocAccueilBlock } from '@/blocks/thirdBlocAccueil/Component'
 import { QuatriemeBlocAccueilBlock } from '@/blocks/quatriemeBlocAccueil/Component'
 import { CinquiemeBlocAccueilBlock } from '@/blocks/CinquiemeBlocAccueil/Component'
+import { RoleCardsBlock } from '@/blocks/RoleCards/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -28,6 +29,7 @@ const blockComponents = {
   troisiemeBlocAccueil: TroisiemeBlocAccueilBlock,
   quatriemeBlocAccueil: QuatriemeBlocAccueilBlock,
   cinquiemeBlocAccueil: CinquiemeBlocAccueilBlock,
+  roleCards: RoleCardsBlock,
 }
 
 export const RenderBlocks: React.FC<{

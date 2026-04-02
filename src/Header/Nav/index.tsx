@@ -9,21 +9,25 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
 
   if (!navItems.length) return null
 
-  const mainItems = navItems.slice(0, -2)
-  const loginItem = navItems[navItems.length - 2]
-  const signupItem = navItems[navItems.length - 1]
+  const hasActionButtons = navItems.length >= 2
+
+  const mainItems = hasActionButtons ? navItems.slice(0, -2) : navItems
+  const loginItem = hasActionButtons ? navItems[navItems.length - 2] : null
+  const signupItem = hasActionButtons ? navItems[navItems.length - 1] : null
 
   return (
     <nav className="flex items-center gap-3">
       <div className="hidden items-center gap-8 md:flex">
-        {mainItems.map(({ link }, i) => (
-          <CMSLink
-            key={i}
-            {...link}
-            appearance="link"
-            className="text-[15px] font-medium text-violet-900/80 transition hover:text-violet-600"
-          />
-        ))}
+        {mainItems.map(({ link }, i) =>
+          link ? (
+            <CMSLink
+              key={i}
+              {...link}
+              appearance="link"
+              className="text-[15px] font-medium text-violet-900/80 transition hover:text-violet-600"
+            />
+          ) : null,
+        )}
       </div>
 
       {loginItem?.link && (
@@ -38,7 +42,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
         <CMSLink
           {...signupItem.link}
           appearance="default"
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500 to-violet-400 px-6 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(139,92,246,0.25)] transition hover:from-violet-600 hover:to-violet-500"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(139,92,246,0.25)] transition hover:from-violet-600 hover:to-fuchsia-500"
         />
       )}
     </nav>
