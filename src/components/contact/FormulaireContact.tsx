@@ -1,76 +1,124 @@
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
 export function FormulaireContact() {
   return (
-    <section
+    <Card
       id="formulaire-contact"
-      className="rounded-[32px] border border-white/60 bg-white/75 p-8 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
+      className="card-hover-premium shimmer-wrap rounded-[32px] border border-white/60 bg-white/75 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
+      style={{
+        animation: 'fadeUpSoft 0.85s ease-out 0.12s both',
+      }}
     >
-      <h2 className="text-4xl font-bold text-[#4d2d7b]">Envoyez-nous un message</h2>
+      <CardContent className="p-8">
+        <h2 className="text-4xl font-bold text-[#4d2d7b]">
+          Envoyez-nous un message
+        </h2>
 
-      <form className="mt-8 space-y-4">
-        <input
-          type="text"
-          placeholder="Nom complet"
-          className="h-14 w-full rounded-2xl border border-white/60 bg-white/88 px-4 text-[#4d2d7b] outline-none placeholder:text-[#a290bf]"
-        />
+        <form className="mt-8 space-y-4">
+          <div style={{ animation: 'fadeUpSoft 0.7s ease-out 0.2s both' }}>
+            <Input
+              type="text"
+              placeholder="Nom complet"
+              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+            />
+          </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="h-14 w-full rounded-2xl border border-white/60 bg-white/88 px-4 text-[#4d2d7b] outline-none placeholder:text-[#a290bf]"
-        />
+          <div style={{ animation: 'fadeUpSoft 0.7s ease-out 0.28s both' }}>
+            <Input
+              type="email"
+              placeholder="Email"
+              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+            />
+          </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <input
-            type="text"
-            placeholder="Téléphone"
-            className="h-14 w-full rounded-2xl border border-white/60 bg-white/88 px-4 text-[#4d2d7b] outline-none placeholder:text-[#a290bf]"
-          />
-
-          <select className="h-14 w-full rounded-2xl border border-white/60 bg-white/88 px-4 text-[#4d2d7b] outline-none">
-            <option>Étudiant</option>
-            <option>Psychologue</option>
-            <option>Coach</option>
-            <option>Support</option>
-          </select>
-
-          <select className="h-14 w-full rounded-2xl border border-white/60 bg-white/88 px-4 text-[#4d2d7b] outline-none">
-            <option>Priorité normale</option>
-            <option>Priorité haute</option>
-            <option>Urgent</option>
-          </select>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <select className="h-14 w-full rounded-2xl border border-white/60 bg-white/88 px-4 text-[#4d2d7b] outline-none">
-            <option>Type de demande</option>
-            <option>Journal de rêves</option>
-            <option>Analyse IA</option>
-            <option>Séances</option>
-            <option>Rapports</option>
-            <option>Support technique</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Sujet"
-            className="h-14 w-full rounded-2xl border border-white/60 bg-white/88 px-4 text-[#4d2d7b] outline-none placeholder:text-[#a290bf]"
-          />
-        </div>
-
-        <textarea
-          placeholder="Décrivez votre demande..."
-          className="min-h-[170px] w-full rounded-2xl border border-white/60 bg-white/88 px-4 py-4 text-[#4d2d7b] outline-none placeholder:text-[#a290bf]"
-        />
-
-        <div className="pt-2 text-center">
-          <button
-            type="submit"
-            className="inline-flex min-w-[240px] items-center justify-center rounded-full bg-gradient-to-r from-[#e1a7d9] via-[#b79ef6] to-[#8c90ff] px-8 py-3 font-semibold text-white shadow-[0_10px_30px_rgba(140,144,255,0.28)] transition hover:scale-[1.02]"
+          <div
+            className="grid gap-4 md:grid-cols-3"
+            style={{ animation: 'fadeUpSoft 0.7s ease-out 0.36s both' }}
           >
-            Envoyer la demande
-          </button>
-        </div>
-      </form>
-    </section>
+            <Input
+              type="text"
+              placeholder="Téléphone"
+              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+            />
+
+            <Select>
+              <SelectTrigger className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] focus:ring-[#d7c0ff]/30">
+                <SelectValue placeholder="Profil" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-white/60 bg-white/95 text-[#4d2d7b]">
+                <SelectItem value="etudiant">Étudiant</SelectItem>
+                <SelectItem value="psychologue">Psychologue</SelectItem>
+                <SelectItem value="coach">Coach</SelectItem>
+                <SelectItem value="support">Support</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select>
+              <SelectTrigger className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] focus:ring-[#d7c0ff]/30">
+                <SelectValue placeholder="Priorité" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-white/60 bg-white/95 text-[#4d2d7b]">
+                <SelectItem value="normale">Priorité normale</SelectItem>
+                <SelectItem value="haute">Priorité haute</SelectItem>
+                <SelectItem value="urgent">Urgent</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div
+            className="grid gap-4 md:grid-cols-2"
+            style={{ animation: 'fadeUpSoft 0.7s ease-out 0.44s both' }}
+          >
+            <Select>
+              <SelectTrigger className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] focus:ring-[#d7c0ff]/30">
+                <SelectValue placeholder="Type de demande" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-white/60 bg-white/95 text-[#4d2d7b]">
+                <SelectItem value="journal-reves">Journal de rêves</SelectItem>
+                <SelectItem value="analyse-ia">Analyse IA</SelectItem>
+                <SelectItem value="seances">Séances</SelectItem>
+                <SelectItem value="rapports">Rapports</SelectItem>
+                <SelectItem value="support-technique">Support technique</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Input
+              type="text"
+              placeholder="Sujet"
+              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+            />
+          </div>
+
+          <div style={{ animation: 'fadeUpSoft 0.7s ease-out 0.52s both' }}>
+            <Textarea
+              placeholder="Décrivez votre demande..."
+              className="min-h-[170px] rounded-2xl border-white/60 bg-white/88 py-4 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+            />
+          </div>
+
+          <div
+            className="pt-2 text-center"
+            style={{ animation: 'fadeUpSoft 0.7s ease-out 0.6s both' }}
+          >
+            <Button
+              type="submit"
+              className="anim-pulse-button min-w-[240px] rounded-full bg-gradient-to-r from-[#e1a7d9] via-[#b79ef6] to-[#8c90ff] px-8 py-6 font-semibold text-white shadow-[0_10px_30px_rgba(140,144,255,0.28)] transition duration-300 hover:scale-[1.03] hover:opacity-100"
+            >
+              Envoyer la demande
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
