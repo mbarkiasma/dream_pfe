@@ -1,6 +1,6 @@
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
+import { InterviewChat } from './InterviewChat'
 export default function StudentInterviewPage() {
   return (
     <div>
@@ -17,16 +17,7 @@ export default function StudentInterviewPage() {
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-slate-600">
-                L’entretien IA permettra à l’étudiant de répondre à une série de questions afin de
-                mieux comprendre son profil, son état émotionnel et ses rêves.
-              </p>
-
-              <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
-                  Non commencé
-                </span>
-              </div>
+              <InterviewChat />
             </CardContent>
           </Card>
         </div>

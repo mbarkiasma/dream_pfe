@@ -13,7 +13,6 @@ import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { LoginBlock } from '../../blocks/LoginBlock/config'
-import { EntretienBlock } from "../../blocks/EntretienBlock/config"
 import { LandingHeroBlock } from '@/blocks/HeroBlock/config'
 import { SecondBlocAccueil } from '@/blocks/secondBlocAccueil/config'
 import { TroisiemeBlocAccueil } from '@/blocks/thirdBlocAccueil/config'
@@ -85,7 +84,6 @@ export const Pages: CollectionConfig<'pages'> = {
                 MediaBlock,
                 Archive,
                 FormBlock,
-                EntretienBlock,
                 LandingHeroBlock,
                 SecondBlocAccueil,
                 TroisiemeBlocAccueil,

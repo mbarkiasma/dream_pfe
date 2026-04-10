@@ -70,6 +70,7 @@ export interface Config {
     pages: Page;
     users: User;
     media: Media;
+    'analyse-personnalite': AnalysePersonnalite;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -85,6 +86,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'analyse-personnalite': AnalysePersonnaliteSelect<false> | AnalysePersonnaliteSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -167,12 +169,6 @@ export interface Page {
     | MediaBlock
     | ArchiveBlock
     | FormBlock
-    | {
-        title: string;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'entretienBlock';
-      }
     | {
         title: string;
         description: string;
@@ -659,6 +655,72 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analyse-personnalite".
+ */
+export interface AnalysePersonnalite {
+  id: string;
+  /**
+   * Reference unique de l analyse
+   */
+  reference: string;
+  user: string | User;
+  date: string;
+  niveauConfiance?: ('eleve' | 'moyen' | 'modere') | null;
+  sessionId?: string | null;
+  /**
+   * Historique complet de la conversation
+   */
+  conversation?:
+    | {
+        role: 'ai' | 'human';
+        message: string;
+        time?: string | null;
+        emotion?:
+          | ('joie' | 'anxiete' | 'neutre' | 'frustration' | 'hesitation' | 'confiance' | 'tristesse' | 'enthousiasme')
+          | null;
+        emotionScore?: number | null;
+        source?: ('text' | 'voice') | null;
+        id?: string | null;
+      }[]
+    | null;
+  traits?:
+    | {
+        name: 'Ouverture' | 'Conscienciosite' | 'Extraversion' | 'Agreabilite' | 'Neuroticisme';
+        score: number;
+        analysis?: string | null;
+        interpretation?: string | null;
+        confidence?: ('eleve' | 'moyen' | 'faible') | null;
+        confidenceReason?: string | null;
+        observedIndicators?:
+          | {
+              indicator?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  profilEmotionnel?: {
+    dominantEmotion?: string | null;
+    emotionalStability?: number | null;
+    emotionalSummary?: string | null;
+  };
+  overview?: string | null;
+  forcesDominantes?: string | null;
+  pointsVigilance?: string | null;
+  styleRelationnel?: string | null;
+  recommandations?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  conclusion?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -854,6 +916,10 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
+        relationTo: 'analyse-personnalite';
+        value: string | AnalysePersonnalite;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: string | Redirect;
       } | null)
@@ -939,13 +1005,6 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
-        entretienBlock?:
-          | T
-          | {
-              title?: T;
-              id?: T;
-              blockName?: T;
-            };
         landingHero?:
           | T
           | {
@@ -1194,6 +1253,65 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analyse-personnalite_select".
+ */
+export interface AnalysePersonnaliteSelect<T extends boolean = true> {
+  reference?: T;
+  user?: T;
+  date?: T;
+  niveauConfiance?: T;
+  sessionId?: T;
+  conversation?:
+    | T
+    | {
+        role?: T;
+        message?: T;
+        time?: T;
+        emotion?: T;
+        emotionScore?: T;
+        source?: T;
+        id?: T;
+      };
+  traits?:
+    | T
+    | {
+        name?: T;
+        score?: T;
+        analysis?: T;
+        interpretation?: T;
+        confidence?: T;
+        confidenceReason?: T;
+        observedIndicators?:
+          | T
+          | {
+              indicator?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  profilEmotionnel?:
+    | T
+    | {
+        dominantEmotion?: T;
+        emotionalStability?: T;
+        emotionalSummary?: T;
+      };
+  overview?: T;
+  forcesDominantes?: T;
+  pointsVigilance?: T;
+  styleRelationnel?: T;
+  recommandations?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  conclusion?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

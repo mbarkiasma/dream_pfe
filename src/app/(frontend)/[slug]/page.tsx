@@ -67,21 +67,23 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const { hero, layout } = page
 
+  const isLoginPage = decodedSlug.toLowerCase() === 'login'
+
   return (
-  <article className="min-h-screen bg-[#f3eef8]">
-    <PageClient />
-    <PayloadRedirects disableNotFound url={url} />
+    <article className={isLoginPage ? 'min-h-screen' : 'min-h-screen bg-[#f3eef8]'}>
+      <PageClient />
+      <PayloadRedirects disableNotFound url={url} />
 
-    {draft && <LivePreviewListener />}
+      {draft && <LivePreviewListener />}
 
-    <Header />
+      {!isLoginPage && <Header />}
 
-    {/* <RenderHero {...hero} /> */}
-    <RenderBlocks blocks={layout} />
-    <Footer />
-  </article>
-)
-  
+      {/* <RenderHero {...hero} /> */}
+      <RenderBlocks blocks={layout} />
+
+      {!isLoginPage && <Footer />}
+    </article>
+  )
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {

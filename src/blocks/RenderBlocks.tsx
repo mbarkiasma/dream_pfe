@@ -8,7 +8,6 @@ import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { LoginBlockComponent } from '@/blocks/LoginBlock/Component'
-import EntretienBlockComponent from './EntretienBlock/Component'
 import LandingHeroBlockComponent from '@/blocks/HeroBlock/Component'
 import { SecondBlocAccueilBlock } from '@/blocks/secondBlocAccueil/Component'
 import { TroisiemeBlocAccueilBlock } from '@/blocks/thirdBlocAccueil/Component'
@@ -23,7 +22,6 @@ const blockComponents = {
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
   loginBlock: LoginBlockComponent,
-  entretienBlock: EntretienBlockComponent,
   landingHero: LandingHeroBlockComponent,
   secondBlocAccueil: SecondBlocAccueilBlock,
   troisiemeBlocAccueil: TroisiemeBlocAccueilBlock,
