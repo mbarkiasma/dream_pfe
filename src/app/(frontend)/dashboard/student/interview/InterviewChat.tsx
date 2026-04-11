@@ -21,6 +21,8 @@ export function InterviewChat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
+  const [isInterviewFinished, setIsInterviewFinished] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
   const [messageMicro, setMessageMicro] = useState('')
   const [sessionId] = useState(() => `session-${crypto.randomUUID()}`)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -34,7 +36,7 @@ export function InterviewChat() {
   const handleSend = async () => {
     const texte = message.trim()
 
-    if (!texte || isLoading) return
+    if (!texte || isLoading || isInterviewFinished) return
 
     const conversationLocale = [...messages, { role: 'user' as const, content: texte }]
 
@@ -70,8 +72,12 @@ export function InterviewChat() {
         void audio.play()
       }
 
+      if (data.isFinished) {
+        setIsInterviewFinished(true)
+      }
+
       if (data.isFinished && data.analysisData) {
-        await fetch('/api/save-analysis', {
+        const saveResponse = await fetch('/api/save-analysis', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -89,6 +95,14 @@ export function InterviewChat() {
             analysisData: data.analysisData,
           }),
         })
+
+        const saveData: { error?: string } = await saveResponse.json()
+
+        if (!saveResponse.ok) {
+          throw new Error(saveData.error || "Erreur lors de l'enregistrement de l'analyse.")
+        }
+
+        setIsSaved(true)
       }
     } catch (error) {
       const messageErreur =
@@ -101,7 +115,7 @@ export function InterviewChat() {
   }
 
   const handleToggleRecording = async () => {
-    if (isLoading) return
+    if (isLoading || isInterviewFinished) return
 
     if (isRecording) {
       mediaRecorderRef.current?.stop()
@@ -176,7 +190,13 @@ export function InterviewChat() {
     }
   }
 
-  const etat = isRecording ? 'Micro actif' : isLoading ? 'Traitement en cours' : 'Disponible'
+  const etat = isInterviewFinished
+    ? 'Entretien termine'
+    : isRecording
+      ? 'Micro actif'
+      : isLoading
+        ? 'Traitement en cours'
+        : 'Disponible'
 
   return (
     <div className="space-y-5">
@@ -203,6 +223,11 @@ export function InterviewChat() {
               <div className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-xs font-medium text-slate-700">
                 {messages.length} echange{messages.length > 1 ? 's' : ''}
               </div>
+              {isSaved ? (
+                <div className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-medium text-emerald-700">
+                  Analyse enregistree
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -298,6 +323,14 @@ export function InterviewChat() {
       </section>
 
       <section className="space-y-3">
+        {isInterviewFinished ? (
+          <div className="rounded-[22px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {isSaved
+              ? "L'entretien est termine et l'analyse a ete enregistree dans Payload."
+              : "L'entretien est termine. Aucune nouvelle reponse ne peut etre envoyee."}
+          </div>
+        ) : null}
+
         {messageMicro ? (
           <div className="rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
             {messageMicro}
@@ -309,7 +342,7 @@ export function InterviewChat() {
             <button
               type="button"
               onClick={() => void handleToggleRecording()}
-              disabled={isLoading}
+              disabled={isLoading || isInterviewFinished}
               className={`shrink-0 rounded-full px-4 py-3 text-sm font-medium transition ${
                 isRecording
                   ? 'bg-rose-700 text-white hover:bg-rose-800'
@@ -329,8 +362,13 @@ export function InterviewChat() {
                     void handleSend()
                   }
                 }}
-                placeholder="Ecrivez ici votre reponse, ou utilisez le micro puis corrigez la transcription..."
+                placeholder={
+                  isInterviewFinished
+                    ? "L'entretien est termine."
+                    : 'Ecrivez ici votre reponse, ou utilisez le micro puis corrigez la transcription...'
+                }
                 rows={4}
+                disabled={isInterviewFinished}
                 className="min-h-[96px] w-full resize-none bg-transparent text-sm leading-7 text-slate-800 outline-none placeholder:text-slate-400"
               />
             </div>
@@ -338,10 +376,10 @@ export function InterviewChat() {
             <button
               type="button"
               onClick={() => void handleSend()}
-              disabled={isLoading}
+              disabled={isLoading || isInterviewFinished}
               className="shrink-0 rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {isLoading ? 'Envoi...' : 'Envoyer'}
+              {isInterviewFinished ? 'Termine' : isLoading ? 'Envoi...' : 'Envoyer'}
             </button>
           </div>
 

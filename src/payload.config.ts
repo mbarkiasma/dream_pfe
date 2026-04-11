@@ -127,83 +127,92 @@ export default buildConfig({
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const body = await (req as Request).json()
-        const { sessionId, conversation, analysisData } = body
+        try {
+          const body = await (req as Request).json()
+          const { sessionId, conversation, analysisData } = body
 
-        if (!analysisData) {
-          return Response.json({ error: 'analysisData requis.' }, { status: 400 })
-        }
+          if (!analysisData) {
+            return Response.json({ error: 'analysisData requis.' }, { status: 400 })
+          }
 
-        const analysis = typeof analysisData === 'string' ? JSON.parse(analysisData) : analysisData
-        const traits = Array.isArray(analysis?.traits) ? analysis.traits : []
-        const recs = Array.isArray(analysis?.recommendations)
-          ? analysis.recommendations
-          : []
-        const resumeExecutif = analysis?.executive_summary || {}
-        const donneesProfilEmotionnel = analysis?.emotional_profile || {}
-        const now = new Date()
-        const reference = `BIG5-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Date.now().toString(36).toUpperCase()}`
+          const analysis = typeof analysisData === 'string' ? JSON.parse(analysisData) : analysisData
+          const traits = Array.isArray(analysis?.traits) ? analysis.traits : []
+          const recs = Array.isArray(analysis?.recommendations)
+            ? analysis.recommendations
+            : []
+          const resumeExecutif = analysis?.executive_summary || {}
+          const donneesProfilEmotionnel = analysis?.emotional_profile || {}
+          const now = new Date()
+          const reference = `BIG5-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Date.now().toString(36).toUpperCase()}`
 
-        const doc = await req.payload.create({
-          collection: 'analyse-personnalite',
-          data: {
-            reference: analysis.reference || reference,
-            user: req.user.id,
-            date: now.toISOString(),
-            niveauConfiance: 'moyen',
-            sessionId: sessionId || '',
-            conversation: Array.isArray(conversation)
-              ? conversation.map((msg: any) => ({
-                  role: msg.role || 'human',
-                  message: msg.text || msg.message || '',
-                  time: msg.time || '',
-                  emotion: msg.emotion || null,
-                  emotionScore:
-                    typeof msg.emotionScore === 'number' ? msg.emotionScore : null,
-                  source: msg.source || 'text',
-                }))
-              : [],
-            traits: traits.map((trait: any) => ({
-              name: trait.name,
-              score: Math.max(1, Math.min(10, Number(trait.score || 5))),
-              analysis: trait.analysis || '',
-              interpretation: trait.interpretation || '',
-              confidence: trait.confidence || 'moyen',
-              confidenceReason: trait.confidence_reason || trait.confidenceReason || '',
-              observedIndicators: Array.isArray(trait.observed_indicators)
-                ? trait.observed_indicators.map((indicator: string) => ({
-                    indicator,
+          const doc = await req.payload.create({
+            collection: 'analyse-personnalite',
+            req,
+            data: {
+              reference: analysis.reference || reference,
+              user: req.user.id,
+              date: now.toISOString(),
+              niveauConfiance: 'moyen',
+              sessionId: sessionId || '',
+              conversation: Array.isArray(conversation)
+                ? conversation.map((msg: any) => ({
+                    role: msg.role || 'human',
+                    message: msg.text || msg.message || '',
+                    time: msg.time || '',
+                    emotion: msg.emotion || null,
+                    emotionScore:
+                      typeof msg.emotionScore === 'number' ? msg.emotionScore : null,
+                    source: msg.source || 'text',
                   }))
-                : Array.isArray(trait.observedIndicators)
-                  ? trait.observedIndicators.map((indicator: any) => ({
-                      indicator:
-                        typeof indicator === 'string'
-                          ? indicator
-                          : indicator?.indicator || '',
+                : [],
+              traits: traits.map((trait: any) => ({
+                name: normaliserNomTrait(trait.name),
+                score: Math.max(1, Math.min(10, Number(trait.score || 5))),
+                analysis: trait.analysis || '',
+                interpretation: trait.interpretation || '',
+                confidence: normaliserConfianceTrait(trait.confidence),
+                confidenceReason: trait.confidence_reason || trait.confidenceReason || '',
+                observedIndicators: Array.isArray(trait.observed_indicators)
+                  ? trait.observed_indicators.map((indicator: string) => ({
+                      indicator,
                     }))
-                  : [],
-            })),
-            profilEmotionnel: {
-              dominantEmotion: donneesProfilEmotionnel.dominant_emotion || '',
-              emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
-              emotionalSummary: donneesProfilEmotionnel.emotional_summary || '',
+                  : Array.isArray(trait.observedIndicators)
+                    ? trait.observedIndicators.map((indicator: any) => ({
+                        indicator:
+                          typeof indicator === 'string'
+                            ? indicator
+                            : indicator?.indicator || '',
+                      }))
+                    : [],
+              })),
+              profilEmotionnel: {
+                dominantEmotion: donneesProfilEmotionnel.dominant_emotion || '',
+                emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
+                emotionalSummary: donneesProfilEmotionnel.emotional_summary || '',
+              },
+              overview: resumeExecutif.overview || '',
+              forcesDominantes: resumeExecutif.dominant_strengths || '',
+              pointsVigilance: resumeExecutif.watch_points || '',
+              styleRelationnel: resumeExecutif.relational_style || '',
+              recommandations: recs.map((recommendation: any) => ({
+                text:
+                  typeof recommendation === 'string' ? recommendation : recommendation?.text || '',
+              })),
+              conclusion: analysis?.conclusion || '',
             },
-            overview: resumeExecutif.overview || '',
-            forcesDominantes: resumeExecutif.dominant_strengths || '',
-            pointsVigilance: resumeExecutif.watch_points || '',
-            styleRelationnel: resumeExecutif.relational_style || '',
-            recommandations: recs.map((recommendation: any) => ({
-              text: typeof recommendation === 'string' ? recommendation : recommendation?.text || '',
-            })),
-            conclusion: analysis?.conclusion || '',
-          },
-        })
+          })
 
-        return Response.json({
-          success: true,
-          id: doc.id,
-          reference: doc.reference,
-        })
+          return Response.json({
+            success: true,
+            id: doc.id,
+            reference: doc.reference,
+          })
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Erreur lors de l'enregistrement."
+
+          return Response.json({ error: message }, { status: 500 })
+        }
       },
     },
   ],
@@ -366,4 +375,28 @@ function extraireAnalysisData(n8nData: any): any {
   }
 
   return null
+}
+
+function normaliserNomTrait(nom: string): string {
+  const nomNettoye = (nom || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+  const correspondances: Record<string, string> = {
+    Ouverture: 'Ouverture',
+    Conscienciosite: 'Conscienciosite',
+    Extraversion: 'Extraversion',
+    Agreabilite: 'Agreabilite',
+    Neuroticisme: 'Neuroticisme',
+  }
+
+  return correspondances[nomNettoye] || 'Ouverture'
+}
+
+function normaliserConfianceTrait(confiance: string): 'eleve' | 'moyen' | 'faible' {
+  const valeur = (confiance || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
+  if (valeur === 'eleve' || valeur === 'faible') {
+    return valeur
+  }
+
+  return 'moyen'
 }
