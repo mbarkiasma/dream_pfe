@@ -18,5 +18,19 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'owner',
+      type: 'relationship',
+      relationTo: 'users',
+    },
+    {
+      name: 'dream',
+      type: 'relationship',
+      relationTo: 'dreams',
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+    },
   ],
 }

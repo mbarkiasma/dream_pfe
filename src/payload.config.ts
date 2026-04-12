@@ -2,6 +2,8 @@ import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
+import type { File } from 'payload'
+import { gcsStorage } from '@payloadcms/storage-gcs'
 import { fileURLToPath } from 'url'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
@@ -12,10 +14,19 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { plugins } from './plugins'
 import { AnalysePersonnalite } from './collections/AnalysePersonnalite'
-
+import { Dreams } from './collections/Dreams'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const hasInlineGCSCredentials = Boolean(
+  process.env.GCS_CLIENT_EMAIL && process.env.GCS_PRIVATE_KEY,
+)
+const hasRuntimeGCSCredentials = Boolean(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+const enableMediaGCSStorage = Boolean(
+  process.env.GCS_BUCKET &&
+    process.env.GCS_PROJECT_ID &&
+    (hasInlineGCSCredentials || hasRuntimeGCSCredentials),
+)
 
 export default buildConfig({
   endpoints: [
@@ -215,6 +226,264 @@ export default buildConfig({
         }
       },
     },
+    {
+      path: '/dreams-submit',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const body = await (req as Request).json()
+        const { description } = body
+
+        if (!description || typeof description !== 'string' || !description.trim()) {
+          return Response.json({ error: 'Description requise.' }, { status: 400 })
+        }
+
+        const n8nDreamWebhookUrl = process.env.N8N_DREAM_WEBHOOK_URL?.trim()
+
+        if (!n8nDreamWebhookUrl) {
+          return Response.json({ error: 'N8N_DREAM_WEBHOOK_URL manquante.' }, { status: 500 })
+        }
+
+        const now = new Date()
+        const day = now.getDay()
+        const diffToMonday = day === 0 ? 6 : day - 1
+
+        const startOfWeek = new Date(now)
+        startOfWeek.setDate(now.getDate() - diffToMonday)
+        startOfWeek.setHours(0, 0, 0, 0)
+
+        const dreamsThisWeek = await req.payload.find({
+          collection: 'dreams',
+          user: req.user,
+          overrideAccess: false,
+          where: {
+            and: [
+              {
+                user: {
+                  equals: req.user.id,
+                },
+              },
+              {
+                createdAt: {
+                  greater_than_equal: startOfWeek.toISOString(),
+                },
+              },
+            ],
+          },
+          limit: 0,
+        })
+
+        if (dreamsThisWeek.totalDocs >= 4) {
+          return Response.json(
+            {
+              error: 'Limite atteinte: 4 reves maximum par semaine.',
+              used: dreamsThisWeek.totalDocs,
+              limit: 4,
+            },
+            { status: 429 },
+          )
+        }
+
+        const trimmedDescription = description.trim()
+
+        const dream = await req.payload.create({
+          collection: 'dreams',
+          req,
+          data: {
+            user: req.user.id,
+            description: trimmedDescription,
+            videoStatus: 'pending',
+          },
+        })
+
+        const n8nResponse = await fetch(n8nDreamWebhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dreamId: dream.id,
+            description: trimmedDescription,
+            userId: req.user.id,
+          }),
+        })
+
+        if (!n8nResponse.ok) {
+          await req.payload.update({
+            collection: 'dreams',
+            id: dream.id,
+            req,
+            data: {
+              videoStatus: 'failed',
+              errorMessage: `Erreur n8n (${n8nResponse.status})`,
+            },
+          })
+
+          return Response.json(
+            {
+              error: `Erreur n8n (${n8nResponse.status}).`,
+            },
+            { status: 502 },
+          )
+        }
+
+        const updatedDream = await req.payload.update({
+          collection: 'dreams',
+          id: dream.id,
+          req,
+          data: {
+            videoStatus: 'generating',
+            errorMessage: '',
+          },
+        })
+
+        return Response.json({
+          success: true,
+          message: 'Reve envoye au workflow avec succes.',
+          dreamId: updatedDream.id,
+          videoStatus: updatedDream.videoStatus,
+        })
+      },
+    },
+    {
+      path: '/dreams-video-callback',
+      method: 'post',
+      handler: async (req) => {
+        const secret = process.env.N8N_CALLBACK_SECRET
+        const authHeader = req.headers.get('authorization')
+
+        if (!secret || authHeader !== `Bearer ${secret}`) {
+          return Response.json({ error: 'Unauthorized callback.' }, { status: 401 })
+        }
+
+        const body = await (req as Request).json()
+        const { dreamId, summary, analysis, videoUrl, operationName, status, errorMessage } = body
+
+        if (!dreamId) {
+          return Response.json({ error: 'dreamId requis.' }, { status: 400 })
+        }
+
+        const safeStatus =
+          status === 'ready' || status === 'failed' || status === 'generating'
+            ? status
+            : 'ready'
+
+        const dream = await req.payload.findByID({
+          collection: 'dreams',
+          id: dreamId,
+          depth: 0,
+        })
+
+        const ownerId = typeof dream.user === 'string' ? dream.user : dream.user.id
+        const currentVideoAssetId =
+          dream.videoAsset && typeof dream.videoAsset === 'object'
+            ? dream.videoAsset.id
+            : dream.videoAsset || null
+
+        let uploadedVideoURL: string | undefined
+        let uploadedVideoAssetId: string | undefined
+
+        if (safeStatus === 'ready' && typeof videoUrl === 'string' && videoUrl) {
+          if (currentVideoAssetId) {
+            await req.payload.delete({
+              collection: 'media',
+              id: currentVideoAssetId,
+            })
+          }
+
+          const remoteVideoFile = await fetchRemoteFile({
+            fallbackName: `${dreamId}.mp4`,
+            url: videoUrl,
+          })
+
+          const uploadedVideo = await req.payload.create({
+            collection: 'media',
+            data: {
+              alt: `Video du reve ${dreamId.slice(-6)}`,
+              owner: ownerId,
+              dream: dreamId,
+              sourceUrl: videoUrl,
+            },
+            file: remoteVideoFile,
+            req,
+          })
+
+          uploadedVideoURL = uploadedVideo.url || undefined
+          uploadedVideoAssetId = uploadedVideo.id
+        }
+
+        const updatedDream = await req.payload.update({
+          collection: 'dreams',
+          id: dreamId,
+          req,
+          data: {
+            summary: typeof summary === 'string' ? summary : undefined,
+            analysis: typeof analysis === 'string' ? analysis : undefined,
+            videoUrl: uploadedVideoURL || (typeof videoUrl === 'string' ? videoUrl : undefined),
+            videoAsset: uploadedVideoAssetId,
+            operationName: typeof operationName === 'string' ? operationName : undefined,
+            videoStatus: safeStatus,
+            errorMessage: typeof errorMessage === 'string' ? errorMessage : undefined,
+          },
+        })
+
+        return Response.json({
+          success: true,
+          dreamId: updatedDream.id,
+          videoStatus: updatedDream.videoStatus,
+        })
+      },
+    },
+    {
+      path: '/dreams-delete/:id',
+      method: 'delete',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const dreamId = typeof req.routeParams?.id === 'string' ? req.routeParams.id : undefined
+
+        if (!dreamId) {
+          return Response.json({ error: 'dreamId requis.' }, { status: 400 })
+        }
+
+        const dream = await req.payload.findByID({
+          collection: 'dreams',
+          id: dreamId,
+          user: req.user,
+          overrideAccess: false,
+          depth: 0,
+        })
+
+        const currentVideoAssetId =
+          dream.videoAsset && typeof dream.videoAsset === 'object'
+            ? dream.videoAsset.id
+            : dream.videoAsset || null
+
+        if (typeof currentVideoAssetId === 'string') {
+          await req.payload.delete({
+            collection: 'media',
+            id: currentVideoAssetId,
+            req,
+          })
+        }
+
+        await req.payload.delete({
+          collection: 'dreams',
+          id: dreamId,
+          user: req.user,
+          overrideAccess: false,
+          req,
+        })
+
+        return Response.json({ success: true })
+      },
+    },
+
   ],
 
 
@@ -232,10 +501,30 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
-  collections: [Pages, Users, Media, AnalysePersonnalite],
+  collections: [Pages, Users, Media, AnalysePersonnalite, Dreams],
   globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),
-  plugins,
+  plugins: [
+    ...plugins,
+    gcsStorage({
+      enabled: enableMediaGCSStorage,
+      collections: {
+        media: true,
+      },
+      bucket: process.env.GCS_BUCKET || '',
+      options: {
+        apiEndpoint: process.env.GCS_ENDPOINT || undefined,
+        credentials:
+          process.env.GCS_CLIENT_EMAIL && process.env.GCS_PRIVATE_KEY
+            ? {
+                client_email: process.env.GCS_CLIENT_EMAIL,
+                private_key: process.env.GCS_PRIVATE_KEY.replace(/\\n/g, '\n'),
+              }
+            : undefined,
+        projectId: process.env.GCS_PROJECT_ID,
+      },
+    }),
+  ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
@@ -399,4 +688,31 @@ function normaliserConfianceTrait(confiance: string): 'eleve' | 'moyen' | 'faibl
   }
 
   return 'moyen'
+}
+
+async function fetchRemoteFile({
+  fallbackName,
+  url,
+}: {
+  fallbackName: string
+  url: string
+}): Promise<File> {
+  const response = await fetch(url, {
+    method: 'GET',
+  })
+
+  if (!response.ok) {
+    throw new Error(`Impossible de telecharger la video distante (${response.status}).`)
+  }
+
+  const contentType = response.headers.get('content-type') || 'video/mp4'
+  const arrayBuffer = await response.arrayBuffer()
+  const fileNameFromURL = url.split('/').pop()?.split('?')[0]
+
+  return {
+    name: fileNameFromURL || fallbackName,
+    data: Buffer.from(arrayBuffer),
+    mimetype: contentType,
+    size: arrayBuffer.byteLength,
+  }
 }

@@ -71,6 +71,7 @@ export interface Config {
     users: User;
     media: Media;
     'analyse-personnalite': AnalysePersonnalite;
+    dreams: Dream;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -87,6 +88,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'analyse-personnalite': AnalysePersonnaliteSelect<false> | AnalysePersonnaliteSelect<true>;
+    dreams: DreamsSelect<false> | DreamsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -611,6 +613,9 @@ export interface Form {
 export interface Media {
   id: string;
   alt: string;
+  owner?: (string | null) | User;
+  dream?: (string | null) | Dream;
+  sourceUrl?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -652,6 +657,24 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dreams".
+ */
+export interface Dream {
+  id: string;
+  user: string | User;
+  description: string;
+  summary?: string | null;
+  analysis?: string | null;
+  videoStatus: 'pending' | 'generating' | 'ready' | 'failed';
+  videoUrl?: string | null;
+  videoAsset?: (string | null) | Media;
+  operationName?: string | null;
+  errorMessage?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -918,6 +941,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'analyse-personnalite';
         value: string | AnalysePersonnalite;
+      } | null)
+    | ({
+        relationTo: 'dreams';
+        value: string | Dream;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1242,6 +1269,9 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  owner?: T;
+  dream?: T;
+  sourceUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1310,6 +1340,23 @@ export interface AnalysePersonnaliteSelect<T extends boolean = true> {
         id?: T;
       };
   conclusion?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dreams_select".
+ */
+export interface DreamsSelect<T extends boolean = true> {
+  user?: T;
+  description?: T;
+  summary?: T;
+  analysis?: T;
+  videoStatus?: T;
+  videoUrl?: T;
+  videoAsset?: T;
+  operationName?: T;
+  errorMessage?: T;
   updatedAt?: T;
   createdAt?: T;
 }
