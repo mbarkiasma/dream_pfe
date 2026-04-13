@@ -1,10 +1,13 @@
 import { getPayload } from 'payload'
 import config from '../../src/payload.config.js'
 
-export const testUser = {
-  email: 'dev@payloadcms.com',
-  password: 'test',
-}
+export const testUser = Object.freeze({
+  firstName: 'Test',
+  lastName: 'User',
+  role: 'etudiant' as const,
+  email: 'dev+e2e@payloadcms.com',
+  password: 'TestUser123!',
+})
 
 /**
  * Seeds a test user for e2e admin tests.
@@ -12,7 +15,7 @@ export const testUser = {
 export async function seedTestUser(): Promise<void> {
   const payload = await getPayload({ config })
 
-  // Delete existing test user if any
+  // Start from a clean state so tests stay deterministic.
   await payload.delete({
     collection: 'users',
     where: {
@@ -22,7 +25,6 @@ export async function seedTestUser(): Promise<void> {
     },
   })
 
-  // Create fresh test user
   await payload.create({
     collection: 'users',
     data: testUser,
