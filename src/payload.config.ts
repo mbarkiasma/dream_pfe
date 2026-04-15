@@ -299,6 +299,9 @@ export default buildConfig({
           },
         })
 
+        const callbackSecret = process.env.N8N_CALLBACK_SECRET?.trim()
+        const callbackUrl = `${getServerSideURL()}/api/dreams-video-callback`
+
         const n8nResponse = await fetch(n8nDreamWebhookUrl, {
           method: 'POST',
           headers: {
@@ -306,8 +309,13 @@ export default buildConfig({
           },
           body: JSON.stringify({
             dreamId: dream.id,
+            dream: trimmedDescription,
             description: trimmedDescription,
+            text: trimmedDescription,
+            input: trimmedDescription,
             userId: req.user.id,
+            callbackUrl,
+            callbackSecret,
           }),
         })
 

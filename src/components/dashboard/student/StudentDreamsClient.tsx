@@ -61,6 +61,22 @@ function getStatusCopy(status: Dream['videoStatus']) {
   }
 }
 
+function getAnalysisCopy(dream: Dream) {
+  if (dream.analysis?.trim()) {
+    return dream.analysis.trim()
+  }
+
+  if (dream.videoStatus === 'failed') {
+    return "L'analyse n'a pas pu etre generee pour ce reve. Vous pouvez en relancer un autre quand vous voulez."
+  }
+
+  if (dream.videoStatus === 'ready') {
+    return "L'analyse n'est pas encore disponible pour ce reve."
+  }
+
+  return 'Aucune analyse disponible pour le moment.'
+}
+
 export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) {
   const router = useRouter()
   const [description, setDescription] = useState('')
@@ -359,7 +375,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                           <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-4">
                             <p className="text-sm font-semibold text-slate-800">Analyse</p>
                             <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">
-                              {dream.analysis || dream.errorMessage || 'Aucune analyse disponible pour le moment.'}
+                              {getAnalysisCopy(dream)}
                             </p>
                           </div>
                         </div>

@@ -97,7 +97,7 @@ export const LoginBlockComponent = (props: Props) => {
     setLoading(true)
 
     try {
-      const res = await fetch("/api/users/magic-link-request", {
+      const response = await fetch("/api/users/magic-link-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,9 +109,11 @@ export const LoginBlockComponent = (props: Props) => {
         }),
       })
 
-      const data = await res.json()
+      const data = (await response.json().catch(() => null)) as
+        | { message?: string }
+        | null
 
-      if (!res.ok) {
+      if (!response.ok) {
         setErrorMessage(data?.message || "Erreur lors de l'envoi du lien.")
         return
       }

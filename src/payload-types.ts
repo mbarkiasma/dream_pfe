@@ -634,8 +634,8 @@ export interface Media {
  */
 export interface User {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string | null;
+  lastName?: string | null;
   role: 'etudiant' | 'coach' | 'psy';
   magicLoginToken?: string | null;
   magicLoginExpiresAt?: string | null;
