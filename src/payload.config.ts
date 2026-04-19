@@ -1,4 +1,4 @@
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -27,9 +27,30 @@ const enableMediaGCSStorage = Boolean(
     process.env.GCS_PROJECT_ID &&
     (hasInlineGCSCredentials || hasRuntimeGCSCredentials),
 )
+const databaseURL = process.env.DATABASE_URL || ''
+const sanitizedDatabaseURL = (() => {
+  if (!databaseURL) return ''
+
+  try {
+    const url = new URL(databaseURL)
+    url.searchParams.delete('sslmode')
+    url.searchParams.delete('ssl')
+    url.searchParams.delete('sslcert')
+    url.searchParams.delete('sslkey')
+    url.searchParams.delete('sslrootcert')
+    return url.toString()
+  } catch {
+    return databaseURL
+  }
+})()
+const databaseRequiresSSL =
+  /supabase\.com/i.test(databaseURL) ||
+  /sslmode=require/i.test(databaseURL) ||
+  /[?&]ssl=true/i.test(databaseURL)
 
 export default buildConfig({
   endpoints: [
+    // Gere le chat d'entretien, la transcription audio et les reponses IA en temps reel.
     {
       path: '/chat',
       method: 'post',
@@ -130,6 +151,7 @@ export default buildConfig({
         })
       },
     },
+    // Enregistre le rapport final d'analyse de personnalite genere apres la conversation.
     {
       path: '/save-analysis',
       method: 'post',
@@ -226,6 +248,7 @@ export default buildConfig({
         }
       },
     },
+    // Cree un reve, l'envoie au workflow n8n d'analyse et initialise son statut.
     {
       path: '/dreams-submit',
       method: 'post',
@@ -338,12 +361,27 @@ export default buildConfig({
           )
         }
 
+        let n8nData: any = {}
+
+        try {
+          n8nData = await n8nResponse.json()
+        } catch {
+          n8nData = {}
+        }
+
+        const summary = typeof n8nData?.summary === 'string' ? n8nData.summary.trim() : ''
+        const analysis = typeof n8nData?.output === 'string' ? n8nData.output.trim() : ''
+        const videoStatus =
+          n8nData?.videoStatus === 'waiting_validation' ? 'waiting_validation' : 'pending'
+
         const updatedDream = await req.payload.update({
           collection: 'dreams',
           id: dream.id,
           req,
           data: {
-            videoStatus: 'generating',
+            summary,
+            analysis,
+            videoStatus,
             errorMessage: '',
           },
         })
@@ -353,9 +391,12 @@ export default buildConfig({
           message: 'Reve envoye au workflow avec succes.',
           dreamId: updatedDream.id,
           videoStatus: updatedDream.videoStatus,
+          summary: updatedDream.summary,
+          analysis: updatedDream.analysis,
         })
       },
     },
+    // Recoit le retour de n8n apres generation video pour mettre a jour le reve et les medias.
     {
       path: '/dreams-video-callback',
       method: 'post',
@@ -368,12 +409,37 @@ export default buildConfig({
         }
 
         const body = await (req as Request).json()
-        const { dreamId, summary, analysis, videoUrl, operationName, status, errorMessage } = body
+        const {
+          dreamId,
+          summary,
+          analysis,
+          videoUrl,
+          video_url,
+          gcsUri,
+          gcs_uri,
+          videos,
+          operationName,
+          operation_name,
+          status,
+          errorMessage,
+          error_message,
+        } = body
 
         if (!dreamId) {
           return Response.json({ error: 'dreamId requis.' }, { status: 400 })
         }
 
+        const rawVideoSource =
+          getFirstString(videoUrl) ||
+          getFirstString(video_url) ||
+          getFirstString(gcsUri) ||
+          getFirstString(gcs_uri) ||
+          getFirstString(videos?.[0]?.videoUrl) ||
+          getFirstString(videos?.[0]?.video_url) ||
+          getFirstString(videos?.[0]?.gcsUri) ||
+          getFirstString(videos?.[0]?.gcs_uri)
+        const playableVideoURL = rawVideoSource ? normalizeVideoSourceURL(rawVideoSource) : undefined
+        const normalizedDreamId = Number.isFinite(Number(dreamId)) ? Number(dreamId) : dreamId
         const safeStatus =
           status === 'ready' || status === 'failed' || status === 'generating'
             ? status
@@ -381,60 +447,77 @@ export default buildConfig({
 
         const dream = await req.payload.findByID({
           collection: 'dreams',
-          id: dreamId,
+          id: normalizedDreamId,
           depth: 0,
         })
 
-        const ownerId = typeof dream.user === 'string' ? dream.user : dream.user.id
+        const ownerId = typeof dream.user === 'object' ? dream.user.id : dream.user
         const currentVideoAssetId =
           dream.videoAsset && typeof dream.videoAsset === 'object'
             ? dream.videoAsset.id
             : dream.videoAsset || null
 
         let uploadedVideoURL: string | undefined
-        let uploadedVideoAssetId: string | undefined
+        let uploadedVideoAssetId: number | undefined
+        let uploadErrorMessage: string | undefined
 
-        if (safeStatus === 'ready' && typeof videoUrl === 'string' && videoUrl) {
-          if (currentVideoAssetId) {
-            await req.payload.delete({
-              collection: 'media',
-              id: currentVideoAssetId,
+        if (safeStatus === 'ready' && playableVideoURL?.startsWith('http')) {
+          try {
+            if (currentVideoAssetId) {
+              await req.payload.delete({
+                collection: 'media',
+                id: currentVideoAssetId,
+                req,
+              })
+            }
+
+            const remoteVideoFile = await fetchRemoteFile({
+              fallbackName: `${normalizedDreamId}.mp4`,
+              url: playableVideoURL,
             })
+
+            const uploadedVideo = await req.payload.create({
+              collection: 'media',
+              data: {
+                alt: `Video du reve ${normalizedDreamId}`,
+                owner: ownerId,
+                dream: normalizedDreamId,
+                sourceUrl: rawVideoSource,
+              },
+              file: remoteVideoFile,
+              req,
+            })
+
+            uploadedVideoURL = uploadedVideo.url || undefined
+            uploadedVideoAssetId = uploadedVideo.id
+          } catch (error) {
+            uploadErrorMessage =
+              error instanceof Error ? error.message : 'Impossible de sauvegarder la video dans Media.'
           }
-
-          const remoteVideoFile = await fetchRemoteFile({
-            fallbackName: `${dreamId}.mp4`,
-            url: videoUrl,
-          })
-
-          const uploadedVideo = await req.payload.create({
-            collection: 'media',
-            data: {
-              alt: `Video du reve ${dreamId.slice(-6)}`,
-              owner: ownerId,
-              dream: dreamId,
-              sourceUrl: videoUrl,
-            },
-            file: remoteVideoFile,
-            req,
-          })
-
-          uploadedVideoURL = uploadedVideo.url || undefined
-          uploadedVideoAssetId = uploadedVideo.id
         }
 
         const updatedDream = await req.payload.update({
           collection: 'dreams',
-          id: dreamId,
+          id: normalizedDreamId,
           req,
           data: {
             summary: typeof summary === 'string' ? summary : undefined,
             analysis: typeof analysis === 'string' ? analysis : undefined,
-            videoUrl: uploadedVideoURL || (typeof videoUrl === 'string' ? videoUrl : undefined),
+            videoUrl: uploadedVideoURL || playableVideoURL || rawVideoSource,
             videoAsset: uploadedVideoAssetId,
-            operationName: typeof operationName === 'string' ? operationName : undefined,
+            operationName:
+              typeof operationName === 'string'
+                ? operationName
+                : typeof operation_name === 'string'
+                  ? operation_name
+                  : undefined,
             videoStatus: safeStatus,
-            errorMessage: typeof errorMessage === 'string' ? errorMessage : undefined,
+            errorMessage:
+              typeof errorMessage === 'string'
+                ? errorMessage
+                : typeof error_message === 'string'
+                  ? error_message
+                  : uploadErrorMessage,
           },
         })
 
@@ -445,6 +528,207 @@ export default buildConfig({
         })
       },
     },
+    // Valide le resume d'un reve puis declenche le workflow n8n de generation video.
+    {
+      path: '/dreams-validate/:id',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const dreamId = typeof req.routeParams?.id === 'string' ? req.routeParams.id : undefined
+
+        if (!dreamId) {
+          return Response.json({ error: 'dreamId requis.' }, { status: 400 })
+        }
+
+        const dream = await req.payload.findByID({
+          collection: 'dreams',
+          id: dreamId,
+          depth: 0,
+        })
+
+        const ownerId = typeof dream.user === 'object' ? dream.user.id : dream.user
+
+        if (ownerId !== req.user.id) {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
+        if (dream.videoStatus !== 'waiting_validation') {
+          return Response.json(
+            { error: 'Ce reve n’est pas en attente de validation.' },
+            { status: 400 },
+          )
+        }
+
+        const n8nDreamVideoStartUrl = process.env.N8N_DREAM_VIDEO_START_URL?.trim()
+
+        if (!n8nDreamVideoStartUrl) {
+          return Response.json(
+            { error: 'N8N_DREAM_VIDEO_START_URL manquante.' },
+            { status: 500 },
+          )
+        }
+
+        const summary = typeof dream.summary === 'string' ? dream.summary.trim() : ''
+
+        if (!summary) {
+          return Response.json(
+            { error: 'Aucun resume valide disponible pour lancer la video.' },
+            { status: 400 },
+          )
+        }
+
+        const callbackSecret = process.env.N8N_CALLBACK_SECRET?.trim()
+        const callbackUrl = `${getServerSideURL()}/api/dreams-video-callback`
+
+        const n8nResponse = await fetch(n8nDreamVideoStartUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dreamId: dream.id,
+            summary,
+            callbackUrl,
+            callbackSecret,
+          }),
+        })
+
+        if (!n8nResponse.ok) {
+          return Response.json(
+            { error: `Erreur n8n video (${n8nResponse.status}).` },
+            { status: 502 },
+          )
+        }
+
+        const updatedDream = await req.payload.update({
+          collection: 'dreams',
+          id: dreamId,
+          req,
+          data: {
+            videoStatus: 'generating',
+            errorMessage: '',
+          },
+        })
+
+        return Response.json({
+          success: true,
+          dreamId: updatedDream.id,
+          videoStatus: updatedDream.videoStatus,
+        })
+      },
+    },
+        // Regenere une nouvelle analyse et un nouveau resume pour un reve non encore valide.
+    {
+      path: '/dreams-regenerate/:id',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const dreamId = typeof req.routeParams?.id === 'string' ? req.routeParams.id : undefined
+
+        if (!dreamId) {
+          return Response.json({ error: 'dreamId requis.' }, { status: 400 })
+        }
+
+        const dream = await req.payload.findByID({
+          collection: 'dreams',
+          id: dreamId,
+          depth: 0,
+        })
+
+        const ownerId = typeof dream.user === 'object' ? dream.user.id : dream.user
+
+        if (ownerId !== req.user.id) {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
+        if (dream.videoStatus !== 'waiting_validation') {
+          return Response.json(
+            { error: 'Ce reve ne peut pas etre regenere dans son etat actuel.' },
+            { status: 400 },
+          )
+        }
+
+        const n8nDreamWebhookUrl = process.env.N8N_DREAM_WEBHOOK_URL?.trim()
+
+        if (!n8nDreamWebhookUrl) {
+          return Response.json({ error: 'N8N_DREAM_WEBHOOK_URL manquante.' }, { status: 500 })
+        }
+
+        const description = typeof dream.description === 'string' ? dream.description.trim() : ''
+
+        if (!description) {
+          return Response.json({ error: 'Description du reve introuvable.' }, { status: 400 })
+        }
+
+        const callbackSecret = process.env.N8N_CALLBACK_SECRET?.trim()
+        const callbackUrl = `${getServerSideURL()}/api/dreams-video-callback`
+
+        const n8nResponse = await fetch(n8nDreamWebhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dreamId: dream.id,
+            dream: description,
+            description,
+            text: description,
+            input: description,
+            userId: req.user.id,
+            callbackUrl,
+            callbackSecret,
+          }),
+        })
+
+        if (!n8nResponse.ok) {
+          return Response.json(
+            { error: `Erreur n8n (${n8nResponse.status}).` },
+            { status: 502 },
+          )
+        }
+
+        let n8nData: any = {}
+
+        try {
+          n8nData = await n8nResponse.json()
+        } catch {
+          n8nData = {}
+        }
+
+        const summary = typeof n8nData?.summary === 'string' ? n8nData.summary.trim() : ''
+        const analysis = typeof n8nData?.output === 'string' ? n8nData.output.trim() : ''
+        const videoStatus =
+          n8nData?.videoStatus === 'waiting_validation' ? 'waiting_validation' : 'pending'
+
+        const updatedDream = await req.payload.update({
+          collection: 'dreams',
+          id: dreamId,
+          req,
+          data: {
+            summary,
+            analysis,
+            videoStatus,
+            errorMessage: '',
+          },
+        })
+
+        return Response.json({
+          success: true,
+          dreamId: updatedDream.id,
+          videoStatus: updatedDream.videoStatus,
+          summary: updatedDream.summary,
+          analysis: updatedDream.analysis,
+        })
+      },
+    },
+
+    // Supprime un reve de l'etudiant ainsi que la video associee si elle existe.
     {
       path: '/dreams-delete/:id',
       method: 'delete',
@@ -472,7 +756,7 @@ export default buildConfig({
             ? dream.videoAsset.id
             : dream.videoAsset || null
 
-        if (typeof currentVideoAssetId === 'string') {
+        if (currentVideoAssetId) {
           await req.payload.delete({
             collection: 'media',
             id: currentVideoAssetId,
@@ -506,8 +790,13 @@ export default buildConfig({
     user: Users.slug,
   },
   editor: defaultLexical,
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URL || '',
+  db: postgresAdapter({
+    blocksAsJSON: true,
+    pool: {
+      connectionString: sanitizedDatabaseURL,
+      ssl: databaseRequiresSSL ? { rejectUnauthorized: false } : undefined,
+    },
+    push: process.env.NODE_ENV !== 'production',
   }),
   collections: [Pages, Users, Media, AnalysePersonnalite, Dreams],
   globals: [Header, Footer],
@@ -696,6 +985,39 @@ function normaliserConfianceTrait(confiance: string): 'eleve' | 'moyen' | 'faibl
   }
 
   return 'moyen'
+}
+
+function getFirstString(value: unknown): string | undefined {
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim()
+  }
+
+  if (Array.isArray(value)) {
+    return value.find((item): item is string => typeof item === 'string' && item.trim().length > 0)?.trim()
+  }
+
+  return undefined
+}
+
+function normalizeVideoSourceURL(source: string): string {
+  if (!source.startsWith('gs://')) {
+    return source
+  }
+
+  const withoutProtocol = source.slice('gs://'.length)
+  const slashIndex = withoutProtocol.indexOf('/')
+
+  if (slashIndex === -1) {
+    return source
+  }
+
+  const bucket = withoutProtocol.slice(0, slashIndex)
+  const objectPath = withoutProtocol.slice(slashIndex + 1)
+
+  return `https://storage.googleapis.com/${bucket}/${objectPath
+    .split('/')
+    .map((part) => encodeURIComponent(part))
+    .join('/')}`
 }
 
 async function fetchRemoteFile({

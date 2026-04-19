@@ -100,7 +100,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {
@@ -150,7 +150,7 @@ export interface UserAuthOperations {
  * via the `definition` "pages".
  */
 export interface Page {
-  id: string;
+  id: number;
   title: string;
   layout: (
     | {
@@ -253,7 +253,7 @@ export interface Page {
           | {
               title: string;
               description: string;
-              icon?: (string | null) | Media;
+              icon?: (number | null) | Media;
               link: string;
               id?: string | null;
             }[]
@@ -304,7 +304,7 @@ export interface CallToActionBlock {
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -349,7 +349,7 @@ export interface ContentBlock {
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -399,7 +399,7 @@ export interface ArchiveBlock {
   selectedDocs?:
     | {
         relationTo: 'pages';
-        value: string | Page;
+        value: number | Page;
       }[]
     | null;
   id?: string | null;
@@ -411,7 +411,7 @@ export interface ArchiveBlock {
  * via the `definition` "FormBlock".
  */
 export interface FormBlock {
-  form: string | Form;
+  form: number | Form;
   enableIntro?: boolean | null;
   introContent?: {
     root: {
@@ -437,7 +437,7 @@ export interface FormBlock {
  * via the `definition` "forms".
  */
 export interface Form {
-  id: string;
+  id: number;
   title: string;
   fields?:
     | (
@@ -611,10 +611,10 @@ export interface Form {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
-  owner?: (string | null) | User;
-  dream?: (string | null) | Dream;
+  owner?: (number | null) | User;
+  dream?: (number | null) | Dream;
   sourceUrl?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -633,7 +633,7 @@ export interface Media {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   firstName?: string | null;
   lastName?: string | null;
   role: 'etudiant' | 'coach' | 'psy';
@@ -663,14 +663,14 @@ export interface User {
  * via the `definition` "dreams".
  */
 export interface Dream {
-  id: string;
-  user: string | User;
+  id: number;
+  user: number | User;
   description: string;
   summary?: string | null;
   analysis?: string | null;
-  videoStatus: 'pending' | 'generating' | 'ready' | 'failed';
+  videoStatus: 'pending' | 'waiting_validation' | 'generating' | 'ready' | 'failed';
   videoUrl?: string | null;
-  videoAsset?: (string | null) | Media;
+  videoAsset?: (number | null) | Media;
   operationName?: string | null;
   errorMessage?: string | null;
   updatedAt: string;
@@ -681,12 +681,12 @@ export interface Dream {
  * via the `definition` "analyse-personnalite".
  */
 export interface AnalysePersonnalite {
-  id: string;
+  id: number;
   /**
    * Reference unique de l analyse
    */
   reference: string;
-  user: string | User;
+  user: number | User;
   date: string;
   niveauConfiance?: ('eleve' | 'moyen' | 'modere') | null;
   sessionId?: string | null;
@@ -747,7 +747,7 @@ export interface AnalysePersonnalite {
  * via the `definition` "redirects".
  */
 export interface Redirect {
-  id: string;
+  id: number;
   /**
    * You will need to rebuild the website when changing this field.
    */
@@ -756,7 +756,7 @@ export interface Redirect {
     type?: ('reference' | 'custom') | null;
     reference?: {
       relationTo: 'pages';
-      value: string | Page;
+      value: number | Page;
     } | null;
     url?: string | null;
   };
@@ -768,8 +768,8 @@ export interface Redirect {
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
-  id: string;
-  form: string | Form;
+  id: number;
+  form: number | Form;
   submissionData?:
     | {
         field: string;
@@ -787,12 +787,12 @@ export interface FormSubmission {
  * via the `definition` "search".
  */
 export interface Search {
-  id: string;
+  id: number;
   title?: string | null;
   priority?: number | null;
   doc: {
     relationTo: 'pages';
-    value: string | Page;
+    value: number | Page;
   };
   slug?: string | null;
   meta?: {
@@ -815,7 +815,7 @@ export interface Search {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -832,7 +832,7 @@ export interface PayloadKv {
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
-  id: string;
+  id: number;
   /**
    * Input data provided to the job
    */
@@ -924,48 +924,48 @@ export interface PayloadJob {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'pages';
-        value: string | Page;
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'analyse-personnalite';
-        value: string | AnalysePersonnalite;
+        value: number | AnalysePersonnalite;
       } | null)
     | ({
         relationTo: 'dreams';
-        value: string | Dream;
+        value: number | Dream;
       } | null)
     | ({
         relationTo: 'redirects';
-        value: string | Redirect;
+        value: number | Redirect;
       } | null)
     | ({
         relationTo: 'forms';
-        value: string | Form;
+        value: number | Form;
       } | null)
     | ({
         relationTo: 'form-submissions';
-        value: string | FormSubmission;
+        value: number | FormSubmission;
       } | null)
     | ({
         relationTo: 'search';
-        value: string | Search;
+        value: number | Search;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -975,10 +975,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -998,7 +998,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -1627,7 +1627,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "header".
  */
 export interface Header {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -1635,7 +1635,7 @@ export interface Header {
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -1651,7 +1651,7 @@ export interface Header {
  * via the `definition` "footer".
  */
 export interface Footer {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -1659,7 +1659,7 @@ export interface Footer {
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -1736,10 +1736,10 @@ export interface TaskSchedulePublish {
     locale?: string | null;
     doc?: {
       relationTo: 'pages';
-      value: string | Page;
+      value: number | Page;
     } | null;
     global?: string | null;
-    user?: (string | null) | User;
+    user?: (number | null) | User;
   };
   output?: unknown;
 }

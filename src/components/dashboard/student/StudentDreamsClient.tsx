@@ -1,14 +1,27 @@
-'use client'
+﻿'use client'
 
-import { useDeferredValue, useState, useTransition } from 'react'
-import { Loader2, Plus, Search, Sparkles, Trash2, Video, Wand2 } from 'lucide-react'
+import { useDeferredValue, useEffect, useState, useTransition } from 'react'
+import {
+  CheckCircle2,
+  Clock3,
+  ExternalLink,
+  Loader2,
+  Moon,
+  Plus,
+  RefreshCw,
+  Search,
+  Sparkles,
+  Trash2,
+  Video,
+  Wand2,
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-import type { Dream } from '@/payload-types'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import type { Dream } from '@/payload-types'
 
 type Props = {
   dreams: Dream[]
@@ -37,25 +50,41 @@ function getStatusCopy(status: Dream['videoStatus']) {
     case 'ready':
       return {
         label: 'Pret',
-        badgeClass: 'bg-emerald-100 text-emerald-700',
+        icon: CheckCircle2,
+        badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+        dotClass: 'bg-emerald-400',
         description: 'La video et le resume sont disponibles.',
       }
     case 'failed':
       return {
         label: 'Echec',
-        badgeClass: 'bg-rose-100 text-rose-700',
+        icon: RefreshCw,
+        badgeClass: 'border-rose-200 bg-rose-50 text-rose-700',
+        dotClass: 'bg-rose-400',
         description: "La generation n'a pas abouti. Vous pouvez relancer un autre reve.",
       }
     case 'generating':
       return {
         label: 'Generation',
-        badgeClass: 'bg-amber-100 text-amber-700',
+        icon: Loader2,
+        badgeClass: 'border-amber-200 bg-amber-50 text-amber-700',
+        dotClass: 'bg-amber-400',
         description: 'Le workflow video est en cours de traitement.',
+      }
+    case 'waiting_validation':
+      return {
+        label: 'A valider',
+        icon: Clock3,
+        badgeClass: 'border-sky-200 bg-sky-50 text-sky-700',
+        dotClass: 'bg-sky-400',
+        description: 'Le resume attend votre validation avant la generation video.',
       }
     default:
       return {
         label: 'En attente',
-        badgeClass: 'bg-slate-100 text-slate-600',
+        icon: Clock3,
+        badgeClass: 'border-slate-200 bg-slate-50 text-slate-600',
+        dotClass: 'bg-slate-400',
         description: 'Le reve est en file avant generation.',
       }
   }
@@ -83,8 +112,24 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   const [query, setQuery] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
+  const [expandedAnalyses, setExpandedAnalyses] = useState<Record<string, boolean>>({})
   const [pending, startTransition] = useTransition()
   const deferredQuery = useDeferredValue(query)
+  const hasDreamInProgress = dreams.some((dream) =>
+    dream.videoStatus === 'pending' || dream.videoStatus === 'generating',
+  )
+
+  useEffect(() => {
+    if (!hasDreamInProgress) {
+      return
+    }
+
+    const interval = window.setInterval(() => {
+      router.refresh()
+    }, 5000)
+
+    return () => window.clearInterval(interval)
+  }, [hasDreamInProgress, router])
 
   const remaining = Math.max(weeklyLimit - weeklyUsed, 0)
   const normalizedQuery = deferredQuery.trim().toLowerCase()
@@ -146,7 +191,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
     })
   }
 
-  function deleteDream(id: string) {
+  function deleteDream(id: string | number) {
     setError('')
     setFeedback('')
 
@@ -165,29 +210,95 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
         setFeedback('Le reve a ete supprime de votre journal.')
         router.refresh()
       } catch {
-        setError("Une erreur reseau est survenue pendant la suppression.")
+        setError('Une erreur reseau est survenue pendant la suppression.')
       }
     })
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_12px_32px_rgba(148,163,184,0.14)]">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-2xl text-slate-800">
-              <Wand2 className="h-6 w-6 text-violet-500" />
-              Nouveau reve
-            </CardTitle>
-          </CardHeader>
+  function validateDream(id: string | number) {
+    setError('')
+    setFeedback('')
 
-          <CardContent>
-            <form onSubmit={submitDream} className="space-y-4">
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/dreams-validate/${id}`, {
+          method: 'POST',
+        })
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => null)
+          setError(data?.message || data?.error || 'Validation impossible pour le moment.')
+          return
+        }
+
+        setFeedback('Resume valide. La generation video va commencer.')
+        router.refresh()
+      } catch {
+        setError('Une erreur reseau est survenue pendant la validation.')
+      }
+    })
+  }
+
+  function regenerateDream(id: string | number) {
+    setError('')
+    setFeedback('')
+
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/dreams-regenerate/${id}`, {
+          method: 'POST',
+        })
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => null)
+          setError(data?.message || data?.error || 'Regeneration impossible pour le moment.')
+          return
+        }
+
+        setFeedback('Une nouvelle analyse et un nouveau resume sont en cours de generation.')
+        router.refresh()
+      } catch {
+        setError('Une erreur reseau est survenue pendant la regeneration.')
+      }
+    })
+  }
+
+  function toggleAnalysis(id: string | number) {
+    setExpandedAnalyses((current) => ({
+      ...current,
+      [String(id)]: !current[String(id)],
+    }))
+  }
+
+  return (
+    <div className="space-y-8">
+      <section className="relative overflow-hidden rounded-[38px] border border-white/80 bg-[linear-gradient(135deg,#ffffff_0%,#eef6ff_42%,#f4edff_100%)] p-5 text-slate-900 shadow-[0_24px_70px_rgba(148,163,184,0.18)] md:p-7">
+        <div className="pointer-events-none absolute -left-16 top-12 h-56 w-56 rounded-full bg-cyan-200/40 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 -top-16 h-72 w-72 rounded-full bg-violet-200/45 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-40 w-72 rounded-full bg-sky-200/35 blur-3xl" />
+
+        <div className="relative grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)]">
+          <div className="flex flex-col justify-between rounded-[30px] border border-white/80 bg-white/75 p-5 md:p-6">
+            <div>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700">
+                <Moon className="h-3.5 w-3.5" />
+                Journal de reves
+              </div>
+
+              <h2 className="max-w-2xl text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-900 md:text-4xl">
+                Racontez votre reve, puis validez son resume.
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
+                Decrivez simplement ce dont vous vous souvenez. L'application prepare un resume et une analyse, puis lance la video apres votre validation.
+              </p>
+            </div>
+
+            <form onSubmit={submitDream} className="mt-7 space-y-4">
               <Textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Racontez votre reve avec assez de details pour generer un resume et une video."
-                className="min-h-[150px] rounded-[24px] border-white/60 bg-slate-50/80 px-5 py-4 text-sm leading-7 text-slate-700"
+                placeholder="Exemple : J'etais dans une maison inconnue, je cherchais quelqu'un et je ressentais de la peur..."
+                className="min-h-[172px] resize-none rounded-[24px] border border-slate-200 bg-white px-5 py-4 text-base leading-8 text-slate-800 shadow-sm placeholder:text-slate-400 focus-visible:ring-sky-200"
                 disabled={pending}
               />
 
@@ -195,27 +306,29 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 <Button
                   type="submit"
                   disabled={pending || remaining === 0}
-                  className="rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-5 text-white shadow-[0_10px_24px_rgba(124,58,237,0.24)]"
+                className="h-12 rounded-2xl bg-sky-600 px-5 text-sm font-semibold text-white shadow-sm"
                 >
                   {pending ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4" />
                       Envoi...
                     </>
                   ) : (
                     <>
                       <Plus className="h-4 w-4" />
-                      Generer un reve
+                      Envoyer le reve
                     </>
                   )}
                 </Button>
 
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                  {weeklyUsed}/{weeklyLimit} utilises cette semaine
-                </span>
-                <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-700">
-                  {remaining} restant{remaining > 1 ? 's' : ''}
-                </span>
+                <div className="flex flex-wrap gap-2 text-sm font-medium text-slate-600">
+                  <span className="rounded-full border border-slate-200 bg-white px-3 py-2">
+                    {weeklyUsed}/{weeklyLimit} reves cette semaine
+                  </span>
+                  <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-2 text-violet-700">
+                    Encore {remaining} possible{remaining > 1 ? 's' : ''}
+                  </span>
+                </div>
               </div>
 
               {feedback ? (
@@ -230,164 +343,215 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 </p>
               ) : null}
             </form>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="overflow-hidden rounded-[28px] border border-white/60 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.18),transparent_42%),linear-gradient(145deg,#ffffff_0%,#eef2ff_100%)] shadow-[0_12px_32px_rgba(148,163,184,0.14)]">
-          <CardContent className="p-6">
-            <div className="rounded-[24px] border border-white/70 bg-white/70 p-5 shadow-sm backdrop-blur">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
-                  <Sparkles className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    Apercu
-                  </p>
-                  <h3 className="text-xl font-semibold text-slate-800">
-                    {latestDream ? 'Dernier reve genere' : 'Journal intelligent'}
-                  </h3>
-                </div>
+          <div className="rounded-[30px] border border-white/80 bg-white/70 p-4">
+            <div className="mb-4 flex items-center justify-between gap-3 px-1">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Apercu video</p>
+                <h3 className="mt-1 text-xl font-bold text-slate-900">
+                  {latestDream ? 'Dernier reve' : 'Aucune video encore'}
+                </h3>
               </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+                <Sparkles className="h-5 w-5" />
+              </div>
+            </div>
 
-              {latestDream ? (
-                <div className="mt-5 space-y-4">
-                  <div className="rounded-3xl bg-slate-950/95 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-                    {latestDreamVideoUrl ? (
-                      <video
-                        key={latestDreamVideoUrl}
-                        controls
-                        className="aspect-video w-full rounded-2xl bg-black object-cover"
-                        src={latestDreamVideoUrl}
-                      />
-                    ) : (
-                      <div className="flex aspect-video items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#312e81_0%,#4c1d95_55%,#6d28d9_100%)] text-center text-sm text-white/80">
-                        <div className="space-y-2 px-6">
-                          <Video className="mx-auto h-6 w-6" />
-                          <p>{getStatusCopy(latestDream.videoStatus).description}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-semibold text-slate-800">
-                      {formatDate(latestDream.createdAt)}
-                    </p>
-                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">
-                      {latestDream.summary || latestDream.description}
-                    </p>
-                  </div>
-                </div>
+            <div className="overflow-hidden rounded-[28px] bg-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+              {latestDreamVideoUrl ? (
+                <video
+                  key={latestDreamVideoUrl}
+                  controls
+                  className="aspect-video w-full bg-black object-cover"
+                  src={latestDreamVideoUrl}
+                />
               ) : (
-                <div className="mt-5 rounded-3xl border border-dashed border-violet-200 bg-white/60 p-6 text-sm leading-7 text-slate-600">
-                  Racontez un premier reve pour lancer la generation automatique du resume et de la
-                  video dans votre espace.
+                <div className="flex aspect-video items-center justify-center bg-[linear-gradient(135deg,#e0f2fe_0%,#e0e7ff_48%,#fae8ff_100%)] px-8 text-center text-sm leading-7 text-slate-700">
+                  <div className="space-y-3">
+                    <Video className="mx-auto h-8 w-8 text-indigo-500" />
+                    <p>{latestDream ? getStatusCopy(latestDream.videoStatus).description : 'La video apparaitra ici apres validation du resume.'}</p>
+                  </div>
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-        <Search className="h-4 w-4 text-slate-400" />
-        <Input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Rechercher dans vos descriptions, resumes ou statuts..."
-          className="h-auto border-0 bg-transparent px-0 py-0 text-sm shadow-none focus-visible:ring-0"
-        />
-      </div>
+            {latestDream ? (
+              <div className="mt-5 rounded-[24px] border border-white bg-white/80 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-900">{formatDate(latestDream.createdAt)}</p>
+                  {(() => {
+                    const statusCopy = getStatusCopy(latestDream.videoStatus)
+                    const StatusIcon = statusCopy.icon
+                    return (
+                      <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${statusCopy.badgeClass}`}>
+                        <StatusIcon className="h-3.5 w-3.5" />
+                        {statusCopy.label}
+                      </span>
+                    )
+                  })()}
+                </div>
+                <p className="mt-3 line-clamp-3 text-sm leading-7 text-slate-600">
+                  {latestDream.summary || latestDream.description}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-[34px] border border-white/70 bg-white/75 p-4 shadow-[0_18px_60px_rgba(148,163,184,0.13)] backdrop-blur md:p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">Journal</p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-slate-900">
+              {filteredDreams.length} reve{filteredDreams.length > 1 ? 's' : ''} conserve{filteredDreams.length > 1 ? 's' : ''}
+            </h2>
+          </div>
+
+          <div className="flex min-h-12 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 shadow-sm md:min-w-[360px]">
+            <Search className="h-4 w-4 text-slate-400" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Rechercher un resume, statut, mot-cle..."
+              className="h-auto border-0 bg-transparent px-0 py-0 text-sm shadow-none focus-visible:ring-0"
+            />
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-5">
         {filteredDreams.length > 0 ? (
           filteredDreams.map((dream) => {
             const statusCopy = getStatusCopy(dream.videoStatus)
+            const StatusIcon = statusCopy.icon
             const dreamVideoUrl = getDreamVideoUrl(dream)
+            const analysisCopy = getAnalysisCopy(dream)
+            const isAnalysisExpanded = Boolean(expandedAnalyses[String(dream.id)])
+            const canExpandAnalysis = analysisCopy.length > 260
 
             return (
               <Card
                 key={dream.id}
-                className="overflow-hidden rounded-[28px] border border-white/60 bg-white/88 shadow-[0_10px_30px_rgba(148,163,184,0.12)]"
+                className="group overflow-hidden rounded-[34px] border border-white/70 bg-white/85 shadow-[0_16px_50px_rgba(148,163,184,0.12)]"
               >
-                <CardContent className="p-6">
-                  <div className="grid gap-6 xl:grid-cols-[minmax(300px,420px)_1fr]">
-                    <div className="overflow-hidden rounded-[24px] bg-slate-100">
-                      {dreamVideoUrl ? (
-                        <video
-                          key={dreamVideoUrl}
-                          controls
-                          className="aspect-video w-full bg-black object-cover"
-                          src={dreamVideoUrl}
-                        />
-                      ) : (
-                        <div className="flex aspect-video items-center justify-center bg-[radial-gradient(circle_at_top,#ddd6fe_0%,#c7d2fe_55%,#e2e8f0_100%)] px-6 text-center text-sm leading-6 text-slate-600">
-                          <div>
-                            <Video className="mx-auto mb-3 h-7 w-7 text-violet-500" />
-                            {statusCopy.description}
+                <CardContent className="p-4 md:p-5">
+                  <div className="grid gap-5 xl:grid-cols-[minmax(300px,430px)_1fr]">
+                    <div className="self-start rounded-[30px] border border-slate-100 bg-white p-3 shadow-sm">
+                      <div className="relative overflow-hidden rounded-[24px] bg-slate-100">
+                        {dreamVideoUrl ? (
+                          <video
+                            key={dreamVideoUrl}
+                            controls
+                            className="aspect-video w-full bg-slate-100 object-cover"
+                            src={dreamVideoUrl}
+                          />
+                        ) : (
+                          <div className="flex aspect-video items-center justify-center bg-[linear-gradient(135deg,#e0f2fe_0%,#e0e7ff_52%,#f5d0fe_100%)] px-6 text-center text-sm leading-6 text-slate-700">
+                            <div>
+                              <Video className="mx-auto mb-3 h-8 w-8 text-indigo-500" />
+                              {statusCopy.description}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+
+                        <span className={`absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold bg-white/90 ${statusCopy.badgeClass}`}>
+                          <StatusIcon className="h-3.5 w-3.5" />
+                          {statusCopy.label}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="flex min-w-0 flex-col">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                            {formatDate(dream.createdAt)}
-                          </p>
-                          <span
-                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusCopy.badgeClass}`}
+                    <div className="flex min-w-0 flex-col justify-between gap-5 rounded-[28px] border border-slate-100 bg-slate-50/70 p-5">
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                              {formatDate(dream.createdAt)}
+                            </p>
+                            <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-slate-900">
+                              {dream.summary || 'Reve en cours de lecture'}
+                            </h3>
+                          </div>
+
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="rounded-full text-slate-400"
+                            onClick={() => deleteDream(dream.id)}
+                            disabled={pending}
                           >
-                            {statusCopy.label}
-                          </span>
+                            <Trash2 className="h-4 w-4" />
+                            Supprimer
+                          </Button>
                         </div>
 
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="rounded-full text-slate-500 hover:bg-rose-50 hover:text-rose-600"
-                          onClick={() => deleteDream(dream.id)}
-                          disabled={pending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Supprimer
-                        </Button>
+                        {dream.videoStatus === 'waiting_validation' ? (
+                          <div className="flex flex-wrap gap-3 rounded-[22px] border border-sky-100 bg-white p-3">
+                            <Button
+                              type="button"
+                              className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white"
+                              onClick={() => validateDream(dream.id)}
+                              disabled={pending}
+                            >
+                              Valider le resume
+                            </Button>
+
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="rounded-full border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+                              onClick={() => regenerateDream(dream.id)}
+                              disabled={pending}
+                            >
+                              Refaire le resume
+                            </Button>
+                          </div>
+                        ) : null}
+
+                        <div className="grid gap-4 lg:grid-cols-2">
+                          <div className="rounded-[24px] border border-white bg-white p-4 shadow-sm">
+                            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
+                              <Moon className="h-4 w-4 text-indigo-500" />
+                              Description
+                            </p>
+                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-slate-600">
+                              {dream.description}
+                            </p>
+                          </div>
+
+                          <div className="rounded-[24px] border border-white bg-white p-4 shadow-sm">
+                            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
+                              <Wand2 className="h-4 w-4 text-cyan-500" />
+                              Analyse
+                            </p>
+                            <p className={`${isAnalysisExpanded ? '' : 'line-clamp-6'} whitespace-pre-line text-sm leading-7 text-slate-600`}>
+                              {analysisCopy}
+                            </p>
+                            {canExpandAnalysis ? (
+                              <button
+                                type="button"
+                                onClick={() => toggleAnalysis(dream.id)}
+                                className="mt-3 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700"
+                              >
+                                {isAnalysisExpanded ? 'Voir moins' : 'Voir plus'}
+                              </button>
+                            ) : null}
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="mt-5 space-y-5">
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-800">Description</h3>
-                          <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">
-                            {dream.description}
-                          </p>
-                        </div>
-
-                        <div className="grid gap-5 lg:grid-cols-2">
-                          <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-4">
-                            <p className="text-sm font-semibold text-slate-800">Resume</p>
-                            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">
-                              {dream.summary || 'Le resume sera ajoute automatiquement des que le workflow termine.'}
-                            </p>
-                          </div>
-
-                          <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-4">
-                            <p className="text-sm font-semibold text-slate-800">Analyse</p>
-                            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">
-                              {getAnalysisCopy(dream)}
-                            </p>
-                          </div>
-                        </div>
-
+                      <div className="flex flex-wrap items-center gap-3">
                         {dreamVideoUrl ? (
                           <a
                             href={dreamVideoUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex w-fit items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                            className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white"
                           >
                             Ouvrir la video
+                            <ExternalLink className="h-4 w-4" />
                           </a>
                         ) : null}
                       </div>
@@ -398,8 +562,8 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             )
           })
         ) : (
-          <Card className="rounded-[28px] border border-dashed border-slate-200 bg-white/70 shadow-none">
-            <CardContent className="p-8 text-center text-sm leading-7 text-slate-500">
+          <Card className="rounded-[34px] border border-dashed border-slate-200 bg-white/70 shadow-none">
+            <CardContent className="p-10 text-center text-sm leading-7 text-slate-500">
               Aucun reve ne correspond a votre recherche pour le moment.
             </CardContent>
           </Card>
@@ -408,3 +572,5 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
     </div>
   )
 }
+
+

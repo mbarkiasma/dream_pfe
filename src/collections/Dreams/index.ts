@@ -131,6 +131,7 @@ export const Dreams: CollectionConfig = {
       defaultValue: 'pending',
       options: [
         { label: 'Pending', value: 'pending' },
+         { label: 'Waiting Validation', value: 'waiting_validation' },
         { label: 'Generating', value: 'generating' },
         { label: 'Ready', value: 'ready' },
         { label: 'Failed', value: 'failed' },
