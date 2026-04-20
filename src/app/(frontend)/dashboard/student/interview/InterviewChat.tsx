@@ -200,16 +200,18 @@ export function InterviewChat() {
 
   return (
     <div className="space-y-5">
-      <section className="overflow-hidden rounded-[30px] border border-slate-200 bg-[linear-gradient(135deg,#f8fafc_0%,#ffffff_55%,#eef2f7_100%)] shadow-[0_20px_70px_rgba(120,113,108,0.10)]">
-        <div className="border-b border-stone-200/80 px-6 py-5">
+      <section className="overflow-hidden rounded-[30px] border border-white/70 bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_48%,#F3ECFF_100%)] shadow-[0_22px_70px_rgba(109,40,217,0.14)] backdrop-blur">
+        <div className="border-b border-white/70 px-6 py-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#7A6A99]">
                 Cabinet D&apos;Entretien
               </p>
               <div>
-                <h3 className="font-serif text-2xl text-slate-900">Echange progressif et confidentiel</h3>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                <h3 className="text-2xl font-bold tracking-[-0.02em] text-[#2d1068]">
+                  Echange progressif et confidentiel
+                </h3>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6E628F]">
                   Prenez le temps de repondre naturellement. Vous pouvez parler avec le micro,
                   relire la transcription, la corriger, puis envoyer seulement quand vous etes pret.
                 </p>
@@ -217,10 +219,10 @@ export function InterviewChat() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <div className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-xs font-medium text-slate-700">
+              <div className="rounded-full border border-white/80 bg-white/80 px-4 py-2 text-xs font-semibold text-[#6D28D9] shadow-sm">
                 {etat}
               </div>
-              <div className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-xs font-medium text-slate-700">
+              <div className="rounded-full border border-white/80 bg-white/80 px-4 py-2 text-xs font-semibold text-[#6E628F] shadow-sm">
                 {messages.length} echange{messages.length > 1 ? 's' : ''}
               </div>
               {isSaved ? (
@@ -232,50 +234,50 @@ export function InterviewChat() {
           </div>
         </div>
 
-        <div className="grid gap-3 border-t border-white/60 bg-white/40 px-6 py-4 md:grid-cols-3">
-          <div className="rounded-[22px] border border-slate-200 bg-white/85 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+        <div className="grid gap-3 border-t border-white/60 bg-white/45 px-6 py-4 md:grid-cols-3">
+          <div className="rounded-[22px] border border-white/70 bg-white/75 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.08)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9B6BFF]">
               Ecriture
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-sm leading-6 text-[#6E628F]">
               Repondez librement, avec vos mots, comme dans un vrai entretien.
             </p>
           </div>
-          <div className="rounded-[22px] border border-slate-200 bg-white/85 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <div className="rounded-[22px] border border-white/70 bg-white/75 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.08)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9B6BFF]">
               Voix
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-sm leading-6 text-[#6E628F]">
               Le micro prepare le texte pour vous, mais vous gardez toujours la main avant l&apos;envoi.
             </p>
           </div>
-          <div className="rounded-[22px] border border-slate-200 bg-white/85 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <div className="rounded-[22px] border border-white/70 bg-white/75 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.08)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9B6BFF]">
               Conseil
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-sm leading-6 text-[#6E628F]">
               Les exemples concrets aident l&apos;assistant a mieux comprendre votre fonctionnement.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="rounded-[32px] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-4 shadow-[0_18px_60px_rgba(120,113,108,0.10)]">
+      <section className="rounded-[32px] border border-white/70 bg-[linear-gradient(180deg,#ffffff_0%,#FDF7FF_100%)] p-4 shadow-[0_18px_60px_rgba(109,40,217,0.12)] backdrop-blur">
         <div className="mb-4 flex items-center justify-between px-2">
           <div>
-            <p className="text-sm font-semibold text-slate-900">Espace de parole</p>
-            <p className="text-xs text-slate-500">Un message a la fois, dans un cadre calme et clair.</p>
+            <p className="text-sm font-semibold text-[#2d1068]">Espace de parole</p>
+            <p className="text-xs text-[#7A6A99]">Un message a la fois, dans un cadre calme et clair.</p>
           </div>
-          <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+          <div className="rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9]">
             Assistant Big Five
           </div>
         </div>
 
-        <div className="max-h-[500px] min-h-[360px] space-y-4 overflow-y-auto rounded-[28px] border border-slate-200 bg-white/90 p-5">
+        <div className="max-h-[500px] min-h-[360px] space-y-4 overflow-y-auto rounded-[28px] border border-white/70 bg-white/75 p-5 shadow-inner">
           {messages.length === 0 ? (
-            <div className="rounded-[24px] border border-dashed border-slate-300 bg-slate-50/80 p-6">
-              <p className="font-serif text-xl text-slate-900">Bienvenue</p>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            <div className="rounded-[24px] border border-dashed border-[#D8C7FF] bg-[#F8F3FF]/80 p-6">
+              <p className="text-xl font-bold text-[#2d1068]">Bienvenue</p>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6E628F]">
                 Commencez par un premier message simple, ou utilisez le microphone pour dicter votre
                 reponse. L&apos;assistant avancera progressivement pour recueillir les informations
                 necessaires a une analyse fiable.
@@ -289,15 +291,15 @@ export function InterviewChat() {
               className={`flex ${item.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-              className={`max-w-[86%] rounded-[24px] px-4 py-3 shadow-sm ${
-                item.role === 'user'
-                    ? 'bg-slate-900 text-slate-50'
-                    : 'border border-slate-200 bg-slate-50 text-slate-800'
+                className={`max-w-[86%] rounded-[24px] px-4 py-3 shadow-sm ${
+                  item.role === 'user'
+                    ? 'bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_12px_28px_rgba(109,40,217,0.18)]'
+                    : 'border border-white/80 bg-white text-[#2d1068] shadow-[0_10px_28px_rgba(109,40,217,0.08)]'
                 }`}
               >
                 <p
                   className={`mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                    item.role === 'user' ? 'text-slate-300' : 'text-slate-400'
+                    item.role === 'user' ? 'text-white/75' : 'text-[#9B6BFF]'
                   }`}
                 >
                   {item.role === 'user' ? 'Vous' : 'Assistant'}
@@ -309,8 +311,8 @@ export function InterviewChat() {
 
           {isLoading ? (
             <div className="flex justify-start">
-              <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-slate-700 shadow-sm">
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <div className="rounded-[24px] border border-white/80 bg-white px-4 py-3 text-[#2d1068] shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9B6BFF]">
                   Assistant
                 </p>
                 <p className="text-sm leading-7">L&apos;assistant prepare sa reponse...</p>
@@ -332,12 +334,12 @@ export function InterviewChat() {
         ) : null}
 
         {messageMicro ? (
-          <div className="rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          <div className="rounded-[22px] border border-white/70 bg-white/75 px-4 py-3 text-sm text-[#6E628F] shadow-[0_10px_30px_rgba(109,40,217,0.08)]">
             {messageMicro}
           </div>
         ) : null}
 
-        <div className="rounded-[30px] border border-slate-200 bg-white p-4 shadow-[0_14px_40px_rgba(120,113,108,0.10)]">
+        <div className="rounded-[30px] border border-white/70 bg-white/80 p-4 shadow-[0_18px_55px_rgba(109,40,217,0.12)] backdrop-blur">
           <div className="flex items-end gap-3">
             <button
               type="button"
@@ -346,13 +348,13 @@ export function InterviewChat() {
               className={`shrink-0 rounded-full px-4 py-3 text-sm font-medium transition ${
                 isRecording
                   ? 'bg-rose-700 text-white hover:bg-rose-800'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  : 'bg-[#F3ECFF] text-[#6D28D9] hover:bg-[#E9DDFF]'
               } disabled:cursor-not-allowed disabled:bg-slate-200`}
             >
               {isRecording ? 'Arreter' : 'Micro'}
             </button>
 
-            <div className="flex-1 rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3">
+            <div className="flex-1 rounded-[24px] border border-[#E6DAFF] bg-[#FBF8FF] px-4 py-3">
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -369,7 +371,7 @@ export function InterviewChat() {
                 }
                 rows={4}
                 disabled={isInterviewFinished}
-                className="min-h-[96px] w-full resize-none bg-transparent text-sm leading-7 text-slate-800 outline-none placeholder:text-slate-400"
+                className="min-h-[96px] w-full resize-none bg-transparent text-sm leading-7 text-[#2d1068] outline-none placeholder:text-slate-400"
               />
             </div>
 
@@ -377,13 +379,13 @@ export function InterviewChat() {
               type="button"
               onClick={() => void handleSend()}
               disabled={isLoading || isInterviewFinished}
-              className="shrink-0 rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+              className="shrink-0 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,40,217,0.22)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
             >
               {isInterviewFinished ? 'Termine' : isLoading ? 'Envoi...' : 'Envoyer'}
             </button>
           </div>
 
-          <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-3 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-2 border-t border-[#EEE5FF] pt-3 text-xs text-[#9A8BB7] sm:flex-row sm:items-center sm:justify-between">
             <p>Entree pour envoyer, Shift+Entree pour revenir a la ligne.</p>
             <div className="flex items-center gap-3">
               <p>{message.trim().length} caracteres</p>

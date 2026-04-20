@@ -66,6 +66,7 @@ export async function Footer() {
         <div className="flex items-start justify-start md:justify-end">
           <div className="rounded-xl bg-white p-3 shadow-lg">
             <QRCodeSVG
+              value={process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}
               size={110}
               bgColor="#FFFFFF"
               fgColor="#4B2E83"

@@ -1,8 +1,40 @@
 import crypto from 'crypto'
-import { SignJWT } from 'jose'
 import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+
+function toBase64Url(input: string | Buffer): string {
+  return Buffer.from(input)
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+}
+
+function signPayloadToken({
+  payload,
+  secret,
+  tokenExpiration,
+}: {
+  payload: Record<string, unknown>
+  secret: string
+  tokenExpiration: number
+}): string {
+  const now = Math.floor(Date.now() / 1000)
+  const header = toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const body = toBase64Url(
+    JSON.stringify({
+      ...payload,
+      iat: now,
+      exp: now + tokenExpiration,
+    }),
+  )
+  const signature = toBase64Url(
+    crypto.createHmac('sha256', secret).update(`${header}.${body}`).digest(),
+  )
+
+  return `${header}.${body}.${signature}`
+}
 
 function getRedirectPath(role: string | null | undefined): string {
   switch (role) {
@@ -74,16 +106,15 @@ export async function GET(request: Request) {
   const tokenExpiration = authConfig.tokenExpiration ?? 7200
 
   // 4. Générer le JWT compatible Payload
-  const secretKey = new TextEncoder().encode(secret)
-  const token = await new SignJWT({
-    id: user.id,
-    collection: 'users',
-    email: user.email,
+  const token = signPayloadToken({
+    secret,
+    tokenExpiration,
+    payload: {
+      id: user.id,
+      collection: 'users',
+      email: user.email,
+    },
   })
-    .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-    .setIssuedAt()
-    .setExpirationTime(`${tokenExpiration}s`)
-    .sign(secretKey)
 
   // 5. Préparer la réponse et poser le cookie
   const targetPath = getRedirectPath(user.role as string)

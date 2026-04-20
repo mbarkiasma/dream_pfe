@@ -22,9 +22,9 @@ export default function PsyRendezVousPage() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800"> rendez-vous planifié</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]"> rendez-vous planifié</CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -34,14 +34,14 @@ export default function PsyRendezVousPage() {
                 </div>
 
                 <div>
-                  <p className="font-medium text-slate-800">Consultations</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="font-medium text-[#2d1068]">Consultations</p>
+                  <p className="text-sm text-[#7A6A99]">
                     Les rendez-vous confirmés apparaîtront ici automatiquement.
                   </p>
                 </div>
               </div>
 
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Cette section affichera plus tard les consultations avec leur date, leur heure,
                 leur statut et les éléments de suivi associés.
               </p>
@@ -50,25 +50,25 @@ export default function PsyRendezVousPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Prochaine consultation</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Prochaine consultation</CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-slate-600">
-                Aucune consultation n'est encore programmée pour le moment.
+              <p className="leading-7 text-[#6E628F]">
+                Aucune consultation n&apos;est encore programmée pour le moment.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/60 bg-gradient-to-br from-white to-violet-50 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Suivi de séance</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Suivi de séance</CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Les éléments liés au suivi des consultations et aux observations du psychologue
                 pourront être ajoutés ici plus tard.
               </p>

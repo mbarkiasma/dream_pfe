@@ -1,8 +1,9 @@
 import { cookies, headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { cache } from 'react'
 
-export async function getAuthenticatedDashboardUser() {
+export const getAuthenticatedDashboardUser = cache(async function getAuthenticatedDashboardUser() {
   const payload = await getPayload({ config })
   const headersList = await getHeaders()
   const cookieStore = await cookies()
@@ -38,4 +39,4 @@ export async function getAuthenticatedDashboardUser() {
     console.error("Erreur lors de l'authentification Payload:", error)
     return { user: null }
   }
-}
+})

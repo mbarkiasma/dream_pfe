@@ -41,7 +41,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
               Rapport d’analyse
             </p>
             <h1 className="mt-2 text-3xl font-semibold text-slate-900">{analyse.reference}</h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-[#7A6A99]">
               Généré le{' '}
               {new Date(analyse.date).toLocaleDateString('fr-FR', {
                 day: '2-digit',
@@ -59,7 +59,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
             Rapport d’analyse de personnalité
           </p>
           <h1 className="mt-2 text-3xl font-semibold">{analyse.reference}</h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-[#7A6A99]">
             Date :{' '}
             {new Date(analyse.date).toLocaleDateString('fr-FR', {
               day: '2-digit',
@@ -87,7 +87,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           <article className="rounded-3xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#7A6A99]">
               Forces dominantes
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-700">
@@ -96,7 +96,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
           </article>
 
           <article className="rounded-3xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#7A6A99]">
               Points de vigilance
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-700">
@@ -105,7 +105,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
           </article>
 
           <article className="rounded-3xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#7A6A99]">
               Style relationnel
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-700">

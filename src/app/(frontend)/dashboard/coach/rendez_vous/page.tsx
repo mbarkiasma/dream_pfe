@@ -22,9 +22,9 @@ export default function CoachAppointmentsPage() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Aucun rendez-vous planifié</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Aucun rendez-vous planifié</CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -34,19 +34,19 @@ export default function CoachAppointmentsPage() {
                 </div>
 
                 <div>
-                  <p className="font-medium text-slate-800">Séances à venir</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="font-medium text-[#2d1068]">Séances à venir</p>
+                  <p className="text-sm text-[#7A6A99]">
                     Les rendez-vous confirmés apparaîtront ici automatiquement.
                   </p>
                 </div>
               </div>
 
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Les séances de coaching apparaîtront ici avec leur date, leur heure, leur statut et les notes associées.
               </p>
 
               <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
+                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99]">
                   En attente
                 </span>
               </div>
@@ -55,31 +55,31 @@ export default function CoachAppointmentsPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Prochaine séance</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Prochaine séance</CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Aucune séance n&apos;est encore programmée pour le moment.
               </p>
 
               <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
+                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99]">
                   Aucun rendez-vous
                 </span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/60 bg-gradient-to-br from-white to-violet-50 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Notes de séance</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Notes de séance</CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Le coach pourra ajouter plus tard des notes privées et des notes partageables avec l’étudiant.
               </p>
 

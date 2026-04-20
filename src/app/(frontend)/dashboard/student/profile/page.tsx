@@ -35,12 +35,12 @@ export default async function StudentProfilePage() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-2xl text-slate-800">Informations personnelles</CardTitle>
+              <CardTitle className="text-2xl text-[#2d1068]">Informations personnelles</CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-4 text-slate-600">
+            <CardContent className="space-y-4 text-[#6E628F]">
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl bg-slate-50 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -62,16 +62,16 @@ export default async function StudentProfilePage() {
               </div>
 
               <div>
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
+                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99]">
                   Profil étudiant connecté
                 </span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Mes analyses en PDF</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Mes analyses en PDF</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-4">
@@ -82,8 +82,8 @@ export default async function StudentProfilePage() {
                     className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 p-4 md:flex-row md:items-center md:justify-between"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-slate-800">{analyse.reference}</p>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="text-sm font-semibold text-[#2d1068]">{analyse.reference}</p>
+                      <p className="mt-1 text-sm text-[#7A6A99]">
                         Générée le{' '}
                         {new Date(analyse.date).toLocaleDateString('fr-FR', {
                           day: '2-digit',
@@ -113,7 +113,7 @@ export default async function StudentProfilePage() {
                 ))
               ) : (
                 <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-[#6E628F]">
                     Aucune analyse n’est encore disponible. Dès qu’un entretien est terminé, un
                     rapport PDF apparaîtra ici.
                   </p>
@@ -124,32 +124,32 @@ export default async function StudentProfilePage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Rapports disponibles</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Rapports disponibles</CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Chaque entretien terminé peut maintenant être consulté et exporté en PDF depuis ce
                 profil.
               </p>
 
               <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
+                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99]">
                   {analyses.docs.length} rapport{analyses.docs.length > 1 ? 's' : ''}
                 </span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/60 bg-gradient-to-br from-white to-slate-50 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-slate-800">Progression</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068]">Progression</CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Le profil centralisera progressivement vos entretiens, vos analyses et les rapports
                 utiles à votre suivi.
               </p>

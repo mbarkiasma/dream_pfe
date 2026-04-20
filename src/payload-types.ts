@@ -72,6 +72,9 @@ export interface Config {
     media: Media;
     'analyse-personnalite': AnalysePersonnalite;
     dreams: Dream;
+    'coaching-sessions': CoachingSession;
+    'coaching-messages': CoachingMessage;
+    'coach-notes': CoachNote;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -89,6 +92,9 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'analyse-personnalite': AnalysePersonnaliteSelect<false> | AnalysePersonnaliteSelect<true>;
     dreams: DreamsSelect<false> | DreamsSelect<true>;
+    'coaching-sessions': CoachingSessionsSelect<false> | CoachingSessionsSelect<true>;
+    'coaching-messages': CoachingMessagesSelect<false> | CoachingMessagesSelect<true>;
+    'coach-notes': CoachNotesSelect<false> | CoachNotesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -636,7 +642,16 @@ export interface User {
   id: number;
   firstName?: string | null;
   lastName?: string | null;
-  role: 'etudiant' | 'coach' | 'psy';
+  role: 'admin' | 'etudiant' | 'coach' | 'psy';
+  /**
+   * Activez ce champ quand le coach peut recevoir de nouvelles sessions d'accompagnement.
+   */
+  isAvailableForCoaching?: boolean | null;
+  /**
+   * Exemple : stress, motivation, orientation, organisation.
+   */
+  coachingSpecialty?: string | null;
+  coachingBio?: string | null;
   magicLoginToken?: string | null;
   magicLoginExpiresAt?: string | null;
   updatedAt: string;
@@ -739,6 +754,51 @@ export interface AnalysePersonnalite {
       }[]
     | null;
   conclusion?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-sessions".
+ */
+export interface CoachingSession {
+  id: number;
+  title: string;
+  student: number | User;
+  coach?: (number | null) | User;
+  mode: 'smart' | 'classic';
+  status: 'open' | 'closed';
+  startedAt: string;
+  endedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-messages".
+ */
+export interface CoachingMessage {
+  id: number;
+  session: number | CoachingSession;
+  senderRole: 'student' | 'coach' | 'ai';
+  senderUser?: (number | null) | User;
+  content: string;
+  audioUrl?: string | null;
+  transcription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coach-notes".
+ */
+export interface CoachNote {
+  id: number;
+  title: string;
+  session: number | CoachingSession;
+  student: number | User;
+  coach: number | User;
+  content: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -945,6 +1005,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'dreams';
         value: number | Dream;
+      } | null)
+    | ({
+        relationTo: 'coaching-sessions';
+        value: number | CoachingSession;
+      } | null)
+    | ({
+        relationTo: 'coaching-messages';
+        value: number | CoachingMessage;
+      } | null)
+    | ({
+        relationTo: 'coach-notes';
+        value: number | CoachNote;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1244,6 +1316,9 @@ export interface UsersSelect<T extends boolean = true> {
   firstName?: T;
   lastName?: T;
   role?: T;
+  isAvailableForCoaching?: T;
+  coachingSpecialty?: T;
+  coachingBio?: T;
   magicLoginToken?: T;
   magicLoginExpiresAt?: T;
   updatedAt?: T;
@@ -1357,6 +1432,48 @@ export interface DreamsSelect<T extends boolean = true> {
   videoAsset?: T;
   operationName?: T;
   errorMessage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-sessions_select".
+ */
+export interface CoachingSessionsSelect<T extends boolean = true> {
+  title?: T;
+  student?: T;
+  coach?: T;
+  mode?: T;
+  status?: T;
+  startedAt?: T;
+  endedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-messages_select".
+ */
+export interface CoachingMessagesSelect<T extends boolean = true> {
+  session?: T;
+  senderRole?: T;
+  senderUser?: T;
+  content?: T;
+  audioUrl?: T;
+  transcription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coach-notes_select".
+ */
+export interface CoachNotesSelect<T extends boolean = true> {
+  title?: T;
+  session?: T;
+  student?: T;
+  coach?: T;
+  content?: T;
   updatedAt?: T;
   createdAt?: T;
 }

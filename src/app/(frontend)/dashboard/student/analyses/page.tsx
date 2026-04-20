@@ -36,16 +36,16 @@ export default async function StudentAnalysesPage() {
       />
 
       <div className="space-y-6">
-        <Card className="rounded-[28px] border border-white/60 bg-white/85 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl text-slate-800">
+            <CardTitle className="text-2xl text-[#2d1068]">
               {latestAnalysis ? 'Dernière analyse disponible' : 'Aucune analyse disponible'}
             </CardTitle>
           </CardHeader>
 
           <CardContent>
             <div className="mb-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99]">
                 {latestAnalysis ? 'Disponible' : 'En attente'}
               </span>
               <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white">
@@ -56,8 +56,8 @@ export default async function StudentAnalysesPage() {
             {latestAnalysis ? (
               <div className="space-y-4">
                 <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-5">
-                  <p className="text-sm font-semibold text-slate-800">{latestAnalysis.reference}</p>
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="text-sm font-semibold text-[#2d1068]">{latestAnalysis.reference}</p>
+                  <p className="mt-1 text-sm text-[#7A6A99]">
                     Générée le{' '}
                     {new Date(latestAnalysis.date).toLocaleDateString('fr-FR', {
                       day: '2-digit',
@@ -65,7 +65,7 @@ export default async function StudentAnalysesPage() {
                       year: 'numeric',
                     })}
                   </p>
-                  <p className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-600">
+                  <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#6E628F]">
                     {latestAnalysis.overview || latestAnalysis.conclusion || 'Résumé non disponible.'}
                   </p>
                 </div>
@@ -87,7 +87,7 @@ export default async function StudentAnalysesPage() {
                 </div>
               </div>
             ) : (
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 Les analyses IA apparaîtront ici automatiquement après un entretien terminé et une
                 sauvegarde réussie.
               </p>
@@ -95,9 +95,9 @@ export default async function StudentAnalysesPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[28px] border border-white/60 bg-gradient-to-br from-white to-slate-50 shadow-[0_8px_30px_rgba(148,163,184,0.12)]">
+        <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-slate-800">Historique des analyses</CardTitle>
+            <CardTitle className="text-xl text-[#2d1068]">Historique des analyses</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -108,15 +108,15 @@ export default async function StudentAnalysesPage() {
                   className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 md:flex-row md:items-center md:justify-between"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">{analyse.reference}</p>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="text-sm font-semibold text-[#2d1068]">{analyse.reference}</p>
+                    <p className="mt-1 text-sm text-[#7A6A99]">
                       {new Date(analyse.date).toLocaleDateString('fr-FR', {
                         day: '2-digit',
                         month: 'long',
                         year: 'numeric',
                       })}
                     </p>
-                    <p className="mt-2 line-clamp-2 text-sm text-slate-600">
+                    <p className="mt-2 line-clamp-2 text-sm text-[#6E628F]">
                       {analyse.overview || analyse.conclusion || 'Résumé non disponible.'}
                     </p>
                   </div>
@@ -139,7 +139,7 @@ export default async function StudentAnalysesPage() {
                 </div>
               ))
             ) : (
-              <p className="leading-7 text-slate-600">
+              <p className="leading-7 text-[#6E628F]">
                 L’historique complet s’affichera ici dès que plusieurs entretiens auront été
                 enregistrés.
               </p>

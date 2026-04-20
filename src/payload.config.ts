@@ -15,6 +15,9 @@ import { getServerSideURL } from './utilities/getURL'
 import { plugins } from './plugins'
 import { AnalysePersonnalite } from './collections/AnalysePersonnalite'
 import { Dreams } from './collections/Dreams'
+import { CoachingSessions } from './collections/CoachingSessions'
+import { CoachingMessages } from './collections/CoachingMessages'
+import { CoachNotes } from './collections/CoachNotes'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,7 +26,8 @@ const hasInlineGCSCredentials = Boolean(
 )
 const hasRuntimeGCSCredentials = Boolean(process.env.GOOGLE_APPLICATION_CREDENTIALS)
 const enableMediaGCSStorage = Boolean(
-  process.env.GCS_BUCKET &&
+  process.env.ENABLE_GCS_STORAGE === 'true' &&
+    process.env.GCS_BUCKET &&
     process.env.GCS_PROJECT_ID &&
     (hasInlineGCSCredentials || hasRuntimeGCSCredentials),
 )
@@ -798,7 +802,16 @@ export default buildConfig({
     },
     push: process.env.NODE_ENV !== 'production',
   }),
-  collections: [Pages, Users, Media, AnalysePersonnalite, Dreams],
+  collections: [
+    Pages,
+    Users,
+    Media,
+    AnalysePersonnalite,
+    Dreams,
+    CoachingSessions,
+    CoachingMessages,
+    CoachNotes,
+  ],
   globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),
   plugins: [

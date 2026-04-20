@@ -1,54 +1,75 @@
-﻿import Link from 'next/link'
-import { CalendarDays, Home, User, Users } from 'lucide-react'
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { CalendarDays, HeartPulse, LayoutDashboard, UserRound, UsersRound } from 'lucide-react'
+
 import { LogoutButton } from '@/components/dashboard/student/Logout'
 
 const navItems = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard/psy',
-    icon: Home,
-  },
-  {
-    title: 'Ã‰tudiants',
-    href: '/dashboard/psy/students',
-    icon: Users,
-  },
-  {
-    title: 'Rendez-vous',
-    href: '/dashboard/psy/rendez_vous',
-    icon: CalendarDays,
-  },
-  {
-    title: 'Mon profil',
-    href: '/dashboard/psy/profil',
-    icon: User,
-  },
+  { title: 'Dashboard', href: '/dashboard/psy', icon: LayoutDashboard },
+  { title: 'Etudiants', href: '/dashboard/psy/students', icon: UsersRound },
+  { title: 'Rendez-vous', href: '/dashboard/psy/rendez_vous', icon: CalendarDays },
+  { title: 'Mon profil', href: '/dashboard/psy/profil', icon: UserRound },
 ]
 
+function isActivePath(pathname: string, href: string) {
+  if (href === '/dashboard/psy') {
+    return pathname === href
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
+
 export function PsySidebar() {
+  const pathname = usePathname()
+
   return (
-    <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-24 shrink-0 flex-col items-center overflow-y-auto rounded-[32px] bg-gradient-to-b from-[#7c83fd] via-[#8b8ff8] to-[#a5b4fc] py-6 shadow-[0_20px_60px_rgba(124,131,253,0.25)] md:flex">
-      <div className="flex flex-1 flex-col items-center justify-center gap-5">
+    <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 flex-col overflow-hidden rounded-[32px] border border-white/60 bg-gradient-to-b from-[#efe4ff]/95 via-[#f8f3ff]/90 to-[#eadcff]/95 p-4 shadow-[0_25px_70px_rgba(109,40,217,0.18)] backdrop-blur-xl md:flex">
+      <div className="mb-6 flex items-center gap-3 rounded-[24px] border border-white/70 bg-white/65 p-3 shadow-[0_8px_24px_rgba(109,40,217,0.08)]">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_26px_rgba(139,92,246,0.28)]">
+          <HeartPulse className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-[#2d1068]">Espace psy</p>
+          <p className="truncate text-xs text-[#7a6a99]">Suivi clinique</p>
+        </div>
+      </div>
+
+      <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
         {navItems.map((item) => {
           const Icon = item.icon
+          const active = isActivePath(pathname, item.href)
 
           return (
             <Link
               key={item.href}
               href={item.href}
               title={item.title}
-              className="rounded-2xl bg-white/20 p-3 text-white"
+              className={`group flex items-center gap-3 rounded-[20px] border px-3 py-3 text-sm font-medium transition ${
+                active
+                  ? 'border-white/80 bg-white text-[#2d1068] shadow-[0_12px_30px_rgba(109,40,217,0.16)]'
+                  : 'border-transparent text-[#6E628F] hover:border-white/70 hover:bg-white/70 hover:text-[#2d1068]'
+              }`}
             >
-              <Icon className="h-5 w-5" />
+              <span
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition ${
+                  active
+                    ? 'bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white'
+                    : 'bg-white/70 text-[#8B5CF6] group-hover:bg-[#F3ECFF]'
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className="truncate">{item.title}</span>
             </Link>
           )
         })}
-      </div>
+      </nav>
 
-      <div className="mt-auto">
-        <LogoutButton />
+      <div className="mt-4 border-t border-white/70 pt-4">
+        <LogoutButton showLabel />
       </div>
     </aside>
   )
 }
-

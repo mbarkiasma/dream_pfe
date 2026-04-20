@@ -188,6 +188,7 @@ CREATE TABLE IF NOT EXISTS metier.reve (
   intensite varchar,
   theme varchar,
   frequence varchar,
+  video_status varchar NOT NULL DEFAULT 'pending',
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT reve_pkey PRIMARY KEY (ref_reve),
@@ -344,6 +345,7 @@ CREATE TABLE IF NOT EXISTS metier.rdv_confirme (
 );
 
 CREATE INDEX IF NOT EXISTS idx_metier_utilisateur_email ON metier.utilisateur(login_email);
+CREATE INDEX IF NOT EXISTS idx_metier_utilisateur_payload_user_id ON metier.utilisateur(payload_user_id);
 CREATE INDEX IF NOT EXISTS idx_metier_reve_etudiant_id ON metier.reve(etudiant_id);
 CREATE INDEX IF NOT EXISTS idx_metier_entretien_etudiant_id ON metier.entretien(etudiant_id);
 CREATE INDEX IF NOT EXISTS idx_metier_question_entretien_id ON metier.question(entretien_id);

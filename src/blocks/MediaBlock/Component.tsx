@@ -4,7 +4,7 @@ import { cn } from '@/utilities/ui'
 import React from 'react'
 import RichText from '@/components/RichText'
 
-import type { MediaBlock as MediaBlockProps } from '@/payload-types'
+import type { Media as MediaType, MediaBlock as MediaBlockProps } from '@/payload-types'
 
 import { Media } from '../../components/Media'
 
@@ -16,6 +16,7 @@ type Props = MediaBlockProps & {
   imgClassName?: string
   staticImage?: StaticImageData
   disableInnerContainer?: boolean
+  media?: (MediaType & { caption?: Parameters<typeof RichText>[0]['data'] | null }) | string | null
 }
 
 export const MediaBlock: React.FC<Props> = (props) => {

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useDeferredValue, useEffect, useState, useTransition } from 'react'
 import {
@@ -14,6 +14,7 @@ import {
   Trash2,
   Video,
   Wand2,
+  X,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -83,7 +84,7 @@ function getStatusCopy(status: Dream['videoStatus']) {
       return {
         label: 'En attente',
         icon: Clock3,
-        badgeClass: 'border-slate-200 bg-slate-50 text-slate-600',
+        badgeClass: 'border-slate-200 bg-slate-50 text-[#6E628F]',
         dotClass: 'bg-slate-400',
         description: 'Le reve est en file avant generation.',
       }
@@ -112,7 +113,11 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   const [query, setQuery] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
-  const [expandedAnalyses, setExpandedAnalyses] = useState<Record<string, boolean>>({})
+  const [selectedAnalysis, setSelectedAnalysis] = useState<{
+    content: string
+    date: string
+    title: string
+  } | null>(null)
   const [pending, startTransition] = useTransition()
   const deferredQuery = useDeferredValue(query)
   const hasDreamInProgress = dreams.some((dream) =>
@@ -263,11 +268,12 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
     })
   }
 
-  function toggleAnalysis(id: string | number) {
-    setExpandedAnalyses((current) => ({
-      ...current,
-      [String(id)]: !current[String(id)],
-    }))
+  function openAnalysisModal(dream: Dream, content: string) {
+    setSelectedAnalysis({
+      content,
+      date: formatDate(dream.createdAt),
+      title: dream.summary?.trim() || dream.description.trim().slice(0, 80) || 'Analyse du reve',
+    })
   }
 
   return (
@@ -288,8 +294,8 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
               <h2 className="max-w-2xl text-3xl font-bold leading-tight tracking-[-0.025em] text-slate-900 md:text-4xl">
                 Racontez votre reve, puis validez son resume.
               </h2>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
-                Decrivez simplement ce dont vous vous souvenez. L'application prepare un resume et une analyse, puis lance la video apres votre validation.
+              <p className="mt-4 max-w-2xl text-base leading-8 text-[#6E628F]">
+                Decrivez simplement ce dont vous vous souvenez. L&apos;application prepare un resume et une analyse, puis lance la video apres votre validation.
               </p>
             </div>
 
@@ -298,7 +304,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 placeholder="Exemple : J'etais dans une maison inconnue, je cherchais quelqu'un et je ressentais de la peur..."
-                className="min-h-[172px] resize-none rounded-[24px] border border-slate-200 bg-white px-5 py-4 text-base leading-8 text-slate-800 shadow-sm placeholder:text-slate-400 focus-visible:ring-sky-200"
+                className="min-h-[172px] resize-none rounded-[24px] border border-slate-200 bg-white px-5 py-4 text-base leading-8 text-[#2d1068] shadow-sm placeholder:text-slate-400 focus-visible:ring-sky-200"
                 disabled={pending}
               />
 
@@ -321,7 +327,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                   )}
                 </Button>
 
-                <div className="flex flex-wrap gap-2 text-sm font-medium text-slate-600">
+                <div className="flex flex-wrap gap-2 text-sm font-medium text-[#6E628F]">
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-2">
                     {weeklyUsed}/{weeklyLimit} reves cette semaine
                   </span>
@@ -391,7 +397,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                     )
                   })()}
                 </div>
-                <p className="mt-3 line-clamp-3 text-sm leading-7 text-slate-600">
+                <p className="mt-3 line-clamp-3 text-sm leading-7 text-[#6E628F]">
                   {latestDream.summary || latestDream.description}
                 </p>
               </div>
@@ -428,7 +434,6 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             const StatusIcon = statusCopy.icon
             const dreamVideoUrl = getDreamVideoUrl(dream)
             const analysisCopy = getAnalysisCopy(dream)
-            const isAnalysisExpanded = Boolean(expandedAnalyses[String(dream.id)])
             const canExpandAnalysis = analysisCopy.length > 260
 
             return (
@@ -516,7 +521,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                               <Moon className="h-4 w-4 text-indigo-500" />
                               Description
                             </p>
-                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-slate-600">
+                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-[#6E628F]">
                               {dream.description}
                             </p>
                           </div>
@@ -526,16 +531,16 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                               <Wand2 className="h-4 w-4 text-cyan-500" />
                               Analyse
                             </p>
-                            <p className={`${isAnalysisExpanded ? '' : 'line-clamp-6'} whitespace-pre-line text-sm leading-7 text-slate-600`}>
+                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-[#6E628F]">
                               {analysisCopy}
                             </p>
                             {canExpandAnalysis ? (
                               <button
                                 type="button"
-                                onClick={() => toggleAnalysis(dream.id)}
-                                className="mt-3 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700"
+                                onClick={() => openAnalysisModal(dream, analysisCopy)}
+                                className="mt-3 rounded-full border border-[#D8C7FF] bg-[#F3ECFF] px-4 py-2 text-xs font-semibold text-[#6D28D9] shadow-[0_8px_20px_rgba(109,40,217,0.10)] transition hover:bg-[#E9DDFF]"
                               >
-                                {isAnalysisExpanded ? 'Voir moins' : 'Voir plus'}
+                                Voir plus
                               </button>
                             ) : null}
                           </div>
@@ -563,12 +568,69 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
           })
         ) : (
           <Card className="rounded-[34px] border border-dashed border-slate-200 bg-white/70 shadow-none">
-            <CardContent className="p-10 text-center text-sm leading-7 text-slate-500">
+            <CardContent className="p-10 text-center text-sm leading-7 text-[#7A6A99]">
               Aucun reve ne correspond a votre recherche pour le moment.
             </CardContent>
           </Card>
         )}
       </div>
+
+      {selectedAnalysis ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d1068]/35 px-4 py-6 backdrop-blur-md"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setSelectedAnalysis(null)}
+        >
+          <div
+            className="relative flex max-h-[86vh] w-full max-w-3xl flex-col overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] shadow-[0_34px_110px_rgba(45,16,104,0.28)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="border-b border-white/70 px-6 py-5 md:px-7">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9B6BFF]">
+                    Analyse du reve
+                  </p>
+                  <h3 className="mt-2 line-clamp-2 text-2xl font-bold tracking-[-0.03em] text-[#2d1068]">
+                    {selectedAnalysis.title}
+                  </h3>
+                  <p className="mt-2 text-sm font-medium text-[#7A6A99]">
+                    Cree le {selectedAnalysis.date}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedAnalysis(null)}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/80 bg-white/80 text-[#6D28D9] shadow-[0_10px_24px_rgba(109,40,217,0.12)] transition hover:bg-white hover:text-rose-600"
+                  aria-label="Fermer l'analyse"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="min-h-0 overflow-y-auto px-6 py-5 md:px-7">
+              <div className="rounded-[26px] border border-white/80 bg-white/75 p-5 shadow-[0_14px_45px_rgba(109,40,217,0.10)]">
+                <p className="whitespace-pre-line text-sm leading-8 text-[#4B3F72] md:text-base">
+                  {selectedAnalysis.content}
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-white/70 bg-white/45 px-6 py-4 md:px-7">
+              <button
+                type="button"
+                onClick={() => setSelectedAnalysis(null)}
+                className="w-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(109,40,217,0.22)] transition hover:brightness-105 sm:w-auto"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -11,7 +11,7 @@ export const Users: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['firstName', 'lastName', 'email', 'role'],
+    defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isAvailableForCoaching'],
     useAsTitle: 'email',
   },
   auth: true,
@@ -29,12 +29,42 @@ export const Users: CollectionConfig = {
       type: 'select',
       defaultValue: 'etudiant',
       options: [
+        { label: 'Admin', value: 'admin' },
         { label: 'Etudiant', value: 'etudiant' },
         { label: 'Coach', value: 'coach' },
         { label: 'Psychologue', value: 'psy' },
       ],
       required: true,
       saveToJWT: true, // Très important : permet à getAuthenticatedDashboardUser de voir le rôle
+    },
+    {
+      name: 'isAvailableForCoaching',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Disponible pour le coaching humain',
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'coach',
+        description:
+          "Activez ce champ quand le coach peut recevoir de nouvelles sessions d'accompagnement.",
+      },
+    },
+    {
+      name: 'coachingSpecialty',
+      type: 'text',
+      label: 'Specialite coaching',
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'coach',
+        description: 'Exemple : stress, motivation, orientation, organisation.',
+      },
+    },
+    {
+      name: 'coachingBio',
+      type: 'textarea',
+      label: 'Presentation coaching',
+      maxLength: 280,
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'coach',
+      },
     },
     {
       name: 'magicLoginToken',

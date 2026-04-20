@@ -13,14 +13,16 @@ import {
 
 import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
 
-import type {
-  BannerBlock as BannerBlockProps,
-  CallToActionBlock as CTABlockProps,
-  MediaBlock as MediaBlockProps,
-} from '@/payload-types'
+import type { CallToActionBlock as CTABlockProps, MediaBlock as MediaBlockProps } from '@/payload-types'
 import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { cn } from '@/utilities/ui'
+
+type BannerBlockProps = {
+  blockType: 'banner'
+  content?: DefaultTypedEditorState
+  style?: 'info' | 'error' | 'success' | 'warning'
+}
 
 type NodeTypes =
   | DefaultNodeTypes
