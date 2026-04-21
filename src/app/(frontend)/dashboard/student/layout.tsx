@@ -1,23 +1,10 @@
 import type { ReactNode } from 'react'
-import { redirect } from 'next/navigation'
 
 import { StudentSidebar } from '@/components/dashboard/student/StudentSidebar'
-import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
+import { requireDashboardRole } from '@/utilities/dashboardAuth'
 
-export default async function StudentDashboardLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
-  const { user } = await getAuthenticatedDashboardUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  if (user.role !== 'etudiant') {
-    redirect(`/dashboard/${user.role === 'coach' ? 'coach' : user.role}`)
-  }
+export default async function StudentDashboardLayout({ children }: { children: ReactNode }) {
+  await requireDashboardRole('etudiant')
 
   return (
     <section className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] p-4 md:p-6">

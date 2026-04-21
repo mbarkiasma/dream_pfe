@@ -1,24 +1,10 @@
 import type { ReactNode } from 'react'
-import { redirect } from 'next/navigation'
+
 import { PsySidebar } from '@/components/dashboard/psy/PsySidebar'
-import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
+import { requireDashboardRole } from '@/utilities/dashboardAuth'
 
-export default async function PsychologueDashboardLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
-  const { user } = await getAuthenticatedDashboardUser()
-
-  // 1. Si pas d'utilisateur -> Login
-  if (!user) {
-    redirect('/login')
-  }
-
-  // 2. Sécurité : Si l'utilisateur n'est pas PSY, on le renvoie vers son bon dashboard
-  if (user.role !== 'psy') {
-    redirect(`/dashboard/${user.role === 'etudiant' ? 'student' : user.role}`)
-  }
+export default async function PsychologueDashboardLayout({ children }: { children: ReactNode }) {
+  await requireDashboardRole('psy')
 
   return (
     <section className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] p-4 md:p-6">

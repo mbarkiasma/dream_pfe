@@ -640,6 +640,7 @@ export interface Media {
  */
 export interface User {
   id: number;
+  clerkUserId?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   role: 'admin' | 'etudiant' | 'coach' | 'psy';
@@ -1313,6 +1314,7 @@ export interface FormBlockSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  clerkUserId?: T;
   firstName?: T;
   lastName?: T;
   role?: T;

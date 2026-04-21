@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { authenticated } from '../../access/authenticated'
+import { clerkAuthStrategy } from './clerkAuthStrategy'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -14,8 +15,20 @@ export const Users: CollectionConfig = {
     defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isAvailableForCoaching'],
     useAsTitle: 'email',
   },
-  auth: true,
+  auth: {
+    strategies: [clerkAuthStrategy],
+  },
   fields: [
+    {
+      name: 'clerkUserId',
+      type: 'text',
+      label: 'Clerk user ID',
+      unique: true,
+      index: true,
+      admin: {
+        readOnly: true,
+      },
+    },
     {
       name: 'firstName',
       type: 'text',
