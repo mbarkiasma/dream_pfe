@@ -1,11 +1,14 @@
-'use client'
+import { redirect } from 'next/navigation'
 
-import { useEffect } from 'react'
+import { getDashboardPath } from '@/utilities/dashboardAuth'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
-export default function AuthRedirectPage() {
-  useEffect(() => {
-    window.location.replace('/dashboard/student')
-  }, [])
+export default async function AuthRedirectPage() {
+  const { user } = await getAuthenticatedDashboardUser()
 
-  return null
+  if (!user) {
+    redirect('/login')
+  }
+
+  redirect(getDashboardPath(user.role))
 }

@@ -25,8 +25,8 @@ export function LoginClient() {
 
           <section className="flex justify-center">
             <SignIn
-              fallbackRedirectUrl="/dashboard/student"
-              forceRedirectUrl="/dashboard/student"
+              fallbackRedirectUrl="/auth/redirect"
+              forceRedirectUrl="/auth/redirect"
               path="/login"
               routing="path"
             />
