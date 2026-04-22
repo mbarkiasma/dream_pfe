@@ -5,7 +5,7 @@ import { clerkAuthStrategy } from './clerkAuthStrategy'
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
-    admin: authenticated,
+    admin: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'psy',
     create: () => true, // Permet l'inscription
     delete: authenticated,
     read: authenticated,

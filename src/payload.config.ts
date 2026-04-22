@@ -18,6 +18,8 @@ import { Dreams } from './collections/Dreams'
 import { CoachingSessions } from './collections/CoachingSessions'
 import { CoachingMessages } from './collections/CoachingMessages'
 import { CoachNotes } from './collections/CoachNotes'
+import { PsyAvailabilities } from './collections/PsyAvailabilities'
+import { RendezvousPsy } from './collections/RendezvousPsy'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -811,6 +813,8 @@ export default buildConfig({
     CoachingSessions,
     CoachingMessages,
     CoachNotes,
+    PsyAvailabilities,
+    RendezvousPsy,
   ],
   globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),

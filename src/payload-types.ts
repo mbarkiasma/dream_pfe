@@ -75,6 +75,8 @@ export interface Config {
     'coaching-sessions': CoachingSession;
     'coaching-messages': CoachingMessage;
     'coach-notes': CoachNote;
+    'psy-availabilities': PsyAvailability;
+    'rendez-vous-psy': RendezVousPsy;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -95,6 +97,8 @@ export interface Config {
     'coaching-sessions': CoachingSessionsSelect<false> | CoachingSessionsSelect<true>;
     'coaching-messages': CoachingMessagesSelect<false> | CoachingMessagesSelect<true>;
     'coach-notes': CoachNotesSelect<false> | CoachNotesSelect<true>;
+    'psy-availabilities': PsyAvailabilitiesSelect<false> | PsyAvailabilitiesSelect<true>;
+    'rendez-vous-psy': RendezVousPsySelect<false> | RendezVousPsySelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -805,6 +809,50 @@ export interface CoachNote {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "psy-availabilities".
+ */
+export interface PsyAvailability {
+  id: number;
+  label: string;
+  psychologist: number | User;
+  dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+  /**
+   * Format HH:mm, exemple 09:00
+   */
+  startTime: string;
+  /**
+   * Format HH:mm, exemple 12:00
+   */
+  endTime: string;
+  slotDuration: number;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rendez-vous-psy".
+ */
+export interface RendezVousPsy {
+  id: number;
+  title: string;
+  student: number | User;
+  psychologist: number | User;
+  date: string;
+  startTime: string;
+  endTime: string;
+  reason: string;
+  urgency: 'normal' | 'urgent';
+  status: 'pending' | 'confirmed' | 'rejected' | 'cancelled' | 'completed';
+  /**
+   * Expliquez pourquoi le rendez-vous est refuse afin d'orienter l'etudiant.
+   */
+  rejectionReason?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1018,6 +1066,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'coach-notes';
         value: number | CoachNote;
+      } | null)
+    | ({
+        relationTo: 'psy-availabilities';
+        value: number | PsyAvailability;
+      } | null)
+    | ({
+        relationTo: 'rendez-vous-psy';
+        value: number | RendezVousPsy;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1476,6 +1532,39 @@ export interface CoachNotesSelect<T extends boolean = true> {
   student?: T;
   coach?: T;
   content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "psy-availabilities_select".
+ */
+export interface PsyAvailabilitiesSelect<T extends boolean = true> {
+  label?: T;
+  psychologist?: T;
+  dayOfWeek?: T;
+  startTime?: T;
+  endTime?: T;
+  slotDuration?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rendez-vous-psy_select".
+ */
+export interface RendezVousPsySelect<T extends boolean = true> {
+  title?: T;
+  student?: T;
+  psychologist?: T;
+  date?: T;
+  startTime?: T;
+  endTime?: T;
+  reason?: T;
+  urgency?: T;
+  status?: T;
+  rejectionReason?: T;
   updatedAt?: T;
   createdAt?: T;
 }
