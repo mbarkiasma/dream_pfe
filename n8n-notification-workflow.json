@@ -1,0 +1,260 @@
+{
+  "name": "Dream PFE - Notifications Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notification",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e33a29c2-9d87-45fb-9b8d-4d0ec2da6c11",
+      "name": "Webhook Notification",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "dream-pfe-notification"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c698f22f-c5df-4433-a2e6-224ded8b1f4f",
+              "leftValue": "={{ $json.headers['x-webhook-secret'] }}",
+              "rightValue": "={{ $env.N8N_WEBHOOK_SECRET }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d755dc3e-60d8-4f91-8db7-3427486fe99f",
+      "name": "Verifier Secret",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || {};\nconst required = ['to', 'subject', 'title', 'message'];\nconst missing = required.filter((key) => typeof body[key] !== 'string' || body[key].trim() === '');\n\nif (missing.length > 0) {\n  return [{ json: { valid: false, error: `Missing required fields: ${missing.join(', ')}` } }];\n}\n\nreturn [{\n  json: {\n    valid: true,\n    event: body.event || 'notification_created',\n    link: body.link || '',\n    message: body.message.trim(),\n    notificationId: body.notificationId,\n    subject: body.subject.trim(),\n    title: body.title.trim(),\n    to: body.to.trim(),\n  },\n}];"
+      },
+      "id": "b392fe8e-9ad6-4102-922f-a5a6f20569e0",
+      "name": "Preparer Donnees",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f36c71bc-1280-4112-a27b-a44d89aac3ee",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b7e862c7-b5da-4e23-a1c1-bc6c4a2f57e6",
+      "name": "Donnees Valides",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        760,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "Dream PFE <notifications@example.com>",
+        "toEmail": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "html": "=<div style=\"font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; color: #24114f; line-height: 1.6;\">\n  <div style=\"padding: 24px; border: 1px solid #eee7ff; border-radius: 16px; background: #fbf8ff;\">\n    <p style=\"font-size: 12px; margin: 0 0 10px; color: #7b6b9a; text-transform: uppercase; letter-spacing: .08em;\">Dream PFE</p>\n    <h2 style=\"margin: 0 0 12px; color: #2d1068; font-size: 22px;\">{{ $json.title }}</h2>\n    <p style=\"font-size: 15px; margin: 0 0 20px;\">{{ $json.message }}</p>\n    {{ $json.link ? '<a href=\"' + $json.link + '\" style=\"display: inline-block; background: #6d28d9; color: #ffffff; text-decoration: none; padding: 12px 18px; border-radius: 999px; font-weight: 700;\">Ouvrir la plateforme</a>' : '' }}\n  </div>\n  <p style=\"font-size: 12px; color: #7b6b9a; margin-top: 16px;\">Cet email a ete envoye automatiquement par Dream PFE.</p>\n</div>",
+        "options": {
+          "allowUnauthorizedCerts": false
+        }
+      },
+      "id": "abcba38d-c21f-4f1f-923b-f57ecf6039a3",
+      "name": "Envoyer Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1020,
+        -220
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, message: 'Email sent', notificationId: $json.notificationId || null } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "f1aa77a3-682e-4e7c-82d8-4d179344b754",
+      "name": "Reponse OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: $json.error || 'Invalid notification payload' } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "fdc1ddf6-c2e0-4361-a7de-aa84ed62ab35",
+      "name": "Reponse Bad Request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1020,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": false, \"error\": \"Invalid webhook secret\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "a2b95867-8d67-4585-9d78-67828a6cb005",
+      "name": "Reponse Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        140
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Notification": {
+      "main": [
+        [
+          {
+            "node": "Verifier Secret",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifier Secret": {
+      "main": [
+        [
+          {
+            "node": "Preparer Donnees",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reponse Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparer Donnees": {
+      "main": [
+        [
+          {
+            "node": "Donnees Valides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Donnees Valides": {
+      "main": [
+        [
+          {
+            "node": "Envoyer Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reponse Bad Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envoyer Email": {
+      "main": [
+        [
+          {
+            "node": "Reponse OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f0af559d-1e7d-4583-a242-e8ddf8450f02",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "dream-pfe-notifications-email",
+  "tags": []
+}

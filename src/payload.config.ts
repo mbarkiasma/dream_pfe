@@ -20,6 +20,9 @@ import { CoachingMessages } from './collections/CoachingMessages'
 import { CoachNotes } from './collections/CoachNotes'
 import { PsyAvailabilities } from './collections/PsyAvailabilities'
 import { RendezvousPsy } from './collections/RendezvousPsy'
+import { Notifications } from './collections/Notifications'
+import { createNotification } from './utilities/createNotification'
+
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -240,6 +243,23 @@ export default buildConfig({
               conclusion: analysis?.conclusion || '',
             },
           })
+
+          try {
+            await createNotification({
+              actor: req.user.id,
+              event: 'personality_analysis_created',
+              link: `/dashboard/student/analyses/${doc.id}/pdf`,
+              message: `Votre analyse de personnalite ${doc.reference} est prete.`,
+              payload: req.payload,
+              recipient: req.user.id,
+              req,
+              sendEmail: true,
+              title: 'Analyse de personnalite prete',
+              type: 'analyse',
+            })
+          } catch (error) {
+            console.error('Failed to create analysis notification:', error)
+          }
 
           return Response.json({
             success: true,
@@ -815,6 +835,7 @@ export default buildConfig({
     CoachNotes,
     PsyAvailabilities,
     RendezvousPsy,
+    Notifications,
   ],
   globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),

@@ -2,7 +2,8 @@ import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-import { getRelationId, isSameId, sanitizeCoachingMessage } from '@/lib/coaching'
+import { getDisplayName, getRelationId, isSameId, sanitizeCoachingMessage } from '@/lib/coaching'
+import { createNotification } from '@/utilities/createNotification'
 
 type SaveNoteBody = {
   content?: string
@@ -109,6 +110,22 @@ export async function POST(request: Request) {
       content,
     },
   })
+
+  try {
+    await createNotification({
+      actor: user.id,
+      event: 'coach_note_created',
+      link: '/dashboard/student/coaching',
+      message: `${getDisplayName(user)} a ajoute une note de suivi a votre accompagnement.`,
+      payload,
+      recipient: studentId,
+      sendEmail: true,
+      title: 'Nouvelle note de suivi',
+      type: 'coaching',
+    })
+  } catch (error) {
+    console.error('Failed to create coach note notification:', error)
+  }
 
   return Response.json({ note })
 }

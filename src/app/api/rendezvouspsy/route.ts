@@ -2,6 +2,8 @@ import config from '@payload-config'
 import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 
+import { createNotification } from '@/utilities/createNotification'
+
 const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 const blockingStatuses = ['pending', 'confirmed', 'completed'] as const
 
@@ -53,6 +55,11 @@ function getNextDateValue(date: string) {
   const day = String(nextDate.getDate()).padStart(2, '0')
 
   return `${year}-${month}-${day}`
+}
+
+function getUserName(user: { email?: string; firstName?: string | null; lastName?: string | null }) {
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
+  return fullName || user.email || 'Un utilisateur'
 }
 
 export async function POST(request: Request) {
@@ -190,6 +197,22 @@ export async function POST(request: Request) {
     },
   })
 
+  try {
+    await createNotification({
+      actor: user.id,
+      event: 'rendezvous_created',
+      link: '/dashboard/psy/rendez_vous',
+      message: `${getUserName(user)} a demande un rendez-vous le ${date} a ${selectedSlot.startTime}.`,
+      payload,
+      recipient: psychologist.id,
+      sendEmail: true,
+      title: 'Nouvelle demande de rendez-vous',
+      type: 'rendezvous',
+    })
+  } catch (error) {
+    console.error('Failed to create rendez-vous notification:', error)
+  }
+
   return Response.json({
     success: true,
     appointment,
@@ -251,6 +274,35 @@ export async function PATCH(request: Request) {
       status,
     },
   })
+
+  const studentId =
+    typeof appointment.student === 'object' ? appointment.student.id : appointment.student
+
+  const statusLabels: Record<NonNullable<UpdateAppointmentBody['status']>, string> = {
+    cancelled: 'annule',
+    completed: 'termine',
+    confirmed: 'confirme',
+    rejected: 'refuse',
+  }
+
+  try {
+    await createNotification({
+      actor: user.id,
+      event: `rendezvous_${status}`,
+      link: '/dashboard/student/rendez_vous',
+      message:
+        status === 'rejected'
+          ? `Votre rendez-vous psy a ete refuse. Motif: ${rejectionReason}.`
+          : `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est ${statusLabels[status]}.`,
+      payload,
+      recipient: studentId,
+      sendEmail: true,
+      title: `Rendez-vous psy ${statusLabels[status]}`,
+      type: 'rendezvous',
+    })
+  } catch (error) {
+    console.error('Failed to create rendez-vous status notification:', error)
+  }
 
   return Response.json({
     success: true,

@@ -4,6 +4,7 @@ import config from '@payload-config'
 
 import type { CoachingMode } from '@/lib/coaching'
 import { getDisplayName, sanitizeCoachingMessage } from '@/lib/coaching'
+import { createNotification } from '@/utilities/createNotification'
 
 type StartSessionBody = {
   coachId?: string
@@ -91,6 +92,24 @@ export async function POST(request: Request) {
       startedAt: new Date().toISOString(),
     },
   })
+
+  if (mode === 'classic' && coachId) {
+    try {
+      await createNotification({
+        actor: user.id,
+        event: 'coaching_session_created',
+        link: '/dashboard/coach/coaching',
+        message: `${getDisplayName(user)} a demarre une session de coaching classique.`,
+        payload,
+        recipient: coachId,
+        sendEmail: true,
+        title: 'Nouvelle session de coaching',
+        type: 'coaching',
+      })
+    } catch (error) {
+      console.error('Failed to create coaching session notification:', error)
+    }
+  }
 
   return Response.json({ session })
 }

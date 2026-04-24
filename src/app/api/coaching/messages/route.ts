@@ -2,8 +2,9 @@ import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-import { isSameId, sanitizeCoachingMessage } from '@/lib/coaching'
+import { getDisplayName, getRelationId, isSameId, sanitizeCoachingMessage } from '@/lib/coaching'
 import { generateSmartCoachingReply } from '@/lib/smart-coaching'
+import { createNotification } from '@/utilities/createNotification'
 
 type SendMessageBody = {
   content?: string
@@ -58,6 +59,30 @@ export async function POST(request: Request) {
       content,
     },
   })
+
+  if (session.mode === 'classic') {
+    const recipientId = senderRole === 'student' ? getRelationId(session.coach) : getRelationId(session.student)
+    const recipientLink =
+      senderRole === 'student' ? '/dashboard/coach/coaching' : '/dashboard/student/coaching'
+
+    if (typeof recipientId === 'number') {
+      try {
+        await createNotification({
+          actor: user.id,
+          event: 'coaching_message_created',
+          link: recipientLink,
+          message: `${getDisplayName(user)} vous a envoye un nouveau message de coaching.`,
+          payload,
+          recipient: recipientId,
+          sendEmail: true,
+          title: 'Nouveau message de coaching',
+          type: 'coaching',
+        })
+      } catch (error) {
+        console.error('Failed to create coaching message notification:', error)
+      }
+    }
+  }
 
   let aiMessage = null
 

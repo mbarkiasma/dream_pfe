@@ -77,6 +77,7 @@ export interface Config {
     'coach-notes': CoachNote;
     'psy-availabilities': PsyAvailability;
     'rendez-vous-psy': RendezVousPsy;
+    notifications: Notification;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -99,6 +100,7 @@ export interface Config {
     'coach-notes': CoachNotesSelect<false> | CoachNotesSelect<true>;
     'psy-availabilities': PsyAvailabilitiesSelect<false> | PsyAvailabilitiesSelect<true>;
     'rendez-vous-psy': RendezVousPsySelect<false> | RendezVousPsySelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -853,6 +855,25 @@ export interface RendezVousPsy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: number;
+  recipient: number | User;
+  actor?: (number | null) | User;
+  title: string;
+  message: string;
+  type: 'rendezvous' | 'coaching' | 'analyse' | 'system';
+  status: 'unread' | 'read';
+  link?: string | null;
+  sendEmail?: boolean | null;
+  emailStatus: 'skipped' | 'pending' | 'sent' | 'failed';
+  readAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1074,6 +1095,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'rendez-vous-psy';
         value: number | RendezVousPsy;
+      } | null)
+    | ({
+        relationTo: 'notifications';
+        value: number | Notification;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1565,6 +1590,24 @@ export interface RendezVousPsySelect<T extends boolean = true> {
   urgency?: T;
   status?: T;
   rejectionReason?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  recipient?: T;
+  actor?: T;
+  title?: T;
+  message?: T;
+  type?: T;
+  status?: T;
+  link?: T;
+  sendEmail?: T;
+  emailStatus?: T;
+  readAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
