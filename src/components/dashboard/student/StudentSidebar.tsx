@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   CalendarDays,
+  Bell,
   FileSearch,
   LayoutDashboard,
   LifeBuoy,
@@ -21,6 +22,7 @@ const navItems = [
   { title: 'Mes analyses', href: '/dashboard/student/analyses', icon: FileSearch },
   { title: 'Smart coaching', href: '/dashboard/student/coaching', icon: LifeBuoy },
   { title: 'Rendez-vous', href: '/dashboard/student/rendez_vous', icon: CalendarDays },
+  { title: 'Notifications', href: '/dashboard/student/notifications', icon: Bell },
   { title: 'Suivi quotidien', href: '/dashboard/student/checkin', icon: NotebookPen },
   { title: 'Entretien IA', href: '/dashboard/student/interview', icon: MicVocal },
   { title: 'Mon profil', href: '/dashboard/student/profile', icon: UserRound },

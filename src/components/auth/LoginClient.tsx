@@ -1,9 +1,20 @@
 'use client'
 
-import { SignIn } from '@clerk/nextjs'
+import { SignIn, useUser } from '@clerk/nextjs'
 import { ShieldCheck } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export function LoginClient() {
+  const router = useRouter()
+  const { isLoaded, isSignedIn } = useUser()
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace('/auth/redirect')
+    }
+  }, [isLoaded, isSignedIn, router])
+
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] px-4 py-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center justify-center">

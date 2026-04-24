@@ -26,6 +26,15 @@ function withSiteUrl(link?: string) {
   return siteUrl ? `${siteUrl}${link.startsWith('/') ? link : `/${link}`}` : link
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export async function createNotification({
   actor,
   event = 'notification_created',
@@ -60,21 +69,6 @@ export async function createNotification({
     return notification
   }
 
-  const webhookUrl = process.env.N8N_NOTIFICATION_WEBHOOK_URL
-
-  if (!webhookUrl) {
-    await payload.update({
-      collection: 'notifications',
-      id: notification.id,
-      data: {
-        emailStatus: 'failed',
-      },
-      ...reqOptions,
-    })
-
-    return notification
-  }
-
   try {
     const user = await payload.findByID({
       collection: 'users',
@@ -83,26 +77,29 @@ export async function createNotification({
       ...reqOptions,
     })
 
-    const response = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-webhook-secret': process.env.N8N_WEBHOOK_SECRET ?? '',
-      },
-      body: JSON.stringify({
-        event,
-        link: withSiteUrl(link),
-        message,
-        notificationId: notification.id,
-        subject: title,
-        title,
-        to: user.email,
-      }),
-    })
+    const fullLink = withSiteUrl(link)
+    const safeTitle = escapeHtml(title)
+    const safeMessage = escapeHtml(message)
+    const safeLink = fullLink ? escapeHtml(fullLink) : ''
 
-    if (!response.ok) {
-      throw new Error(`Notification webhook failed with status ${response.status}`)
-    }
+    await payload.sendEmail({
+      to: user.email,
+      subject: title,
+      html: [
+        '<div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; color: #24114f; line-height: 1.6;">',
+        '<div style="padding: 24px; border: 1px solid #eee7ff; border-radius: 16px; background: #fbf8ff;">',
+        '<p style="font-size: 12px; margin: 0 0 10px; color: #7b6b9a; text-transform: uppercase; letter-spacing: .08em;">Dream PFE</p>',
+        `<h2 style="margin: 0 0 12px; color: #2d1068; font-size: 22px;">${safeTitle}</h2>`,
+        `<p style="font-size: 15px; margin: 0 0 20px;">${safeMessage}</p>`,
+        safeLink
+          ? `<a href="${safeLink}" style="display: inline-block; background: #6d28d9; color: #ffffff; text-decoration: none; padding: 12px 18px; border-radius: 999px; font-weight: 700;">Ouvrir la plateforme</a>`
+          : '',
+        '</div>',
+        '<p style="font-size: 12px; color: #7b6b9a; margin-top: 16px;">Cet email a ete envoye automatiquement par Dream PFE.</p>',
+        '</div>',
+      ].join(''),
+      text: fullLink ? `${message}\n\n${fullLink}` : message,
+    })
 
     await payload.update({
       collection: 'notifications',

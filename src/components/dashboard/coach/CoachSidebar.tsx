@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   BookOpenCheck,
+  Bell,
   CalendarDays,
   ClipboardList,
   LayoutDashboard,
@@ -22,6 +23,7 @@ const navItems = [
   { title: 'Sessions', href: '/dashboard/coach/coaching', icon: LifeBuoy },
   { title: 'Exercices', href: '/dashboard/coach/exercices', icon: BookOpenCheck },
   { title: 'Rendez-vous', href: '/dashboard/coach/rendez_vous', icon: CalendarDays },
+  { title: 'Notifications', href: '/dashboard/coach/notifications', icon: Bell },
   { title: 'Orientation psy', href: '/dashboard/coach/orientation_psy', icon: Stethoscope },
   { title: 'Mon profil', href: '/dashboard/coach/profil', icon: UserRound },
 ]

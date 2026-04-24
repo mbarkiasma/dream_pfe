@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -56,6 +57,11 @@ const databaseRequiresSSL =
   /supabase\.com/i.test(databaseURL) ||
   /sslmode=require/i.test(databaseURL) ||
   /[?&]ssl=true/i.test(databaseURL)
+const smtpHost = process.env.SMTP_HOST?.trim()
+const smtpPort = Number(process.env.SMTP_PORT || 587)
+const smtpSecure = process.env.SMTP_SECURE === 'true'
+const smtpUser = process.env.SMTP_USER?.trim()
+const smtpPass = process.env.SMTP_PASS?.replace(/\s+/g, '')
 
 export default buildConfig({
   endpoints: [
@@ -816,6 +822,31 @@ export default buildConfig({
     user: Users.slug,
   },
   editor: defaultLexical,
+  email: nodemailerAdapter({
+    defaultFromAddress:
+      process.env.SMTP_FROM_ADDRESS || smtpUser || 'notifications@dream-pfe.local',
+    defaultFromName: process.env.SMTP_FROM_NAME || 'Dream PFE',
+    transportOptions: smtpHost
+      ? {
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpSecure,
+          auth:
+            smtpUser && smtpPass
+              ? {
+                  user: smtpUser,
+                  pass: smtpPass,
+                }
+              : undefined,
+          tls:
+            process.env.SMTP_ALLOW_UNAUTHORIZED === 'true'
+              ? {
+                  rejectUnauthorized: false,
+                }
+              : undefined,
+        }
+      : undefined,
+  }),
   db: postgresAdapter({
     blocksAsJSON: true,
     pool: {

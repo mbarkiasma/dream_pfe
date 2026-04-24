@@ -26,7 +26,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
-        <ClerkProvider>
+        <ClerkProvider
+          signInFallbackRedirectUrl="/auth/redirect"
+          signInForceRedirectUrl="/auth/redirect"
+          signUpFallbackRedirectUrl="/auth/redirect"
+          signUpForceRedirectUrl="/auth/redirect"
+        >
           <Providers>
             {children}
           </Providers>

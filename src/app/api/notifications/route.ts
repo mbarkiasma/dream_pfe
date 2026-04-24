@@ -7,13 +7,17 @@ type PatchBody = {
   action?: 'mark-read' | 'mark-all-read'
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await getHeaders() })
 
   if (!user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const { searchParams } = new URL(request.url)
+  const limitParam = Number(searchParams.get('limit') || 30)
+  const limit = Number.isFinite(limitParam) ? Math.max(1, Math.min(limitParam, 100)) : 30
 
   const notifications = await payload.find({
     collection: 'notifications',
@@ -26,7 +30,7 @@ export async function GET() {
     },
     sort: '-createdAt',
     depth: 1,
-    limit: 30,
+    limit,
   })
 
   const unread = await payload.count({

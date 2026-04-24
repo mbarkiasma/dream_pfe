@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, HeartPulse, LayoutDashboard, UserRound, UsersRound } from 'lucide-react'
+import { Bell, CalendarDays, HeartPulse, LayoutDashboard, UserRound, UsersRound } from 'lucide-react'
 
 import { LogoutButton } from '@/components/dashboard/student/Logout'
 
@@ -10,6 +10,7 @@ const navItems = [
   { title: 'Dashboard', href: '/dashboard/psy', icon: LayoutDashboard },
   { title: 'Etudiants', href: '/dashboard/psy/students', icon: UsersRound },
   { title: 'Rendez-vous', href: '/dashboard/psy/rendez_vous', icon: CalendarDays },
+  { title: 'Notifications', href: '/dashboard/psy/notifications', icon: Bell },
   { title: 'Mon profil', href: '/dashboard/psy/profil', icon: UserRound },
 ]
 
