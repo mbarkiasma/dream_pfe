@@ -7,7 +7,6 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
-import { LoginBlockComponent } from '@/blocks/LoginBlock/Component'
 import LandingHeroBlockComponent from '@/blocks/HeroBlock/Component'
 import { SecondBlocAccueilBlock } from '@/blocks/secondBlocAccueil/Component'
 import { TroisiemeBlocAccueilBlock } from '@/blocks/thirdBlocAccueil/Component'
@@ -21,7 +20,6 @@ const blockComponents = {
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
-  loginBlock: LoginBlockComponent,
   landingHero: LandingHeroBlockComponent,
   secondBlocAccueil: SecondBlocAccueilBlock,
   troisiemeBlocAccueil: TroisiemeBlocAccueilBlock,

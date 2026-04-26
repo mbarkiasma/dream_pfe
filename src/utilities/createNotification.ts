@@ -1,6 +1,6 @@
 import type { Payload, PayloadRequest } from 'payload'
 
-type NotificationType = 'rendezvous' | 'coaching' | 'analyse' | 'system'
+type NotificationType = 'rendezvous' | 'coaching' | 'analyse' | 'motivation' | 'system'
 
 type CreateNotificationArgs = {
   actor?: number

@@ -78,6 +78,8 @@ export interface Config {
     'psy-availabilities': PsyAvailability;
     'rendez-vous-psy': RendezVousPsy;
     notifications: Notification;
+    'annonce-motivation': AnnonceMotivation;
+    'annonce-motivation-reactions': AnnonceMotivationReaction;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -101,6 +103,8 @@ export interface Config {
     'psy-availabilities': PsyAvailabilitiesSelect<false> | PsyAvailabilitiesSelect<true>;
     'rendez-vous-psy': RendezVousPsySelect<false> | RendezVousPsySelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    'annonce-motivation': AnnonceMotivationSelect<false> | AnnonceMotivationSelect<true>;
+    'annonce-motivation-reactions': AnnonceMotivationReactionsSelect<false> | AnnonceMotivationReactionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -165,19 +169,6 @@ export interface Page {
   id: number;
   title: string;
   layout: (
-    | {
-        title?: string | null;
-        subtitle?: string | null;
-        emailPlaceholder?: string | null;
-        passwordPlaceholder?: string | null;
-        buttonLabel?: string | null;
-        signupText?: string | null;
-        signupLabel?: string | null;
-        signupUrl?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'loginBlock';
-      }
     | CallToActionBlock
     | ContentBlock
     | MediaBlock
@@ -647,6 +638,8 @@ export interface Media {
 export interface User {
   id: number;
   clerkUserId?: string | null;
+  magic_login_token?: string | null;
+  magic_login_expires_at?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   role: 'admin' | 'etudiant' | 'coach' | 'psy';
@@ -659,8 +652,6 @@ export interface User {
    */
   coachingSpecialty?: string | null;
   coachingBio?: string | null;
-  magicLoginToken?: string | null;
-  magicLoginExpiresAt?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -863,12 +854,38 @@ export interface Notification {
   actor?: (number | null) | User;
   title: string;
   message: string;
-  type: 'rendezvous' | 'coaching' | 'analyse' | 'system';
+  type: 'rendezvous' | 'coaching' | 'analyse' | 'motivation' | 'system';
   status: 'unread' | 'read';
   link?: string | null;
   sendEmail?: boolean | null;
   emailStatus: 'skipped' | 'pending' | 'sent' | 'failed';
   readAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "annonce-motivation".
+ */
+export interface AnnonceMotivation {
+  id: number;
+  title: string;
+  content: string;
+  author: number | User;
+  status: 'draft' | 'published';
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "annonce-motivation-reactions".
+ */
+export interface AnnonceMotivationReaction {
+  id: number;
+  announcement: number | AnnonceMotivation;
+  student: number | User;
+  reaction: 'like';
   updatedAt: string;
   createdAt: string;
 }
@@ -1101,6 +1118,14 @@ export interface PayloadLockedDocument {
         value: number | Notification;
       } | null)
     | ({
+        relationTo: 'annonce-motivation';
+        value: number | AnnonceMotivation;
+      } | null)
+    | ({
+        relationTo: 'annonce-motivation-reactions';
+        value: number | AnnonceMotivationReaction;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1167,20 +1192,6 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        loginBlock?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              emailPlaceholder?: T;
-              passwordPlaceholder?: T;
-              buttonLabel?: T;
-              signupText?: T;
-              signupLabel?: T;
-              signupUrl?: T;
-              id?: T;
-              blockName?: T;
-            };
         cta?: T | CallToActionBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
@@ -1396,14 +1407,14 @@ export interface FormBlockSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   clerkUserId?: T;
+  magic_login_token?: T;
+  magic_login_expires_at?: T;
   firstName?: T;
   lastName?: T;
   role?: T;
   isAvailableForCoaching?: T;
   coachingSpecialty?: T;
   coachingBio?: T;
-  magicLoginToken?: T;
-  magicLoginExpiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1608,6 +1619,30 @@ export interface NotificationsSelect<T extends boolean = true> {
   sendEmail?: T;
   emailStatus?: T;
   readAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "annonce-motivation_select".
+ */
+export interface AnnonceMotivationSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  author?: T;
+  status?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "annonce-motivation-reactions_select".
+ */
+export interface AnnonceMotivationReactionsSelect<T extends boolean = true> {
+  announcement?: T;
+  student?: T;
+  reaction?: T;
   updatedAt?: T;
   createdAt?: T;
 }

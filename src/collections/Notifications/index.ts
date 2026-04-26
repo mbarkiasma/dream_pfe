@@ -86,6 +86,7 @@ export const Notifications: CollectionConfig = {
         { label: 'Rendez-vous', value: 'rendezvous' },
         { label: 'Coaching', value: 'coaching' },
         { label: 'Analyse', value: 'analyse' },
+        { label: 'Motivation', value: 'motivation' },
         { label: 'Système', value: 'system' },
       ],
       access: {

@@ -6,7 +6,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   access: {
     admin: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'psy',
-    create: () => true, // Permet l'inscription
+    create: () => true,
     delete: authenticated,
     read: authenticated,
     update: authenticated,
@@ -30,6 +30,22 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      name: 'magic_login_token',
+      type: 'text',
+      admin: {
+        hidden: true,
+        readOnly: true,
+      },
+    },
+    {
+      name: 'magic_login_expires_at',
+      type: 'date',
+      admin: {
+        hidden: true,
+        readOnly: true,
+      },
+    },
+    {
       name: 'firstName',
       type: 'text',
     },
@@ -48,7 +64,7 @@ export const Users: CollectionConfig = {
         { label: 'Psychologue', value: 'psy' },
       ],
       required: true,
-      saveToJWT: true, // Très important : permet à getAuthenticatedDashboardUser de voir le rôle
+      saveToJWT: true,
     },
     {
       name: 'isAvailableForCoaching',
@@ -77,30 +93,6 @@ export const Users: CollectionConfig = {
       maxLength: 280,
       admin: {
         condition: (_, siblingData) => siblingData?.role === 'coach',
-      },
-    },
-    {
-      name: 'magicLoginToken',
-      type: 'text',
-      admin: {
-        hidden: true,
-      },
-      access: {
-        create: () => false,
-        read: () => false,
-        update: () => false, // Reste bloqué pour les utilisateurs, mais le serveur (payload.update) passe outre avec overrideAccess: true
-      },
-    },
-    {
-      name: 'magicLoginExpiresAt',
-      type: 'date',
-      admin: {
-        hidden: true,
-      },
-      access: {
-        create: () => false,
-        read: () => false,
-        update: () => false,
       },
     },
   ],

@@ -12,6 +12,7 @@ import {
   MoonStar,
   NotebookPen,
   UserRound,
+  Megaphone,
 } from 'lucide-react'
 
 import { LogoutButton } from '@/components/dashboard/student/Logout'
@@ -21,6 +22,7 @@ const navItems = [
   { title: 'Mes reves', href: '/dashboard/student/dreams', icon: MoonStar },
   { title: 'Mes analyses', href: '/dashboard/student/analyses', icon: FileSearch },
   { title: 'Smart coaching', href: '/dashboard/student/coaching', icon: LifeBuoy },
+  { title: 'Annonces de motivation', href: '/dashboard/student/motivation', icon: Megaphone },
   { title: 'Rendez-vous', href: '/dashboard/student/rendez_vous', icon: CalendarDays },
   { title: 'Notifications', href: '/dashboard/student/notifications', icon: Bell },
   { title: 'Suivi quotidien', href: '/dashboard/student/checkin', icon: NotebookPen },

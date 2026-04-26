@@ -23,6 +23,8 @@ import { PsyAvailabilities } from './collections/PsyAvailabilities'
 import { RendezvousPsy } from './collections/RendezvousPsy'
 import { Notifications } from './collections/Notifications'
 import { createNotification } from './utilities/createNotification'
+import { AnnonceMotivation } from './collections/AnnonceMotivation'
+import { AnnonceMotivationReactions } from './collections/AnnonceMotivationReactions'
 
 
 const filename = fileURLToPath(import.meta.url)
@@ -867,6 +869,8 @@ export default buildConfig({
     PsyAvailabilities,
     RendezvousPsy,
     Notifications,
+    AnnonceMotivation,
+    AnnonceMotivationReactions,
   ],
   globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),

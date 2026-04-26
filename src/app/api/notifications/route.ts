@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const limitParam = Number(searchParams.get('limit') || 30)
-  const limit = Number.isFinite(limitParam) ? Math.max(1, Math.min(limitParam, 100)) : 30
+  const limit = Number.isFinite(limitParam) ? Math.max(1, Math.min(limitParam, 500)) : 30
 
   const notifications = await payload.find({
     collection: 'notifications',

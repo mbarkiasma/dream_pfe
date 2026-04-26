@@ -9,10 +9,12 @@ import {
   ClipboardList,
   LayoutDashboard,
   LifeBuoy,
+  Megaphone,
   Stethoscope,
   UserRound,
   UsersRound,
 } from 'lucide-react'
+
 
 import { LogoutButton } from '@/components/dashboard/student/Logout'
 
@@ -25,6 +27,7 @@ const navItems = [
   { title: 'Rendez-vous', href: '/dashboard/coach/rendez_vous', icon: CalendarDays },
   { title: 'Notifications', href: '/dashboard/coach/notifications', icon: Bell },
   { title: 'Orientation psy', href: '/dashboard/coach/orientation_psy', icon: Stethoscope },
+  { title: 'Annonces', href: '/dashboard/coach/annonces', icon: Megaphone },
   { title: 'Mon profil', href: '/dashboard/coach/profil', icon: UserRound },
 ]
 

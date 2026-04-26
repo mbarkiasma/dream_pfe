@@ -22,6 +22,7 @@ type NotificationsResponse = {
 const typeLabels: Record<string, string> = {
   analyse: 'Analyse',
   coaching: 'Coaching',
+  motivation: 'Motivation',
   rendezvous: 'Rendez-vous',
   system: 'Systeme',
 }
@@ -37,7 +38,7 @@ export function NotificationsPageClient() {
 
   async function loadNotifications() {
     try {
-      const response = await fetch('/api/notifications?limit=100', {
+      const response = await fetch('/api/notifications?limit=500', {
         cache: 'no-store',
       })
 

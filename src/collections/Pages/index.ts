@@ -12,7 +12,6 @@ import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
-import { LoginBlock } from '../../blocks/LoginBlock/config'
 import { LandingHeroBlock } from '@/blocks/HeroBlock/config'
 import { SecondBlocAccueil } from '@/blocks/secondBlocAccueil/config'
 import { TroisiemeBlocAccueil } from '@/blocks/thirdBlocAccueil/config'
@@ -78,7 +77,6 @@ export const Pages: CollectionConfig<'pages'> = {
               name: 'layout',
               type: 'blocks',
               blocks: [
-                LoginBlock,
                 CallToAction,
                 Content,
                 MediaBlock,
