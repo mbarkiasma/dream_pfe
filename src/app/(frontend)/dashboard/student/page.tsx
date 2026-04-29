@@ -98,94 +98,110 @@ export default async function StudentDashboardPage() {
 
       <div className="grid items-start gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-            <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200">
-                  <MoonStar className="h-5 w-5" />
-                </span>
-                <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
-                  Mon dernier reve
-                </CardTitle>
-              </div>
-              <Link
-                href="/dashboard/student/dreams"
-                className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-violet-700 transition hover:bg-violet-50 dark:text-violet-200 dark:hover:bg-white/10"
-              >
-                Voir
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </CardHeader>
-
-            <CardContent className="px-6 pb-6">
-              {latestDream ? (
-                <div className="space-y-4">
-                  <p className="line-clamp-4 text-base leading-8 text-[#6E628F] dark:text-muted-foreground">
-                    {latestDream.summary || latestDream.description}
-                  </p>
-                  <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
-                    Video : {latestDream.videoStatus}
+          <Link
+            href="/dashboard/student/dreams"
+            className="group block rounded-[32px] outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
+          >
+            <Card className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-violet-200 group-hover:bg-white group-hover:shadow-[0_24px_70px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
+              <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-violet-100 text-violet-700 transition group-hover:bg-violet-500 group-hover:text-white dark:bg-violet-500/15 dark:text-violet-200">
+                    <MoonStar className="h-5 w-5" />
                   </span>
+                  <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+                    Mon dernier reve
+                  </CardTitle>
                 </div>
-              ) : (
-                <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
-                  Aucun reve enregistre pour le moment.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                <span className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-violet-700 transition group-hover:bg-violet-50 dark:text-violet-200 dark:group-hover:bg-white/10">
+                  Voir
+                  <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </span>
+              </CardHeader>
+
+              <CardContent className="px-6 pb-6">
+                {latestDream ? (
+                  <div className="space-y-4">
+                    <p className="line-clamp-4 text-base leading-8 text-[#6E628F] dark:text-muted-foreground">
+                      {latestDream.summary || latestDream.description}
+                    </p>
+                    <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
+                      Video : {latestDream.videoStatus}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+                    Aucun reve enregistre pour le moment.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         <div className="space-y-6">
-          <Card className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-            <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200">
-                  <BarChart3 className="h-5 w-5" />
-                </span>
-                <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
-                  Analyse IA
-                </CardTitle>
-              </div>
-            </CardHeader>
-
-            <CardContent className="px-6 pb-6">
-              {latestAnalysis ? (
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-[#2d1068] dark:text-foreground">
-                    {latestAnalysis.reference}
-                  </p>
-                  <p className="line-clamp-4 leading-7 text-[#6E628F] dark:text-muted-foreground">
-                    {latestAnalysis.overview || 'Analyse disponible dans votre espace analyses.'}
-                  </p>
-                  <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
-                    Confiance : {latestAnalysis.niveauConfiance || 'moyen'}
+          <Link
+            href="/dashboard/student/analyses"
+            className="group block rounded-[32px] outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
+          >
+            <Card className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-violet-200 group-hover:bg-white group-hover:shadow-[0_24px_70px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
+              <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-violet-100 text-violet-700 transition group-hover:bg-violet-500 group-hover:text-white dark:bg-violet-500/15 dark:text-violet-200">
+                    <BarChart3 className="h-5 w-5" />
                   </span>
+                  <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+                    Analyse IA
+                  </CardTitle>
                 </div>
-              ) : (
+                <ChevronRight className="h-4 w-4 text-violet-600 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+              </CardHeader>
+
+              <CardContent className="px-6 pb-6">
+                {latestAnalysis ? (
+                  <div className="space-y-3">
+                    <p className="text-sm font-semibold text-[#2d1068] dark:text-foreground">
+                      {latestAnalysis.reference}
+                    </p>
+                    <p className="line-clamp-4 leading-7 text-[#6E628F] dark:text-muted-foreground">
+                      {latestAnalysis.overview || 'Analyse disponible dans votre espace analyses.'}
+                    </p>
+                    <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
+                      Confiance : {latestAnalysis.niveauConfiance || 'moyen'}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+                    Aucune analyse generee pour le moment.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link
+            href="/dashboard/student/rendez_vous"
+            className="group block rounded-[32px] outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
+          >
+            <Card className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-violet-200 group-hover:bg-white group-hover:shadow-[0_24px_70px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
+              <CardHeader className="flex-row items-center justify-between gap-3 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-violet-100 text-violet-700 transition group-hover:bg-violet-500 group-hover:text-white dark:bg-violet-500/15 dark:text-violet-200">
+                    <CalendarDays className="h-5 w-5" />
+                  </span>
+                  <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+                    Prochain rendez-vous
+                  </CardTitle>
+                </div>
+                <ChevronRight className="h-4 w-4 text-violet-600 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+              </CardHeader>
+
+              <CardContent className="px-6 pb-6">
                 <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
-                  Aucune analyse generee pour le moment.
+                  Aucun rendez-vous planifie pour le moment.
                 </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-            <CardHeader className="flex-row items-center gap-3 pb-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200">
-                <CalendarDays className="h-5 w-5" />
-              </span>
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
-                Prochain rendez-vous
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="px-6 pb-6">
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
-                Aucun rendez-vous planifie pour le moment.
-              </p>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>
