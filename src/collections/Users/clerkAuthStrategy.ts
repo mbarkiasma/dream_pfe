@@ -1,11 +1,6 @@
 import crypto from 'crypto'
 
-import type {
-  AuthStrategy,
-  AuthStrategyFunctionArgs,
-  AuthStrategyResult,
-  Payload,
-} from 'payload'
+import type { AuthStrategy, AuthStrategyFunctionArgs, AuthStrategyResult, Payload } from 'payload'
 
 type PayloadAuthUser = NonNullable<AuthStrategyResult['user']>
 
@@ -57,7 +52,12 @@ async function getOrCreatePayloadUser({
   }
 
   if (payloadUser) {
-    if (!payloadUser.clerkUserId) {
+    const shouldSyncClerkProfile =
+      !payloadUser.clerkUserId ||
+      (!payloadUser.firstName && clerkUser.firstName) ||
+      (!payloadUser.lastName && clerkUser.lastName)
+
+    if (shouldSyncClerkProfile) {
       payloadUser = await payload.update({
         collection: 'users',
         id: payloadUser.id,
@@ -83,6 +83,7 @@ async function getOrCreatePayloadUser({
       password: crypto.randomUUID(),
       firstName: clerkUser.firstName || '',
       lastName: clerkUser.lastName || '',
+      onboardingStep: 'profile',
       role: 'etudiant',
     },
   })
@@ -93,9 +94,7 @@ async function getOrCreatePayloadUser({
   } as PayloadAuthUser
 }
 
-async function authenticate({
-  payload,
-}: AuthStrategyFunctionArgs): Promise<AuthStrategyResult> {
+async function authenticate({ payload }: AuthStrategyFunctionArgs): Promise<AuthStrategyResult> {
   const user = await getOrCreatePayloadUser({ payload })
 
   if (!user) {

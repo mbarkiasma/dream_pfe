@@ -87,6 +87,7 @@
 }
 
 :root {
+  color-scheme: light;
   --background: oklch(100% 0 0deg);
   --foreground: oklch(14.5% 0 0deg);
   --card: oklch(96.5% 0.005 265deg);
@@ -126,6 +127,7 @@
 }
 
 [data-theme='dark'] {
+  color-scheme: dark;
   --background: oklch(14.5% 0 0deg);
   --foreground: oklch(98.5% 0 0deg);
   --card: oklch(17% 0 0deg);
@@ -214,6 +216,149 @@
   }
 }
 
+@layer base {
+  body,
+  header,
+  main,
+  section,
+  aside,
+  article,
+  button,
+  input,
+  textarea,
+  select {
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+  }
+}
+
+@layer components {
+  [data-theme='dark'] .dashboard-content [class*='bg-white'],
+  [data-theme='dark'] .dashboard-content [class*='from-white'],
+  [data-theme='dark'] .dashboard-content [class*='via-[#FDF7FF]'],
+  [data-theme='dark'] .dashboard-content [class*='to-[#F3ECFF]'],
+  [data-theme='dark'] .dashboard-content [class*='bg-gradient-to-br'],
+  [data-theme='dark'] .dashboard-content [class*='bg-gradient-to-b'] {
+    background: rgb(255 255 255 / 0.06) !important;
+    background-image: none !important;
+  }
+
+  [data-theme='dark'] .dashboard-content [class*='hover:bg-white']:hover,
+  [data-theme='dark'] .dashboard-content [class*='hover:bg-[#F8F3FF]']:hover,
+  [data-theme='dark'] .dashboard-content [class*='hover:bg-[#FAF7FF]']:hover {
+    background: rgb(255 255 255 / 0.1) !important;
+  }
+
+  [data-theme='dark'] .dashboard-content [class*='border-white'],
+  [data-theme='dark'] .dashboard-content [class*='border-violet'],
+  [data-theme='dark'] .dashboard-content [class*='border-slate'] {
+    border-color: rgb(255 255 255 / 0.1) !important;
+  }
+
+  [data-theme='dark'] .dashboard-content [class*='text-[#2d1068]'],
+  [data-theme='dark'] .dashboard-content [class*='text-[#4B3F72]'],
+  [data-theme='dark'] .dashboard-content [class*='text-slate-900'],
+  [data-theme='dark'] .dashboard-content [class*='text-slate-700'] {
+    color: var(--foreground) !important;
+  }
+
+  [data-theme='dark'] .dashboard-content [class*='text-[#6E628F]'],
+  [data-theme='dark'] .dashboard-content [class*='text-[#7A6A99]'],
+  [data-theme='dark'] .dashboard-content [class*='text-[#7a6a99]'],
+  [data-theme='dark'] .dashboard-content [class*='text-[#9A8BB7]'],
+  [data-theme='dark'] .dashboard-content [class*='text-[#9B8BB7]'],
+  [data-theme='dark'] .dashboard-content [class*='text-[#A18BBF]'],
+  [data-theme='dark'] .dashboard-content [class*='text-muted'] {
+    color: var(--muted-foreground) !important;
+  }
+
+  [data-theme='dark'] .dashboard-content input,
+  [data-theme='dark'] .dashboard-content textarea,
+  [data-theme='dark'] .dashboard-content select {
+    background: rgb(255 255 255 / 0.06) !important;
+    border-color: rgb(255 255 255 / 0.12) !important;
+    color: var(--foreground) !important;
+  }
+
+  [data-theme='dark'] .dashboard-content input::placeholder,
+  [data-theme='dark'] .dashboard-content textarea::placeholder {
+    color: rgb(255 255 255 / 0.45) !important;
+  }
+
+  [data-theme='dark'] .dashboard-content table thead tr,
+  [data-theme='dark'] .dashboard-content [class*='bg-[#FBF8FF]'],
+  [data-theme='dark'] .dashboard-content [class*='bg-slate-100'],
+  [data-theme='dark'] .dashboard-content [class*='bg-[#F3ECFF]'],
+  [data-theme='dark'] .dashboard-content [class*='bg-[#F8F3FF]'] {
+    background: rgb(255 255 255 / 0.08) !important;
+  }
+
+  [data-theme='dark'] .dashboard-content tr,
+  [data-theme='dark'] .dashboard-content li {
+    border-color: rgb(255 255 255 / 0.1) !important;
+  }
+
+  [data-theme='dark'] .student-coaching [class*='bg-white'],
+  [data-theme='dark'] .student-coaching [class*='from-white'],
+  [data-theme='dark'] .student-coaching [class*='via-[#FDF7FF]'],
+  [data-theme='dark'] .student-coaching [class*='to-[#F8F3FF]'],
+  [data-theme='dark'] .student-coaching [class*='to-white'],
+  [data-theme='dark'] .student-coaching [class*='bg-gradient-to-b'],
+  [data-theme='dark'] .student-coaching [class*='bg-gradient-to-br'] {
+    background: rgb(255 255 255 / 0.06) !important;
+    background-image: none !important;
+  }
+
+  [data-theme='dark'] .student-coaching [class*='bg-[#F3ECFF]'],
+  [data-theme='dark'] .student-coaching [class*='bg-[#F8F3FF]'],
+  [data-theme='dark'] .student-coaching [class*='bg-[#FBF8FF]'],
+  [data-theme='dark'] .student-coaching [class*='bg-violet'],
+  [data-theme='dark'] .student-coaching [class*='bg-fuchsia'] {
+    background: rgb(139 92 246 / 0.14) !important;
+  }
+
+  [data-theme='dark'] .student-coaching [class*='border-white'],
+  [data-theme='dark'] .student-coaching [class*='border-violet'],
+  [data-theme='dark'] .student-coaching [class*='border-slate'] {
+    border-color: rgb(255 255 255 / 0.1) !important;
+  }
+
+  [data-theme='dark'] .student-coaching [class*='text-[#2d1068]'],
+  [data-theme='dark'] .student-coaching [class*='text-[#4B3F72]'],
+  [data-theme='dark'] .student-coaching [class*='text-slate-700'],
+  [data-theme='dark'] .student-coaching [class*='text-slate-900'] {
+    color: var(--foreground) !important;
+  }
+
+  [data-theme='dark'] .student-coaching [class*='text-[#6E628F]'],
+  [data-theme='dark'] .student-coaching [class*='text-[#7a6a99]'],
+  [data-theme='dark'] .student-coaching [class*='text-[#7A6A99]'],
+  [data-theme='dark'] .student-coaching [class*='text-[#9b8bbd]'],
+  [data-theme='dark'] .student-coaching [class*='text-slate-400'] {
+    color: var(--muted-foreground) !important;
+  }
+
+  [data-theme='dark'] .student-coaching input,
+  [data-theme='dark'] .student-coaching textarea {
+    background: rgb(15 23 42 / 0.55) !important;
+    border-color: rgb(255 255 255 / 0.12) !important;
+    color: var(--foreground) !important;
+  }
+
+  [data-theme='dark'] .student-coaching input::placeholder,
+  [data-theme='dark'] .student-coaching textarea::placeholder {
+    color: rgb(255 255 255 / 0.45) !important;
+  }
+
+  [data-theme='dark'] .student-coaching [class*='hover:bg-white']:hover,
+  [data-theme='dark'] .student-coaching [class*='hover:bg-[#F8F3FF]']:hover,
+  [data-theme='dark'] .student-coaching [class*='hover:bg-[#eadcff]']:hover {
+    background: rgb(255 255 255 / 0.1) !important;
+  }
+}
+
 html {
   opacity: 0;
 }
@@ -222,4 +367,3 @@ html[data-theme='dark'],
 html[data-theme='light'] {
   opacity: initial;
 }
-

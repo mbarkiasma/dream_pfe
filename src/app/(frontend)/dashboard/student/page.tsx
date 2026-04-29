@@ -3,6 +3,8 @@ import { StudentStatsCards } from '@/components/dashboard/student/StudentStatsCa
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 import config from '@payload-config'
+import { BarChart3, CalendarDays, ChevronRight, MoonStar } from 'lucide-react'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 
@@ -15,8 +17,8 @@ export default async function StudentDashboardPage() {
 
   const payload = await getPayload({ config })
 
-  const [dreamsResult, analysesResult, latestDreamResult, latestAnalysisResult] =
-    await Promise.all([
+  const [dreamsResult, analysesResult, latestDreamResult, latestAnalysisResult] = await Promise.all(
+    [
       payload.count({
         collection: 'dreams',
         user,
@@ -75,7 +77,8 @@ export default async function StudentDashboardPage() {
           reference: true,
         },
       }),
-    ])
+    ],
+  )
 
   const latestDream = latestDreamResult.docs[0]
   const latestAnalysis = latestAnalysisResult.docs[0]
@@ -93,25 +96,39 @@ export default async function StudentDashboardPage() {
         dreamsCount={dreamsResult.totalDocs}
       />
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="grid items-start gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Mon dernier reve</CardTitle>
+          <Card className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+            <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200">
+                  <MoonStar className="h-5 w-5" />
+                </span>
+                <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+                  Mon dernier reve
+                </CardTitle>
+              </div>
+              <Link
+                href="/dashboard/student/dreams"
+                className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-violet-700 transition hover:bg-violet-50 dark:text-violet-200 dark:hover:bg-white/10"
+              >
+                Voir
+                <ChevronRight className="h-4 w-4" />
+              </Link>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="px-6 pb-6">
               {latestDream ? (
                 <div className="space-y-4">
-                  <p className="line-clamp-4 leading-7 text-[#6E628F]">
+                  <p className="line-clamp-4 text-base leading-8 text-[#6E628F] dark:text-muted-foreground">
                     {latestDream.summary || latestDream.description}
                   </p>
-                  <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9]">
+                  <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
                     Video : {latestDream.videoStatus}
                   </span>
                 </div>
               ) : (
-                <p className="leading-7 text-[#6E628F]">
+                <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
                   Aucun reve enregistre pour le moment.
                 </p>
               )}
@@ -120,37 +137,51 @@ export default async function StudentDashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Analyse IA</CardTitle>
+          <Card className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+            <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200">
+                  <BarChart3 className="h-5 w-5" />
+                </span>
+                <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+                  Analyse IA
+                </CardTitle>
+              </div>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="px-6 pb-6">
               {latestAnalysis ? (
                 <div className="space-y-3">
-                  <p className="text-sm font-semibold text-[#2d1068]">{latestAnalysis.reference}</p>
-                  <p className="line-clamp-4 leading-7 text-[#6E628F]">
+                  <p className="text-sm font-semibold text-[#2d1068] dark:text-foreground">
+                    {latestAnalysis.reference}
+                  </p>
+                  <p className="line-clamp-4 leading-7 text-[#6E628F] dark:text-muted-foreground">
                     {latestAnalysis.overview || 'Analyse disponible dans votre espace analyses.'}
                   </p>
-                  <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9]">
+                  <span className="inline-flex rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
                     Confiance : {latestAnalysis.niveauConfiance || 'moyen'}
                   </span>
                 </div>
               ) : (
-                <p className="leading-7 text-[#6E628F]">
+                <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
                   Aucune analyse generee pour le moment.
                 </p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Prochain rendez-vous</CardTitle>
+          <Card className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+            <CardHeader className="flex-row items-center gap-3 pb-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200">
+                <CalendarDays className="h-5 w-5" />
+              </span>
+              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+                Prochain rendez-vous
+              </CardTitle>
             </CardHeader>
 
-            <CardContent>
-              <p className="leading-7 text-[#6E628F]">
+            <CardContent className="px-6 pb-6">
+              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
                 Aucun rendez-vous planifie pour le moment.
               </p>
             </CardContent>

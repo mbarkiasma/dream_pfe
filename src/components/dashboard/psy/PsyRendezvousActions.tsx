@@ -97,15 +97,15 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
       ) : null}
 
       {status === 'pending' && isRejecting ? (
-        <div className="rounded-2xl border border-red-100 bg-red-50 p-3">
-          <label className="mb-2 block text-sm font-semibold text-red-700">
+        <div className="rounded-2xl border border-red-100 bg-red-50 p-3 dark:border-red-400/20 dark:bg-red-500/10">
+          <label className="mb-2 block text-sm font-semibold text-red-700 dark:text-red-200">
             Cause du refus
           </label>
           <Textarea
             value={rejectionReason}
             onChange={(event) => setRejectionReason(event.target.value)}
             placeholder="Exemple : indisponibilite exceptionnelle, merci de choisir un autre creneau."
-            className="min-h-24 rounded-2xl border-red-100 bg-white text-[#2d1068]"
+            className="min-h-24 rounded-2xl border-red-100 bg-white text-[#2d1068] dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
           />
           <div className="mt-3 flex flex-wrap gap-2">
             <button
@@ -129,7 +129,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
                 setError('')
               }}
               disabled={loadingStatus !== null}
-              className="inline-flex items-center gap-2 rounded-2xl border border-red-100 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-2xl border border-red-100 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.06] dark:text-red-200 dark:hover:bg-white/10"
             >
               Annuler
             </button>
@@ -153,7 +153,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
         </button>
       ) : null}
 
-      {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
     </div>
   )
 }

@@ -22,6 +22,12 @@ function getTodayValue() {
   return formatDateValue(new Date())
 }
 
+function isPastSlot(date: string, startTime: string) {
+  const slotDate = new Date(`${date}T${startTime}:00`)
+
+  return slotDate.getTime() <= Date.now()
+}
+
 function getNextDateValue(date: string) {
   const nextDate = new Date(`${date}T00:00:00`)
   nextDate.setDate(nextDate.getDate() + 1)
@@ -145,7 +151,7 @@ async function getSlotsForDate({
   const busyStartTimes = new Set(appointments.docs.map((appointment) => appointment.startTime))
   const slots = allSlots.map((slot) => ({
     ...slot,
-    available: !busyStartTimes.has(slot.startTime),
+    available: !busyStartTimes.has(slot.startTime) && !isPastSlot(date, slot.startTime),
   }))
 
   return {

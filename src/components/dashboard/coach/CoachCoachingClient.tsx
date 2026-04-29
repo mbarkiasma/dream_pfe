@@ -60,7 +60,9 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
   const [statusMessage, setStatusMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
-  const [lastSenderBySession, setLastSenderBySession] = useState<Record<string, CoachingMessage['senderRole']>>({})
+  const [lastSenderBySession, setLastSenderBySession] = useState<
+    Record<string, CoachingMessage['senderRole']>
+  >({})
   const [messageCountBySession, setMessageCountBySession] = useState<Record<string, number>>({})
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
@@ -95,7 +97,8 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         })
         setLastSenderBySession((current) => ({
           ...current,
-          [String(selectedSessionId)]: nextMessages.at(-1)?.senderRole ?? current[String(selectedSessionId)],
+          [String(selectedSessionId)]:
+            nextMessages.at(-1)?.senderRole ?? current[String(selectedSessionId)],
         }))
         setMessageCountBySession((current) => ({
           ...current,
@@ -280,7 +283,9 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         throw new Error(data.error || 'Suppression impossible.')
       }
 
-      setSavedNotes((current) => current.filter((currentNote) => String(currentNote.id) !== String(noteId)))
+      setSavedNotes((current) =>
+        current.filter((currentNote) => String(currentNote.id) !== String(noteId)),
+      )
       setNoteToDelete(null)
       setStatusMessage('Note supprimee.')
     } catch (error) {
@@ -597,8 +602,8 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
-                          <button
-                            type="button"
+                        <button
+                          type="button"
                           onClick={() => setNoteToDelete(savedNote)}
                           className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 transition hover:bg-rose-500 hover:text-white"
                           title="Supprimer la note"
@@ -660,9 +665,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9B6BFF]">
                   Confirmation
                 </p>
-                <h3 className="mt-2 text-xl font-bold text-[#2d1068]">
-                  Supprimer cette note ?
-                </h3>
+                <h3 className="mt-2 text-xl font-bold text-[#2d1068]">Supprimer cette note ?</h3>
                 <p className="mt-3 text-sm leading-6 text-[#6E628F]">
                   Cette note sera supprimee de l'historique de suivi et de Payload. Cette action ne
                   pourra pas etre annulee.

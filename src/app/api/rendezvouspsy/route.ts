@@ -57,6 +57,12 @@ function getNextDateValue(date: string) {
   return `${year}-${month}-${day}`
 }
 
+function isPastSlot(date: string, startTime: string) {
+  const slotDate = new Date(`${date}T${startTime}:00`)
+
+  return slotDate.getTime() <= Date.now()
+}
+
 function getUserName(user: { email?: string; firstName?: string | null; lastName?: string | null }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
   return fullName || user.email || 'Un utilisateur'
@@ -170,7 +176,9 @@ export async function POST(request: Request) {
   })
 
   const busyStartTimes = new Set(appointments.docs.map((appointment) => appointment.startTime))
-  const availableSlots = allSlots.filter((slot) => !busyStartTimes.has(slot.startTime))
+  const availableSlots = allSlots.filter(
+    (slot) => !busyStartTimes.has(slot.startTime) && !isPastSlot(date, slot.startTime),
+  )
   const selectedSlot = availableSlots.find((slot) => slot.startTime === startTime)
 
   if (!selectedSlot) {

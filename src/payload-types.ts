@@ -642,6 +642,7 @@ export interface User {
   magic_login_expires_at?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  onboardingStep: 'profile' | 'interview' | 'completed';
   role: 'admin' | 'etudiant' | 'coach' | 'psy';
   /**
    * Activez ce champ quand le coach peut recevoir de nouvelles sessions d'accompagnement.
@@ -1411,6 +1412,7 @@ export interface UsersSelect<T extends boolean = true> {
   magic_login_expires_at?: T;
   firstName?: T;
   lastName?: T;
+  onboardingStep?: T;
   role?: T;
   isAvailableForCoaching?: T;
   coachingSpecialty?: T;

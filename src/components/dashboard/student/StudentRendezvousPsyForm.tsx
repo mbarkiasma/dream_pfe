@@ -2,7 +2,15 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CalendarDays, ChevronLeft, ChevronRight, Clock, Loader2, Send } from 'lucide-react'
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Loader2,
+  MoveRight,
+  Send,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -80,22 +88,22 @@ function getMonthGridOffset(monthDate: Date) {
 
 function getDayButtonClass(day: MonthDay, isSelected: boolean) {
   if (isSelected) {
-    return 'border-violet-500 bg-violet-500 text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)]'
+    return 'border-violet-500 bg-violet-500 text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)] dark:border-violet-400 dark:bg-violet-500'
   }
 
   if (day.status === 'available') {
-    return 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:border-emerald-400 hover:bg-emerald-100'
+    return 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:border-emerald-400 hover:bg-emerald-100 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:bg-emerald-500/15'
   }
 
   if (day.status === 'full') {
-    return 'border-red-200 bg-red-50 text-red-700 hover:border-red-300'
+    return 'border-red-200 bg-red-50 text-red-700 hover:border-red-300 dark:border-red-400/20 dark:bg-red-500/10 dark:text-red-200'
   }
 
   if (day.status === 'weekend' || day.status === 'closed') {
-    return 'border-amber-200 bg-amber-50 text-amber-700 hover:border-amber-300'
+    return 'border-amber-200 bg-amber-50 text-amber-700 hover:border-amber-300 dark:border-amber-400/20 dark:bg-amber-500/10 dark:text-amber-200'
   }
 
-  return 'border-slate-200 bg-slate-100 text-slate-400'
+  return 'border-slate-200 bg-slate-100 text-slate-400 dark:border-white/10 dark:bg-white/[0.04] dark:text-muted-foreground'
 }
 
 function getDayLabel(day: MonthDay) {
@@ -113,6 +121,13 @@ function getSelectedDayMessage(status: DayStatus | undefined) {
   if (status === 'past') return 'Cette date est deja passee.'
 
   return ''
+}
+
+function isSameMonth(firstDate: Date, secondDate: Date) {
+  return (
+    firstDate.getFullYear() === secondDate.getFullYear() &&
+    firstDate.getMonth() === secondDate.getMonth()
+  )
 }
 
 export function StudentRendezvousPsyForm() {
@@ -288,39 +303,47 @@ export function StudentRendezvousPsyForm() {
   const selectedDateLabel = selectedDateFormatter.format(new Date(`${selectedDate}T00:00:00`))
   const selectedDayMessage = getSelectedDayMessage(selectedDayStatus)
   const gridOffset = getMonthGridOffset(monthDate)
+  const availableSlots = slots.filter((slot) => slot.available)
+  const hiddenUnavailableSlots = slots.length - availableSlots.length
+  const selectedSlot = slots.find((slot) => slot.startTime === startTime)
+  const canGoPreviousMonth = !isSameMonth(monthDate, initialMonth)
+  const nextAvailableDay = days.find((day) => day.status === 'available' && day.date > selectedDate)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[24px] border border-violet-100 bg-white/80 p-4">
+        <div className="rounded-[24px] border border-violet-100 bg-white/80 p-4 dark:border-white/10 dark:bg-white/[0.05]">
           <div className="mb-4 flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={() => changeMonth(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-violet-100 bg-white text-[#2d1068] transition hover:bg-violet-50"
+              disabled={!canGoPreviousMonth}
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-violet-100 bg-white text-[#2d1068] transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:hover:bg-white/10"
               title="Mois precedent"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
 
             <div className="text-center">
-              <p className="text-lg font-bold capitalize text-[#2d1068]">
+              <p className="text-lg font-bold capitalize text-[#2d1068] dark:text-foreground">
                 {monthFormatter.format(monthDate)}
               </p>
-              <p className="text-xs text-[#7A6A99]">Choisis une journee dans le mois</p>
+              <p className="text-xs text-[#7A6A99] dark:text-muted-foreground">
+                Choisis une journee dans le mois
+              </p>
             </div>
 
             <button
               type="button"
               onClick={() => changeMonth(1)}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-violet-100 bg-white text-[#2d1068] transition hover:bg-violet-50"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-violet-100 bg-white text-[#2d1068] transition hover:bg-violet-50 dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:hover:bg-white/10"
               title="Mois suivant"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-[#7A6A99]">
+          <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-[#7A6A99] dark:text-muted-foreground">
             {weekDays.map((day) => (
               <div key={day}>{day}</div>
             ))}
@@ -332,7 +355,7 @@ export function StudentRendezvousPsyForm() {
             ))}
 
             {isLoadingMonth ? (
-              <div className="col-span-7 flex items-center justify-center gap-2 rounded-2xl bg-slate-50 p-6 text-sm text-[#6E628F]">
+              <div className="col-span-7 flex items-center justify-center gap-2 rounded-2xl bg-slate-50 p-6 text-sm text-[#6E628F] dark:bg-white/[0.05] dark:text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
                 Chargement du calendrier...
               </div>
@@ -363,50 +386,63 @@ export function StudentRendezvousPsyForm() {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium">
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">Vert: libre</span>
-            <span className="rounded-full bg-red-50 px-3 py-1 text-red-700">Rouge: complet</span>
-            <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-700">
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
+              Vert: libre
+            </span>
+            <span className="rounded-full bg-red-50 px-3 py-1 text-red-700 dark:bg-red-500/10 dark:text-red-200">
+              Rouge: complet
+            </span>
+            <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-700 dark:bg-amber-500/10 dark:text-amber-200">
               Jaune: indisponible
             </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-500">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-500 dark:bg-white/10 dark:text-muted-foreground">
               Gris: passe
             </span>
           </div>
         </div>
 
-        <div className="rounded-[24px] border border-violet-100 bg-white/80 p-4">
+        <div className="rounded-[24px] border border-violet-100 bg-white/80 p-4 dark:border-white/10 dark:bg-white/[0.05]">
           <div className="mb-4 flex items-start gap-3">
-            <div className="rounded-2xl bg-violet-100 p-3">
+            <div className="rounded-2xl bg-violet-100 p-3 dark:bg-violet-500/15">
               <CalendarDays className="h-5 w-5 text-violet-600" />
             </div>
             <div>
-              <p className="font-bold capitalize text-[#2d1068]">{selectedDateLabel}</p>
-              <p className="text-sm text-[#7A6A99]">Horaires de consultation</p>
+              <p className="font-bold capitalize text-[#2d1068] dark:text-foreground">
+                {selectedDateLabel}
+              </p>
+              <p className="text-sm text-[#7A6A99] dark:text-muted-foreground">
+                {availableSlots.length > 0
+                  ? `${availableSlots.length} horaire${availableSlots.length > 1 ? 's' : ''} restant${availableSlots.length > 1 ? 's' : ''}`
+                  : 'Aucun horaire restant'}
+              </p>
             </div>
           </div>
 
+          {selectedDate === today ? (
+            <div className="mb-4 rounded-2xl border border-violet-100 bg-violet-50 px-4 py-3 text-xs font-medium leading-5 text-violet-700 dark:border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-100">
+              Journée passée
+            </div>
+          ) : null}
+
           {isLoadingDay ? (
-            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-[#6E628F]">
+            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-[#6E628F] dark:bg-white/[0.05] dark:text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
               Chargement des horaires...
             </div>
-          ) : slots.length > 0 ? (
+          ) : availableSlots.length > 0 ? (
             <div className="grid grid-cols-2 gap-3">
-              {slots.map((slot) => {
+              {availableSlots.map((slot) => {
                 const active = startTime === slot.startTime
 
                 return (
                   <button
                     key={`${slot.startTime}-${slot.endTime}`}
                     type="button"
-                    disabled={!slot.available}
                     onClick={() => setStartTime(slot.startTime)}
                     className={`flex min-h-16 flex-col items-center justify-center rounded-2xl border px-3 py-3 text-sm font-medium transition disabled:cursor-not-allowed ${
                       active
                         ? 'border-violet-400 bg-violet-500 text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)]'
-                        : slot.available
-                          ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:border-emerald-400 hover:bg-emerald-100'
-                          : 'border-red-100 bg-red-50 text-red-400 opacity-80'
+                        : 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:border-emerald-400 hover:bg-emerald-100 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:bg-emerald-500/15'
                     }`}
                   >
                     <span className="flex items-center gap-2">
@@ -421,24 +457,53 @@ export function StudentRendezvousPsyForm() {
               })}
             </div>
           ) : (
-            <div className="rounded-2xl bg-amber-50 p-4 text-sm font-medium text-amber-700">
-              {selectedDayMessage || 'Aucun horaire disponible pour cette date.'}
+            <div className="rounded-[24px] border border-dashed border-violet-200 bg-white/70 p-5 text-center dark:border-white/10 dark:bg-white/[0.04]">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-100">
+                <Clock className="h-5 w-5" />
+              </div>
+              <p className="mt-4 font-semibold text-[#2d1068] dark:text-foreground">
+                Aucun horaire disponible
+              </p>
+              <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-[#6E628F] dark:text-muted-foreground">
+                {selectedDayMessage ||
+                  "Tous les horaires restants sont deja reserves ou la journee est terminee."}
+              </p>
+              {nextAvailableDay ? (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDate(nextAvailableDay.date)}
+                  className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700"
+                >
+                  Prochain jour libre
+                  <MoveRight className="h-4 w-4" />
+                </button>
+              ) : null}
             </div>
           )}
 
-          {selectedDayMessage && slots.length > 0 ? (
-            <div className="mt-4 rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-700">
-              {selectedDayMessage}
-            </div>
+          {hiddenUnavailableSlots > 0 && availableSlots.length > 0 ? (
+            <p className="mt-4 text-center text-xs font-medium text-[#7A6A99] dark:text-muted-foreground">
+              Les horaires passes ou deja reserves ne sont pas affiches.
+            </p>
           ) : null}
         </div>
       </div>
 
+      {selectedSlot ? (
+        <div className="rounded-[24px] border border-violet-100 bg-violet-50/80 px-4 py-3 text-sm font-medium text-[#2d1068] dark:border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-100">
+          Rendez-vous selectionne : {selectedDateLabel} de {selectedSlot.startTime} a{' '}
+          {selectedSlot.endTime}.
+        </div>
+      ) : null}
+
       <div className="grid gap-4 md:grid-cols-[240px_1fr]">
         <div className="space-y-2">
-          <Label className="text-[#2d1068]">Urgence</Label>
-          <Select value={urgency} onValueChange={(value) => setUrgency(value as 'normal' | 'urgent')}>
-            <SelectTrigger className="h-12 rounded-2xl border-violet-100 bg-white/90 text-[#2d1068]">
+          <Label className="text-[#2d1068] dark:text-foreground">Urgence</Label>
+          <Select
+            value={urgency}
+            onValueChange={(value) => setUrgency(value as 'normal' | 'urgent')}
+          >
+            <SelectTrigger className="h-12 rounded-2xl border-violet-100 bg-white/90 text-[#2d1068] dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground">
               <SelectValue placeholder="Niveau d'urgence" />
             </SelectTrigger>
             <SelectContent>
@@ -449,7 +514,7 @@ export function StudentRendezvousPsyForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="appointment-reason" className="text-[#2d1068]">
+          <Label htmlFor="appointment-reason" className="text-[#2d1068] dark:text-foreground">
             Motif de la demande
           </Label>
           <Textarea
@@ -457,19 +522,19 @@ export function StudentRendezvousPsyForm() {
             value={reason}
             onChange={(event) => setReason(event.target.value)}
             placeholder="Explique brievement pourquoi tu souhaites rencontrer le psychologue."
-            className="min-h-32 rounded-2xl border-violet-100 bg-white/90 text-[#2d1068]"
+            className="min-h-32 rounded-2xl border-violet-100 bg-white/90 text-[#2d1068] dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:placeholder:text-muted-foreground"
           />
         </div>
       </div>
 
       {error ? (
-        <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:bg-red-500/10 dark:text-red-200">
           {error}
         </div>
       ) : null}
 
       {message ? (
-        <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+        <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
           {message}
         </div>
       ) : null}

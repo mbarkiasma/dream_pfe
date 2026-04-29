@@ -4,6 +4,7 @@ import config from '../../src/payload.config.js'
 export const testUser = Object.freeze({
   firstName: 'Test',
   lastName: 'User',
+  onboardingStep: 'completed',
   role: 'etudiant' as const,
   email: 'dev+e2e@payloadcms.com',
   password: 'TestUser123!',

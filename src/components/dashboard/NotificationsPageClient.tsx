@@ -138,16 +138,16 @@ export function NotificationsPageClient() {
 
   return (
     <div>
-      <div className="mb-8 rounded-[30px] border border-white/70 bg-white/60 p-5 shadow-[0_18px_55px_rgba(109,40,217,0.10)] backdrop-blur md:p-6">
+      <div className="mb-8 rounded-[30px] border border-white/70 bg-white/60 p-5 shadow-[0_18px_55px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_55px_rgba(0,0,0,0.24)] md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.22em] text-[#9B6BFF]">
               Centre notifications
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-[#2d1068] md:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-[#2d1068] dark:text-foreground md:text-4xl">
               Notifications
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6E628F] md:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6E628F] dark:text-muted-foreground md:text-base">
               Consultez les nouvelles actions et ouvrez directement la page associee.
             </p>
           </div>
@@ -156,7 +156,7 @@ export function NotificationsPageClient() {
             type="button"
             onClick={() => void markAllAsRead()}
             disabled={unreadCount === 0}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/80 bg-white px-4 text-sm font-bold text-[#6D28D9] shadow-[0_12px_28px_rgba(109,40,217,0.12)] transition hover:bg-[#F8F3FF] disabled:cursor-not-allowed disabled:text-[#C5BADB]"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/80 bg-white px-4 text-sm font-bold text-[#6D28D9] shadow-[0_12px_28px_rgba(109,40,217,0.12)] transition hover:bg-[#F8F3FF] disabled:cursor-not-allowed disabled:text-[#C5BADB] dark:border-white/10 dark:bg-white/[0.06] dark:text-violet-200 dark:hover:bg-white/10 dark:disabled:text-muted-foreground"
           >
             <CheckCheck className="h-5 w-5" />
             Tout marquer comme lu
@@ -164,41 +164,55 @@ export function NotificationsPageClient() {
         </div>
       </div>
 
-      <div className="rounded-[28px] border border-white/70 bg-white/75 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
-        <div className="flex items-center justify-between border-b border-[#EEE8FF] px-5 py-4">
+      <div className="overflow-hidden rounded-[28px] border border-white/70 bg-white/75 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+        <div className="flex items-center justify-between border-b border-[#EEE8FF] px-5 py-4 dark:border-white/10">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F3ECFF] text-[#6D28D9]">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F3ECFF] text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
               <Bell className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm font-bold text-[#2d1068]">Toutes les notifications</p>
-              <p className="text-xs text-[#7B6B9A]">{unreadCount} non lue(s)</p>
+              <p className="text-sm font-bold text-[#2d1068] dark:text-foreground">
+                Toutes les notifications
+              </p>
+              <p className="text-xs text-[#7B6B9A] dark:text-muted-foreground">
+                {unreadCount} non lue(s)
+              </p>
             </div>
           </div>
         </div>
 
         {isLoading ? (
-          <p className="px-5 py-6 text-sm text-[#7B6B9A]">Chargement...</p>
+          <p className="px-5 py-6 text-sm text-[#7B6B9A] dark:text-muted-foreground">
+            Chargement...
+          </p>
         ) : !hasNotifications ? (
-          <p className="px-5 py-6 text-sm text-[#7B6B9A]">Aucune notification pour le moment.</p>
+          <p className="px-5 py-6 text-sm text-[#7B6B9A] dark:text-muted-foreground">
+            Aucune notification pour le moment.
+          </p>
         ) : (
-          <div className="divide-y divide-[#F0EAFB]">
+          <div className="divide-y divide-[#F0EAFB] dark:divide-white/10">
             {sortedNotifications.map((notification) => {
               const isUnread = notification.status === 'unread'
-              const typeLabel = notification.type ? typeLabels[notification.type] || notification.type : 'Info'
+              const typeLabel = notification.type
+                ? typeLabels[notification.type] || notification.type
+                : 'Info'
 
               return (
                 <button
                   key={notification.id}
                   type="button"
                   onClick={() => void openNotification(notification)}
-                  className={`flex w-full items-start gap-4 px-5 py-4 text-left transition hover:bg-[#FAF7FF] ${
-                    isUnread ? 'bg-[#FBF8FF]' : 'bg-white/60'
+                  className={`flex w-full items-start gap-4 px-5 py-4 text-left transition hover:bg-[#FAF7FF] dark:hover:bg-white/10 ${
+                    isUnread
+                      ? 'bg-[#FBF8FF] dark:bg-violet-500/10'
+                      : 'bg-white/60 dark:bg-transparent'
                   }`}
                 >
                   <span
                     className={`mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${
-                      isUnread ? 'bg-[#EEE4FF] text-[#6D28D9]' : 'bg-[#F6F2FB] text-[#B3A5CB]'
+                      isUnread
+                        ? 'bg-[#EEE4FF] text-[#6D28D9] dark:bg-violet-500/20 dark:text-violet-200'
+                        : 'bg-[#F6F2FB] text-[#B3A5CB] dark:bg-white/10 dark:text-muted-foreground'
                     }`}
                   >
                     <Circle className={`h-3 w-3 ${isUnread ? 'fill-current' : ''}`} />
@@ -206,21 +220,23 @@ export function NotificationsPageClient() {
 
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-bold text-[#2d1068]">{notification.title}</span>
-                      <span className="rounded-full bg-[#F3ECFF] px-2 py-1 text-[11px] font-bold text-[#6D28D9]">
+                      <span className="text-sm font-bold text-[#2d1068] dark:text-foreground">
+                        {notification.title}
+                      </span>
+                      <span className="rounded-full bg-[#F3ECFF] px-2 py-1 text-[11px] font-bold text-[#6D28D9] dark:bg-violet-500/15 dark:text-violet-200">
                         {typeLabel}
                       </span>
                     </span>
-                    <span className="mt-2 block text-sm leading-6 text-[#6E628F]">
+                    <span className="mt-2 block text-sm leading-6 text-[#6E628F] dark:text-muted-foreground">
                       {notification.message}
                     </span>
-                    <span className="mt-2 block text-xs font-medium text-[#9B8BB7]">
+                    <span className="mt-2 block text-xs font-medium text-[#9B8BB7] dark:text-muted-foreground">
                       {formatDate(notification.createdAt)}
                     </span>
                   </span>
 
                   {notification.link ? (
-                    <ExternalLink className="mt-1 h-4 w-4 shrink-0 text-[#A18BBF]" />
+                    <ExternalLink className="mt-1 h-4 w-4 shrink-0 text-[#A18BBF] dark:text-muted-foreground" />
                   ) : null}
                 </button>
               )

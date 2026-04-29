@@ -2,12 +2,10 @@
 
 import { useClerk } from '@clerk/nextjs'
 import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function VerifyEmailPage() {
   const clerk = useClerk()
-  const router = useRouter()
 
   useEffect(() => {
     void clerk
@@ -16,18 +14,18 @@ export default function VerifyEmailPage() {
           redirectUrl: '/auth/redirect',
           redirectUrlComplete: '/auth/redirect',
           onVerifiedOnOtherDevice: () => {
-            router.replace('/login?message=verified-other-device')
+            window.location.assign('/login?message=verified-other-device')
           },
         },
         async (to) => {
-          router.replace(to)
+          window.location.assign(to)
         },
       )
       .catch((error) => {
         console.error('Clerk email link verification error:', error)
-        router.replace('/login?error=invalid-or-expired-link')
+        window.location.assign('/login?error=invalid-or-expired-link')
       })
-  }, [clerk, router])
+  }, [clerk])
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] px-4">

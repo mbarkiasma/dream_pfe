@@ -44,7 +44,9 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
   const [error, setError] = useState('')
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null)
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null)
-  const [selectedLikesAnnouncement, setSelectedLikesAnnouncement] = useState<Announcement | null>(null)
+  const [selectedLikesAnnouncement, setSelectedLikesAnnouncement] = useState<Announcement | null>(
+    null,
+  )
   const [announcementToDelete, setAnnouncementToDelete] = useState<Announcement | null>(null)
   const [pending, startTransition] = useTransition()
 
@@ -89,7 +91,9 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
         }
 
         resetForm()
-        setStatusMessage(isEditing ? 'Annonce modifiee avec succes.' : 'Annonce publiee avec succes.')
+        setStatusMessage(
+          isEditing ? 'Annonce modifiee avec succes.' : 'Annonce publiee avec succes.',
+        )
         router.refresh()
       } catch {
         setError("Impossible d'enregistrer l'annonce.")
@@ -251,7 +255,9 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                 {initialAnnouncements.map((announcement) => (
                   <tr key={announcement.id} className="bg-white/60 transition hover:bg-[#FAF7FF]">
                     <td className="max-w-[360px] px-5 py-4">
-                      <p className="truncate text-sm font-bold text-[#2d1068]">{announcement.title}</p>
+                      <p className="truncate text-sm font-bold text-[#2d1068]">
+                        {announcement.title}
+                      </p>
                       <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#6E628F]">
                         {announcement.content}
                       </p>
@@ -374,7 +380,9 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                             {getStudentName(reaction.student)}
                           </p>
                           {reaction.student?.email ? (
-                            <p className="truncate text-xs text-[#7A6A99]">{reaction.student.email}</p>
+                            <p className="truncate text-xs text-[#7A6A99]">
+                              {reaction.student.email}
+                            </p>
                           ) : null}
                         </div>
                       </div>
@@ -472,11 +480,10 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9B6BFF]">
                   Confirmation
                 </p>
-                <h3 className="mt-2 text-xl font-bold text-[#2d1068]">
-                  Supprimer cette annonce ?
-                </h3>
+                <h3 className="mt-2 text-xl font-bold text-[#2d1068]">Supprimer cette annonce ?</h3>
                 <p className="mt-3 text-sm leading-6 text-[#6E628F]">
-                  Elle ne sera plus visible par les etudiants. Cette action ne pourra pas etre annulee.
+                  Elle ne sera plus visible par les etudiants. Cette action ne pourra pas etre
+                  annulee.
                 </p>
                 <div className="mt-4 rounded-[20px] border border-white/80 bg-white/75 p-4">
                   <p className="truncate text-sm font-semibold text-[#2d1068]">

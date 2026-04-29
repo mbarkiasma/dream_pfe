@@ -3,6 +3,7 @@
 import React from 'react'
 import type { Header as HeaderType } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
@@ -24,17 +25,19 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
               key={i}
               {...link}
               appearance="link"
-              className="text-[15px] font-medium text-violet-900/80 transition hover:text-violet-600"
+              className="text-[15px] font-medium text-violet-900/80 transition hover:text-violet-600 dark:text-foreground/80 dark:hover:text-foreground"
             />
           ) : null,
         )}
       </div>
 
+      <ThemeToggle />
+
       {loginItem?.link && (
         <CMSLink
           {...loginItem.link}
           appearance="outline"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-white px-5 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-white px-5 text-sm font-semibold text-violet-700 transition hover:bg-violet-50 dark:border-border dark:bg-background dark:text-foreground dark:hover:bg-accent"
         />
       )}
 

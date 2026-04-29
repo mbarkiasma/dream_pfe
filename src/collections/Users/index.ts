@@ -1,15 +1,35 @@
-import type { CollectionConfig } from 'payload'
+import type { Access, CollectionConfig, FieldAccess } from 'payload'
+import type { User } from '@/payload-types'
+import { hasRole } from '@/access/roles'
 import { authenticated } from '../../access/authenticated'
 import { clerkAuthStrategy } from './clerkAuthStrategy'
+
+const adminOnly = ({ req: { user } }: { req: { user: User | null } }): boolean =>
+  hasRole(user, ['admin'])
+
+const adminOnlyAccess: Access = ({ req: { user } }) => hasRole(user, ['admin'])
+
+const adminOnlyFieldAccess: FieldAccess = ({ req: { user } }) => hasRole(user, ['admin'])
+
+const adminOrSelf: Access = ({ req: { user } }) => {
+  if (!user) return false
+  if (hasRole(user, ['admin'])) return true
+
+  return {
+    id: {
+      equals: user.id,
+    },
+  }
+}
 
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
-    admin: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'psy',
-    create: () => true,
-    delete: authenticated,
+    admin: adminOnly,
+    create: adminOnlyAccess,
+    delete: adminOnlyAccess,
     read: authenticated,
-    update: authenticated,
+    update: adminOrSelf,
   },
   admin: {
     defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isAvailableForCoaching'],
@@ -18,6 +38,123 @@ export const Users: CollectionConfig = {
   auth: {
     strategies: [clerkAuthStrategy],
   },
+  hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        const userId = String(id)
+        const userToDelete = await req.payload.findByID({
+          collection: 'users',
+          id,
+          depth: 0,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'coaching-messages',
+          where: {
+            or: [
+              { senderUser: { equals: userId } },
+              { 'session.student': { equals: userId } },
+              { 'session.coach': { equals: userId } },
+            ],
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'coach-notes',
+          where: {
+            or: [{ student: { equals: userId } }, { coach: { equals: userId } }],
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'coaching-sessions',
+          where: {
+            or: [{ student: { equals: userId } }, { coach: { equals: userId } }],
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'notifications',
+          where: {
+            or: [{ recipient: { equals: userId } }, { actor: { equals: userId } }],
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'rendez-vous-psy',
+          where: {
+            or: [{ student: { equals: userId } }, { psychologist: { equals: userId } }],
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'psy-availabilities',
+          where: {
+            psychologist: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'annonce-motivation-reactions',
+          where: {
+            student: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'analyse-personnalite',
+          where: {
+            user: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'dreams',
+          where: {
+            user: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        if (userToDelete.clerkUserId) {
+          try {
+            const { clerkClient } = await import('@clerk/nextjs/server')
+            const clerk = await clerkClient()
+
+            await clerk.users.deleteUser(userToDelete.clerkUserId)
+          } catch (error) {
+            console.error('Failed to delete Clerk user:', error)
+          }
+        }
+      },
+    ],
+  },
   fields: [
     {
       name: 'clerkUserId',
@@ -25,6 +162,9 @@ export const Users: CollectionConfig = {
       label: 'Clerk user ID',
       unique: true,
       index: true,
+      access: {
+        update: adminOnlyFieldAccess,
+      },
       admin: {
         readOnly: true,
       },
@@ -32,6 +172,10 @@ export const Users: CollectionConfig = {
     {
       name: 'magic_login_token',
       type: 'text',
+      access: {
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
       admin: {
         hidden: true,
         readOnly: true,
@@ -40,6 +184,10 @@ export const Users: CollectionConfig = {
     {
       name: 'magic_login_expires_at',
       type: 'date',
+      access: {
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
       admin: {
         hidden: true,
         readOnly: true,
@@ -54,6 +202,17 @@ export const Users: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'onboardingStep',
+      type: 'select',
+      defaultValue: 'profile',
+      required: true,
+      options: [
+        { label: 'Profil', value: 'profile' },
+        { label: 'Entretien', value: 'interview' },
+        { label: 'Termine', value: 'completed' },
+      ],
+    },
+    {
       name: 'role',
       type: 'select',
       defaultValue: 'etudiant',
@@ -65,6 +224,9 @@ export const Users: CollectionConfig = {
       ],
       required: true,
       saveToJWT: true,
+      access: {
+        update: adminOnlyFieldAccess,
+      },
     },
     {
       name: 'isAvailableForCoaching',

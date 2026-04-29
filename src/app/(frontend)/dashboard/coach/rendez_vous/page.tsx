@@ -1,4 +1,5 @@
 import { CalendarDays, Plus } from 'lucide-react'
+
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -7,46 +8,49 @@ export default function CoachAppointmentsPage() {
     <div>
       <CoachTopbar
         title="Rendez-vous"
-        description="Planifiez et gérez les séances de coaching avec les étudiants."
+        description="Planifiez et gerez les seances de coaching avec les etudiants."
       />
 
       <div className="mb-6 flex justify-end">
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-400 px-4 py-3 text-sm font-medium text-white shadow-md transition hover:opacity-95"
+          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-400 px-4 py-3 text-sm font-medium text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Plus className="h-4 w-4" />
-          Planifier une séance
+          Planifier une seance
         </button>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Aucun rendez-vous planifié</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068] dark:text-white">
+                Aucun rendez-vous planifie
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <div className="mb-4 flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
-                <div className="rounded-2xl bg-indigo-100 p-3">
-                  <CalendarDays className="h-5 w-5 text-indigo-600" />
+              <div className="mb-4 flex items-center gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
+                <div className="rounded-2xl bg-indigo-100 p-3 dark:bg-indigo-400/15">
+                  <CalendarDays className="h-5 w-5 text-indigo-600 dark:text-indigo-200" />
                 </div>
 
                 <div>
-                  <p className="font-medium text-[#2d1068]">Séances à venir</p>
-                  <p className="text-sm text-[#7A6A99]">
-                    Les rendez-vous confirmés apparaîtront ici automatiquement.
+                  <p className="font-medium text-[#2d1068] dark:text-white">Seances a venir</p>
+                  <p className="text-sm text-[#7A6A99] dark:text-white/60">
+                    Les rendez-vous confirmes apparaitront ici automatiquement.
                   </p>
                 </div>
               </div>
 
-              <p className="leading-7 text-[#6E628F]">
-                Les séances de coaching apparaîtront ici avec leur date, leur heure, leur statut et les notes associées.
+              <p className="leading-7 text-[#6E628F] dark:text-white/65">
+                Les seances de coaching apparaitront ici avec leur date, leur heure, leur statut et
+                les notes associees.
               </p>
 
               <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99]">
+                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99] dark:bg-white/10 dark:text-white/70">
                   En attente
                 </span>
               </div>
@@ -55,37 +59,42 @@ export default function CoachAppointmentsPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Prochaine séance</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068] dark:text-white">
+                Prochaine seance
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F]">
-                Aucune séance n&apos;est encore programmée pour le moment.
+              <p className="leading-7 text-[#6E628F] dark:text-white/65">
+                Aucune seance n&apos;est encore programmee pour le moment.
               </p>
 
               <div className="mt-4">
-                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99]">
+                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99] dark:bg-white/10 dark:text-white/70">
                   Aucun rendez-vous
                 </span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
+          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:from-white/[0.08] dark:via-white/[0.06] dark:to-violet-500/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Notes de séance</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068] dark:text-white">
+                Notes de seance
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F]">
-                Le coach pourra ajouter plus tard des notes privées et des notes partageables avec l’étudiant.
+              <p className="leading-7 text-[#6E628F] dark:text-white/65">
+                Le coach pourra ajouter plus tard des notes privees et des notes partageables avec
+                l'etudiant.
               </p>
 
               <div className="mt-4">
-                <span className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-700">
-                  Fonction à venir
+                <span className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-700 dark:bg-violet-400/15 dark:text-violet-100">
+                  Fonction a venir
                 </span>
               </div>
             </CardContent>

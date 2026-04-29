@@ -69,9 +69,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   const [selectedCoachId, setSelectedCoachId] = useState<string | number | null>(null)
   const [isLoadingCoaches, setIsLoadingCoaches] = useState(false)
   const [coachesError, setCoachesError] = useState('')
-  const [selectedChoicesByMessage, setSelectedChoicesByMessage] = useState<Record<string, string[]>>(
-    {},
-  )
+  const [selectedChoicesByMessage, setSelectedChoicesByMessage] = useState<
+    Record<string, string[]>
+  >({})
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -136,7 +136,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         setSelectedCoachId((current) => current ?? coaches[0]?.id ?? null)
 
         if (coaches.length === 0) {
-          setStatusMessage('Aucun coach humain disponible pour le moment. Vous pouvez utiliser le Smart coach IA.')
+          setStatusMessage(
+            'Aucun coach humain disponible pour le moment. Vous pouvez utiliser le Smart coach IA.',
+          )
         }
       } catch (error) {
         if (isMounted) {
@@ -318,7 +320,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         throw new Error(data.error || 'Suppression impossible.')
       }
 
-      setSessions((current) => current.filter((session) => String(session.id) !== String(sessionId)))
+      setSessions((current) =>
+        current.filter((session) => String(session.id) !== String(sessionId)),
+      )
 
       if (String(selectedSessionId) === String(sessionId)) {
         const nextSession = sessions.find((session) => String(session.id) !== String(sessionId))
@@ -459,16 +463,27 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     }
   }
 
+  const suggestedPrompts = [
+    'Je me sens stresse avant mes examens.',
+    'Aide-moi a organiser ma semaine.',
+    'Je manque de motivation ces derniers jours.',
+  ]
+
   return (
-    <div className="grid gap-6 xl:h-[calc(100vh-11rem)] xl:min-h-[640px] xl:grid-cols-[340px_1fr] xl:overflow-hidden">
+    <div className="student-coaching grid gap-6 xl:h-[calc(100vh-11rem)] xl:min-h-[640px] xl:grid-cols-[340px_1fr] xl:overflow-hidden">
       <section className="min-h-0 space-y-5 xl:overflow-y-auto xl:pr-1">
         <div className="rounded-[32px] border border-white/70 bg-white/80 p-5 shadow-[0_14px_46px_rgba(170,150,230,0.16)] backdrop-blur-md">
           <div className="flex items-start gap-4">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-[#F3ECFF] text-[#8B5CF6] shadow-[0_8px_24px_rgba(109,40,217,0.10)]">
               <Plus className="h-5 w-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-[#2d1068]">Nouvel accompagnement</h2>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="text-lg font-semibold text-[#2d1068]">Nouvel accompagnement</h2>
+                <span className="rounded-full bg-[#F8F3FF] px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                  {mode === 'smart' ? 'Instantane' : 'Humain'}
+                </span>
+              </div>
               <p className="mt-1 text-sm leading-6 text-[#7a6a99]">
                 Lancez une session adaptee a votre besoin du moment.
               </p>
@@ -497,6 +512,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   <span className="block text-sm font-semibold">Smart coach IA</span>
                   <span className="mt-1 block text-xs leading-5 text-[#7a6a99]">
                     Disponible maintenant, avec voix et reponses courtes.
+                  </span>
+                  <span className="mt-2 inline-flex rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                    Stress, motivation, organisation
                   </span>
                 </span>
                 {mode === 'smart' ? (
@@ -528,6 +546,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   <span className="block text-sm font-semibold">Coaching classique</span>
                   <span className="mt-1 block text-xs leading-5 text-[#7a6a99]">
                     Une session suivie par un coach humain.
+                  </span>
+                  <span className="mt-2 inline-flex rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                    Suivi personnalise
                   </span>
                 </span>
                 {mode === 'classic' ? (
@@ -621,21 +642,21 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             <Plus className="h-4 w-4" />
             Demarrer
           </button>
-
-          {statusMessage ? (
-            <p className="mt-4 rounded-2xl border border-white/70 bg-[#F8F3FF] px-4 py-3 text-sm text-[#6E628F]">
-              {statusMessage}
-            </p>
-          ) : null}
         </div>
 
         <div className="rounded-[28px] border border-white/70 bg-white/80 p-4 shadow-[0_10px_40px_rgba(170,150,230,0.14)] backdrop-blur-md">
-          <h2 className="px-2 text-lg font-semibold text-[#2d1068]">Mes sessions</h2>
+          <div className="flex items-center justify-between gap-3 px-2">
+            <h2 className="text-lg font-semibold text-[#2d1068]">Mes sessions</h2>
+            <span className="rounded-full bg-[#F8F3FF] px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+              {sessions.length}
+            </span>
+          </div>
           <div className="mt-4 max-h-[340px] space-y-2 overflow-y-auto pr-1 xl:max-h-[420px]">
             {sessions.length === 0 ? (
-              <p className="rounded-[20px] bg-[#F8F3FF] p-4 text-sm text-[#7a6a99]">
-                Aucune session pour le moment.
-              </p>
+              <div className="rounded-[20px] border border-dashed border-violet-200 bg-[#F8F3FF] p-4 text-sm leading-6 text-[#7a6a99]">
+                <p className="font-semibold text-[#2d1068]">Aucune session pour le moment.</p>
+                <p className="mt-1">Demarrez un accompagnement pour retrouver vos échanges ici.</p>
+              </div>
             ) : null}
 
             {sessions.map((session) => (
@@ -745,6 +766,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     Reponse en cours
                   </span>
                 ) : null}
+                {selectedSession?.status === 'closed' ? (
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-500">Fermee</span>
+                ) : null}
               </div>
             </div>
             <div className="rounded-2xl bg-[#F3ECFF] p-3 text-[#8B5CF6]">
@@ -756,8 +780,23 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
           {messages.length === 0 ? (
             <div className="rounded-[24px] border border-dashed border-violet-200 bg-white/70 p-6 text-sm leading-7 text-[#6E628F]">
-              Demarrez la discussion avec un message simple sur votre besoin actuel : stress,
-              motivation, organisation, concentration ou confiance.
+              <p className="font-semibold text-[#2d1068]">Commencez simplement.</p>
+              <p className="mt-1">
+                Ecrivez votre besoin actuel ou choisissez une suggestion pour lancer la discussion.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {suggestedPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => setMessage(prompt)}
+                    disabled={!selectedSessionId || selectedSession?.status === 'closed'}
+                    className="rounded-full border border-violet-100 bg-white px-3 py-2 text-xs font-semibold text-[#6D28D9] transition hover:bg-[#F8F3FF] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : null}
 
@@ -856,7 +895,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
                           <button
                             type="button"
-                            onClick={() => void sendSelectedChoices(item.id, multipleChoice.choices)}
+                            onClick={() =>
+                              void sendSelectedChoices(item.id, multipleChoice.choices)
+                            }
                             disabled={selectedChoices.length === 0 || isLoading}
                             className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400 px-4 py-2 text-xs font-semibold text-white transition hover:from-violet-600 hover:to-fuchsia-500 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300"
                           >
@@ -897,6 +938,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         </div>
 
         <div className="shrink-0 border-t border-white/70 bg-white/85 p-4 backdrop-blur">
+          {statusMessage ? (
+            <p className="mb-3 rounded-2xl border border-white/70 bg-[#F8F3FF] px-4 py-3 text-sm text-[#6E628F]">
+              {statusMessage}
+            </p>
+          ) : null}
           <div className="flex items-end gap-2 md:gap-3">
             <button
               type="button"
@@ -922,7 +968,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               }}
               disabled={!selectedSessionId || selectedSession?.status === 'closed'}
               rows={3}
-              placeholder="Ecrivez votre message..."
+              placeholder={
+                selectedSessionId
+                  ? 'Ecrivez votre message...'
+                  : 'Demarrez ou selectionnez une session pour ecrire.'
+              }
               className="min-h-[84px] flex-1 resize-none rounded-[20px] border border-violet-100 bg-white/80 px-4 py-3 text-sm leading-6 text-[#4B3F72] outline-none transition placeholder:text-[#9b8bbd] focus:border-violet-300 disabled:cursor-not-allowed disabled:bg-slate-100 md:min-h-[92px]"
             />
             <button
@@ -936,8 +986,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             </button>
           </div>
           <div className="mt-3 flex items-center justify-between px-1 text-xs text-slate-400">
-            <span>Entrée pour envoyer, Shift+Entrée pour une nouvelle ligne.</span>
-            <span>{message.trim().length} caractères</span>
+            <span>Entree pour envoyer, Shift+Entree pour une nouvelle ligne.</span>
+            <span>{message.trim().length} caracteres</span>
           </div>
         </div>
       </section>
@@ -1006,7 +1056,9 @@ type MultipleChoiceOption = {
   text: string
 }
 
-function parseMultipleChoice(content: string): { choices: MultipleChoiceOption[]; prompt: string } | null {
+function parseMultipleChoice(
+  content: string,
+): { choices: MultipleChoiceOption[]; prompt: string } | null {
   const lines = content.split('\n')
   const choices: MultipleChoiceOption[] = []
   const promptLines: string[] = []

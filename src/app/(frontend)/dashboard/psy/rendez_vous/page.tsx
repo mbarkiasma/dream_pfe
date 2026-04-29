@@ -80,9 +80,11 @@ export default async function PsyRendezVousPage() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Demandes recues</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068] dark:text-white">
+                Demandes recues
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -91,24 +93,26 @@ export default async function PsyRendezVousPage() {
                   {docs.map((appointment) => (
                     <div
                       key={appointment.id}
-                      className="rounded-2xl border border-violet-100 bg-white/80 p-4"
+                      className="rounded-2xl border border-violet-100 bg-white/80 p-4 dark:border-white/10 dark:bg-white/[0.06]"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2 text-sm font-medium text-[#6E628F]">
+                          <div className="flex items-center gap-2 text-sm font-medium text-[#6E628F] dark:text-white/60">
                             <UserRound className="h-4 w-4 text-violet-500" />
                             {getStudentName(appointment.student)}
                           </div>
 
-                          <p className="mt-2 font-semibold text-[#2d1068]">
+                          <p className="mt-2 font-semibold text-[#2d1068] dark:text-white">
                             {formatDate(appointment.date)} de {appointment.startTime} a{' '}
                             {appointment.endTime}
                           </p>
 
-                          <p className="mt-2 leading-6 text-[#6E628F]">{appointment.reason}</p>
+                          <p className="mt-2 leading-6 text-[#6E628F] dark:text-white/65">
+                            {appointment.reason}
+                          </p>
 
                           {appointment.status === 'rejected' && appointment.rejectionReason ? (
-                            <div className="mt-3 rounded-2xl bg-red-50 p-3 text-sm text-red-700">
+                            <div className="mt-3 rounded-2xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-200">
                               <p className="font-semibold">Cause du refus envoyee</p>
                               <p className="mt-1">{appointment.rejectionReason}</p>
                             </div>
@@ -138,14 +142,16 @@ export default async function PsyRendezVousPage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
-                  <div className="rounded-2xl bg-indigo-100 p-3">
-                    <CalendarDays className="h-5 w-5 text-indigo-600" />
+                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
+                  <div className="rounded-2xl bg-indigo-100 p-3 dark:bg-indigo-400/15">
+                    <CalendarDays className="h-5 w-5 text-indigo-600 dark:text-indigo-200" />
                   </div>
 
                   <div>
-                    <p className="font-medium text-[#2d1068]">Aucune demande pour le moment</p>
-                    <p className="text-sm text-[#7A6A99]">
+                    <p className="font-medium text-[#2d1068] dark:text-white">
+                      Aucune demande pour le moment
+                    </p>
+                    <p className="text-sm text-[#7A6A99] dark:text-white/60">
                       Les demandes envoyees par les etudiants apparaitront ici.
                     </p>
                   </div>
@@ -156,50 +162,54 @@ export default async function PsyRendezVousPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
+          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Prochaine consultation</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068] dark:text-white">
+                Prochaine consultation
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
               {nextAppointment ? (
-                <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 p-4">
-                  <div className="rounded-2xl bg-emerald-100 p-3">
-                    <Clock className="h-5 w-5 text-emerald-600" />
+                <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
+                  <div className="rounded-2xl bg-emerald-100 p-3 dark:bg-emerald-400/15">
+                    <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-200" />
                   </div>
                   <div>
-                    <p className="font-medium text-[#2d1068]">
+                    <p className="font-medium text-[#2d1068] dark:text-white">
                       {formatDate(nextAppointment.date)}
                     </p>
-                    <p className="text-sm text-[#6E628F]">
+                    <p className="text-sm text-[#6E628F] dark:text-white/60">
                       {nextAppointment.startTime} - {nextAppointment.endTime}
                     </p>
                   </div>
                 </div>
               ) : (
-                <p className="leading-7 text-[#6E628F]">
+                <p className="leading-7 text-[#6E628F] dark:text-white/65">
                   Aucune consultation n&apos;est encore confirmee pour le moment.
                 </p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur">
+          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:from-white/[0.08] dark:via-white/[0.06] dark:to-violet-500/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068]">Resume</CardTitle>
+              <CardTitle className="text-xl text-[#2d1068] dark:text-white">Resume</CardTitle>
             </CardHeader>
 
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-white/80 p-4">
-                  <p className="text-2xl font-bold text-[#2d1068]">{pendingAppointments.length}</p>
-                  <p className="text-sm text-[#6E628F]">En attente</p>
+                <div className="rounded-2xl bg-white/80 p-4 dark:bg-white/[0.06]">
+                  <p className="text-2xl font-bold text-[#2d1068] dark:text-white">
+                    {pendingAppointments.length}
+                  </p>
+                  <p className="text-sm text-[#6E628F] dark:text-white/60">En attente</p>
                 </div>
-                <div className="rounded-2xl bg-white/80 p-4">
-                  <p className="text-2xl font-bold text-[#2d1068]">
+                <div className="rounded-2xl bg-white/80 p-4 dark:bg-white/[0.06]">
+                  <p className="text-2xl font-bold text-[#2d1068] dark:text-white">
                     {confirmedAppointments.length}
                   </p>
-                  <p className="text-sm text-[#6E628F]">Confirmes</p>
+                  <p className="text-sm text-[#6E628F] dark:text-white/60">Confirmes</p>
                 </div>
               </div>
             </CardContent>

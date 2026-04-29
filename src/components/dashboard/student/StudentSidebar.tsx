@@ -8,7 +8,6 @@ import {
   FileSearch,
   LayoutDashboard,
   LifeBuoy,
-  MicVocal,
   MoonStar,
   NotebookPen,
   UserRound,
@@ -26,7 +25,6 @@ const navItems = [
   { title: 'Rendez-vous', href: '/dashboard/student/rendez_vous', icon: CalendarDays },
   { title: 'Notifications', href: '/dashboard/student/notifications', icon: Bell },
   { title: 'Suivi quotidien', href: '/dashboard/student/checkin', icon: NotebookPen },
-  { title: 'Entretien IA', href: '/dashboard/student/interview', icon: MicVocal },
   { title: 'Mon profil', href: '/dashboard/student/profile', icon: UserRound },
 ]
 
@@ -42,14 +40,18 @@ export function StudentSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 flex-col overflow-hidden rounded-[32px] border border-white/60 bg-gradient-to-b from-[#efe4ff]/95 via-[#f8f3ff]/90 to-[#eadcff]/95 p-4 shadow-[0_25px_70px_rgba(109,40,217,0.18)] backdrop-blur-xl md:flex">
-      <div className="mb-6 flex items-center gap-3 rounded-[24px] border border-white/70 bg-white/65 p-3 shadow-[0_8px_24px_rgba(109,40,217,0.08)]">
+    <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 flex-col overflow-hidden rounded-[32px] border border-white/60 bg-gradient-to-b from-[#efe4ff]/95 via-[#f8f3ff]/90 to-[#eadcff]/95 p-4 shadow-[0_25px_70px_rgba(109,40,217,0.18)] backdrop-blur-xl dark:border-border dark:bg-[linear-gradient(180deg,rgba(36,18,63,0.95),rgba(20,16,31,0.92),rgba(15,23,42,0.95))] md:flex">
+      <div className="mb-6 flex items-center gap-3 rounded-[24px] border border-white/70 bg-white/65 p-3 shadow-[0_8px_24px_rgba(109,40,217,0.08)] dark:border-border dark:bg-card/70">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_26px_rgba(139,92,246,0.28)]">
           <MoonStar className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-[#2d1068]">Espace etudiant</p>
-          <p className="truncate text-xs text-[#7a6a99]">Dream coaching</p>
+          <p className="truncate text-sm font-semibold text-[#2d1068] dark:text-foreground">
+            Espace etudiant
+          </p>
+          <p className="truncate text-xs text-[#7a6a99] dark:text-muted-foreground">
+            Dream coaching
+          </p>
         </div>
       </div>
 
@@ -65,15 +67,15 @@ export function StudentSidebar() {
               title={item.title}
               className={`group flex items-center gap-3 rounded-[20px] border px-3 py-3 text-sm font-medium transition ${
                 active
-                  ? 'border-white/80 bg-white text-[#2d1068] shadow-[0_12px_30px_rgba(109,40,217,0.16)]'
-                  : 'border-transparent text-[#6E628F] hover:border-white/70 hover:bg-white/70 hover:text-[#2d1068]'
+                  ? 'border-white/80 bg-white text-[#2d1068] shadow-[0_12px_30px_rgba(109,40,217,0.16)] dark:border-border dark:bg-accent dark:text-foreground'
+                  : 'border-transparent text-[#6E628F] hover:border-white/70 hover:bg-white/70 hover:text-[#2d1068] dark:text-muted-foreground dark:hover:border-border dark:hover:bg-accent dark:hover:text-foreground'
               }`}
             >
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition ${
-                  active
-                    ? 'bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white'
-                    : 'bg-white/70 text-[#8B5CF6] group-hover:bg-[#F3ECFF]'
+                active
+                  ? 'bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white'
+                    : 'bg-white/70 text-[#8B5CF6] group-hover:bg-[#F3ECFF] dark:bg-background/70 dark:text-foreground dark:group-hover:bg-background'
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -84,7 +86,7 @@ export function StudentSidebar() {
         })}
       </nav>
 
-      <div className="mt-4 border-t border-white/70 pt-4">
+      <div className="mt-4 border-t border-white/70 pt-4 dark:border-border">
         <LogoutButton showLabel />
       </div>
     </aside>
