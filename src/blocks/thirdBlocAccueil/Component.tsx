@@ -39,7 +39,7 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
   mockupImage,
 }) => {
   return (
-    <section className="relative overflow-hidden bg-[#F8F3FF] px-4 py-20 md:px-8">
+    <section className="relative overflow-hidden bg-dream-soft px-4 py-20 md:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(196,181,253,0.22),_transparent_45%)]" />
 
       <div className="relative mx-auto max-w-7xl">
@@ -58,7 +58,7 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
                 return (
                   <div
                     key={feature.id || index}
-                    className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-5 py-4 shadow-[0_10px_30px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-[0_18px_40px_rgba(124,58,237,0.18)]"
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-card/80 px-5 py-4 shadow-[0_10px_30px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-[0_18px_40px_rgba(124,58,237,0.18)]"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F1E8FF]">
                       <Icon className="h-5 w-5 text-[#8B5CF6]" />
@@ -78,7 +78,7 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
                 return (
                   <div
                     key={feature.id || `middle-${index}`}
-                    className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-5 py-4 shadow-[0_10px_30px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-[0_18px_40px_rgba(124,58,237,0.18)]"
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-card/80 px-5 py-4 shadow-[0_10px_30px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-[0_18px_40px_rgba(124,58,237,0.18)]"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F1E8FF]">
                       <Icon className="h-5 w-5 text-[#8B5CF6]" />
@@ -98,7 +98,7 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
                 return (
                   <div
                     key={feature.id || `last-${index}`}
-                    className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-5 py-4 shadow-[0_10px_30px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-[0_18px_40px_rgba(124,58,237,0.18)]"
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-card/80 px-5 py-4 shadow-[0_10px_30px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-[0_18px_40px_rgba(124,58,237,0.18)]"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F1E8FF]">
                       <Icon className="h-5 w-5 text-[#8B5CF6]" />
@@ -112,7 +112,7 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
             </div>
           </div>
 
-          <Card className="rounded-[36px] border-white/60 bg-white/75 p-5 shadow-[0_25px_70px_rgba(124,58,237,0.14)] backdrop-blur-md">
+          <Card className="rounded-[36px] border-border bg-card/75 p-5 shadow-[0_25px_70px_rgba(124,58,237,0.14)] backdrop-blur-md">
   <CardContent className="space-y-5 p-0">
     <div className="rounded-[28px] bg-gradient-to-br from-[#E8D9FF] via-[#EEE4FF] to-[#F8F3FF] p-6">
       <div className="flex items-start justify-between">
@@ -122,12 +122,12 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
             Rêve 
           </h3>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-card/70">
           <Moon className="h-6 w-6 text-[#8B5CF6]" />
         </div>
       </div>
 
-      <p className="mt-4 max-w-md text-sm leading-6 text-[#6E628F]">
+      <p className="mt-4 max-w-md text-sm leading-6 text-dream-muted">
         Votre rêve évoque un besoin d’apaisement, d’exploration intérieure
         et une recherche de clarté émotionnelle.
       </p>
@@ -136,7 +136,7 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
     <div className="space-y-3">
       <div>
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-[#6E628F]">Clarté émotionnelle</span>
+          <span className="text-dream-muted">Clarté émotionnelle</span>
           <span className="font-medium text-[#4B3F72]">82%</span>
         </div>
         <div className="h-3 rounded-full bg-[#EFE7FF]">
@@ -146,7 +146,7 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
 
       <div>
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-[#6E628F]">Intensité symbolique</span>
+          <span className="text-dream-muted">Intensité symbolique</span>
           <span className="font-medium text-[#4B3F72]">67%</span>
         </div>
         <div className="h-3 rounded-full bg-[#EFE7FF]">
@@ -171,13 +171,13 @@ export const TroisiemeBlocAccueilBlock: React.FC<Props> = ({
       </div>
     </div>
 
-    <div className="rounded-2xl bg-[#F3ECFF] p-4">
+    <div className="rounded-2xl bg-dream-highlight p-4">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-[#4B3F72]">
             Insight personnalisé
           </p>
-          <p className="mt-1 text-sm text-[#6E628F]">
+          <p className="mt-1 text-sm text-dream-muted">
             Ce rêve suggère une phase de recentrage et d’écoute intérieure.
           </p>
         </div>

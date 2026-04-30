@@ -12,9 +12,9 @@ export default function StudentInterviewPage() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Entretien en attente
               </CardTitle>
             </CardHeader>
@@ -26,13 +26,13 @@ export default function StudentInterviewPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">Statut</CardTitle>
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">Statut</CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 Le statut de l'entretien apparaitra ici : en attente, commence ou termine.
               </p>
 
@@ -44,15 +44,15 @@ export default function StudentInterviewPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Resultat futur
               </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 Les reponses fournies par l'etudiant serviront plus tard a enrichir l'analyse et a
                 ameliorer l'accompagnement personnalise.
               </p>

@@ -41,7 +41,7 @@ const canaux = [
 export function CanauxContact() {
   return (
     <section id="canaux-contact" className="rounded-[30px]">
-      <h2 className="anim-fade-up mb-6 text-4xl font-bold text-[#4d2d7b]">
+      <h2 className="anim-fade-up mb-6 text-4xl font-bold text-dream-heading">
         Contactez-nous facilement
       </h2>
 
@@ -49,7 +49,7 @@ export function CanauxContact() {
         {canaux.map((item, index) => (
           <Card
             key={item.title}
-            className="card-hover-premium group relative overflow-hidden rounded-[24px] border border-white/60 bg-white/75 shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]"
+            className="card-hover-premium group relative overflow-hidden rounded-[24px] border border-border bg-card/75 shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]"
             style={{
               animation: 'fadeUpSoft 0.8s ease-out both',
               animationDelay: `${0.08 + index * 0.1}s`,
@@ -72,7 +72,7 @@ export function CanauxContact() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold text-[#4d2d7b] transition duration-300 group-hover:translate-x-1">
+                  <h3 className="text-xl font-semibold text-dream-heading transition duration-300 group-hover:translate-x-1">
                     {item.title}
                   </h3>
                   <p className="mt-1 text-sm font-medium text-[#5e458b]">

@@ -472,15 +472,15 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   return (
     <div className="student-coaching grid gap-6 xl:h-[calc(100vh-11rem)] xl:min-h-[640px] xl:grid-cols-[340px_1fr] xl:overflow-hidden">
       <section className="min-h-0 space-y-5 xl:overflow-y-auto xl:pr-1">
-        <div className="rounded-[32px] border border-white/70 bg-white/80 p-5 shadow-[0_14px_46px_rgba(170,150,230,0.16)] backdrop-blur-md">
+        <div className="rounded-[32px] border border-border bg-card/80 p-5 shadow-[0_14px_46px_rgba(170,150,230,0.16)] backdrop-blur-md">
           <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-[#F3ECFF] text-[#8B5CF6] shadow-[0_8px_24px_rgba(109,40,217,0.10)]">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-dream-highlight text-[#8B5CF6] shadow-[0_8px_24px_rgba(109,40,217,0.10)]">
               <Plus className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-lg font-semibold text-[#2d1068]">Nouvel accompagnement</h2>
-                <span className="rounded-full bg-[#F8F3FF] px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                <h2 className="text-lg font-semibold text-dream-heading">Nouvel accompagnement</h2>
+                <span className="rounded-full bg-dream-soft px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
                   {mode === 'smart' ? 'Instantane' : 'Humain'}
                 </span>
               </div>
@@ -496,14 +496,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               onClick={() => setMode('smart')}
               className={`group relative overflow-hidden rounded-[24px] border p-4 text-left transition ${
                 mode === 'smart'
-                  ? 'border-violet-200 bg-gradient-to-br from-[#F3ECFF] to-white text-[#2d1068] shadow-[0_14px_34px_rgba(109,40,217,0.14)]'
-                  : 'border-white/70 bg-white/70 text-[#4B3F72] hover:border-violet-100 hover:bg-white'
+                  ? 'border-border bg-gradient-to-br from-[#F3ECFF] to-white text-dream-heading shadow-[0_14px_34px_rgba(109,40,217,0.14)]'
+                  : 'border-border bg-card/70 text-[#4B3F72] hover:border-border hover:bg-white'
               }`}
             >
               <div className="flex items-center gap-4">
                 <div
                   className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] transition ${
-                    mode === 'smart' ? 'bg-white text-[#8B5CF6]' : 'bg-[#F8F3FF] text-[#8B5CF6]'
+                    mode === 'smart' ? 'bg-white text-[#8B5CF6]' : 'bg-dream-soft text-[#8B5CF6]'
                   }`}
                 >
                   <Bot className="h-5 w-5" />
@@ -513,7 +513,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   <span className="mt-1 block text-xs leading-5 text-[#7a6a99]">
                     Disponible maintenant, avec voix et reponses courtes.
                   </span>
-                  <span className="mt-2 inline-flex rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                  <span className="mt-2 inline-flex rounded-full bg-card/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
                     Stress, motivation, organisation
                   </span>
                 </span>
@@ -530,14 +530,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               onClick={() => setMode('classic')}
               className={`group relative overflow-hidden rounded-[24px] border p-4 text-left transition ${
                 mode === 'classic'
-                  ? 'border-violet-200 bg-gradient-to-br from-[#F3ECFF] to-white text-[#2d1068] shadow-[0_14px_34px_rgba(109,40,217,0.14)]'
-                  : 'border-white/70 bg-white/70 text-[#4B3F72] hover:border-violet-100 hover:bg-white'
+                  ? 'border-border bg-gradient-to-br from-[#F3ECFF] to-white text-dream-heading shadow-[0_14px_34px_rgba(109,40,217,0.14)]'
+                  : 'border-border bg-card/70 text-[#4B3F72] hover:border-border hover:bg-white'
               }`}
             >
               <div className="flex items-center gap-4">
                 <div
                   className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] transition ${
-                    mode === 'classic' ? 'bg-white text-[#8B5CF6]' : 'bg-[#F8F3FF] text-[#8B5CF6]'
+                    mode === 'classic' ? 'bg-white text-[#8B5CF6]' : 'bg-dream-soft text-[#8B5CF6]'
                   }`}
                 >
                   <UserRound className="h-5 w-5" />
@@ -547,7 +547,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   <span className="mt-1 block text-xs leading-5 text-[#7a6a99]">
                     Une session suivie par un coach humain.
                   </span>
-                  <span className="mt-2 inline-flex rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                  <span className="mt-2 inline-flex rounded-full bg-card/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
                     Suivi personnalise
                   </span>
                 </span>
@@ -561,10 +561,10 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           </div>
 
           {mode === 'classic' ? (
-            <div className="mt-5 rounded-[24px] border border-violet-100 bg-[#FBF8FF] p-4">
+            <div className="mt-5 rounded-[24px] border border-border bg-[#FBF8FF] p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-[#2d1068]">Coachs disponibles</h3>
+                  <h3 className="text-sm font-semibold text-dream-heading">Coachs disponibles</h3>
                   <p className="mt-1 text-xs leading-5 text-[#7a6a99]">
                     Choisissez un coach humain disponible pour commencer la session.
                   </p>
@@ -584,7 +584,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 ) : null}
 
                 {!isLoadingCoaches && availableCoaches.length === 0 ? (
-                  <div className="rounded-[20px] border border-dashed border-violet-200 bg-white/80 p-4 text-sm leading-6 text-[#6E628F]">
+                  <div className="rounded-[20px] border border-dashed border-border bg-card/80 p-4 text-sm leading-6 text-dream-muted">
                     Aucun coach n'est disponible actuellement. Le Smart coach IA reste disponible
                     pour continuer l'accompagnement sans attente.
                     <button
@@ -607,12 +607,12 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     onClick={() => setSelectedCoachId(coach.id)}
                     className={`w-full rounded-[20px] border p-4 text-left transition ${
                       String(selectedCoachId) === String(coach.id)
-                        ? 'border-violet-200 bg-white text-[#2d1068] shadow-[0_12px_28px_rgba(109,40,217,0.12)]'
-                        : 'border-white bg-white/70 text-[#4B3F72] hover:border-violet-100 hover:bg-white'
+                        ? 'border-border bg-white text-dream-heading shadow-[0_12px_28px_rgba(109,40,217,0.12)]'
+                        : 'border-white bg-card/70 text-[#4B3F72] hover:border-border hover:bg-white'
                     }`}
                   >
                     <span className="flex items-start gap-3">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#F3ECFF] text-[#8B5CF6]">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-dream-highlight text-[#8B5CF6]">
                         <UserRound className="h-5 w-5" />
                       </span>
                       <span className="min-w-0 flex-1">
@@ -644,17 +644,17 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           </button>
         </div>
 
-        <div className="rounded-[28px] border border-white/70 bg-white/80 p-4 shadow-[0_10px_40px_rgba(170,150,230,0.14)] backdrop-blur-md">
+        <div className="rounded-[28px] border border-border bg-card/80 p-4 shadow-[0_10px_40px_rgba(170,150,230,0.14)] backdrop-blur-md">
           <div className="flex items-center justify-between gap-3 px-2">
-            <h2 className="text-lg font-semibold text-[#2d1068]">Mes sessions</h2>
-            <span className="rounded-full bg-[#F8F3FF] px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+            <h2 className="text-lg font-semibold text-dream-heading">Mes sessions</h2>
+            <span className="rounded-full bg-dream-soft px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
               {sessions.length}
             </span>
           </div>
           <div className="mt-4 max-h-[340px] space-y-2 overflow-y-auto pr-1 xl:max-h-[420px]">
             {sessions.length === 0 ? (
-              <div className="rounded-[20px] border border-dashed border-violet-200 bg-[#F8F3FF] p-4 text-sm leading-6 text-[#7a6a99]">
-                <p className="font-semibold text-[#2d1068]">Aucune session pour le moment.</p>
+              <div className="rounded-[20px] border border-dashed border-border bg-dream-soft p-4 text-sm leading-6 text-[#7a6a99]">
+                <p className="font-semibold text-dream-heading">Aucune session pour le moment.</p>
                 <p className="mt-1">Demarrez un accompagnement pour retrouver vos échanges ici.</p>
               </div>
             ) : null}
@@ -664,8 +664,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 key={session.id}
                 className={`w-full rounded-[20px] border p-4 text-left transition ${
                   String(selectedSessionId) === String(session.id)
-                    ? 'border-white/80 bg-gradient-to-br from-[#F3ECFF] to-[#FDF7FF] text-[#2d1068] shadow-[0_12px_30px_rgba(109,40,217,0.14)]'
-                    : 'border-white/70 bg-white/70 text-[#4B3F72] hover:border-white hover:bg-white'
+                    ? 'border-border bg-gradient-to-br from-[#F3ECFF] to-[#FDF7FF] text-dream-heading shadow-[0_12px_30px_rgba(109,40,217,0.14)]'
+                    : 'border-border bg-card/70 text-[#4B3F72] hover:border-white hover:bg-white'
                 }`}
               >
                 {String(editingSessionId) === String(session.id) ? (
@@ -673,14 +673,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     <input
                       value={editingTitle}
                       onChange={(event) => setEditingTitle(event.target.value)}
-                      className="w-full rounded-2xl border border-violet-100 bg-white px-3 py-2 text-sm text-[#2d1068] outline-none focus:border-violet-300"
+                      className="w-full rounded-2xl border border-border bg-white px-3 py-2 text-sm text-dream-heading outline-none focus:border-violet-300"
                       maxLength={120}
                     />
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => void renameSession(session.id)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500 text-white"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-softer0 text-white"
                         title="Enregistrer"
                       >
                         <Check className="h-4 w-4" />
@@ -691,7 +691,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                           setEditingSessionId(null)
                           setEditingTitle('')
                         }}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3ECFF] text-[#7a6a99]"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-highlight text-[#7a6a99]"
                         title="Annuler"
                       >
                         <X className="h-4 w-4" />
@@ -719,7 +719,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                           setEditingSessionId(session.id)
                           setEditingTitle(session.title)
                         }}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/70 text-current transition hover:bg-white"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-card/70 text-current transition hover:bg-white"
                         title="Renommer"
                       >
                         <Pencil className="h-4 w-4" />
@@ -728,7 +728,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         <button
                           type="button"
                           onClick={() => setSessionToDelete(session)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/70 text-current transition hover:bg-rose-500 hover:text-white"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-card/70 text-current transition hover:bg-rose-500 hover:text-white"
                           title="Supprimer"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -743,22 +743,22 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         </div>
       </section>
 
-      <section className="flex min-h-[620px] flex-col overflow-hidden rounded-[30px] border border-white/70 bg-gradient-to-b from-white/90 via-[#FDF7FF]/90 to-[#F8F3FF]/90 shadow-[0_25px_70px_rgba(109,40,217,0.16)] backdrop-blur-xl xl:min-h-0">
-        <div className="shrink-0 border-b border-white/70 bg-white/65 p-5">
+      <section className="flex min-h-[620px] flex-col overflow-hidden rounded-[30px] border border-border bg-gradient-to-b from-white/90 via-[#FDF7FF]/90 to-[#F8F3FF]/90 shadow-[0_25px_70px_rgba(109,40,217,0.16)] backdrop-blur-xl xl:min-h-0">
+        <div className="shrink-0 border-b border-border bg-white/65 p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-[#2d1068]">
+              <h2 className="text-xl font-semibold text-dream-heading">
                 {selectedSession?.title ?? 'Aucune session selectionnee'}
               </h2>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium">
-                <span className="rounded-full bg-[#F3ECFF] px-3 py-1 text-[#6D28D9]">
+                <span className="rounded-full bg-dream-highlight px-3 py-1 text-dream-accent">
                   {selectedSession?.mode === 'smart'
                     ? 'Smart coach IA'
                     : selectedSession
                       ? selectedCoachName
                       : 'Aucune session'}
                 </span>
-                <span className="rounded-full bg-[#F3ECFF] px-3 py-1 text-[#6D28D9]">
+                <span className="rounded-full bg-dream-highlight px-3 py-1 text-dream-accent">
                   {messageCount} message{messageCount > 1 ? 's' : ''}
                 </span>
                 {isLoading ? (
@@ -771,7 +771,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 ) : null}
               </div>
             </div>
-            <div className="rounded-2xl bg-[#F3ECFF] p-3 text-[#8B5CF6]">
+            <div className="rounded-2xl bg-dream-highlight p-3 text-[#8B5CF6]">
               <MessageCircle className="h-5 w-5" />
             </div>
           </div>
@@ -779,8 +779,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
           {messages.length === 0 ? (
-            <div className="rounded-[24px] border border-dashed border-violet-200 bg-white/70 p-6 text-sm leading-7 text-[#6E628F]">
-              <p className="font-semibold text-[#2d1068]">Commencez simplement.</p>
+            <div className="rounded-[24px] border border-dashed border-border bg-card/70 p-6 text-sm leading-7 text-dream-muted">
+              <p className="font-semibold text-dream-heading">Commencez simplement.</p>
               <p className="mt-1">
                 Ecrivez votre besoin actuel ou choisissez une suggestion pour lancer la discussion.
               </p>
@@ -791,7 +791,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     type="button"
                     onClick={() => setMessage(prompt)}
                     disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-                    className="rounded-full border border-violet-100 bg-white px-3 py-2 text-xs font-semibold text-[#6D28D9] transition hover:bg-[#F8F3FF] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-full border border-border bg-white px-3 py-2 text-xs font-semibold text-dream-accent transition hover:bg-dream-soft disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {prompt}
                   </button>
@@ -812,7 +812,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   className={`max-w-[88%] rounded-[24px] px-4 py-3 shadow-sm md:max-w-[78%] ${
                     isMine
                       ? 'bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_28px_rgba(139,92,246,0.24)]'
-                      : 'border border-white/80 bg-white/85 text-[#4B3F72] shadow-[0_8px_24px_rgba(109,40,217,0.08)]'
+                      : 'border border-border bg-card/85 text-[#4B3F72] shadow-[0_8px_24px_rgba(109,40,217,0.08)]'
                   }`}
                 >
                   <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] opacity-60">
@@ -828,13 +828,13 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         value={editingMessageContent}
                         onChange={(event) => setEditingMessageContent(event.target.value)}
                         rows={4}
-                        className="min-h-[104px] w-full resize-none rounded-2xl border border-violet-100 bg-white px-3 py-2 text-sm leading-6 text-[#2d1068] outline-none focus:border-violet-300"
+                        className="min-h-[104px] w-full resize-none rounded-2xl border border-border bg-white px-3 py-2 text-sm leading-6 text-dream-heading outline-none focus:border-violet-300"
                       />
                       <div className="flex justify-end gap-2">
                         <button
                           type="button"
                           onClick={() => void updateMessage(item.id)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500 text-white"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-softer0 text-white"
                           title="Enregistrer"
                         >
                           <Check className="h-4 w-4" />
@@ -845,7 +845,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                             setEditingMessageId(null)
                             setEditingMessageContent('')
                           }}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3ECFF] text-[#7a6a99]"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-highlight text-[#7a6a99]"
                           title="Annuler"
                         >
                           <X className="h-4 w-4" />
@@ -865,7 +865,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                             return (
                               <label
                                 key={choice.label}
-                                className="flex cursor-pointer items-start gap-3 rounded-2xl border border-violet-100 bg-white/90 px-3 py-2 text-sm text-[#4B3F72] transition hover:bg-[#F8F3FF]"
+                                className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card/90 px-3 py-2 text-sm text-[#4B3F72] transition hover:bg-dream-soft"
                               >
                                 <input
                                   type="checkbox"
@@ -937,9 +937,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="shrink-0 border-t border-white/70 bg-white/85 p-4 backdrop-blur">
+        <div className="shrink-0 border-t border-border bg-card/85 p-4 backdrop-blur">
           {statusMessage ? (
-            <p className="mb-3 rounded-2xl border border-white/70 bg-[#F8F3FF] px-4 py-3 text-sm text-[#6E628F]">
+            <p className="mb-3 rounded-2xl border border-border bg-dream-soft px-4 py-3 text-sm text-dream-muted">
               {statusMessage}
             </p>
           ) : null}
@@ -951,7 +951,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               className={`inline-flex h-[84px] w-[56px] shrink-0 items-center justify-center rounded-[20px] transition disabled:cursor-not-allowed disabled:bg-slate-300 md:h-[92px] md:w-[64px] ${
                 isRecording
                   ? 'bg-rose-500 text-white hover:bg-rose-600'
-                  : 'bg-[#F3ECFF] text-[#8B5CF6] hover:bg-[#eadcff]'
+                  : 'bg-dream-highlight text-[#8B5CF6] hover:bg-[#eadcff]'
               }`}
               title={isRecording ? 'Arreter' : 'Dicter'}
             >
@@ -973,7 +973,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   ? 'Ecrivez votre message...'
                   : 'Demarrez ou selectionnez une session pour ecrire.'
               }
-              className="min-h-[84px] flex-1 resize-none rounded-[20px] border border-violet-100 bg-white/80 px-4 py-3 text-sm leading-6 text-[#4B3F72] outline-none transition placeholder:text-[#9b8bbd] focus:border-violet-300 disabled:cursor-not-allowed disabled:bg-slate-100 md:min-h-[92px]"
+              className="min-h-[84px] flex-1 resize-none rounded-[20px] border border-border bg-card/80 px-4 py-3 text-sm leading-6 text-[#4B3F72] outline-none transition placeholder:text-[#9b8bbd] focus:border-violet-300 disabled:cursor-not-allowed disabled:bg-slate-100 md:min-h-[92px]"
             />
             <button
               type="button"
@@ -993,18 +993,18 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       </section>
       {sessionToDelete ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_30px_90px_rgba(109,40,217,0.24)]">
+          <div className="w-full max-w-md rounded-[28px] border border-border bg-white p-6 shadow-[0_30px_90px_rgba(109,40,217,0.24)]">
             <div className="flex items-start gap-4">
               <div className="rounded-2xl bg-rose-50 p-3 text-rose-600">
                 <Trash2 className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-lg font-semibold text-[#2d1068]">Supprimer la session ?</h3>
+                <h3 className="text-lg font-semibold text-dream-heading">Supprimer la session ?</h3>
                 <p className="mt-2 text-sm leading-6 text-[#7a6a99]">
                   Cette action supprimera aussi les messages de cette session. Elle ne pourra pas
                   etre annulee.
                 </p>
-                <p className="mt-3 truncate rounded-2xl bg-[#F8F3FF] px-3 py-2 text-sm font-medium text-[#4B3F72]">
+                <p className="mt-3 truncate rounded-2xl bg-dream-soft px-3 py-2 text-sm font-medium text-[#4B3F72]">
                   {sessionToDelete.title}
                 </p>
               </div>
@@ -1014,7 +1014,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               <button
                 type="button"
                 onClick={() => setSessionToDelete(null)}
-                className="rounded-2xl border border-violet-100 bg-white px-4 py-2 text-sm font-semibold text-[#4B3F72] transition hover:bg-[#F8F3FF]"
+                className="rounded-2xl border border-border bg-white px-4 py-2 text-sm font-semibold text-[#4B3F72] transition hover:bg-dream-soft"
               >
                 Annuler
               </button>

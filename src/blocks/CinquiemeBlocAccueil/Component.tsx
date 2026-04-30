@@ -43,7 +43,7 @@ export const CinquiemeBlocAccueilBlock: React.FC<Props> = ({
           {testimonials?.map((item, index) => (
             <Card
               key={item.id || index}
-              className="group rounded-[28px] border border-white/60 bg-white/70 shadow-[0_12px_40px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/90 hover:shadow-[0_24px_60px_rgba(124,58,237,0.20)]"
+              className="group rounded-[28px] border border-border bg-card/70 shadow-[0_12px_40px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-card/90 hover:shadow-[0_24px_60px_rgba(124,58,237,0.20)]"
             >
               <CardContent className="p-6">
                 <div className="mb-5 flex items-start gap-4">

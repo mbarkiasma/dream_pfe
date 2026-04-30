@@ -43,7 +43,7 @@ export function BesoinsContact() {
   return (
     <section className="mx-auto max-w-7xl px-6 py-8">
       <div className="mb-10 text-center">
-        <h2 className="text-4xl font-bold text-[#4d2d7b]">
+        <h2 className="text-4xl font-bold text-dream-heading">
           Quel est votre besoin ?
         </h2>
       </div>
@@ -52,7 +52,7 @@ export function BesoinsContact() {
         {besoins.map((item) => (
           <Card
             key={item.title}
-            className={`card-hover-premium group relative overflow-hidden rounded-[28px] border border-white/60 ${item.softBg} shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]`}
+            className={`card-hover-premium group relative overflow-hidden rounded-[28px] border border-border ${item.softBg} shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]`}
           >
             <CardContent className="p-6">
               <div className="pointer-events-none absolute inset-0">
@@ -70,11 +70,11 @@ export function BesoinsContact() {
                 <span>{item.icon}</span>
               </div>
 
-              <h3 className="relative text-2xl font-semibold text-[#4d2d7b]">
+              <h3 className="relative text-2xl font-semibold text-dream-heading">
                 {item.title}
               </h3>
 
-              <p className="relative mt-4 text-[15px] leading-7 text-[#7f6b9f]">
+              <p className="relative mt-4 text-[15px] leading-7 text-dream-muted">
                 {item.description}
               </p>
 

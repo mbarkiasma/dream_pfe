@@ -65,14 +65,14 @@ export default function AuthRedirectPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] px-4">
-      <div className="flex w-full max-w-sm flex-col items-center rounded-[28px] border border-white/70 bg-white/80 px-8 py-10 text-center shadow-[0_24px_80px_rgba(82,45,145,0.16)] backdrop-blur-xl">
+      <div className="flex w-full max-w-sm flex-col items-center rounded-[28px] border border-border bg-card/80 px-8 py-10 text-center shadow-[0_24px_80px_rgba(82,45,145,0.16)] backdrop-blur-xl">
         {errorMessage ? (
           <>
             <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="mt-5 text-2xl font-bold text-[#2d1068]">Connexion incomplete</h1>
-            <p className="mt-2 text-sm leading-6 text-[#6E628F]">{errorMessage}</p>
+            <h1 className="mt-5 text-2xl font-bold text-dream-heading">Connexion incomplete</h1>
+            <p className="mt-2 text-sm leading-6 text-dream-muted">{errorMessage}</p>
             <button
-              className="mt-6 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700"
+              className="mt-6 rounded-2xl bg-dream-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700"
               onClick={() => window.location.reload()}
               type="button"
             >
@@ -81,9 +81,9 @@ export default function AuthRedirectPage() {
           </>
         ) : (
           <>
-            <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-            <h1 className="mt-5 text-2xl font-bold text-[#2d1068]">Connexion en cours</h1>
-            <p className="mt-2 text-sm leading-6 text-[#6E628F]">
+            <Loader2 className="h-8 w-8 animate-spin text-dream-accent" />
+            <h1 className="mt-5 text-2xl font-bold text-dream-heading">Connexion en cours</h1>
+            <p className="mt-2 text-sm leading-6 text-dream-muted">
               Nous preparons votre espace personnel.
             </p>
           </>

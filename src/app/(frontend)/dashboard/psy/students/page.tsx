@@ -19,11 +19,11 @@ const statusLabels: Record<RendezVousPsy['status'], string> = {
 }
 
 const statusClasses: Record<RendezVousPsy['status'], string> = {
-  pending: 'border-violet-200 bg-[#F3ECFF] text-[#6D28D9]',
-  confirmed: 'border-violet-200 bg-white text-[#6D28D9]',
-  rejected: 'border-violet-200 bg-[#F8F3FF] text-[#6D28D9]',
-  cancelled: 'border-violet-100 bg-white text-[#6E628F]',
-  completed: 'border-violet-200 bg-[#F3ECFF] text-[#6D28D9]',
+  pending: 'border-border bg-dream-highlight text-dream-accent',
+  confirmed: 'border-border bg-white text-dream-accent',
+  rejected: 'border-border bg-dream-soft text-dream-accent',
+  cancelled: 'border-border bg-white text-dream-muted',
+  completed: 'border-border bg-dream-highlight text-dream-accent',
 }
 
 type AssignedStudent = {
@@ -164,18 +164,18 @@ export default async function PsyStudentsPage() {
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="xl:col-span-2">
-          <Card className="overflow-hidden rounded-[32px] border border-white/70 bg-white/85 shadow-[0_18px_60px_rgba(109,40,217,0.12)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
-            <CardHeader className="border-b border-violet-100/70 bg-white/65 pb-4 dark:border-white/10 dark:bg-white/[0.04]">
+          <Card className="overflow-hidden rounded-[32px] border border-border bg-card/85 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
+            <CardHeader className="border-b border-border/70 bg-white/65 pb-4 dark:border-white/10 dark:bg-white/[0.04]">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9B6BFF]">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-dream-accent">
                     Suivi clinique
                   </p>
-                  <CardTitle className="mt-1 text-2xl text-[#2d1068] dark:text-white">
+                  <CardTitle className="mt-1 text-2xl text-dream-heading dark:text-white">
                     Etudiants assignes
                   </CardTitle>
                 </div>
-                <Badge className="border-violet-200 bg-[#F3ECFF] text-[#6D28D9]">
+                <Badge className="border-border bg-dream-highlight text-dream-accent">
                   {assignedStudents.length} dossier{assignedStudents.length > 1 ? 's' : ''}
                 </Badge>
               </div>
@@ -188,19 +188,19 @@ export default async function PsyStudentsPage() {
                     <Link
                       key={item.user.id}
                       href="/dashboard/psy/rendez_vous"
-                      className="group block rounded-[26px] border border-violet-100 bg-white/90 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.06)] transition hover:-translate-y-0.5 hover:border-violet-200 hover:bg-[#FDF7FF] hover:shadow-[0_18px_50px_rgba(109,40,217,0.12)] dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.09]"
+                      className="group block rounded-[26px] border border-border bg-card/90 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.06)] transition hover:-translate-y-0.5 hover:border-border hover:bg-dream-softer hover:shadow-[0_18px_50px_rgba(109,40,217,0.12)] dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.09]"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div className="min-w-0">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-[#F3ECFF] text-[#6D28D9] transition group-hover:bg-violet-500 group-hover:text-white dark:bg-violet-500/15 dark:text-violet-100">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-dream-highlight text-dream-accent transition group-hover:bg-dream-softer0 group-hover:text-white dark:bg-dream-softer0/15 dark:text-violet-100">
                               <UserRound className="h-5 w-5" />
                             </div>
                             <div>
-                              <p className="text-lg font-semibold text-[#2d1068] dark:text-white">
+                              <p className="text-lg font-semibold text-dream-heading dark:text-white">
                                 {getStudentName(item.user)}
                               </p>
-                              <p className="mt-1 flex items-center gap-1 text-sm text-[#6E628F] dark:text-white/60">
+                              <p className="mt-1 flex items-center gap-1 text-sm text-dream-muted dark:text-white/60">
                                 <Mail className="h-3.5 w-3.5" />
                                 {item.user.email}
                               </p>
@@ -208,33 +208,33 @@ export default async function PsyStudentsPage() {
                           </div>
 
                           <div className="mt-4 flex flex-wrap gap-2">
-                            <Badge className="border-violet-200 bg-violet-50 text-violet-700">
+                            <Badge className="border-border bg-dream-softer text-dream-accent">
                               {item.appointments.length} rendez-vous
                             </Badge>
                             {item.pendingCount > 0 ? (
-                              <Badge className="border-violet-200 bg-[#F3ECFF] text-[#6D28D9]">
+                              <Badge className="border-border bg-dream-highlight text-dream-accent">
                                 {item.pendingCount} en attente
                               </Badge>
                             ) : null}
                             {item.urgentCount > 0 ? (
-                              <Badge className="border-violet-200 bg-white text-[#6D28D9]">
+                              <Badge className="border-border bg-white text-dream-accent">
                                 {item.urgentCount} urgent
                               </Badge>
                             ) : null}
                           </div>
                         </div>
 
-                        <div className="min-w-[190px] rounded-[22px] border border-violet-100 bg-[#F8F3FF] p-3 dark:border-white/10 dark:bg-white/[0.06]">
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9B6BFF]">
+                        <div className="min-w-[190px] rounded-[22px] border border-border bg-dream-soft p-3 dark:border-white/10 dark:bg-white/[0.06]">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-dream-accent">
                             Prochaine consultation
                           </p>
                           {item.nextAppointment ? (
-                            <p className="mt-2 text-sm font-medium text-[#2d1068] dark:text-white">
+                            <p className="mt-2 text-sm font-medium text-dream-heading dark:text-white">
                               {formatDate(item.nextAppointment.date)} a{' '}
                               {item.nextAppointment.startTime}
                             </p>
                           ) : (
-                            <p className="mt-2 text-sm text-[#6E628F] dark:text-white/60">
+                            <p className="mt-2 text-sm text-dream-muted dark:text-white/60">
                               Aucune consultation confirmee
                             </p>
                           )}
@@ -244,12 +244,12 @@ export default async function PsyStudentsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 rounded-[24px] border border-violet-100 bg-[#FDF7FF] p-5 dark:border-white/10 dark:bg-white/[0.06]">
-                  <div className="rounded-2xl bg-[#F3ECFF] p-3 dark:bg-violet-400/15">
-                    <UserRound className="h-5 w-5 text-violet-600 dark:text-violet-200" />
+                <div className="flex items-center gap-3 rounded-[24px] border border-border bg-dream-softer p-5 dark:border-white/10 dark:bg-white/[0.06]">
+                  <div className="rounded-2xl bg-dream-highlight p-3 dark:bg-violet-400/15">
+                    <UserRound className="h-5 w-5 text-dream-accent dark:text-violet-200" />
                   </div>
                   <div>
-                    <p className="font-medium text-[#2d1068] dark:text-white">
+                    <p className="font-medium text-dream-heading dark:text-white">
                       Aucun etudiant assigne
                     </p>
                     <p className="text-sm text-[#7A6A99] dark:text-white/60">
@@ -263,9 +263,9 @@ export default async function PsyStudentsPage() {
         </div>
 
         <div className="space-y-5">
-          <Card className="rounded-[30px] border border-white/70 bg-white/85 shadow-[0_18px_60px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
+          <Card className="rounded-[30px] border border-border bg-card/85 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-white">Rendez-vous</CardTitle>
+              <CardTitle className="text-xl text-dream-heading dark:text-white">Rendez-vous</CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -274,17 +274,17 @@ export default async function PsyStudentsPage() {
                   {upcomingAppointments.slice(0, 4).map((appointment) => (
                     <Link
                       key={appointment.id}
-                      className="flex items-start gap-3 rounded-[22px] border border-violet-100 bg-[#FDF7FF] p-3 transition hover:border-violet-200 hover:bg-[#F3ECFF] dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.10]"
+                      className="flex items-start gap-3 rounded-[22px] border border-border bg-dream-softer p-3 transition hover:border-border hover:bg-dream-highlight dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.10]"
                       href="/dashboard/psy/rendez_vous"
                     >
-                      <Clock className="mt-0.5 h-4 w-4 text-[#6D28D9] dark:text-violet-200" />
+                      <Clock className="mt-0.5 h-4 w-4 text-dream-accent dark:text-violet-200" />
                       <div>
-                        <p className="text-sm font-medium text-[#2d1068] dark:text-white">
+                        <p className="text-sm font-medium text-dream-heading dark:text-white">
                           {isUser(appointment.student)
                             ? getStudentName(appointment.student)
                             : 'Etudiant'}
                         </p>
-                        <p className="text-xs text-[#6E628F] dark:text-white/60">
+                        <p className="text-xs text-dream-muted dark:text-white/60">
                           {formatDate(appointment.date)} - {appointment.startTime}
                         </p>
                       </div>
@@ -292,16 +292,16 @@ export default async function PsyStudentsPage() {
                   ))}
                 </div>
               ) : (
-                <p className="leading-7 text-[#6E628F] dark:text-white/65">
+                <p className="leading-7 text-dream-muted dark:text-white/65">
                   Aucune consultation confirmee pour le moment.
                 </p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-[30px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_18px_60px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:from-white/[0.08] dark:via-white/[0.06] dark:to-violet-500/10">
+          <Card className="rounded-[30px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:from-white/[0.08] dark:via-white/[0.06] dark:to-violet-500/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-white">
+              <CardTitle className="text-xl text-dream-heading dark:text-white">
                 Suivi clinique
               </CardTitle>
             </CardHeader>
@@ -312,25 +312,25 @@ export default async function PsyStudentsPage() {
                   {urgentAppointments.slice(0, 4).map((appointment) => (
                     <Link
                       key={appointment.id}
-                      className="block rounded-[22px] border border-violet-100 bg-white/80 p-3 transition hover:border-violet-200 hover:bg-white dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.10]"
+                      className="block rounded-[22px] border border-border bg-card/80 p-3 transition hover:border-border hover:bg-white dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.10]"
                       href="/dashboard/psy/rendez_vous"
                     >
-                      <p className="flex items-center gap-2 text-sm font-semibold text-[#6D28D9] dark:text-violet-200">
+                      <p className="flex items-center gap-2 text-sm font-semibold text-dream-accent dark:text-violet-200">
                         <AlertTriangle className="h-4 w-4" />
                         {isUser(appointment.student)
                           ? getStudentName(appointment.student)
                           : 'Etudiant'}
                       </p>
-                      <p className="mt-1 text-xs leading-5 text-[#6E628F] dark:text-white/70">
+                      <p className="mt-1 text-xs leading-5 text-dream-muted dark:text-white/70">
                         {appointment.reason}
                       </p>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 rounded-[22px] border border-violet-100 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[0.06]">
-                  <CalendarDays className="h-5 w-5 text-violet-600 dark:text-violet-200" />
-                  <p className="text-sm leading-6 text-[#6E628F] dark:text-white/65">
+                <div className="flex items-center gap-3 rounded-[22px] border border-border bg-card/70 p-4 dark:border-white/10 dark:bg-white/[0.06]">
+                  <CalendarDays className="h-5 w-5 text-dream-accent dark:text-violet-200" />
+                  <p className="text-sm leading-6 text-dream-muted dark:text-white/65">
                     Aucun cas urgent actif. Les demandes urgentes seront affichees ici.
                   </p>
                 </div>

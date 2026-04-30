@@ -21,11 +21,11 @@ export function HeroAccompagnement() {
 
         <div className="grid auto-cols-fr gap-6 sm:grid-cols-4">
           {profils.map((profil) => (
-            <div key={profil.label} className="rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]">
+            <div key={profil.label} className="rounded-[28px] border border-border bg-card/80 p-6 shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]">
               <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#d7c0ff] via-[#b79ef6] to-[#8c90ff] text-3xl text-white shadow-lg">
                 {profil.emoji}
               </div>
-              <p className="text-base font-semibold text-[#4d2d7b]">{profil.label}</p>
+              <p className="text-base font-semibold text-dream-heading">{profil.label}</p>
             </div>
           ))}
         </div>
@@ -37,7 +37,7 @@ export function HeroAccompagnement() {
       </div>
 
       <div className="mt-10 flex justify-center">
-        <Button size="lg" className="rounded-full bg-gradient-to-r from-[#8c90ff] via-[#a97bf4] to-[#cd6ee0] text-white shadow-[0_16px_40px_rgba(140,114,236,0.25)]">
+        <Button variant="dream" size="pillLg">
           Accéder à mon accompagnement
         </Button>
       </div>

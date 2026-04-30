@@ -30,13 +30,13 @@ export function ConfianceContact() {
   return (
     <section className="mx-auto max-w-7xl px-6 pt-6 pb-20">
       <Card
-        className="card-hover-premium shimmer-wrap rounded-[32px] border border-white/60 bg-white/70 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
+        className="card-hover-premium shimmer-wrap rounded-[32px] border border-border bg-card/70 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
         style={{
           animation: 'fadeUpSoft 0.9s ease-out 0.18s both',
         }}
       >
         <CardContent className="p-8">
-          <h2 className="anim-fade-up text-4xl font-bold text-[#4d2d7b]">
+          <h2 className="anim-fade-up text-4xl font-bold text-dream-heading">
             Pourquoi nous faire confiance ?
           </h2>
 
@@ -44,7 +44,7 @@ export function ConfianceContact() {
             {items.map((item, index) => (
               <Card
                 key={item.label}
-                className="card-hover-premium group relative overflow-hidden rounded-[24px] border border-white/60 bg-white/80"
+                className="card-hover-premium group relative overflow-hidden rounded-[24px] border border-border bg-card/80"
                 style={{
                   animation: 'fadeUpSoft 0.75s ease-out both',
                   animationDelay: `${0.24 + index * 0.1}s`,
@@ -59,11 +59,11 @@ export function ConfianceContact() {
                     />
                   </div>
 
-                  <p className="relative text-3xl font-bold text-[#4d2d7b] transition duration-300 group-hover:translate-x-1">
+                  <p className="relative text-3xl font-bold text-dream-heading transition duration-300 group-hover:translate-x-1">
                     {item.value}
                   </p>
 
-                  <p className="relative mt-3 text-[15px] leading-7 text-[#7f6b9f]">
+                  <p className="relative mt-3 text-[15px] leading-7 text-dream-muted">
                     {item.label}
                   </p>
                 </CardContent>

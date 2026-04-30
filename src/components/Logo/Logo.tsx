@@ -13,11 +13,11 @@ export const Logo = (props: Props) => {
 
   return (
     <div className={clsx('flex items-center gap-2', className)}>
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100">
-        <MoonStar className="h-5 w-5 text-violet-600" />
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-dream-highlight">
+        <MoonStar className="h-5 w-5 text-dream-accent" />
       </div>
 
-      <span className="text-3xl font-semibold tracking-tight text-violet-700">
+      <span className="text-3xl font-semibold tracking-tight text-dream-accent">
         Dream
       </span>
     </div>

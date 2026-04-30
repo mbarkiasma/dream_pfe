@@ -105,7 +105,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
             value={rejectionReason}
             onChange={(event) => setRejectionReason(event.target.value)}
             placeholder="Exemple : indisponibilite exceptionnelle, merci de choisir un autre creneau."
-            className="min-h-24 rounded-2xl border-red-100 bg-white text-[#2d1068] dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
+            className="min-h-24 rounded-2xl border-red-100 bg-white text-dream-heading dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
           />
           <div className="mt-3 flex flex-wrap gap-2">
             <button

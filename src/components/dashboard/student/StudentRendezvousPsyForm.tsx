@@ -102,7 +102,7 @@ function getAgendaStatusLabel(day: AgendaDay) {
 
 function getAgendaStatusClass(day: AgendaDay, isSelected: boolean) {
   if (isSelected) {
-    return 'border-violet-500 bg-violet-600 text-white shadow-[0_16px_34px_rgba(109,40,217,0.26)]'
+    return 'border-violet-500 bg-dream-accent text-white shadow-[0_16px_34px_rgba(109,40,217,0.26)]'
   }
 
   if (day.status === 'available') {
@@ -277,8 +277,8 @@ export function StudentRendezvousPsyForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-4 lg:grid-cols-[330px_1fr]">
-        <section className="overflow-hidden rounded-[22px] border border-violet-100 bg-white/85 shadow-[0_14px_40px_rgba(109,40,217,0.08)] dark:border-white/10 dark:bg-white/[0.05]">
-          <div className="bg-gradient-to-br from-violet-600 to-fuchsia-500 p-3.5 text-white">
+        <section className="overflow-hidden rounded-[22px] border border-border bg-card/85 shadow-[0_14px_40px_rgba(109,40,217,0.08)] dark:border-white/10 dark:bg-white/[0.05]">
+          <div className="dream-brand-bg p-3.5 text-white">
             <div className="flex items-start gap-3">
               <div className="rounded-xl bg-white/18 p-2">
                 <CalendarDays className="h-4 w-4" />
@@ -302,14 +302,12 @@ export function StudentRendezvousPsyForm() {
                 const isSelected = selectedDate === day.date
 
                 return (
-                  <button
+                  <Button
                     key={day.date}
                     type="button"
                     onClick={() => setSelectedDate(day.date)}
-                    className={`min-h-[78px] rounded-[16px] border p-2.5 text-left transition ${getAgendaStatusClass(
-                      day,
-                      isSelected,
-                    )}`}
+                    variant={isSelected ? 'slotActive' : 'slot'}
+                    size="cardSm"
                   >
                     <span className="block text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
                       {day.dayName}
@@ -325,19 +323,19 @@ export function StudentRendezvousPsyForm() {
                         isSelected
                           ? 'bg-white/20 text-white'
                           : day.status === 'available'
-                            ? 'bg-white/70 text-emerald-700'
-                            : 'bg-white/70 text-slate-500'
+                            ? 'bg-card/70 text-emerald-700'
+                            : 'bg-card/70 text-slate-500'
                       }`}
                     >
                       {getAgendaStatusLabel(day)}
                     </span>
-                  </button>
+                  </Button>
                 )
               })}
             </div>
 
             <div className="mt-3 space-y-2">
-              <Label htmlFor="appointment-date" className="text-[#2d1068] dark:text-foreground">
+              <Label htmlFor="appointment-date" className="text-dream-heading dark:text-foreground">
                 Autre date
               </Label>
               <Input
@@ -346,20 +344,20 @@ export function StudentRendezvousPsyForm() {
                 onChange={(event) => setSelectedDate(event.target.value)}
                 type="date"
                 value={selectedDate}
-                className="h-10 rounded-xl border-violet-100 bg-white text-[#2d1068] shadow-inner dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground"
+                className="h-10 rounded-xl border-border bg-white text-dream-heading shadow-inner dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground"
               />
             </div>
           </div>
         </section>
 
-        <section className="rounded-[22px] border border-violet-100 bg-white/85 p-3.5 shadow-[0_14px_40px_rgba(109,40,217,0.08)] dark:border-white/10 dark:bg-white/[0.05]">
+        <section className="rounded-[22px] border border-border bg-card/85 p-3.5 shadow-[0_14px_40px_rgba(109,40,217,0.08)] dark:border-white/10 dark:bg-white/[0.05]">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
               <div className="rounded-xl bg-emerald-100 p-2.5 dark:bg-emerald-500/15">
                 <Clock className="h-4 w-4 text-emerald-600" />
               </div>
               <div>
-                <p className="text-lg font-bold capitalize text-[#2d1068] dark:text-foreground">
+                <p className="text-lg font-bold capitalize text-dream-heading dark:text-foreground">
                   {getDateLabel(selectedDate)}
                 </p>
                 <p className="text-[15px] text-[#7A6A99] dark:text-muted-foreground">
@@ -374,25 +372,22 @@ export function StudentRendezvousPsyForm() {
           </div>
 
           {isLoadingDay ? (
-            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-[#6E628F] dark:bg-white/[0.05] dark:text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
+            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-dream-muted dark:bg-white/[0.05] dark:text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin text-dream-accent" />
               Chargement des horaires...
             </div>
           ) : availableSlots.length > 0 ? (
-            <div className="relative space-y-3 before:absolute before:bottom-4 before:left-[22px] before:top-4 before:w-px before:bg-violet-100 dark:before:bg-white/10">
+            <div className="relative space-y-3 before:absolute before:bottom-4 before:left-[22px] before:top-4 before:w-px before:bg-dream-highlight dark:before:bg-white/10">
               {availableSlots.map((slot) => {
                 const active = startTime === slot.startTime
 
                 return (
-                  <button
+                  <Button
                     key={`${slot.startTime}-${slot.endTime}`}
                     type="button"
                     onClick={() => setStartTime(slot.startTime)}
-                    className={`relative flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${
-                      active
-                        ? 'border-violet-400 bg-violet-500 text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)]'
-                        : 'border-emerald-100 bg-white text-[#2d1068] hover:border-emerald-300 hover:bg-emerald-50 dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:hover:bg-emerald-500/10'
-                    }`}
+                    variant={active ? 'slotActive' : 'slot'}
+                    size="cardSm"
                   >
                     <span
                       className={`z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
@@ -405,7 +400,7 @@ export function StudentRendezvousPsyForm() {
                       <span className="block text-lg font-bold">
                         {slot.startTime} - {slot.endTime}
                       </span>
-                      <span className={`mt-1 block text-xs ${active ? 'text-white/75' : 'text-[#6E628F]'}`}>
+                      <span className={`mt-1 block text-xs ${active ? 'text-white/75' : 'text-dream-muted'}`}>
                         Consultation disponible
                       </span>
                     </span>
@@ -421,14 +416,14 @@ export function StudentRendezvousPsyForm() {
               })}
             </div>
           ) : (
-            <div className="rounded-[18px] border border-dashed border-violet-200 bg-white/70 p-4 text-center dark:border-white/10 dark:bg-white/[0.04]">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-100">
+            <div className="rounded-[18px] border border-dashed border-border bg-card/70 p-4 text-center dark:border-white/10 dark:bg-white/[0.04]">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-dream-highlight text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-100">
                 <Clock className="h-4 w-4" />
               </div>
-              <p className="mt-3 font-semibold text-[#2d1068] dark:text-foreground">
+              <p className="mt-3 font-semibold text-dream-heading dark:text-foreground">
                 Aucun horaire disponible
               </p>
-              <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-[#6E628F] dark:text-muted-foreground">
+              <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-dream-muted dark:text-muted-foreground">
                 {getSelectedDayMessage(selectedDayStatus)}
               </p>
             </div>
@@ -443,7 +438,7 @@ export function StudentRendezvousPsyForm() {
       </div>
 
       {selectedSlot ? (
-        <div className="rounded-[24px] border border-violet-100 bg-violet-50/80 px-4 py-3 text-sm font-medium text-[#2d1068] dark:border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-100">
+        <div className="rounded-[24px] border border-border bg-dream-softer/80 px-4 py-3 text-sm font-medium text-dream-heading dark:border-violet-400/20 dark:bg-dream-softer0/10 dark:text-violet-100">
           Rendez-vous selectionne : {getDateLabel(selectedDate)} de {selectedSlot.startTime} a{' '}
           {selectedSlot.endTime}.
         </div>
@@ -451,12 +446,12 @@ export function StudentRendezvousPsyForm() {
 
       <div className="grid gap-4 md:grid-cols-[240px_1fr]">
         <div className="space-y-2">
-          <Label className="text-[#2d1068] dark:text-foreground">Urgence</Label>
+          <Label className="text-dream-heading dark:text-foreground">Urgence</Label>
           <Select
             value={urgency}
             onValueChange={(value) => setUrgency(value as 'normal' | 'urgent')}
           >
-            <SelectTrigger className="h-12 rounded-2xl border-violet-100 bg-white/90 text-[#2d1068] dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground">
+            <SelectTrigger className="h-12 rounded-2xl border-border bg-card/90 text-dream-heading dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground">
               <SelectValue placeholder="Niveau d'urgence" />
             </SelectTrigger>
             <SelectContent>
@@ -467,7 +462,7 @@ export function StudentRendezvousPsyForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="appointment-reason" className="text-[#2d1068] dark:text-foreground">
+          <Label htmlFor="appointment-reason" className="text-dream-heading dark:text-foreground">
             Motif de la demande
           </Label>
           <Textarea
@@ -475,7 +470,7 @@ export function StudentRendezvousPsyForm() {
             value={reason}
             onChange={(event) => setReason(event.target.value)}
             placeholder="Explique brievement pourquoi tu souhaites rencontrer le psychologue."
-            className="min-h-32 rounded-2xl border-violet-100 bg-white/90 text-[#2d1068] dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:placeholder:text-muted-foreground"
+            className="min-h-32 rounded-2xl border-border bg-card/90 text-dream-heading dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:placeholder:text-muted-foreground"
           />
         </div>
       </div>

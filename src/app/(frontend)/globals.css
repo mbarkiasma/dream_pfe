@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'tw-animate-css';
 
 @config '../../../tailwind.config.mjs';
 
@@ -124,6 +123,21 @@
   --success: oklch(78% 0.08 200deg);
   --warning: oklch(89% 0.1 75deg);
   --error: oklch(75% 0.15 25deg);
+  --dream-heading: oklch(30% 0.12 300deg);
+  --dream-muted: oklch(50% 0.06 300deg);
+  --dream-accent: oklch(58% 0.22 300deg);
+  --dream-accent-foreground: oklch(100% 0 0deg);
+  --dream-soft: oklch(96% 0.03 300deg);
+  --dream-softer: oklch(98% 0.02 300deg);
+  --dream-highlight: oklch(91% 0.06 300deg);
+  --dream-warning: oklch(78% 0.15 78deg);
+  --dream-danger: oklch(66% 0.23 15deg);
+  --dream-page-gradient: radial-gradient(circle at top left, oklch(93% 0.06 300deg) 0%, oklch(97% 0.03 300deg) 34%, oklch(96% 0.03 260deg) 70%, oklch(98% 0.02 340deg) 100%);
+  --dream-section-gradient: linear-gradient(180deg, oklch(98% 0.02 300deg) 0%, oklch(94% 0.06 300deg) 100%);
+  --dream-panel-gradient: linear-gradient(135deg, oklch(100% 0 0deg) 0%, oklch(98% 0.02 300deg) 52%, oklch(95% 0.04 300deg) 100%);
+  --dream-brand-gradient: linear-gradient(90deg, oklch(58% 0.22 300deg) 0%, oklch(62% 0.2 315deg) 100%);
+  --dream-card-shadow: 0 14px 45px oklch(40% 0.16 300deg / 10%);
+  --dream-card-shadow-lg: 0 24px 80px oklch(40% 0.16 300deg / 16%);
 }
 
 [data-theme='dark'] {
@@ -163,6 +177,21 @@
   --success: oklch(28% 0.1 200deg);
   --warning: oklch(35% 0.08 70deg);
   --error: oklch(45% 0.1 25deg);
+  --dream-heading: var(--foreground);
+  --dream-muted: var(--muted-foreground);
+  --dream-accent: oklch(74% 0.17 300deg);
+  --dream-accent-foreground: oklch(100% 0 0deg);
+  --dream-soft: oklch(24% 0.05 300deg);
+  --dream-softer: oklch(20% 0.04 300deg);
+  --dream-highlight: oklch(30% 0.06 300deg);
+  --dream-warning: oklch(78% 0.15 78deg);
+  --dream-danger: oklch(68% 0.22 15deg);
+  --dream-page-gradient: radial-gradient(circle at top left, oklch(24% 0.08 300deg) 0%, oklch(18% 0.04 300deg) 42%, oklch(16% 0.04 260deg) 100%);
+  --dream-section-gradient: linear-gradient(180deg, oklch(18% 0.04 300deg) 0%, oklch(15% 0.03 260deg) 100%);
+  --dream-panel-gradient: linear-gradient(135deg, oklch(100% 0 0deg / 8%) 0%, oklch(68% 0.18 300deg / 10%) 100%);
+  --dream-brand-gradient: linear-gradient(90deg, oklch(60% 0.22 300deg) 0%, oklch(68% 0.2 320deg) 100%);
+  --dream-card-shadow: 0 18px 50px oklch(0% 0 0deg / 22%);
+  --dream-card-shadow-lg: 0 24px 90px oklch(0% 0 0deg / 30%);
 }
 
 @theme inline {
@@ -205,6 +234,17 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
+  --color-dream-heading: var(--dream-heading);
+  --color-dream-muted: var(--dream-muted);
+  --color-dream-accent: var(--dream-accent);
+  --color-dream-accent-foreground: var(--dream-accent-foreground);
+  --color-dream-soft: var(--dream-soft);
+  --color-dream-softer: var(--dream-softer);
+  --color-dream-highlight: var(--dream-highlight);
+  --color-dream-warning: var(--dream-warning);
+  --color-dream-danger: var(--dream-danger);
+  --shadow-dream-card: var(--dream-card-shadow);
+  --shadow-dream-card-lg: var(--dream-card-shadow-lg);
 }
 
 @layer base {
@@ -235,6 +275,316 @@
 }
 
 @layer components {
+  .dream-page-bg {
+    background: var(--dream-page-gradient);
+  }
+
+  .dream-section-bg {
+    background: var(--dream-section-gradient);
+  }
+
+  .dream-panel-bg {
+    background: var(--dream-panel-gradient);
+  }
+
+  .dream-brand-bg {
+    background: var(--dream-brand-gradient);
+  }
+
+  .shadow-dream-card {
+    box-shadow: var(--dream-card-shadow);
+  }
+
+  .shadow-dream-card-lg {
+    box-shadow: var(--dream-card-shadow-lg);
+  }
+
+  .dream-card,
+  .dream-card-soft {
+    border-color: color-mix(in oklch, var(--border) 72%, transparent);
+    background: color-mix(in oklch, var(--card) 88%, transparent);
+    box-shadow: var(--dream-card-shadow);
+  }
+
+  .dream-card-glass {
+    border-color: color-mix(in oklch, var(--border) 72%, transparent);
+    background: color-mix(in oklch, var(--card) 78%, transparent);
+    box-shadow: var(--dream-card-shadow);
+    backdrop-filter: blur(16px);
+  }
+
+  .dream-card-dashed {
+    border-style: dashed;
+    border-color: color-mix(in oklch, var(--dream-accent) 32%, var(--border));
+    background: color-mix(in oklch, var(--card) 70%, transparent);
+  }
+
+  .dream-surface {
+    border-color: color-mix(in oklch, var(--border) 76%, transparent);
+    background: color-mix(in oklch, var(--card) 86%, transparent);
+  }
+
+  .dream-surface-muted {
+    border-color: color-mix(in oklch, var(--border) 76%, transparent);
+    background: color-mix(in oklch, var(--dream-softer) 82%, transparent);
+  }
+
+  .dream-field {
+    border-color: color-mix(in oklch, var(--dream-accent) 24%, var(--border));
+    background: color-mix(in oklch, var(--card) 92%, transparent);
+    color: var(--dream-heading);
+  }
+
+  .dream-field::placeholder {
+    color: var(--dream-muted);
+  }
+
+  .dream-pill {
+    border-color: color-mix(in oklch, var(--border) 76%, transparent);
+    background: color-mix(in oklch, var(--card) 88%, transparent);
+    color: var(--dream-muted);
+  }
+
+  .dream-pill-accent,
+  .dream-badge,
+  .dream-status-ready,
+  .dream-status-generating,
+  .dream-status-validation {
+    border-color: color-mix(in oklch, var(--dream-accent) 32%, var(--border));
+    background: var(--dream-highlight);
+    color: var(--dream-accent);
+  }
+
+  .dream-status-failed {
+    border-color: color-mix(in oklch, var(--dream-danger) 32%, var(--border));
+    background: color-mix(in oklch, var(--dream-danger) 10%, var(--card));
+    color: var(--dream-danger);
+  }
+
+  .dream-status-pending,
+  .dream-badge-muted {
+    border-color: color-mix(in oklch, var(--border) 76%, transparent);
+    background: color-mix(in oklch, var(--card) 88%, transparent);
+    color: var(--dream-muted);
+  }
+
+  .dream-icon-soft {
+    background: var(--dream-highlight);
+    color: var(--dream-accent);
+  }
+
+  .dream-video-frame {
+    background: color-mix(in oklch, var(--dream-heading) 10%, transparent);
+  }
+
+  .dream-video-player {
+    background: oklch(0% 0 0deg);
+  }
+
+  .dream-modal-backdrop {
+    background: color-mix(in oklch, var(--dream-heading) 35%, transparent);
+    backdrop-filter: blur(16px);
+  }
+
+  .dream-modal-footer {
+    border-color: color-mix(in oklch, var(--border) 76%, transparent);
+    background: color-mix(in oklch, var(--card) 45%, transparent);
+  }
+
+  .dream-timeline::before {
+    background: color-mix(in oklch, var(--dream-accent) 20%, var(--border));
+  }
+
+  .dream-dashboard-content {
+    border-color: color-mix(in oklch, var(--border) 72%, transparent);
+    background: color-mix(in oklch, var(--card) 58%, transparent);
+    box-shadow: var(--dream-card-shadow-lg);
+    backdrop-filter: blur(24px);
+  }
+
+  /* Typography utilities */
+  .dream-text-body {
+    @apply text-sm leading-6;
+  }
+
+  .dream-text-body-muted {
+    @apply text-sm leading-6 text-dream-muted;
+  }
+
+  .dream-text-body-lg {
+    @apply text-sm leading-8 md:text-base;
+  }
+
+  .dream-text-heading {
+    @apply text-dream-heading;
+  }
+
+  .dream-text-muted {
+    @apply text-dream-muted;
+  }
+
+  .dream-text-accent {
+    @apply text-dream-accent;
+  }
+
+  .dream-text-section-title {
+    @apply text-xl font-semibold text-dream-heading;
+  }
+
+  .dream-text-modal-title {
+    @apply mt-2 line-clamp-2 text-2xl font-bold tracking-[-0.03em] text-dream-heading;
+  }
+
+  .dream-text-modal-subtitle {
+    @apply mt-2 text-sm font-medium text-dream-muted;
+  }
+
+  .dream-text-table-title {
+    @apply truncate text-sm font-bold text-dream-heading;
+  }
+
+  .dream-text-table-content {
+    @apply mt-1 line-clamp-2 text-sm leading-6 text-dream-muted;
+  }
+
+  .dream-text-table-date {
+    @apply text-sm font-medium text-dream-muted;
+  }
+
+  .dream-text-reaction-name {
+    @apply truncate text-sm font-semibold text-dream-heading;
+  }
+
+  .dream-text-reaction-email {
+    @apply truncate text-xs text-dream-muted;
+  }
+
+  .dream-text-form-title {
+    @apply text-sm font-bold text-dream-heading;
+  }
+
+  .dream-text-form-description {
+    @apply text-sm text-dream-muted;
+  }
+
+  .dream-text-status {
+    @apply mt-4 rounded-2xl border px-4 py-3 text-sm font-medium;
+  }
+
+  .dream-text-section-header {
+    @apply text-xs font-bold uppercase tracking-[0.22em] text-dream-accent;
+  }
+
+  .dream-text-confirmation-header {
+    @apply text-xs font-bold uppercase tracking-[0.2em] text-dream-accent;
+  }
+
+  .dream-text-confirmation-title {
+    @apply mt-2 text-xl font-bold text-dream-heading;
+  }
+
+  .dream-text-confirmation-content {
+    @apply mt-2 line-clamp-3 text-sm leading-6 text-dream-muted;
+  }
+
+  /* Spacing utilities */
+  .dream-spacing-top-sm {
+    @apply mt-3;
+  }
+
+  .dream-spacing-top-md {
+    @apply mt-4;
+  }
+
+  .dream-spacing-top-lg {
+    @apply mt-6;
+  }
+
+  .dream-spacing-bottom-sm {
+    @apply mb-3;
+  }
+
+  .dream-spacing-bottom-md {
+    @apply mb-4;
+  }
+
+  /* Layout utilities */
+  .dream-flex-end {
+    @apply mt-6 flex justify-end gap-3;
+  }
+
+  .dream-flex-actions {
+    @apply flex justify-end gap-2;
+  }
+
+  .dream-flex-form-header {
+    @apply mb-5 flex items-center gap-3;
+  }
+
+  .dream-flex-button-group {
+    @apply mt-4 flex flex-wrap gap-3;
+  }
+
+  .dream-flex-table-header {
+    @apply flex flex-col gap-2 border-b border-border/70 px-5 py-4 md:flex-row md:items-center md:justify-between;
+  }
+
+  .dream-grid-form {
+    @apply grid gap-4 xl:grid-cols-[0.75fr_1.25fr];
+  }
+
+  /* Modal utilities */
+  .dream-modal-backdrop {
+    @apply fixed inset-0 z-50 flex items-center justify-center px-4 py-6;
+  }
+
+  .dream-modal-card {
+    @apply relative flex max-h-[86vh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] border;
+    background: var(--dream-panel-gradient);
+    box-shadow: var(--dream-card-shadow-lg);
+  }
+
+  .dream-modal-header {
+    @apply border-b px-6 py-5 md:px-7;
+    border-color: color-mix(in oklch, var(--border) 76%, transparent);
+    background: color-mix(in oklch, var(--card) 86%, transparent);
+  }
+
+  .dream-modal-content {
+    @apply min-h-0 overflow-y-auto px-6 py-5 md:px-7;
+  }
+
+  .dream-modal-footer {
+    @apply border-t px-6 py-4 md:px-7;
+  }
+
+  /* Form utilities */
+  .dream-input-field {
+    @apply h-12 rounded-2xl border;
+    border-color: color-mix(in oklch, var(--dream-accent) 24%, var(--border));
+    background: color-mix(in oklch, var(--card) 92%, transparent);
+    color: var(--dream-heading);
+  }
+
+  .dream-textarea-field {
+    @apply min-h-32 rounded-2xl border;
+    border-color: color-mix(in oklch, var(--dream-accent) 24%, var(--border));
+    background: color-mix(in oklch, var(--card) 92%, transparent);
+    color: var(--dream-heading);
+  }
+
+  .dream-button-primary {
+    @apply rounded-2xl px-5;
+  }
+
+  /* Badge utilities */
+  .dream-badge-count {
+    @apply w-fit rounded-full border px-3 py-1 text-xs font-bold;
+    border-color: color-mix(in oklch, var(--dream-accent) 32%, var(--border));
+    background: color-mix(in oklch, var(--dream-accent) 64%, var(--primary));
+    color: var(--primary-foreground);
+  }
+
   [data-theme='dark'] .dashboard-content [class*='bg-white'],
   [data-theme='dark'] .dashboard-content [class*='from-white'],
   [data-theme='dark'] .dashboard-content [class*='via-[#FDF7FF]'],

@@ -14,13 +14,13 @@ export function FormulaireContact() {
   return (
     <Card
       id="formulaire-contact"
-      className="card-hover-premium shimmer-wrap rounded-[32px] border border-white/60 bg-white/75 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
+      className="card-hover-premium shimmer-wrap rounded-[32px] border border-border bg-card/75 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
       style={{
         animation: 'fadeUpSoft 0.85s ease-out 0.12s both',
       }}
     >
       <CardContent className="p-8">
-        <h2 className="text-4xl font-bold text-[#4d2d7b]">
+        <h2 className="text-4xl font-bold text-dream-heading">
           Envoyez-nous un message
         </h2>
 
@@ -29,7 +29,7 @@ export function FormulaireContact() {
             <Input
               type="text"
               placeholder="Nom complet"
-              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+              className="h-14 rounded-2xl border-border bg-white/88 text-dream-heading placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
             />
           </div>
 
@@ -37,7 +37,7 @@ export function FormulaireContact() {
             <Input
               type="email"
               placeholder="Email"
-              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+              className="h-14 rounded-2xl border-border bg-white/88 text-dream-heading placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
             />
           </div>
 
@@ -48,14 +48,14 @@ export function FormulaireContact() {
             <Input
               type="text"
               placeholder="Téléphone"
-              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+              className="h-14 rounded-2xl border-border bg-white/88 text-dream-heading placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
             />
 
             <Select>
-              <SelectTrigger className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] focus:ring-[#d7c0ff]/30">
+              <SelectTrigger className="h-14 rounded-2xl border-border bg-white/88 text-dream-heading focus:ring-[#d7c0ff]/30">
                 <SelectValue placeholder="Profil" />
               </SelectTrigger>
-              <SelectContent className="rounded-2xl border-white/60 bg-white/95 text-[#4d2d7b]">
+              <SelectContent className="rounded-2xl border-border bg-white/95 text-dream-heading">
                 <SelectItem value="etudiant">Étudiant</SelectItem>
                 <SelectItem value="psychologue">Psychologue</SelectItem>
                 <SelectItem value="coach">Coach</SelectItem>
@@ -64,10 +64,10 @@ export function FormulaireContact() {
             </Select>
 
             <Select>
-              <SelectTrigger className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] focus:ring-[#d7c0ff]/30">
+              <SelectTrigger className="h-14 rounded-2xl border-border bg-white/88 text-dream-heading focus:ring-[#d7c0ff]/30">
                 <SelectValue placeholder="Priorité" />
               </SelectTrigger>
-              <SelectContent className="rounded-2xl border-white/60 bg-white/95 text-[#4d2d7b]">
+              <SelectContent className="rounded-2xl border-border bg-white/95 text-dream-heading">
                 <SelectItem value="normale">Priorité normale</SelectItem>
                 <SelectItem value="haute">Priorité haute</SelectItem>
                 <SelectItem value="urgent">Urgent</SelectItem>
@@ -80,10 +80,10 @@ export function FormulaireContact() {
             style={{ animation: 'fadeUpSoft 0.7s ease-out 0.44s both' }}
           >
             <Select>
-              <SelectTrigger className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] focus:ring-[#d7c0ff]/30">
+              <SelectTrigger className="h-14 rounded-2xl border-border bg-white/88 text-dream-heading focus:ring-[#d7c0ff]/30">
                 <SelectValue placeholder="Type de demande" />
               </SelectTrigger>
-              <SelectContent className="rounded-2xl border-white/60 bg-white/95 text-[#4d2d7b]">
+              <SelectContent className="rounded-2xl border-border bg-white/95 text-dream-heading">
                 <SelectItem value="journal-reves">Journal de rêves</SelectItem>
                 <SelectItem value="analyse-ia">Analyse IA</SelectItem>
                 <SelectItem value="seances">Séances</SelectItem>
@@ -95,14 +95,14 @@ export function FormulaireContact() {
             <Input
               type="text"
               placeholder="Sujet"
-              className="h-14 rounded-2xl border-white/60 bg-white/88 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+              className="h-14 rounded-2xl border-border bg-white/88 text-dream-heading placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
             />
           </div>
 
           <div style={{ animation: 'fadeUpSoft 0.7s ease-out 0.52s both' }}>
             <Textarea
               placeholder="Décrivez votre demande..."
-              className="min-h-[170px] rounded-2xl border-white/60 bg-white/88 py-4 text-[#4d2d7b] placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
+              className="min-h-[170px] rounded-2xl border-border bg-white/88 py-4 text-dream-heading placeholder:text-[#a290bf] transition duration-300 focus-visible:-translate-y-0.5 focus-visible:border-[#d7c0ff] focus-visible:bg-white focus-visible:ring-[#d7c0ff]/30"
             />
           </div>
 

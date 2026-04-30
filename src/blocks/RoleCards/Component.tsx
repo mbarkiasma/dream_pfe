@@ -26,7 +26,7 @@ export const RoleCardsBlock: React.FC<Props> = ({ title, subtitle, cards }) => {
       <div className="container mx-auto px-4">
         <div className="mb-14 text-center">
           {title && (
-            <h1 className="text-4xl font-bold text-[#2d1068] md:text-5xl">
+            <h1 className="text-4xl font-bold text-dream-heading md:text-5xl">
               {title}
             </h1>
           )}
@@ -45,7 +45,7 @@ export const RoleCardsBlock: React.FC<Props> = ({ title, subtitle, cards }) => {
             return (
               <div
                 key={index}
-                className="rounded-[32px] border border-white/60 bg-white/80 p-8 text-center shadow-lg backdrop-blur"
+                className="rounded-[32px] border border-border bg-card/80 p-8 text-center shadow-lg backdrop-blur"
               >
                 <div className="mb-5 flex justify-center">
                   {media?.url ? (
@@ -63,7 +63,7 @@ export const RoleCardsBlock: React.FC<Props> = ({ title, subtitle, cards }) => {
                   )}
                 </div>
 
-                <h2 className="mb-3 text-2xl font-semibold text-[#2d1068]">
+                <h2 className="mb-3 text-2xl font-semibold text-dream-heading">
                   {card.title}
                 </h2>
 

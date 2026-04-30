@@ -1,78 +1,32 @@
 "use client"
 
-import { type HTMLMotionProps, motion, type Transition } from "motion/react"
 import type * as React from "react"
+
 import { cn } from "@/utilities/ui"
 
 type ShimmeringTextProps = {
   text: string
   duration?: number
-  transition?: Transition
+  transition?: unknown
   wave?: boolean
   color?: string
   shimmeringColor?: string
-} & Omit<HTMLMotionProps<"span">, "children">
+} & Omit<React.ComponentPropsWithoutRef<"span">, "children">
 
 function ShimmeringText({
   text,
-  duration = 1,
-  transition,
-  wave = false,
   className,
-  color = "var(--color-neutral-500)",
-  shimmeringColor = "var(--color-neutral-300)",
+  color = "var(--dream-muted)",
   ...props
 }: ShimmeringTextProps) {
   return (
-    <motion.span
-      className={cn("relative inline-block [perspective:500px]", className)}
-      style={
-        {
-          "--shimmering-color": shimmeringColor,
-          "--color": color,
-          color: "var(--color)",
-        } as React.CSSProperties
-      }
-      {...(props as any)}
+    <span
+      className={cn("relative inline-block", className)}
+      style={{ color, ...props.style }}
+      {...props}
     >
-      {text?.split("")?.map((char, i) => (
-        <motion.span
-          animate={{
-            ...(wave
-              ? {
-                  x: [0, 5, 0],
-                  y: [0, -5, 0],
-                  scale: [1, 1.1, 1],
-                  rotateY: [0, 15, 0],
-                }
-              : {}),
-            color: ["var(--color)", "var(--shimmering-color)", "var(--color)"],
-          }}
-          className="inline-block whitespace-pre [transform-style:preserve-3d]"
-          initial={{
-            ...(wave
-              ? {
-                  scale: 1,
-                  rotateY: 0,
-                }
-              : {}),
-            color: "var(--color)",
-          }}
-          key={i}
-          transition={{
-            duration,
-            repeat: Number.POSITIVE_INFINITY,
-            repeatType: "loop",
-            repeatDelay: text.length * 0.05,
-            delay: (i * duration) / text.length,
-            ease: "easeInOut",
-            ...transition,
-          }}
-        >
-          {char}
-        </motion.span>
-      ))}
-    </motion.span>
+      {text}
+    </span>
   )
 }
 

@@ -25,7 +25,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
               key={i}
               {...link}
               appearance="link"
-              className="text-[15px] font-medium text-violet-900/80 transition hover:text-violet-600 dark:text-foreground/80 dark:hover:text-foreground"
+              className="text-[15px] font-medium text-violet-900/80 hover:text-violet-600 dark:text-foreground/80 dark:hover:text-foreground"
             />
           ) : null,
         )}
@@ -37,7 +37,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
         <CMSLink
           {...loginItem.link}
           appearance="outline"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-white px-5 text-sm font-semibold text-violet-700 transition hover:bg-violet-50 dark:border-border dark:bg-background dark:text-foreground dark:hover:bg-accent"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-white px-5 text-sm font-semibold text-violet-700 hover:bg-violet-50 dark:border-border dark:bg-background dark:text-foreground dark:hover:bg-accent"
         />
       )}
 
@@ -45,7 +45,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
         <CMSLink
           {...signupItem.link}
           appearance="default"
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(139,92,246,0.25)] transition hover:from-violet-600 hover:to-fuchsia-500"
+          className="inline-flex h-11 items-center justify-center rounded-xl dream-brand-bg px-6 text-sm font-semibold text-white shadow-dream-card hover:brightness-105"
         />
       )}
     </nav>

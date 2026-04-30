@@ -12,13 +12,13 @@ const couleurs = ['bg-[#efbfd7]', 'bg-[#d7c0ff]', 'bg-[#b79ef6]', 'bg-[#f6c59f]'
 export function ProcessusContact() {
   return (
     <Card
-      className="card-hover-premium shimmer-wrap rounded-[30px] border border-white/60 bg-white/75 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
+      className="card-hover-premium shimmer-wrap rounded-[30px] border border-border bg-card/75 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
       style={{
         animation: 'fadeUpSoft 0.85s ease-out 0.18s both',
       }}
     >
       <CardContent className="p-8">
-        <h2 className="text-4xl font-bold text-[#4d2d7b]">
+        <h2 className="text-4xl font-bold text-dream-heading">
           Envoyez-nous un message
         </h2>
 
@@ -36,7 +36,7 @@ export function ProcessusContact() {
                 className={`mt-2 block h-3.5 w-3.5 rounded-full ${couleurs[index]} transition duration-300 group-hover:scale-125`}
               />
               <p className="text-lg leading-8 text-[#6f5f97] transition duration-300 group-hover:translate-x-1">
-                <span className="font-semibold text-[#4d2d7b]">{index + 1}.</span>{' '}
+                <span className="font-semibold text-dream-heading">{index + 1}.</span>{' '}
                 {etape}
               </p>
             </div>

@@ -48,15 +48,15 @@ export function StudentStatsCards({
             href={item.href}
             className="group block rounded-[28px] outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
           >
-            <Card className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-violet-200 group-hover:bg-white group-hover:shadow-[0_22px_65px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
+            <Card className="overflow-hidden rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-border group-hover:bg-white group-hover:shadow-[0_22px_65px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
               <CardContent className="relative p-5">
-                <div className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-[22px] bg-gradient-to-br from-violet-100 to-fuchsia-100 text-violet-700 shadow-inner transition group-hover:scale-105 group-hover:from-violet-500 group-hover:to-fuchsia-400 group-hover:text-white dark:from-violet-500/20 dark:to-fuchsia-400/15 dark:text-violet-200">
+                <div className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-[22px] bg-gradient-to-br from-violet-100 to-fuchsia-100 text-dream-accent shadow-inner transition group-hover:scale-105 group-hover:from-violet-500 group-hover:to-fuchsia-400 group-hover:text-white dark:from-violet-500/20 dark:to-fuchsia-400/15 dark:text-violet-200">
                   <Icon className="h-5 w-5" />
                 </div>
-                <p className="pr-14 text-sm font-semibold text-[#6E628F] dark:text-muted-foreground">
+                <p className="pr-14 text-sm font-semibold text-dream-muted dark:text-muted-foreground">
                   {item.label}
                 </p>
-                <p className="mt-3 text-4xl font-bold tracking-tight text-[#2d1068] dark:text-foreground">
+                <p className="mt-3 text-4xl font-bold tracking-tight text-dream-heading dark:text-foreground">
                   {item.value}
                 </p>
                 <p className="mt-1 text-xs font-medium text-[#9A8BB7] dark:text-muted-foreground">

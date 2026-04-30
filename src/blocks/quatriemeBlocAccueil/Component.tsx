@@ -63,7 +63,7 @@ export const QuatriemeBlocAccueilBlock: React.FC<Props> = ({
             return (
               <Card
                 key={step.id || index}
-                className="group rounded-[28px] border border-white/60 bg-white/75 shadow-[0_12px_40px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/90 hover:shadow-[0_22px_60px_rgba(124,58,237,0.20)]"
+                className="group rounded-[28px] border border-border bg-card/75 shadow-[0_12px_40px_rgba(170,150,230,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-card/90 hover:shadow-[0_22px_60px_rgba(124,58,237,0.20)]"
               >
                 <CardContent className="flex items-start gap-4 p-6">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#F1E8FF] transition-all duration-300 group-hover:scale-105 group-hover:bg-[#EBDDFF]">
@@ -74,7 +74,7 @@ export const QuatriemeBlocAccueilBlock: React.FC<Props> = ({
                     <h3 className="mb-2 text-xl font-semibold text-[#4B3F72]">
                       {step.title}
                     </h3>
-                    <p className="text-sm leading-7 text-[#6E628F] md:text-base">
+                    <p className="text-sm leading-7 text-dream-muted md:text-base">
                       {step.description}
                     </p>
                   </div>
@@ -84,7 +84,7 @@ export const QuatriemeBlocAccueilBlock: React.FC<Props> = ({
           })}
         </div>
 
-        <Card className="rounded-[36px] border border-white/60 bg-white/50 shadow-[0_18px_50px_rgba(170,150,230,0.14)] backdrop-blur-md">
+        <Card className="rounded-[36px] border border-border bg-white/50 shadow-[0_18px_50px_rgba(170,150,230,0.14)] backdrop-blur-md">
           <CardContent className="p-6 md:p-10">
             <div className="grid items-center gap-8 md:grid-cols-[220px_1fr]">
               <div className="flex flex-col items-center text-center">

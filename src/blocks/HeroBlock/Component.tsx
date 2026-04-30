@@ -45,15 +45,15 @@ export default function LandingHeroBlockComponent(props: LandingHeroBlockProps) 
         <div className="relative flex min-h-[520px] items-center justify-center">
           <div className="absolute h-[380px] w-[380px] rounded-full bg-violet-300/20 blur-3xl" />
 
-          <div className="relative z-20 w-[280px] rounded-[44px] border border-white/70 bg-white/60 p-[10px] shadow-[0_25px_70px_rgba(109,40,217,0.18)] backdrop-blur-xl">
+          <div className="relative z-20 w-[280px] rounded-[44px] border border-border bg-white/60 p-[10px] shadow-[0_25px_70px_rgba(109,40,217,0.18)] backdrop-blur-xl">
             <div className="rounded-[36px] bg-gradient-to-b from-[#ceb4ff] via-[#eadcff] to-[#faf6ff] p-4">
               <div className="mb-4 flex justify-center">
                 <div className="h-2.5 w-24 rounded-full bg-violet-400/35" />
               </div>
 
               <div className="space-y-4">
-                <div className="rounded-[26px] bg-white/85 p-5 shadow-[0_8px_24px_rgba(109,40,217,0.08)]">
-                  <div className="mb-3 flex items-center gap-2 text-violet-700">
+                <div className="rounded-[26px] bg-card/85 p-5 shadow-[0_8px_24px_rgba(109,40,217,0.08)]">
+                  <div className="mb-3 flex items-center gap-2 text-dream-accent">
                     <MoonStar className="h-4 w-4" />
                     <span className="text-sm font-semibold">
                       {mockupTitle || 'Rêve Lucide'}
@@ -65,10 +65,10 @@ export default function LandingHeroBlockComponent(props: LandingHeroBlockProps) 
                   </p>
                 </div>
 
-                <div className="rounded-[26px] bg-white/90 p-5 shadow-[0_8px_24px_rgba(109,40,217,0.08)]">
+                <div className="rounded-[26px] bg-card/90 p-5 shadow-[0_8px_24px_rgba(109,40,217,0.08)]">
                   <div className="flex items-start gap-3">
-                    <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-full bg-violet-100">
-                      <MessageCircleMore className="h-5 w-5 text-violet-600" />
+                    <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-full bg-dream-highlight">
+                      <MessageCircleMore className="h-5 w-5 text-dream-accent" />
                     </div>
 
                     <div>

@@ -38,27 +38,27 @@ const questions = [
 export function QuestionsContact() {
   return (
     <Card
-      className="card-hover-premium rounded-[32px] border border-white/60 bg-white/75 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
+      className="card-hover-premium rounded-[32px] border border-border bg-card/75 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]"
       style={{
         animation: 'fadeUpSoft 0.85s ease-out 0.2s both',
       }}
     >
       <CardContent className="p-8">
-        <h2 className="text-4xl font-bold text-[#4d2d7b]">Questions fréquentes</h2>
+        <h2 className="text-4xl font-bold text-dream-heading">Questions fréquentes</h2>
 
-        <div className="mt-8 overflow-hidden rounded-[24px] border border-white/60 bg-white/70">
+        <div className="mt-8 overflow-hidden rounded-[24px] border border-border bg-card/70">
           <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
             {questions.map((item, index) => (
               <AccordionItem
                 key={item.value}
                 value={item.value}
-                className="border-white/60 px-6"
+                className="border-border px-6"
                 style={{
                   animation: 'fadeUpSoft 0.7s ease-out both',
                   animationDelay: `${0.28 + index * 0.08}s`,
                 }}
               >
-                <AccordionTrigger className="group py-5 text-left text-lg font-medium text-[#4d2d7b] hover:no-underline">
+                <AccordionTrigger className="group py-5 text-left text-lg font-medium text-dream-heading hover:no-underline">
                   <div className="flex items-start gap-3">
                     <span className="mt-2 block h-2.5 w-2.5 rounded-full bg-[#d7c0ff] transition duration-300 group-hover:scale-125 group-hover:bg-[#b79ef6]" />
                     <span className="transition duration-300 group-hover:translate-x-1">
@@ -67,7 +67,7 @@ export function QuestionsContact() {
                   </div>
                 </AccordionTrigger>
 
-                <AccordionContent className="pb-5 pl-5 pr-2 text-[16px] leading-7 text-[#7f6b9f]">
+                <AccordionContent className="pb-5 pl-5 pr-2 text-[16px] leading-7 text-dream-muted">
                   {item.answer}
                 </AccordionContent>
               </AccordionItem>

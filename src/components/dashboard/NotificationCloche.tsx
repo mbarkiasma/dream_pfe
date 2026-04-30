@@ -165,7 +165,7 @@ export function NotificationBell() {
         aria-label="Notifications"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
-        className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/80 text-[#4B2A82] shadow-[0_12px_28px_rgba(109,40,217,0.14)] transition hover:bg-white dark:border-border dark:bg-background/80 dark:text-foreground dark:hover:bg-accent"
+        className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card/80 text-[#4B2A82] shadow-[0_12px_28px_rgba(109,40,217,0.14)] transition hover:bg-white dark:border-border dark:bg-background/80 dark:text-foreground dark:hover:bg-accent"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 ? (
@@ -176,10 +176,10 @@ export function NotificationBell() {
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 z-[100] mt-3 w-[min(92vw,380px)] overflow-hidden rounded-2xl border border-white/80 bg-white shadow-[0_24px_70px_rgba(45,16,104,0.20)] dark:border-border dark:bg-card">
+        <div className="absolute right-0 z-[100] mt-3 w-[min(92vw,380px)] overflow-hidden rounded-2xl border border-border bg-white shadow-[0_24px_70px_rgba(45,16,104,0.20)] dark:border-border dark:bg-card">
           <div className="flex items-center justify-between border-b border-[#EEE8FF] px-4 py-3 dark:border-border">
             <div>
-              <p className="text-sm font-bold text-[#2d1068] dark:text-foreground">Notifications</p>
+              <p className="text-sm font-bold text-dream-heading dark:text-foreground">Notifications</p>
               <p className="text-xs text-[#7B6B9A] dark:text-muted-foreground">
                 {unreadCount} non lue(s)
               </p>
@@ -189,7 +189,7 @@ export function NotificationBell() {
               type="button"
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#6D28D9] transition hover:bg-[#F4EFFF] disabled:cursor-not-allowed disabled:text-[#C5BADB] dark:text-foreground dark:hover:bg-accent dark:disabled:text-muted-foreground"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-dream-accent transition hover:bg-[#F4EFFF] disabled:cursor-not-allowed disabled:text-[#C5BADB] dark:text-foreground dark:hover:bg-accent dark:disabled:text-muted-foreground"
               aria-label="Tout marquer comme lu"
             >
               <CheckCheck className="h-5 w-5" />
@@ -221,10 +221,10 @@ export function NotificationBell() {
                         }`}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-[#2d1068] dark:text-foreground">
+                        <p className="text-sm font-bold text-dream-heading dark:text-foreground">
                           {notification.title}
                         </p>
-                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#6E628F] dark:text-muted-foreground">
+                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-dream-muted dark:text-muted-foreground">
                           {notification.message}
                         </p>
                         {createdAt ? (

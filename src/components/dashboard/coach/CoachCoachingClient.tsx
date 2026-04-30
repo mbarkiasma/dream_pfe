@@ -14,6 +14,8 @@ import {
   X,
 } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
+
 type CoachingSession = {
   id: string | number
   title: string
@@ -150,7 +152,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
   }, [selectedSessionId])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    messagesEndRef.current?.scrollIntoView({ block: 'end' })
   }, [messages])
 
   async function sendMessage() {
@@ -360,16 +362,16 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
 
   return (
     <div className="grid gap-6 xl:h-[calc(100vh-11rem)] xl:min-h-[660px] xl:grid-cols-[340px_1fr] xl:overflow-hidden">
-      <section className="min-h-0 rounded-[28px] border border-white/70 bg-white/80 p-4 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur xl:overflow-hidden">
+      <section className="dream-card-glass min-h-0 rounded-[28px] border p-4 xl:overflow-hidden">
         <div className="px-2">
-          <h2 className="text-lg font-semibold text-[#2d1068]">Sessions classiques</h2>
-          <p className="mt-1 text-sm leading-6 text-[#7A6A99]">
+          <h2 className="text-lg font-semibold text-dream-heading">Sessions classiques</h2>
+          <p className="mt-1 text-sm leading-6 text-dream-muted">
             Demandes de coaching humain assignees a vous.
           </p>
         </div>
         <div className="mt-4 max-h-[560px] space-y-2 overflow-y-auto pr-1 xl:max-h-[calc(100%-82px)]">
           {sessions.length === 0 ? (
-            <p className="rounded-[20px] bg-[#F8F3FF] p-4 text-sm text-[#7A6A99]">
+            <p className="dream-surface-muted rounded-[20px] border p-4 text-sm text-dream-muted">
               Aucune session assignee pour le moment.
             </p>
           ) : null}
@@ -381,59 +383,55 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
               String(selectedSessionId) !== String(session.id) && lastSender === 'student'
 
             return (
-              <button
+              <Button
                 key={session.id}
                 type="button"
                 onClick={() => setSelectedSessionId(session.id)}
-                className={`w-full rounded-[20px] border p-4 text-left transition ${
-                  String(selectedSessionId) === String(session.id)
-                    ? 'border-violet-200 bg-gradient-to-br from-[#F3ECFF] to-white text-[#2d1068] shadow-[0_12px_30px_rgba(109,40,217,0.14)]'
-                    : 'border-white/70 bg-white/70 text-[#4B3F72] hover:border-violet-100 hover:bg-white'
-                }`}
+                size="card"
+                variant={String(selectedSessionId) === String(session.id) ? 'panelActive' : 'panel'}
+                className="w-full rounded-[20px] p-4"
               >
                 <span className="flex items-start justify-between gap-3">
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold">{session.title}</span>
                     <span className="mt-1 block truncate text-xs opacity-75">{studentName}</span>
-                    <span className="mt-2 inline-flex rounded-full bg-white/75 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                    <span className="dream-pill-accent mt-2 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold">
                       {messageCountBySession[String(session.id)] ?? 0} message
                       {(messageCountBySession[String(session.id)] ?? 0) > 1 ? 's' : ''}
                     </span>
                   </span>
                   {hasNewStudentMessage ? (
-                    <span className="shrink-0 rounded-full bg-fuchsia-100 px-2.5 py-1 text-[11px] font-bold text-fuchsia-700">
+                    <span className="dream-badge shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold">
                       Nouveau
                     </span>
                   ) : null}
                 </span>
-              </button>
+              </Button>
             )
           })}
         </div>
       </section>
 
       <section className="grid min-h-0 gap-6 2xl:grid-cols-[1fr_360px]">
-        <div className="flex min-h-[660px] flex-col overflow-hidden rounded-[30px] border border-white/70 bg-gradient-to-b from-white/90 via-[#FDF7FF]/90 to-[#F8F3FF]/90 shadow-[0_25px_70px_rgba(109,40,217,0.14)] backdrop-blur-xl xl:min-h-0">
-          <div className="shrink-0 border-b border-white/70 bg-white/65 p-5">
+        <div className="flex min-h-[660px] flex-col overflow-hidden rounded-[30px] border dream-panel-bg shadow-dream-card-lg xl:min-h-0">
+          <div className="dream-surface shrink-0 border-b p-5">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-[#2d1068]">
+                <h2 className="text-xl font-semibold text-dream-heading">
                   {selectedSession?.title ?? 'Aucune session selectionnee'}
                 </h2>
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F3ECFF] px-3 py-1 text-[#6D28D9]">
+                  <span className="dream-badge inline-flex items-center gap-1.5 rounded-full border px-3 py-1">
                     <UserRound className="h-3.5 w-3.5" />
                     {selectedStudentName}
                   </span>
-                  <span className="rounded-full bg-[#F3ECFF] px-3 py-1 text-[#6D28D9]">
-                    Coaching humain
-                  </span>
-                  <span className="rounded-full bg-[#F3ECFF] px-3 py-1 text-[#6D28D9]">
+                  <span className="dream-badge rounded-full border px-3 py-1">Coaching humain</span>
+                  <span className="dream-badge rounded-full border px-3 py-1">
                     {messages.length} message{messages.length > 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
-              <div className="rounded-2xl bg-[#F3ECFF] p-3 text-[#8B5CF6]">
+              <div className="dream-icon-soft rounded-2xl p-3">
                 <MessageCircle className="h-5 w-5" />
               </div>
             </div>
@@ -441,7 +439,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
 
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
             {messages.length === 0 ? (
-              <div className="rounded-[24px] border border-dashed border-violet-200 bg-white/70 p-6 text-sm leading-7 text-[#6E628F]">
+              <div className="dream-card-dashed rounded-[24px] border p-6 text-sm leading-7 text-dream-muted">
                 Aucun message pour cette session. Vous pouvez attendre le premier message de
                 l'etudiant ou envoyer un message d'accueil.
               </div>
@@ -455,8 +453,8 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                   <div
                     className={`max-w-[82%] rounded-[24px] px-4 py-3 ${
                       isMine
-                        ? 'bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_28px_rgba(139,92,246,0.24)]'
-                        : 'border border-white/80 bg-white/85 text-[#4B3F72] shadow-[0_8px_24px_rgba(109,40,217,0.08)]'
+                        ? 'dream-brand-bg text-dream-accent-foreground shadow-dream-card'
+                        : 'dream-surface border text-dream-heading shadow-dream-card'
                     }`}
                   >
                     <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] opacity-60">
@@ -470,63 +468,63 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="shrink-0 border-t border-white/70 bg-white/85 p-4 backdrop-blur">
+          <div className="dream-surface shrink-0 border-t p-4">
             <div className="flex items-end gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => void toggleRecording()}
                 disabled={!selectedSessionId || isLoading}
-                className={`inline-flex h-[92px] w-[64px] shrink-0 items-center justify-center rounded-[22px] transition disabled:cursor-not-allowed disabled:bg-slate-300 ${
-                  isRecording
-                    ? 'bg-rose-700 text-white hover:bg-rose-800'
-                    : 'bg-[#F3ECFF] text-[#8B5CF6] hover:bg-[#eadcff]'
-                }`}
+                variant={isRecording ? 'destructive' : 'dreamSoft'}
+                className="h-[92px] w-[64px] shrink-0 rounded-[22px]"
                 title={isRecording ? 'Arreter' : 'Dicter'}
               >
                 {isRecording ? <Square className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-              </button>
+              </Button>
               <textarea
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 rows={3}
                 placeholder="Repondre a l'etudiant..."
-                className="min-h-[92px] flex-1 resize-none rounded-[22px] border border-violet-100 bg-white/80 px-4 py-3 text-sm leading-6 text-[#4B3F72] outline-none transition placeholder:text-[#9b8bbd] focus:border-violet-300"
+                className="dream-field min-h-[92px] flex-1 resize-none rounded-[22px] border px-4 py-3 text-sm leading-6 outline-none"
               />
-              <button
+              <Button
                 type="button"
                 onClick={() => void sendMessage()}
                 disabled={!message.trim() || !selectedSessionId || isLoading}
-                className="inline-flex h-[92px] w-[92px] shrink-0 items-center justify-center rounded-[22px] bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_30px_rgba(139,92,246,0.28)] transition hover:from-violet-600 hover:to-fuchsia-500 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
+                variant="dream"
+                className="h-[92px] w-[92px] shrink-0 rounded-[22px] disabled:shadow-none"
                 title="Envoyer"
               >
                 <Send className="h-5 w-5" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
-        <aside className="flex min-h-[660px] flex-col overflow-hidden rounded-[30px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur xl:min-h-0">
-          <div className="shrink-0 border-b border-violet-100/70 p-5">
+        <aside className="dream-card-glass flex min-h-[660px] flex-col overflow-hidden rounded-[30px] border xl:min-h-0">
+          <div className="shrink-0 border-b border-border/70 p-5">
             <div className="flex items-center gap-3">
-              <div className="rounded-2xl bg-[#F3ECFF] p-3 text-[#8B5CF6]">
+              <div className="dream-icon-soft rounded-2xl p-3">
                 <ClipboardPlus className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-[#2d1068]">Note de suivi</h2>
-                <p className="text-sm text-[#7A6A99]">Visible dans Payload pour le suivi.</p>
+                <h2 className="text-lg font-semibold text-dream-heading">Note de suivi</h2>
+                <p className="text-sm text-dream-muted">Visible dans Payload pour le suivi.</p>
               </div>
             </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto p-5">
             {selectedSession ? (
-              <div className="rounded-[22px] border border-violet-100 bg-[#F8F3FF] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9B6BFF]">
+              <div className="dream-surface-muted rounded-[22px] border p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-dream-accent">
                   Etudiant
                 </p>
-                <p className="mt-2 text-sm font-semibold text-[#2d1068]">{selectedStudentName}</p>
+                <p className="mt-2 text-sm font-semibold text-dream-heading">
+                  {selectedStudentName}
+                </p>
                 {selectedSession.student?.email ? (
-                  <p className="mt-1 truncate text-xs text-[#7A6A99]">
+                  <p className="mt-1 truncate text-xs text-dream-muted">
                     {selectedSession.student.email}
                   </p>
                 ) : null}
@@ -538,40 +536,41 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
               onChange={(event) => setNote(event.target.value)}
               rows={6}
               placeholder="Observations, objectifs, prochaines actions..."
-              className="mt-5 w-full resize-none rounded-[22px] border border-violet-100 bg-white/80 px-4 py-3 text-sm leading-7 text-[#4B3F72] outline-none transition placeholder:text-[#9b8bbd] focus:border-violet-300"
+              className="dream-field mt-5 w-full resize-none rounded-[22px] border px-4 py-3 text-sm leading-7 outline-none"
             />
 
-            <button
+            <Button
               type="button"
               onClick={() => void saveNote()}
               disabled={!note.trim() || !selectedSessionId || isLoading}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-violet-500 to-fuchsia-400 px-4 py-3 text-sm font-semibold text-white transition hover:from-violet-600 hover:to-fuchsia-500 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300"
+              variant="dream"
+              className="mt-4 w-full rounded-[18px]"
             >
               Enregistrer la note
-            </button>
+            </Button>
 
             {statusMessage ? (
-              <p className="mt-4 rounded-2xl border border-white/70 bg-[#F8F3FF] px-4 py-3 text-sm text-[#6E628F]">
+              <p className="dream-badge-muted mt-4 rounded-2xl border px-4 py-3 text-sm">
                 {statusMessage}
               </p>
             ) : null}
 
-            <div className="mt-6 border-t border-violet-100 pt-5">
+            <div className="mt-6 border-t border-border pt-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-[#2d1068]">Notes precedentes</h3>
-                  <p className="mt-1 text-xs text-[#7A6A99]">
+                  <h3 className="text-sm font-semibold text-dream-heading">Notes precedentes</h3>
+                  <p className="mt-1 text-xs text-dream-muted">
                     Historique de suivi pour cette session.
                   </p>
                 </div>
-                <span className="rounded-full bg-[#F3ECFF] px-3 py-1 text-xs font-semibold text-[#8B5CF6]">
+                <span className="dream-badge rounded-full border px-3 py-1 text-xs font-semibold">
                   {savedNotes.length}
                 </span>
               </div>
 
               <div className="mt-4 space-y-3">
                 {savedNotes.length === 0 ? (
-                  <p className="rounded-[18px] border border-dashed border-violet-200 bg-white/60 p-4 text-sm leading-6 text-[#7A6A99]">
+                  <p className="dream-card-dashed rounded-[18px] border p-4 text-sm leading-6 text-dream-muted">
                     Aucune note enregistree pour cette session.
                   </p>
                 ) : null}
@@ -579,37 +578,41 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                 {savedNotes.map((savedNote) => (
                   <article
                     key={savedNote.id}
-                    className="rounded-[20px] border border-white/80 bg-white/75 p-4 shadow-[0_8px_24px_rgba(109,40,217,0.08)]"
+                    className="dream-surface rounded-[20px] border p-4 shadow-dream-card"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h4 className="min-w-0 truncate text-sm font-semibold text-[#2d1068]">
+                      <h4 className="min-w-0 truncate text-sm font-semibold text-dream-heading">
                         {savedNote.title}
                       </h4>
                       <div className="flex shrink-0 items-center gap-1">
                         {savedNote.createdAt ? (
-                          <time className="mr-1 text-[11px] font-medium text-[#9B8BBD]">
+                          <time className="mr-1 text-[11px] font-medium text-dream-muted">
                             {formatShortDate(savedNote.createdAt)}
                           </time>
                         ) : null}
-                        <button
+                        <Button
                           type="button"
                           onClick={() => {
                             setEditingNoteId(savedNote.id)
                             setEditingNoteContent(savedNote.content)
                           }}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#F3ECFF] text-[#6D28D9] transition hover:bg-[#eadcff]"
+                          variant="dreamSoft"
+                          size="iconSm"
+                          className="h-8 w-8"
                           title="Modifier la note"
                         >
                           <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
                           onClick={() => setNoteToDelete(savedNote)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 transition hover:bg-rose-500 hover:text-white"
+                          variant="destructive"
+                          size="iconSm"
+                          className="h-8 w-8"
                           title="Supprimer la note"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                     {String(editingNoteId) === String(savedNote.id) ? (
@@ -618,32 +621,34 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                           value={editingNoteContent}
                           onChange={(event) => setEditingNoteContent(event.target.value)}
                           rows={5}
-                          className="w-full resize-none rounded-[18px] border border-violet-100 bg-white px-3 py-2 text-sm leading-6 text-[#4B3F72] outline-none focus:border-violet-300"
+                          className="dream-field w-full resize-none rounded-[18px] border px-3 py-2 text-sm leading-6 outline-none"
                         />
                         <div className="flex justify-end gap-2">
-                          <button
+                          <Button
                             type="button"
                             onClick={() => void updateNote(savedNote.id)}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500 text-white"
+                            variant="dream"
+                            size="iconSm"
                             title="Enregistrer"
                           >
                             <Check className="h-4 w-4" />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
                             onClick={() => {
                               setEditingNoteId(null)
                               setEditingNoteContent('')
                             }}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3ECFF] text-[#7a6a99]"
+                            variant="dreamOutline"
+                            size="iconSm"
                             title="Annuler"
                           >
                             <X className="h-4 w-4" />
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
-                      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#6E628F]">
+                      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-dream-muted">
                         {savedNote.content}
                       </p>
                     )}
@@ -655,26 +660,28 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         </aside>
       </section>
       {noteToDelete ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d1068]/35 px-4 backdrop-blur-md">
-          <div className="w-full max-w-md rounded-[30px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] p-6 shadow-[0_30px_90px_rgba(109,40,217,0.28)]">
+        <div className="dream-modal-backdrop fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="w-full max-w-md rounded-[30px] border dream-panel-bg p-6 shadow-dream-card-lg">
             <div className="flex items-start gap-4">
-              <div className="rounded-2xl bg-rose-50 p-3 text-rose-600">
+              <div className="dream-status-failed rounded-2xl border p-3">
                 <Trash2 className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9B6BFF]">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-dream-accent">
                   Confirmation
                 </p>
-                <h3 className="mt-2 text-xl font-bold text-[#2d1068]">Supprimer cette note ?</h3>
-                <p className="mt-3 text-sm leading-6 text-[#6E628F]">
+                <h3 className="mt-2 text-xl font-bold text-dream-heading">
+                  Supprimer cette note ?
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-dream-muted">
                   Cette note sera supprimee de l'historique de suivi et de Payload. Cette action ne
                   pourra pas etre annulee.
                 </p>
-                <div className="mt-4 rounded-[20px] border border-white/80 bg-white/75 p-4">
-                  <p className="truncate text-sm font-semibold text-[#2d1068]">
+                <div className="dream-surface mt-4 rounded-[20px] border p-4">
+                  <p className="truncate text-sm font-semibold text-dream-heading">
                     {noteToDelete.title}
                   </p>
-                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#7A6A99]">
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-dream-muted">
                     {noteToDelete.content}
                   </p>
                 </div>
@@ -682,21 +689,25 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => setNoteToDelete(null)}
-                className="rounded-2xl border border-violet-100 bg-white px-4 py-2 text-sm font-semibold text-[#4B3F72] transition hover:bg-[#F8F3FF]"
+                variant="dreamOutline"
+                size="pill"
+                className="rounded-2xl"
               >
                 Annuler
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => void deleteNote(noteToDelete.id)}
                 disabled={isLoading}
-                className="rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                variant="destructive"
+                size="pill"
+                className="rounded-2xl"
               >
                 Supprimer
-              </button>
+              </Button>
             </div>
           </div>
         </div>

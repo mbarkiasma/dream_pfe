@@ -53,14 +53,14 @@ export default async function StudentProfilePage() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-2xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-2xl text-dream-heading dark:text-foreground">
                 Informations personnelles
               </CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-4 text-[#6E628F] dark:text-muted-foreground">
+            <CardContent className="space-y-4 text-dream-muted dark:text-muted-foreground">
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl border border-slate-200/80 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.05]">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-muted-foreground">
@@ -89,9 +89,9 @@ export default async function StudentProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Mes analyses en PDF
               </CardTitle>
             </CardHeader>
@@ -104,7 +104,7 @@ export default async function StudentProfilePage() {
                     className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.05] md:flex-row md:items-center md:justify-between"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-[#2d1068] dark:text-foreground">
+                      <p className="text-sm font-semibold text-dream-heading dark:text-foreground">
                         {analyse.reference}
                       </p>
                       <p className="mt-1 text-sm text-[#7A6A99] dark:text-muted-foreground">
@@ -132,7 +132,7 @@ export default async function StudentProfilePage() {
                 ))
               ) : (
                 <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 dark:border-white/10 dark:bg-white/[0.04]">
-                  <p className="text-sm text-[#6E628F] dark:text-muted-foreground">
+                  <p className="text-sm text-dream-muted dark:text-muted-foreground">
                     Aucune analyse n'est encore disponible. Des qu'un entretien est termine, un
                     rapport PDF apparaitra ici.
                   </p>
@@ -143,15 +143,15 @@ export default async function StudentProfilePage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Rapports disponibles
               </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 Chaque entretien termine peut maintenant etre consulte et exporte en PDF depuis ce
                 profil.
               </p>
@@ -164,15 +164,15 @@ export default async function StudentProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Progression
               </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 Le profil centralisera progressivement vos entretiens, vos analyses et les rapports
                 utiles a votre suivi.
               </p>

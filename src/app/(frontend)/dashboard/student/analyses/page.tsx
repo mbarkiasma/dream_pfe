@@ -44,9 +44,9 @@ export default async function StudentAnalysesPage() {
       />
 
       <div className="space-y-6">
-        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+        <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl text-[#2d1068] dark:text-foreground">
+            <CardTitle className="text-2xl text-dream-heading dark:text-foreground">
               {latestAnalysis ? 'Derniere analyse disponible' : 'Aucune analyse disponible'}
             </CardTitle>
           </CardHeader>
@@ -64,13 +64,13 @@ export default async function StudentAnalysesPage() {
             {latestAnalysis ? (
               <div className="space-y-4">
                 <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-5 dark:border-white/10 dark:bg-white/[0.05]">
-                  <p className="text-sm font-semibold text-[#2d1068] dark:text-foreground">
+                  <p className="text-sm font-semibold text-dream-heading dark:text-foreground">
                     {latestAnalysis.reference}
                   </p>
                   <p className="mt-1 text-sm text-[#7A6A99] dark:text-muted-foreground">
                     Generee le {formatAnalysisDate(latestAnalysis.date)}
                   </p>
-                  <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#6E628F] dark:text-muted-foreground">
+                  <p className="mt-4 whitespace-pre-line text-sm leading-7 text-dream-muted dark:text-muted-foreground">
                     {latestAnalysis.overview ||
                       latestAnalysis.conclusion ||
                       'Resume non disponible.'}
@@ -94,7 +94,7 @@ export default async function StudentAnalysesPage() {
                 </div>
               </div>
             ) : (
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 Les analyses IA apparaitront ici automatiquement apres un entretien termine et une
                 sauvegarde reussie.
               </p>
@@ -102,9 +102,9 @@ export default async function StudentAnalysesPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+        <Card className="rounded-[28px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+            <CardTitle className="text-xl text-dream-heading dark:text-foreground">
               Historique des analyses
             </CardTitle>
           </CardHeader>
@@ -117,13 +117,13 @@ export default async function StudentAnalysesPage() {
                   className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 dark:border-white/10 dark:bg-white/[0.06] md:flex-row md:items-center md:justify-between"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-[#2d1068] dark:text-foreground">
+                    <p className="text-sm font-semibold text-dream-heading dark:text-foreground">
                       {analyse.reference}
                     </p>
                     <p className="mt-1 text-sm text-[#7A6A99] dark:text-muted-foreground">
                       {formatAnalysisDate(analyse.date)}
                     </p>
-                    <p className="mt-2 line-clamp-2 text-sm text-[#6E628F] dark:text-muted-foreground">
+                    <p className="mt-2 line-clamp-2 text-sm text-dream-muted dark:text-muted-foreground">
                       {analyse.overview || analyse.conclusion || 'Resume non disponible.'}
                     </p>
                   </div>
@@ -146,7 +146,7 @@ export default async function StudentAnalysesPage() {
                 </div>
               ))
             ) : (
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 L'historique complet s'affichera ici des que plusieurs entretiens auront ete
                 enregistres.
               </p>

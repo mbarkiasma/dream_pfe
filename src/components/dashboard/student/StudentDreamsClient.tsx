@@ -52,7 +52,7 @@ function getStatusCopy(status: Dream['videoStatus']) {
       return {
         label: 'Pret',
         icon: CheckCircle2,
-        badgeClass: 'border-violet-200 bg-violet-50 text-violet-700',
+        badgeClass: 'border-border bg-dream-softer text-dream-accent',
         dotClass: 'bg-violet-400',
         description: 'La video et le resume sont disponibles.',
       }
@@ -60,7 +60,7 @@ function getStatusCopy(status: Dream['videoStatus']) {
       return {
         label: 'Echec',
         icon: RefreshCw,
-        badgeClass: 'border-violet-200 bg-white text-[#6D28D9]',
+        badgeClass: 'border-border bg-white text-dream-accent',
         dotClass: 'bg-violet-300',
         description: "La generation n'a pas abouti. Vous pouvez relancer un autre reve.",
       }
@@ -68,7 +68,7 @@ function getStatusCopy(status: Dream['videoStatus']) {
       return {
         label: 'Generation',
         icon: Loader2,
-        badgeClass: 'border-violet-200 bg-[#F3ECFF] text-[#6D28D9]',
+        badgeClass: 'border-border bg-dream-highlight text-dream-accent',
         dotClass: 'bg-violet-400',
         description: 'Le workflow video est en cours de traitement.',
       }
@@ -76,7 +76,7 @@ function getStatusCopy(status: Dream['videoStatus']) {
       return {
         label: 'A valider',
         icon: Clock3,
-        badgeClass: 'border-violet-200 bg-[#F3ECFF] text-[#6D28D9]',
+        badgeClass: 'border-border bg-dream-highlight text-dream-accent',
         dotClass: 'bg-violet-400',
         description: 'Le resume attend votre validation avant la generation video.',
       }
@@ -84,7 +84,7 @@ function getStatusCopy(status: Dream['videoStatus']) {
       return {
         label: 'En attente',
         icon: Clock3,
-        badgeClass: 'border-violet-100 bg-white text-[#6E628F]',
+        badgeClass: 'border-border bg-white text-dream-muted',
         dotClass: 'bg-violet-200',
         description: 'Le reve est en file avant generation.',
       }
@@ -279,18 +279,18 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   return (
     <div className="space-y-6">
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.7fr)]">
-        <Card className="overflow-hidden rounded-[32px] border border-white/70 bg-white/85 shadow-[0_18px_60px_rgba(109,40,217,0.12)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
+        <Card className="overflow-hidden rounded-[32px] border border-border bg-card/85 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
           <CardContent className="p-5 md:p-6">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-[#F3ECFF] px-3 py-1.5 text-xs font-semibold text-[#6D28D9] dark:border-violet-400/20 dark:bg-violet-400/10 dark:text-violet-200">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-dream-highlight px-3 py-1.5 text-xs font-semibold text-dream-accent dark:border-violet-400/20 dark:bg-violet-400/10 dark:text-violet-200">
                 <Moon className="h-3.5 w-3.5" />
                 Journal de reves
               </div>
 
-              <h2 className="max-w-2xl text-3xl font-bold leading-tight tracking-[-0.025em] text-[#2d1068] dark:text-foreground">
+              <h2 className="max-w-2xl text-3xl font-bold leading-tight tracking-[-0.025em] text-dream-heading dark:text-foreground">
                 Racontez votre reve, puis validez son resume.
               </h2>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="mt-3 max-w-2xl text-base leading-7 text-dream-muted dark:text-muted-foreground">
                 Decrivez simplement ce dont vous vous souvenez. L&apos;application prepare un resume
                 et une analyse, puis lance la video apres votre validation.
               </p>
@@ -301,7 +301,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 placeholder="Exemple : J'etais dans une maison inconnue, je cherchais quelqu'un et je ressentais de la peur..."
-                className="min-h-[156px] resize-none rounded-[24px] border border-violet-100 bg-white px-5 py-4 text-base leading-8 text-[#2d1068] shadow-inner placeholder:text-[#A99AC5] focus-visible:ring-violet-200 dark:border-white/10 dark:bg-background/70 dark:text-foreground dark:placeholder:text-muted-foreground dark:focus-visible:ring-violet-400/20"
+                className="min-h-[156px] resize-none rounded-[24px] border border-border bg-white px-5 py-4 text-base leading-8 text-dream-heading shadow-inner placeholder:text-dream-muted focus-visible:ring-violet-200 dark:border-white/10 dark:bg-background/70 dark:text-foreground dark:placeholder:text-muted-foreground dark:focus-visible:ring-violet-400/20"
                 disabled={pending}
               />
 
@@ -309,7 +309,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 <Button
                   type="submit"
                   disabled={pending || remaining === 0}
-                  className="h-12 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(109,40,217,0.22)]"
+                  className="h-12 rounded-2xl dream-brand-bg px-5 text-sm font-semibold text-white shadow-dream-card"
                 >
                   {pending ? (
                     <>
@@ -324,24 +324,24 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                   )}
                 </Button>
 
-                <div className="flex flex-wrap gap-2 text-sm font-medium text-[#6E628F] dark:text-muted-foreground">
-                  <span className="rounded-full border border-violet-100 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.06]">
+                <div className="flex flex-wrap gap-2 text-sm font-medium text-dream-muted dark:text-muted-foreground">
+                  <span className="rounded-full border border-border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.06]">
                     {weeklyUsed}/{weeklyLimit} reves cette semaine
                   </span>
-                  <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-2 text-violet-700 dark:border-violet-400/20 dark:bg-violet-400/10 dark:text-violet-200">
+                  <span className="rounded-full border border-border bg-dream-softer px-3 py-2 text-dream-accent dark:border-violet-400/20 dark:bg-violet-400/10 dark:text-violet-200">
                     Encore {remaining} possible{remaining > 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
 
               {feedback ? (
-                <p className="rounded-2xl border border-violet-200 bg-[#F3ECFF] px-4 py-3 text-sm text-[#6D28D9]">
+                <p className="rounded-2xl border border-border bg-dream-highlight px-4 py-3 text-sm text-dream-accent">
                   {feedback}
                 </p>
               ) : null}
 
               {error ? (
-                <p className="rounded-2xl border border-violet-200 bg-white px-4 py-3 text-sm text-[#6D28D9]">
+                <p className="rounded-2xl border border-border bg-white px-4 py-3 text-sm text-dream-accent">
                   {error}
                 </p>
               ) : null}
@@ -349,18 +349,18 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden rounded-[32px] border border-white/70 bg-white/85 shadow-[0_18px_60px_rgba(109,40,217,0.12)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
+        <Card className="overflow-hidden rounded-[32px] border border-border bg-card/85 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
           <CardContent className="p-4">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9B6BFF]">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-dream-accent">
                   Apercu video
                 </p>
-                <h3 className="mt-1 text-xl font-bold text-[#2d1068] dark:text-foreground">
+                <h3 className="mt-1 text-xl font-bold text-dream-heading dark:text-foreground">
                   {latestDream ? 'Dernier reve' : 'Aucune video encore'}
                 </h3>
               </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F3ECFF] text-[#6D28D9] dark:bg-violet-400/10 dark:text-violet-200">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-dream-highlight text-dream-accent dark:bg-violet-400/10 dark:text-violet-200">
                 <Sparkles className="h-5 w-5" />
               </div>
             </div>
@@ -374,9 +374,9 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                   src={latestDreamVideoUrl}
                 />
               ) : (
-                <div className="flex aspect-video items-center justify-center bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] px-8 text-center text-sm leading-7 text-[#6E628F] dark:bg-violet-500/10 dark:text-muted-foreground">
+                <div className="flex aspect-video items-center justify-center bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] px-8 text-center text-sm leading-7 text-dream-muted dark:bg-dream-softer0/10 dark:text-muted-foreground">
                   <div className="space-y-3">
-                    <Video className="mx-auto h-8 w-8 text-[#6D28D9]" />
+                    <Video className="mx-auto h-8 w-8 text-dream-accent" />
                     <p>
                       {latestDream?.errorMessage ||
                         (latestDream
@@ -389,9 +389,9 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             </div>
 
             {latestDream ? (
-              <div className="mt-4 rounded-[24px] border border-violet-100 bg-white/80 p-4 dark:border-white/10 dark:bg-white/[0.06]">
+              <div className="mt-4 rounded-[24px] border border-border bg-card/80 p-4 dark:border-white/10 dark:bg-white/[0.06]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-[#2d1068] dark:text-foreground">
+                  <p className="text-sm font-semibold text-dream-heading dark:text-foreground">
                     {formatDate(latestDream.createdAt)}
                   </p>
                   {(() => {
@@ -407,7 +407,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                     )
                   })()}
                 </div>
-                <p className="mt-3 line-clamp-3 text-sm leading-7 text-[#6E628F] dark:text-muted-foreground">
+                <p className="mt-3 line-clamp-3 text-sm leading-7 text-dream-muted dark:text-muted-foreground">
                   {latestDream.summary || latestDream.description}
                 </p>
               </div>
@@ -416,20 +416,20 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
         </Card>
       </section>
 
-      <section className="rounded-[30px] border border-white/70 bg-white/80 p-4 shadow-[0_18px_60px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] md:p-5">
+      <section className="rounded-[30px] border border-border bg-card/80 p-4 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] md:p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9B6BFF]">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-dream-accent">
               Journal
             </p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#2d1068] dark:text-foreground">
+            <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-dream-heading dark:text-foreground">
               {filteredDreams.length} reve{filteredDreams.length > 1 ? 's' : ''} conserve
               {filteredDreams.length > 1 ? 's' : ''}
             </h2>
           </div>
 
-          <div className="flex min-h-12 items-center gap-3 rounded-2xl border border-violet-100 bg-white px-4 shadow-sm dark:border-white/10 dark:bg-background/70 md:min-w-[360px]">
-            <Search className="h-4 w-4 text-[#9B6BFF]" />
+          <div className="flex min-h-12 items-center gap-3 rounded-2xl border border-border bg-white px-4 shadow-sm dark:border-white/10 dark:bg-background/70 md:min-w-[360px]">
+            <Search className="h-4 w-4 text-dream-accent" />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -440,7 +440,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
         </div>
       </section>
 
-      <div className="relative grid gap-4 before:absolute before:bottom-6 before:left-6 before:top-6 before:hidden before:w-px before:bg-violet-100 md:before:block">
+      <div className="relative grid gap-4 before:absolute before:bottom-6 before:left-6 before:top-6 before:hidden before:w-px before:bg-dream-highlight md:before:block">
         {filteredDreams.length > 0 ? (
           filteredDreams.map((dream, index) => {
             const statusCopy = getStatusCopy(dream.videoStatus)
@@ -452,33 +452,33 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             return (
               <Card
                 key={dream.id}
-                className="group relative ml-0 overflow-hidden rounded-[28px] border border-white/70 bg-white/90 shadow-[0_14px_42px_rgba(109,40,217,0.10)] transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_22px_62px_rgba(109,40,217,0.15)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_16px_50px_rgba(0,0,0,0.22)] md:ml-12"
+                className="group relative ml-0 overflow-hidden rounded-[28px] border border-border bg-card/90 shadow-dream-card transition hover:-translate-y-0.5 hover:border-border hover:shadow-dream-card-lg dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_16px_50px_rgba(0,0,0,0.22)] md:ml-12"
               >
-                <div className="absolute -left-[3.28rem] top-7 hidden h-10 w-10 items-center justify-center rounded-full border border-violet-100 bg-white text-[#6D28D9] shadow-[0_10px_24px_rgba(109,40,217,0.12)] md:flex">
+                <div className="absolute -left-[3.28rem] top-7 hidden h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-dream-accent shadow-dream-card md:flex">
                   {String(index + 1).padStart(2, '0')}
                 </div>
 
                 <CardContent className="p-4 md:p-5">
                   <div className="grid gap-4 xl:grid-cols-[minmax(300px,420px)_1fr]">
-                    <div className="self-start overflow-hidden rounded-[24px] border border-violet-100 bg-[#F8F3FF] dark:border-white/10 dark:bg-white/[0.05]">
+                    <div className="self-start overflow-hidden rounded-[24px] border border-border bg-dream-soft dark:border-white/10 dark:bg-white/[0.05]">
                       {dreamVideoUrl ? (
                         <video
                           key={dreamVideoUrl}
                           controls
-                          className="aspect-video w-full bg-[#F3ECFF] object-cover dark:bg-background"
+                          className="aspect-video w-full bg-dream-highlight object-cover dark:bg-background"
                           src={dreamVideoUrl}
                         />
                       ) : (
-                        <div className="flex aspect-video items-center justify-center bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] px-4 text-center text-xs leading-5 text-[#6E628F] dark:bg-violet-500/10 dark:text-muted-foreground">
+                        <div className="flex aspect-video items-center justify-center bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] px-4 text-center text-xs leading-5 text-dream-muted dark:bg-dream-softer0/10 dark:text-muted-foreground">
                           <div>
-                            <Video className="mx-auto mb-2 h-7 w-7 text-[#6D28D9]" />
+                            <Video className="mx-auto mb-2 h-7 w-7 text-dream-accent" />
                             {dream.errorMessage || statusCopy.description}
                           </div>
                         </div>
                       )}
 
                       <div className="flex items-center justify-between gap-2 px-3 py-2">
-                        <span className="text-xs font-semibold text-[#9B6BFF]">
+                        <span className="text-xs font-semibold text-dream-accent">
                           {formatDate(dream.createdAt)}
                         </span>
                         <span
@@ -494,10 +494,10 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                       <div className="space-y-3">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9B6BFF]">
+                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-dream-accent">
                               Entree de journal
                             </p>
-                            <h3 className="mt-2 text-xl font-bold tracking-[-0.02em] text-[#2d1068] dark:text-foreground">
+                            <h3 className="mt-2 text-xl font-bold tracking-[-0.02em] text-dream-heading dark:text-foreground">
                               {dream.summary || 'Reve en cours de lecture'}
                             </h3>
                           </div>
@@ -505,7 +505,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                           <Button
                             type="button"
                             variant="ghost"
-                            className="rounded-full text-[#9B6BFF] hover:bg-[#F3ECFF] hover:text-[#6D28D9] dark:text-muted-foreground dark:hover:bg-white/10 dark:hover:text-foreground"
+                            className="rounded-full text-dream-accent hover:bg-dream-highlight hover:text-dream-accent dark:text-muted-foreground dark:hover:bg-white/10 dark:hover:text-foreground"
                             onClick={() => deleteDream(dream.id)}
                             disabled={pending}
                           >
@@ -515,7 +515,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                         </div>
 
                         {dream.videoStatus === 'waiting_validation' ? (
-                          <div className="flex flex-wrap gap-3 rounded-[22px] border border-violet-100 bg-white p-3 dark:border-white/10 dark:bg-white/[0.05]">
+                          <div className="flex flex-wrap gap-3 rounded-[22px] border border-border bg-white p-3 dark:border-white/10 dark:bg-white/[0.05]">
                             <Button
                               type="button"
                               className="rounded-full bg-[#6D28D9] px-4 py-2 text-sm font-semibold text-white"
@@ -528,7 +528,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                             <Button
                               type="button"
                               variant="outline"
-                              className="rounded-full border-violet-200 px-4 py-2 text-sm font-semibold text-[#6D28D9] dark:border-white/10 dark:text-foreground dark:hover:bg-white/10"
+                              className="rounded-full border-border px-4 py-2 text-sm font-semibold text-dream-accent dark:border-white/10 dark:text-foreground dark:hover:bg-white/10"
                               onClick={() => regenerateDream(dream.id)}
                               disabled={pending}
                             >
@@ -538,29 +538,29 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                         ) : null}
 
                         <div className="grid gap-3 lg:grid-cols-2">
-                          <div className="rounded-[22px] border border-violet-100 bg-[#FDF7FF] p-4 dark:border-white/10 dark:bg-white/[0.05]">
-                            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#2d1068] dark:text-foreground">
-                              <Moon className="h-4 w-4 text-[#6D28D9]" />
+                          <div className="rounded-[22px] border border-border bg-dream-softer p-4 dark:border-white/10 dark:bg-white/[0.05]">
+                            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-dream-heading dark:text-foreground">
+                              <Moon className="h-4 w-4 text-dream-accent" />
                               Description
                             </p>
-                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-[#6E628F] dark:text-muted-foreground">
+                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-dream-muted dark:text-muted-foreground">
                               {dream.description}
                             </p>
                           </div>
 
-                          <div className="rounded-[22px] border border-violet-100 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.05]">
-                            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#2d1068] dark:text-foreground">
-                              <Wand2 className="h-4 w-4 text-[#6D28D9]" />
+                          <div className="rounded-[22px] border border-border bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.05]">
+                            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-dream-heading dark:text-foreground">
+                              <Wand2 className="h-4 w-4 text-dream-accent" />
                               Analyse
                             </p>
-                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-[#6E628F] dark:text-muted-foreground">
+                            <p className="line-clamp-6 whitespace-pre-line text-sm leading-7 text-dream-muted dark:text-muted-foreground">
                               {analysisCopy}
                             </p>
                             {canExpandAnalysis ? (
                               <button
                                 type="button"
                                 onClick={() => openAnalysisModal(dream, analysisCopy)}
-                                className="mt-3 rounded-full border border-[#D8C7FF] bg-[#F3ECFF] px-4 py-2 text-xs font-semibold text-[#6D28D9] shadow-[0_8px_20px_rgba(109,40,217,0.10)] transition hover:bg-[#E9DDFF] dark:border-violet-400/20 dark:bg-violet-400/10 dark:text-violet-200 dark:hover:bg-violet-400/15"
+                                className="mt-3 rounded-full border border-[#D8C7FF] bg-dream-highlight px-4 py-2 text-xs font-semibold text-dream-accent shadow-[0_8px_20px_rgba(109,40,217,0.10)] transition hover:bg-[#E9DDFF] dark:border-violet-400/20 dark:bg-violet-400/10 dark:text-violet-200 dark:hover:bg-violet-400/15"
                               >
                                 Voir plus
                               </button>
@@ -589,7 +589,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             )
           })
         ) : (
-          <Card className="rounded-[34px] border border-dashed border-violet-200 bg-white/70 shadow-none dark:border-white/10 dark:bg-white/[0.04]">
+          <Card className="rounded-[34px] border border-dashed border-border bg-card/70 shadow-none dark:border-white/10 dark:bg-white/[0.04]">
             <CardContent className="p-10 text-center text-sm leading-7 text-[#7A6A99] dark:text-muted-foreground">
               Aucun reve ne correspond a votre recherche pour le moment.
             </CardContent>
@@ -605,16 +605,16 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
           onClick={() => setSelectedAnalysis(null)}
         >
           <div
-            className="relative flex max-h-[86vh] w-full max-w-3xl flex-col overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] shadow-[0_34px_110px_rgba(45,16,104,0.28)] dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_34px_110px_rgba(0,0,0,0.45)]"
+            className="relative flex max-h-[86vh] w-full max-w-3xl flex-col overflow-hidden rounded-[34px] border border-border bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] shadow-dream-card-lg dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_34px_110px_rgba(0,0,0,0.45)]"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="border-b border-white/70 px-6 py-5 dark:border-white/10 md:px-7">
+            <div className="border-b border-border px-6 py-5 dark:border-white/10 md:px-7">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9B6BFF]">
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-dream-accent">
                     Analyse du reve
                   </p>
-                  <h3 className="mt-2 line-clamp-2 text-2xl font-bold tracking-[-0.03em] text-[#2d1068] dark:text-foreground">
+                  <h3 className="mt-2 line-clamp-2 text-2xl font-bold tracking-[-0.03em] text-dream-heading dark:text-foreground">
                     {selectedAnalysis.title}
                   </h3>
                   <p className="mt-2 text-sm font-medium text-[#7A6A99] dark:text-muted-foreground">
@@ -625,7 +625,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 <button
                   type="button"
                   onClick={() => setSelectedAnalysis(null)}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/80 bg-white/80 text-[#6D28D9] shadow-[0_10px_24px_rgba(109,40,217,0.12)] transition hover:bg-[#F3ECFF] hover:text-[#2d1068] dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:hover:bg-white/10"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card/80 text-dream-accent shadow-dream-card transition hover:bg-dream-highlight hover:text-dream-heading dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:hover:bg-white/10"
                   aria-label="Fermer l'analyse"
                 >
                   <X className="h-5 w-5" />
@@ -634,18 +634,18 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             </div>
 
             <div className="min-h-0 overflow-y-auto px-6 py-5 md:px-7">
-              <div className="rounded-[26px] border border-white/80 bg-white/75 p-5 shadow-[0_14px_45px_rgba(109,40,217,0.10)] dark:border-white/10 dark:bg-white/[0.06]">
+              <div className="rounded-[26px] border border-border bg-card/75 p-5 shadow-dream-card dark:border-white/10 dark:bg-white/[0.06]">
                 <p className="whitespace-pre-line text-sm leading-8 text-[#4B3F72] dark:text-muted-foreground md:text-base">
                   {selectedAnalysis.content}
                 </p>
               </div>
             </div>
 
-            <div className="border-t border-white/70 bg-white/45 px-6 py-4 dark:border-white/10 dark:bg-white/[0.04] md:px-7">
+            <div className="border-t border-border bg-white/45 px-6 py-4 dark:border-white/10 dark:bg-white/[0.04] md:px-7">
               <button
                 type="button"
                 onClick={() => setSelectedAnalysis(null)}
-                className="w-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(109,40,217,0.22)] transition hover:brightness-105 sm:w-auto"
+                className="w-full rounded-full dream-brand-bg px-5 py-3 text-sm font-semibold text-white shadow-dream-card transition hover:brightness-105 sm:w-auto"
               >
                 Fermer
               </button>

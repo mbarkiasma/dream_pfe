@@ -19,9 +19,9 @@ export default function StudentCheckinPage() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Etat du jour
               </CardTitle>
             </CardHeader>
@@ -36,13 +36,13 @@ export default function StudentCheckinPage() {
                       key={item.label}
                       className="rounded-2xl border border-slate-200/80 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.05]"
                     >
-                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200">
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-dream-highlight text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
                         <Icon className="h-5 w-5" />
                       </div>
                       <p className="text-sm text-[#7A6A99] dark:text-muted-foreground">
                         {item.label}
                       </p>
-                      <p className="mt-2 text-lg font-semibold text-[#2d1068] dark:text-foreground">
+                      <p className="mt-2 text-lg font-semibold text-dream-heading dark:text-foreground">
                         {item.value}
                       </p>
                     </div>
@@ -50,7 +50,7 @@ export default function StudentCheckinPage() {
                 })}
               </div>
 
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 Cette page affichera plus tard les informations quotidiennes saisies par l'etudiant
                 afin d'assurer un suivi simple de son etat emotionnel.
               </p>
@@ -65,15 +65,15 @@ export default function StudentCheckinPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Historique
               </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 L'historique des check-ins quotidiens apparaitra ici automatiquement.
               </p>
 
@@ -85,15 +85,15 @@ export default function StudentCheckinPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-white/70 bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-[0_14px_45px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+          <Card className="rounded-[28px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-[#2d1068] dark:text-foreground">
+              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
                 Observation
               </CardTitle>
             </CardHeader>
 
             <CardContent>
-              <p className="leading-7 text-[#6E628F] dark:text-muted-foreground">
+              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
                 Cette section permettra plus tard d'afficher une synthese simple de l'evolution de
                 l'humeur, du sommeil et du niveau de stress.
               </p>
