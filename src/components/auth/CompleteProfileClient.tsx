@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@payloadcms/ui'
+import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowRight, Loader2, UserRound } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -84,7 +84,10 @@ export function CompleteProfileClient({
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-semibold text-dream-heading" htmlFor="firstName">
+                <label
+                  className="block text-sm font-semibold text-dream-heading"
+                  htmlFor="firstName"
+                >
                   Prenom
                 </label>
                 <input
@@ -99,7 +102,10 @@ export function CompleteProfileClient({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-dream-heading" htmlFor="lastName">
+                <label
+                  className="block text-sm font-semibold text-dream-heading"
+                  htmlFor="lastName"
+                >
                   Nom
                 </label>
                 <input
@@ -121,12 +127,7 @@ export function CompleteProfileClient({
               </div>
             ) : null}
 
-            <Button
-              variant="dream"
-              size="lg"
-              disabled={isSubmitting}
-              type="submit"
-            >
+            <Button variant="dream" size="lg" disabled={isSubmitting} type="submit">
               {isSubmitting ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (

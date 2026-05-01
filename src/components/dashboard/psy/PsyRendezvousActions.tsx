@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, Loader2, X } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
 type PsyRendezvousActionsProps = {
@@ -64,96 +65,99 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
   }
 
   return (
-    <div className="mt-4 space-y-2">
+    <div className="dream-action-stack">
       {status === 'pending' ? (
-        <div className="flex flex-wrap gap-2">
-          <button
+        <div className="dream-action-row">
+          <Button
             type="button"
+            variant="success"
+            size="pill"
             onClick={() => updateStatus('confirmed')}
             disabled={loadingStatus !== null}
-            className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-600 disabled:opacity-60"
           >
             {loadingStatus === 'confirmed' ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="dream-action-icon" />
             ) : (
-              <Check className="h-4 w-4" />
+              <Check className="dream-action-icon" />
             )}
             Confirmer
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="destructive"
+            size="pill"
             onClick={() => {
               setIsRejecting((current) => !current)
               setError('')
             }}
             disabled={loadingStatus !== null}
-            className="inline-flex items-center gap-2 rounded-2xl bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
           >
-            <X className="h-4 w-4" />
+            <X className="dream-action-icon" />
             Refuser
-          </button>
+          </Button>
         </div>
       ) : null}
 
       {status === 'pending' && isRejecting ? (
-        <div className="rounded-2xl border border-red-100 bg-red-50 p-3 dark:border-red-400/20 dark:bg-red-500/10">
-          <label className="mb-2 block text-sm font-semibold text-red-700 dark:text-red-200">
-            Cause du refus
-          </label>
+        <div className="dream-danger-panel">
+          <label className="dream-danger-label">Cause du refus</label>
           <Textarea
             value={rejectionReason}
             onChange={(event) => setRejectionReason(event.target.value)}
             placeholder="Exemple : indisponibilite exceptionnelle, merci de choisir un autre creneau."
-            className="min-h-24 rounded-2xl border-red-100 bg-white text-dream-heading dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
+            className="dream-field dream-action-textarea"
           />
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
+          <div className="dream-action-row-spaced">
+            <Button
               type="button"
+              variant="destructive"
+              size="pill"
               onClick={handleReject}
               disabled={loadingStatus !== null}
-              className="inline-flex items-center gap-2 rounded-2xl bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
             >
               {loadingStatus === 'rejected' ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="dream-action-icon" />
               ) : (
-                <X className="h-4 w-4" />
+                <X className="dream-action-icon" />
               )}
               Envoyer le refus
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="dreamOutline"
+              size="pill"
               onClick={() => {
                 setIsRejecting(false)
                 setRejectionReason('')
                 setError('')
               }}
               disabled={loadingStatus !== null}
-              className="inline-flex items-center gap-2 rounded-2xl border border-red-100 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.06] dark:text-red-200 dark:hover:bg-white/10"
             >
               Annuler
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}
 
       {status === 'confirmed' ? (
-        <button
+        <Button
           type="button"
+          variant="dream"
+          size="pill"
           onClick={() => updateStatus('completed')}
           disabled={loadingStatus !== null}
-          className="inline-flex items-center gap-2 rounded-2xl bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-600 disabled:opacity-60"
         >
           {loadingStatus === 'completed' ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="dream-action-icon" />
           ) : (
-            <Check className="h-4 w-4" />
+            <Check className="dream-action-icon" />
           )}
           Marquer comme termine
-        </button>
+        </Button>
       ) : null}
 
-      {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
+      {error ? <p className="dream-danger-message">{error}</p> : null}
     </div>
   )
 }

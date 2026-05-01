@@ -93,7 +93,8 @@ function getDateLabel(dateValue: string) {
 }
 
 function getAgendaStatusLabel(day: AgendaDay) {
-  if (day.status === 'available') return `${day.availableSlots} libre${day.availableSlots > 1 ? 's' : ''}`
+  if (day.status === 'available')
+    return `${day.availableSlots} libre${day.availableSlots > 1 ? 's' : ''}`
   if (day.status === 'full') return 'Complet'
   if (day.status === 'weekend') return 'Week-end'
   if (day.status === 'closed') return 'Ferme'
@@ -294,11 +295,14 @@ export function StudentRendezvousPsyForm() {
 
           <div className="p-3.5">
             <div className="grid grid-cols-3 gap-2">
-              {(agendaDays.length > 0 ? agendaDays : agendaDates.map((day) => ({
-                ...day,
-                availableSlots: 0,
-                status: 'closed' as DayStatus,
-              }))).map((day) => {
+              {(agendaDays.length > 0
+                ? agendaDays
+                : agendaDates.map((day) => ({
+                    ...day,
+                    availableSlots: 0,
+                    status: 'closed' as DayStatus,
+                  }))
+              ).map((day) => {
                 const isSelected = selectedDate === day.date
 
                 return (
@@ -394,13 +398,19 @@ export function StudentRendezvousPsyForm() {
                         active ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-700'
                       }`}
                     >
-                      {active ? <CheckCircle2 className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                      {active ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : (
+                        <Clock className="h-4 w-4" />
+                      )}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-lg font-bold">
                         {slot.startTime} - {slot.endTime}
                       </span>
-                      <span className={`mt-1 block text-xs ${active ? 'text-white/75' : 'text-dream-muted'}`}>
+                      <span
+                        className={`mt-1 block text-xs ${active ? 'text-white/75' : 'text-dream-muted'}`}
+                      >
                         Consultation disponible
                       </span>
                     </span>
@@ -411,7 +421,7 @@ export function StudentRendezvousPsyForm() {
                     >
                       {active ? 'Choisi' : 'Libre'}
                     </span>
-                  </button>
+                  </Button>
                 )
               })}
             </div>

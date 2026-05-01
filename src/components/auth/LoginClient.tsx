@@ -1,7 +1,7 @@
 'use client'
 
 import { useSignIn, useSignUp, useUser } from '@clerk/nextjs'
-import { Button } from '@payloadcms/ui'
+import { Button } from '@/components/ui/button'
 import { AlertCircle, CheckCircle2, Loader2, Mail, MailCheck, Moon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -223,9 +223,7 @@ export function LoginClient() {
 
         <div className="my-7 flex items-center gap-4">
           <div className="h-px flex-1 bg-dream-highlight" />
-          <span className="text-xs font-medium uppercase tracking-[0.18em] text-[#9A8BB7]">
-            ou
-          </span>
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-[#9A8BB7]">ou</span>
           <div className="h-px flex-1 bg-dream-highlight/80" />
         </div>
 
@@ -268,12 +266,7 @@ export function LoginClient() {
             </div>
           ) : null}
 
-          <Button
-            variant="dream"
-            size="lg"
-            disabled={isSubmitting || !signIn}
-            type="submit"
-          >
+          <Button variant="dream" size="lg" disabled={isSubmitting || !signIn} type="submit">
             {emailLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (

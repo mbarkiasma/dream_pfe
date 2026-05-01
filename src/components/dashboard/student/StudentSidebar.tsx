@@ -40,22 +40,18 @@ export function StudentSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 flex-col overflow-hidden rounded-[32px] border border-border bg-gradient-to-b from-[#efe4ff]/95 via-[#f8f3ff]/90 to-[#eadcff]/95 p-4 shadow-[0_25px_70px_rgba(109,40,217,0.18)] backdrop-blur-xl dark:border-border dark:bg-[linear-gradient(180deg,rgba(36,18,63,0.95),rgba(20,16,31,0.92),rgba(15,23,42,0.95))] md:flex">
-      <div className="mb-6 flex items-center gap-3 rounded-[24px] border border-border bg-white/65 p-3 shadow-[0_8px_24px_rgba(109,40,217,0.08)] dark:border-border dark:bg-card/70">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_26px_rgba(139,92,246,0.28)]">
-          <MoonStar className="h-5 w-5" />
+    <aside className="dream-sidebar">
+      <div className="dream-sidebar-profile">
+        <div className="dream-sidebar-brand-icon">
+          <MoonStar />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-dream-heading dark:text-foreground">
-            Espace etudiant
-          </p>
-          <p className="truncate text-xs text-[#7a6a99] dark:text-muted-foreground">
-            Dream coaching
-          </p>
+          <p className="dream-sidebar-title">Espace etudiant</p>
+          <p className="dream-sidebar-subtitle">Dream coaching</p>
         </div>
       </div>
 
-      <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+      <nav className="dream-sidebar-nav">
         {navItems.map((item) => {
           const Icon = item.icon
           const active = isActivePath(pathname, item.href)
@@ -65,20 +61,10 @@ export function StudentSidebar() {
               key={item.href}
               href={item.href}
               title={item.title}
-              className={`group flex items-center gap-3 rounded-[20px] border px-3 py-3 text-sm font-medium transition ${
-                active
-                  ? 'border-border bg-white text-dream-heading shadow-[0_12px_30px_rgba(109,40,217,0.16)] dark:border-border dark:bg-accent dark:text-foreground'
-                  : 'border-transparent text-dream-muted hover:border-border hover:bg-card/70 hover:text-dream-heading dark:text-muted-foreground dark:hover:border-border dark:hover:bg-accent dark:hover:text-foreground'
-              }`}
+              className={active ? 'dream-sidebar-link-active' : 'dream-sidebar-link'}
             >
-              <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition ${
-                active
-                  ? 'bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white'
-                    : 'bg-card/70 text-[#8B5CF6] group-hover:bg-dream-highlight dark:bg-background/70 dark:text-foreground dark:group-hover:bg-background'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
+              <span className="dream-sidebar-icon">
+                <Icon />
               </span>
               <span className="truncate">{item.title}</span>
             </Link>
@@ -86,7 +72,7 @@ export function StudentSidebar() {
         })}
       </nav>
 
-      <div className="mt-4 border-t border-border pt-4 dark:border-border">
+      <div className="dream-sidebar-footer">
         <LogoutButton showLabel />
       </div>
     </aside>

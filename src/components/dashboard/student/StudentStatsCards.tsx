@@ -38,7 +38,7 @@ export function StudentStatsCards({
   ]
 
   return (
-    <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="dream-stats-grid-three">
       {stats.map((item) => {
         const Icon = item.icon
 

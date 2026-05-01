@@ -42,18 +42,18 @@ export function CoachSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="dream-panel-bg sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 flex-col overflow-hidden rounded-[32px] border border-border p-4 shadow-dream-card-lg md:flex">
-      <div className="dream-surface mb-6 flex items-center gap-3 rounded-[24px] border p-3 shadow-dream-card">
-        <div className="dream-brand-bg flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-dream-accent-foreground shadow-dream-card">
-          <LifeBuoy className="h-5 w-5" />
+    <aside className="dream-sidebar">
+      <div className="dream-sidebar-profile">
+        <div className="dream-sidebar-brand-icon">
+          <LifeBuoy />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-dream-heading">Espace coach</p>
-          <p className="truncate text-xs text-dream-muted">Accompagnement</p>
+          <p className="dream-sidebar-title">Espace coach</p>
+          <p className="dream-sidebar-subtitle">Accompagnement</p>
         </div>
       </div>
 
-      <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+      <nav className="dream-sidebar-nav">
         {navItems.map((item) => {
           const Icon = item.icon
           const active = isActivePath(pathname, item.href)
@@ -63,20 +63,10 @@ export function CoachSidebar() {
               key={item.href}
               href={item.href}
               title={item.title}
-              className={`group flex items-center gap-3 rounded-[20px] border px-3 py-3 text-sm font-medium ${
-                active
-                  ? 'dream-surface text-dream-heading shadow-dream-card'
-                  : 'border-border/0 text-dream-muted hover:border-border hover:bg-dream-softer hover:text-dream-heading'
-              }`}
+              className={active ? 'dream-sidebar-link-active' : 'dream-sidebar-link'}
             >
-              <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
-                  active
-                    ? 'dream-brand-bg text-dream-accent-foreground'
-                    : 'dream-icon-soft group-hover:bg-dream-highlight'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
+              <span className="dream-sidebar-icon">
+                <Icon />
               </span>
               <span className="truncate">{item.title}</span>
             </Link>
@@ -84,7 +74,7 @@ export function CoachSidebar() {
         })}
       </nav>
 
-      <div className="mt-4 border-t border-border pt-4">
+      <div className="dream-sidebar-footer">
         <LogoutButton showLabel />
       </div>
     </aside>

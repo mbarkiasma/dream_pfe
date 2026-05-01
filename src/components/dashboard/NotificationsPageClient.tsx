@@ -138,16 +138,16 @@ export function NotificationsPageClient() {
 
   return (
     <div>
-      <div className="mb-8 rounded-[30px] border border-border bg-white/60 p-5 shadow-[0_18px_55px_rgba(109,40,217,0.10)] backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_55px_rgba(0,0,0,0.24)] md:p-6">
+      <div className="dream-card-glass mb-8 p-5 md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.22em] text-dream-accent">
               Centre notifications
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-dream-heading dark:text-foreground md:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-dream-heading md:text-4xl">
               Notifications
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-dream-muted dark:text-muted-foreground md:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-dream-muted md:text-base">
               Consultez les nouvelles actions et ouvrez directement la page associee.
             </p>
           </div>
@@ -156,7 +156,7 @@ export function NotificationsPageClient() {
             type="button"
             onClick={() => void markAllAsRead()}
             disabled={unreadCount === 0}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-white px-4 text-sm font-bold text-dream-accent shadow-[0_12px_28px_rgba(109,40,217,0.12)] transition hover:bg-dream-soft disabled:cursor-not-allowed disabled:text-[#C5BADB] dark:border-white/10 dark:bg-white/[0.06] dark:text-violet-200 dark:hover:bg-white/10 dark:disabled:text-muted-foreground"
+            className="dream-icon-button h-11 gap-2 px-4 text-sm font-bold"
           >
             <CheckCheck className="h-5 w-5" />
             Tout marquer comme lu
@@ -164,33 +164,25 @@ export function NotificationsPageClient() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-[28px] border border-border bg-card/75 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-        <div className="flex items-center justify-between border-b border-[#EEE8FF] px-5 py-4 dark:border-white/10">
+      <div className="dream-list-panel">
+        <div className="dream-list-header">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-dream-highlight text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
+            <span className="dream-icon-soft flex h-10 w-10 items-center justify-center rounded-2xl">
               <Bell className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm font-bold text-dream-heading dark:text-foreground">
-                Toutes les notifications
-              </p>
-              <p className="text-xs text-[#7B6B9A] dark:text-muted-foreground">
-                {unreadCount} non lue(s)
-              </p>
+              <p className="text-sm font-bold text-dream-heading">Toutes les notifications</p>
+              <p className="text-xs text-dream-muted">{unreadCount} non lue(s)</p>
             </div>
           </div>
         </div>
 
         {isLoading ? (
-          <p className="px-5 py-6 text-sm text-[#7B6B9A] dark:text-muted-foreground">
-            Chargement...
-          </p>
+          <p className="dream-list-empty">Chargement...</p>
         ) : !hasNotifications ? (
-          <p className="px-5 py-6 text-sm text-[#7B6B9A] dark:text-muted-foreground">
-            Aucune notification pour le moment.
-          </p>
+          <p className="dream-list-empty">Aucune notification pour le moment.</p>
         ) : (
-          <div className="divide-y divide-[#F0EAFB] dark:divide-white/10">
+          <div>
             {sortedNotifications.map((notification) => {
               const isUnread = notification.status === 'unread'
               const typeLabel = notification.type
@@ -202,17 +194,13 @@ export function NotificationsPageClient() {
                   key={notification.id}
                   type="button"
                   onClick={() => void openNotification(notification)}
-                  className={`flex w-full items-start gap-4 px-5 py-4 text-left transition hover:bg-[#FAF7FF] dark:hover:bg-white/10 ${
-                    isUnread
-                      ? 'bg-[#FBF8FF] dark:bg-dream-softer0/10'
-                      : 'bg-white/60 dark:bg-transparent'
+                  className={`dream-notification-row flex items-start gap-4 px-5 py-4 text-left ${
+                    isUnread ? 'dream-notification-row-unread' : ''
                   }`}
                 >
                   <span
                     className={`mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${
-                      isUnread
-                        ? 'bg-[#EEE4FF] text-dream-accent dark:bg-dream-softer0/20 dark:text-violet-200'
-                        : 'bg-[#F6F2FB] text-[#B3A5CB] dark:bg-white/10 dark:text-muted-foreground'
+                      isUnread ? 'dream-notification-dot-unread' : 'dream-notification-dot'
                     }`}
                   >
                     <Circle className={`h-3 w-3 ${isUnread ? 'fill-current' : ''}`} />
@@ -220,23 +208,21 @@ export function NotificationsPageClient() {
 
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-bold text-dream-heading dark:text-foreground">
+                      <span className="text-sm font-bold text-dream-heading">
                         {notification.title}
                       </span>
-                      <span className="rounded-full bg-dream-highlight px-2 py-1 text-[11px] font-bold text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
-                        {typeLabel}
-                      </span>
+                      <span className="dream-badge px-2 py-1 text-xs font-bold">{typeLabel}</span>
                     </span>
-                    <span className="mt-2 block text-sm leading-6 text-dream-muted dark:text-muted-foreground">
+                    <span className="mt-2 block text-sm leading-6 text-dream-muted">
                       {notification.message}
                     </span>
-                    <span className="mt-2 block text-xs font-medium text-[#9B8BB7] dark:text-muted-foreground">
+                    <span className="mt-2 block text-xs font-medium text-dream-muted">
                       {formatDate(notification.createdAt)}
                     </span>
                   </span>
 
                   {notification.link ? (
-                    <ExternalLink className="mt-1 h-4 w-4 shrink-0 text-[#A18BBF] dark:text-muted-foreground" />
+                    <ExternalLink className="mt-1 h-4 w-4 shrink-0 text-dream-muted" />
                   ) : null}
                 </button>
               )

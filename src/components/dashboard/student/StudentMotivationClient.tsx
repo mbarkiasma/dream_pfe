@@ -5,6 +5,7 @@ import { Heart, Megaphone, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 type MotivationAnnouncement = {
   id: string | number
@@ -152,9 +153,7 @@ export function StudentMotivationClient({ announcements }: Props) {
                 >
                   <Heart className="h-3.5 w-3.5" />
 
-                  <span>
-                    {count}
-                  </span>
+                  <span>{count}</span>
                 </Button>
               )
             })()}

@@ -16,6 +16,8 @@ import {
   X,
 } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
+
 type CoachingSession = {
   id: string | number
   title: string
@@ -470,121 +472,89 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   ]
 
   return (
-    <div className="student-coaching grid gap-6 xl:h-[calc(100vh-11rem)] xl:min-h-[640px] xl:grid-cols-[340px_1fr] xl:overflow-hidden">
-      <section className="min-h-0 space-y-5 xl:overflow-y-auto xl:pr-1">
-        <div className="rounded-[32px] border border-border bg-card/80 p-5 shadow-[0_14px_46px_rgba(170,150,230,0.16)] backdrop-blur-md">
-          <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-dream-highlight text-[#8B5CF6] shadow-[0_8px_24px_rgba(109,40,217,0.10)]">
-              <Plus className="h-5 w-5" />
+    <div className="student-coaching-layout">
+      <section className="student-coaching-sidebar">
+        <div className="student-coaching-panel">
+          <div className="student-coaching-header-row">
+            <div className="student-coaching-icon">
+              <Plus />
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-3">
-                <h2 className="text-lg font-semibold text-dream-heading">Nouvel accompagnement</h2>
-                <span className="rounded-full bg-dream-soft px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
-                  {mode === 'smart' ? 'Instantane' : 'Humain'}
-                </span>
+            <div className="student-flex-content">
+              <div className="student-coaching-title-row">
+                <h2 className="student-section-title">Nouvel accompagnement</h2>
+                <span className="dream-badge">{mode === 'smart' ? 'Instantane' : 'Humain'}</span>
               </div>
-              <p className="mt-1 text-sm leading-6 text-[#7a6a99]">
+              <p className="student-coaching-copy">
                 Lancez une session adaptee a votre besoin du moment.
               </p>
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3">
+          <div className="student-choice-grid">
             <button
               type="button"
               onClick={() => setMode('smart')}
-              className={`group relative overflow-hidden rounded-[24px] border p-4 text-left transition ${
-                mode === 'smart'
-                  ? 'border-border bg-gradient-to-br from-[#F3ECFF] to-white text-dream-heading shadow-[0_14px_34px_rgba(109,40,217,0.14)]'
-                  : 'border-border bg-card/70 text-[#4B3F72] hover:border-border hover:bg-white'
-              }`}
+              className={`student-choice-card ${mode === 'smart' ? 'student-choice-card-active' : ''}`}
             >
-              <div className="flex items-center gap-4">
+              <div className="student-choice-content">
                 <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] transition ${
-                    mode === 'smart' ? 'bg-white text-[#8B5CF6]' : 'bg-dream-soft text-[#8B5CF6]'
-                  }`}
+                  className={`student-choice-icon ${mode === 'smart' ? 'student-choice-icon-active' : ''}`}
                 >
-                  <Bot className="h-5 w-5" />
+                  <Bot />
                 </div>
-                <span className="min-w-0 flex-1">
+                <span className="student-flex-content">
                   <span className="block text-sm font-semibold">Smart coach IA</span>
-                  <span className="mt-1 block text-xs leading-5 text-[#7a6a99]">
+                  <span className="student-choice-description">
                     Disponible maintenant, avec voix et reponses courtes.
                   </span>
-                  <span className="mt-2 inline-flex rounded-full bg-card/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
+                  <span className="dream-badge dream-badge-spaced">
                     Stress, motivation, organisation
                   </span>
                 </span>
-                {mode === 'smart' ? (
-                  <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
-                    Choisi
-                  </span>
-                ) : null}
+                {mode === 'smart' ? <span className="dream-badge">Choisi</span> : null}
               </div>
             </button>
 
             <button
               type="button"
               onClick={() => setMode('classic')}
-              className={`group relative overflow-hidden rounded-[24px] border p-4 text-left transition ${
-                mode === 'classic'
-                  ? 'border-border bg-gradient-to-br from-[#F3ECFF] to-white text-dream-heading shadow-[0_14px_34px_rgba(109,40,217,0.14)]'
-                  : 'border-border bg-card/70 text-[#4B3F72] hover:border-border hover:bg-white'
-              }`}
+              className={`student-choice-card ${mode === 'classic' ? 'student-choice-card-active' : ''}`}
             >
-              <div className="flex items-center gap-4">
+              <div className="student-choice-content">
                 <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] transition ${
-                    mode === 'classic' ? 'bg-white text-[#8B5CF6]' : 'bg-dream-soft text-[#8B5CF6]'
-                  }`}
+                  className={`student-choice-icon ${mode === 'classic' ? 'student-choice-icon-active' : ''}`}
                 >
-                  <UserRound className="h-5 w-5" />
+                  <UserRound />
                 </div>
-                <span className="min-w-0 flex-1">
+                <span className="student-flex-content">
                   <span className="block text-sm font-semibold">Coaching classique</span>
-                  <span className="mt-1 block text-xs leading-5 text-[#7a6a99]">
+                  <span className="student-choice-description">
                     Une session suivie par un coach humain.
                   </span>
-                  <span className="mt-2 inline-flex rounded-full bg-card/70 px-2.5 py-1 text-[11px] font-semibold text-[#8B5CF6]">
-                    Suivi personnalise
-                  </span>
+                  <span className="dream-badge dream-badge-spaced">Suivi personnalise</span>
                 </span>
-                {mode === 'classic' ? (
-                  <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
-                    Choisi
-                  </span>
-                ) : null}
+                {mode === 'classic' ? <span className="dream-badge">Choisi</span> : null}
               </div>
             </button>
           </div>
 
           {mode === 'classic' ? (
-            <div className="mt-5 rounded-[24px] border border-border bg-[#FBF8FF] p-4">
-              <div className="flex items-center justify-between gap-3">
+            <div className="student-coach-panel">
+              <div className="student-between-row">
                 <div>
-                  <h3 className="text-sm font-semibold text-dream-heading">Coachs disponibles</h3>
-                  <p className="mt-1 text-xs leading-5 text-[#7a6a99]">
+                  <h3 className="student-subsection-title">Coachs disponibles</h3>
+                  <p className="student-choice-description">
                     Choisissez un coach humain disponible pour commencer la session.
                   </p>
                 </div>
-                {isLoadingCoaches ? (
-                  <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
-                    Chargement
-                  </span>
-                ) : null}
+                {isLoadingCoaches ? <span className="dream-badge">Chargement</span> : null}
               </div>
 
-              <div className="mt-4 space-y-2">
-                {coachesError ? (
-                  <div className="rounded-[20px] border border-rose-100 bg-rose-50/80 p-4 text-sm leading-6 text-rose-700">
-                    {coachesError}
-                  </div>
-                ) : null}
+              <div className="student-list-stack">
+                {coachesError ? <div className="dream-danger-surface">{coachesError}</div> : null}
 
                 {!isLoadingCoaches && availableCoaches.length === 0 ? (
-                  <div className="rounded-[20px] border border-dashed border-border bg-card/80 p-4 text-sm leading-6 text-dream-muted">
+                  <div className="dream-empty-surface">
                     Aucun coach n'est disponible actuellement. Le Smart coach IA reste disponible
                     pour continuer l'accompagnement sans attente.
                     <button
@@ -593,7 +563,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         setMode('smart')
                         setSelectedCoachId(null)
                       }}
-                      className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400 px-4 py-2 text-xs font-semibold text-white"
+                      className="dream-empty-cta"
                     >
                       Utiliser le Smart coach IA
                     </button>
@@ -605,25 +575,21 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     key={coach.id}
                     type="button"
                     onClick={() => setSelectedCoachId(coach.id)}
-                    className={`w-full rounded-[20px] border p-4 text-left transition ${
+                    className={`student-choice-card ${
                       String(selectedCoachId) === String(coach.id)
-                        ? 'border-border bg-white text-dream-heading shadow-[0_12px_28px_rgba(109,40,217,0.12)]'
-                        : 'border-white bg-card/70 text-[#4B3F72] hover:border-border hover:bg-white'
+                        ? 'student-choice-card-active'
+                        : ''
                     }`}
                   >
-                    <span className="flex items-start gap-3">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-dream-highlight text-[#8B5CF6]">
-                        <UserRound className="h-5 w-5" />
+                    <span className="student-media-row">
+                      <span className="student-choice-icon">
+                        <UserRound />
                       </span>
-                      <span className="min-w-0 flex-1">
+                      <span className="student-flex-content">
                         <span className="block truncate text-sm font-semibold">{coach.name}</span>
-                        <span className="mt-1 block text-xs font-medium text-[#8B5CF6]">
-                          {coach.specialty}
-                        </span>
+                        <span className="dream-badge dream-badge-tight">{coach.specialty}</span>
                         {coach.bio ? (
-                          <span className="mt-2 block line-clamp-2 text-xs leading-5 text-[#7a6a99]">
-                            {coach.bio}
-                          </span>
+                          <span className="student-choice-description-clamped">{coach.bio}</span>
                         ) : null}
                       </span>
                     </span>
@@ -633,27 +599,27 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             </div>
           ) : null}
 
-          <button
+          <Button
             type="button"
+            variant="dream"
+            size="pillLg"
             onClick={() => void startSession()}
             disabled={isLoading || isLoadingCoaches || (mode === 'classic' && !selectedCoachId)}
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(139,92,246,0.28)] transition hover:from-violet-600 hover:to-fuchsia-500 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
+            className="student-primary-action"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="dream-action-icon" />
             Demarrer
-          </button>
+          </Button>
         </div>
 
-        <div className="rounded-[28px] border border-border bg-card/80 p-4 shadow-[0_10px_40px_rgba(170,150,230,0.14)] backdrop-blur-md">
-          <div className="flex items-center justify-between gap-3 px-2">
-            <h2 className="text-lg font-semibold text-dream-heading">Mes sessions</h2>
-            <span className="rounded-full bg-dream-soft px-3 py-1 text-[11px] font-semibold text-[#8B5CF6]">
-              {sessions.length}
-            </span>
+        <div className="student-coaching-panel-compact">
+          <div className="student-between-row-inset">
+            <h2 className="student-section-title">Mes sessions</h2>
+            <span className="dream-badge">{sessions.length}</span>
           </div>
-          <div className="mt-4 max-h-[340px] space-y-2 overflow-y-auto pr-1 xl:max-h-[420px]">
+          <div className="student-list-stack">
             {sessions.length === 0 ? (
-              <div className="rounded-[20px] border border-dashed border-border bg-dream-soft p-4 text-sm leading-6 text-[#7a6a99]">
+              <div className="dream-empty-surface-soft">
                 <p className="font-semibold text-dream-heading">Aucune session pour le moment.</p>
                 <p className="mt-1">Demarrez un accompagnement pour retrouver vos échanges ici.</p>
               </div>
@@ -662,25 +628,25 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className={`w-full rounded-[20px] border p-4 text-left transition ${
+                className={`student-choice-card ${
                   String(selectedSessionId) === String(session.id)
-                    ? 'border-border bg-gradient-to-br from-[#F3ECFF] to-[#FDF7FF] text-dream-heading shadow-[0_12px_30px_rgba(109,40,217,0.14)]'
-                    : 'border-border bg-card/70 text-[#4B3F72] hover:border-white hover:bg-white'
+                    ? 'student-choice-card-active'
+                    : ''
                 }`}
               >
                 {String(editingSessionId) === String(session.id) ? (
-                  <div className="space-y-3">
+                  <div className="student-edit-stack">
                     <input
                       value={editingTitle}
                       onChange={(event) => setEditingTitle(event.target.value)}
-                      className="w-full rounded-2xl border border-border bg-white px-3 py-2 text-sm text-dream-heading outline-none focus:border-violet-300"
+                      className="student-edit-input"
                       maxLength={120}
                     />
-                    <div className="flex gap-2">
+                    <div className="student-icon-action-row">
                       <button
                         type="button"
                         onClick={() => void renameSession(session.id)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-softer0 text-white"
+                        className="student-icon-action student-icon-action-md student-icon-action-primary"
                         title="Enregistrer"
                       >
                         <Check className="h-4 w-4" />
@@ -691,7 +657,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                           setEditingSessionId(null)
                           setEditingTitle('')
                         }}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-highlight text-[#7a6a99]"
+                        className="student-icon-action student-icon-action-md student-icon-action-muted"
                         title="Annuler"
                       >
                         <X className="h-4 w-4" />
@@ -699,11 +665,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="student-session-row">
                     <button
                       type="button"
                       onClick={() => setSelectedSessionId(session.id)}
-                      className="min-w-0 flex-1 text-left"
+                      className="student-flex-button-content"
                     >
                       <span className="block truncate text-sm font-semibold">{session.title}</span>
                       <span className="mt-1 block text-xs opacity-75">
@@ -712,14 +678,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       </span>
                     </button>
 
-                    <div className="flex shrink-0 gap-1">
+                    <div className="student-session-actions">
                       <button
                         type="button"
                         onClick={() => {
                           setEditingSessionId(session.id)
                           setEditingTitle(session.title)
                         }}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-card/70 text-current transition hover:bg-white"
+                        className="student-icon-action student-icon-action-sm"
                         title="Renommer"
                       >
                         <Pencil className="h-4 w-4" />
@@ -728,7 +694,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         <button
                           type="button"
                           onClick={() => setSessionToDelete(session)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-card/70 text-current transition hover:bg-rose-500 hover:text-white"
+                          className="student-icon-action student-icon-action-sm student-icon-action-danger"
                           title="Supprimer"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -743,55 +709,51 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         </div>
       </section>
 
-      <section className="flex min-h-[620px] flex-col overflow-hidden rounded-[30px] border border-border bg-gradient-to-b from-white/90 via-[#FDF7FF]/90 to-[#F8F3FF]/90 shadow-[0_25px_70px_rgba(109,40,217,0.16)] backdrop-blur-xl xl:min-h-0">
-        <div className="shrink-0 border-b border-border bg-white/65 p-5">
-          <div className="flex items-center justify-between gap-4">
+      <section className="student-chat-shell">
+        <div className="student-chat-header">
+          <div className="student-chat-header-inner">
             <div>
-              <h2 className="text-xl font-semibold text-dream-heading">
+              <h2 className="student-chat-title">
                 {selectedSession?.title ?? 'Aucune session selectionnee'}
               </h2>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium">
-                <span className="rounded-full bg-dream-highlight px-3 py-1 text-dream-accent">
+              <div className="student-chat-badges">
+                <span className="dream-badge">
                   {selectedSession?.mode === 'smart'
                     ? 'Smart coach IA'
                     : selectedSession
                       ? selectedCoachName
                       : 'Aucune session'}
                 </span>
-                <span className="rounded-full bg-dream-highlight px-3 py-1 text-dream-accent">
+                <span className="dream-badge">
                   {messageCount} message{messageCount > 1 ? 's' : ''}
                 </span>
-                {isLoading ? (
-                  <span className="rounded-full bg-fuchsia-50 px-3 py-1 text-fuchsia-700">
-                    Reponse en cours
-                  </span>
-                ) : null}
+                {isLoading ? <span className="dream-badge">Reponse en cours</span> : null}
                 {selectedSession?.status === 'closed' ? (
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-500">Fermee</span>
+                  <span className="dream-badge-muted rounded-full px-3 py-1">Fermee</span>
                 ) : null}
               </div>
             </div>
-            <div className="rounded-2xl bg-dream-highlight p-3 text-[#8B5CF6]">
-              <MessageCircle className="h-5 w-5" />
+            <div className="student-chat-icon">
+              <MessageCircle />
             </div>
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <div className="student-chat-scroll">
           {messages.length === 0 ? (
-            <div className="rounded-[24px] border border-dashed border-border bg-card/70 p-6 text-sm leading-7 text-dream-muted">
+            <div className="student-chat-empty">
               <p className="font-semibold text-dream-heading">Commencez simplement.</p>
               <p className="mt-1">
                 Ecrivez votre besoin actuel ou choisissez une suggestion pour lancer la discussion.
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="dream-action-row mt-4">
                 {suggestedPrompts.map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
                     onClick={() => setMessage(prompt)}
                     disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-                    className="rounded-full border border-border bg-white px-3 py-2 text-xs font-semibold text-dream-accent transition hover:bg-dream-soft disabled:cursor-not-allowed disabled:opacity-50"
+                    className="dream-badge border"
                   >
                     {prompt}
                   </button>
@@ -806,289 +768,226 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             const multipleChoice = parseMultipleChoice(item.content)
             const selectedChoices = selectedChoicesByMessage[String(item.id)] ?? []
 
-            return (
-              <div key={item.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[88%] rounded-[24px] px-4 py-3 shadow-sm md:max-w-[78%] ${
-                    isMine
-                      ? 'bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_28px_rgba(139,92,246,0.24)]'
-                      : 'border border-border bg-card/85 text-[#4B3F72] shadow-[0_8px_24px_rgba(109,40,217,0.08)]'
-                  }`}
-                >
-                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] opacity-60">
-                    {item.senderRole === 'ai'
-                      ? 'Smart coach'
-                      : item.senderRole === 'coach'
-                        ? 'Coach'
-                        : 'Vous'}
-                  </p>
-                  {isEditingMessage ? (
-                    <div className="space-y-3">
-                      <textarea
-                        value={editingMessageContent}
-                        onChange={(event) => setEditingMessageContent(event.target.value)}
-                        rows={4}
-                        className="min-h-[104px] w-full resize-none rounded-2xl border border-border bg-white px-3 py-2 text-sm leading-6 text-dream-heading outline-none focus:border-violet-300"
-                      />
-                      <div className="flex justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => void updateMessage(item.id)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-softer0 text-white"
-                          title="Enregistrer"
-                        >
-                          <Check className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingMessageId(null)
-                            setEditingMessageContent('')
-                          }}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-dream-highlight text-[#7a6a99]"
-                          title="Annuler"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="whitespace-pre-wrap text-sm leading-7">
-                        {multipleChoice?.prompt || item.content}
-                      </p>
-                      {!isMine && multipleChoice ? (
-                        <div className="mt-4 space-y-2">
-                          {multipleChoice.choices.map((choice) => {
-                            const checked = selectedChoices.includes(choice.label)
+           return (
+  <div
+    key={item.id}
+    className={isMine ? 'student-message-row-mine' : 'student-message-row-assistant'}
+  >
+    <div
+      className={`student-message-bubble ${
+        isMine ? 'student-message-bubble-mine' : 'student-message-bubble-assistant'
+      }`}
+    >
+      <p className="student-message-meta">
+        {item.senderRole === 'ai'
+          ? 'Smart coach'
+          : item.senderRole === 'coach'
+            ? 'Coach'
+            : 'Vous'}
+      </p>
 
-                            return (
-                              <label
-                                key={choice.label}
-                                className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card/90 px-3 py-2 text-sm text-[#4B3F72] transition hover:bg-dream-soft"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  onChange={(event) => {
-                                    setSelectedChoicesByMessage((current) => {
-                                      const currentValues = current[String(item.id)] ?? []
-                                      const nextValues = event.target.checked
-                                        ? [...currentValues, choice.label]
-                                        : currentValues.filter((value) => value !== choice.label)
-
-                                      return {
-                                        ...current,
-                                        [String(item.id)]: nextValues,
-                                      }
-                                    })
-                                  }}
-                                  className="mt-1 h-4 w-4 rounded border-slate-300"
-                                />
-                                <span>
-                                  <span className="font-semibold">{choice.label}.</span>{' '}
-                                  {choice.text}
-                                </span>
-                              </label>
-                            )
-                          })}
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void sendSelectedChoices(item.id, multipleChoice.choices)
-                            }
-                            disabled={selectedChoices.length === 0 || isLoading}
-                            className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400 px-4 py-2 text-xs font-semibold text-white transition hover:from-violet-600 hover:to-fuchsia-500 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300"
-                          >
-                            Envoyer mon choix
-                          </button>
-                        </div>
-                      ) : null}
-                      {isMine ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingMessageId(item.id)
-                            setEditingMessageContent(item.content)
-                          }}
-                          className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium opacity-80 transition hover:opacity-100"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                          Modifier
-                        </button>
-                      ) : null}
-                    </>
-                  )}
-                  {item.senderRole !== 'student' ? (
-                    <button
-                      type="button"
-                      onClick={() => void playText(item.content)}
-                      className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium opacity-80 transition hover:opacity-100"
-                    >
-                      <Volume2 className="h-3.5 w-3.5" />
-                      Ecouter
-                    </button>
-                  ) : null}
-                </div>
-              </div>
-            )
-          })}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <div className="shrink-0 border-t border-border bg-card/85 p-4 backdrop-blur">
-          {statusMessage ? (
-            <p className="mb-3 rounded-2xl border border-border bg-dream-soft px-4 py-3 text-sm text-dream-muted">
-              {statusMessage}
-            </p>
-          ) : null}
-          <div className="flex items-end gap-2 md:gap-3">
+      {isEditingMessage ? (
+        <div className="student-edit-stack">
+          <textarea
+            value={editingMessageContent}
+            onChange={(event) => setEditingMessageContent(event.target.value)}
+            rows={4}
+            className="student-message-edit-textarea"
+          />
+          <div className="student-icon-action-row-end">
             <button
               type="button"
-              onClick={() => void toggleRecording()}
-              disabled={!selectedSessionId || isLoading}
-              className={`inline-flex h-[84px] w-[56px] shrink-0 items-center justify-center rounded-[20px] transition disabled:cursor-not-allowed disabled:bg-slate-300 md:h-[92px] md:w-[64px] ${
-                isRecording
-                  ? 'bg-rose-500 text-white hover:bg-rose-600'
-                  : 'bg-dream-highlight text-[#8B5CF6] hover:bg-[#eadcff]'
-              }`}
-              title={isRecording ? 'Arreter' : 'Dicter'}
+              onClick={() => void updateMessage(item.id)}
+              className="student-icon-action student-icon-action-md student-icon-action-primary"
+              title="Enregistrer"
             >
-              {isRecording ? <Square className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              <Check />
             </button>
-            <textarea
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                  event.preventDefault()
-                  void sendMessage()
-                }
+            <button
+              type="button"
+              onClick={() => {
+                setEditingMessageId(null)
+                setEditingMessageContent('')
               }}
-              disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-              rows={3}
-              placeholder={
-                selectedSessionId
-                  ? 'Ecrivez votre message...'
-                  : 'Demarrez ou selectionnez une session pour ecrire.'
-              }
-              className="min-h-[84px] flex-1 resize-none rounded-[20px] border border-border bg-card/80 px-4 py-3 text-sm leading-6 text-[#4B3F72] outline-none transition placeholder:text-[#9b8bbd] focus:border-violet-300 disabled:cursor-not-allowed disabled:bg-slate-100 md:min-h-[92px]"
-            />
-            <button
-              type="button"
-              onClick={() => void sendMessage()}
-              disabled={!message.trim() || !selectedSessionId || isLoading}
-              className="inline-flex h-[84px] w-[64px] shrink-0 items-center justify-center rounded-[20px] bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_10px_30px_rgba(139,92,246,0.28)] transition hover:from-violet-600 hover:to-fuchsia-500 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none md:h-[92px] md:w-[92px]"
-              title="Envoyer"
+              className="student-icon-action student-icon-action-md student-icon-action-muted"
+              title="Annuler"
             >
-              <Send className="h-5 w-5" />
+              <X />
             </button>
           </div>
-          <div className="mt-3 flex items-center justify-between px-1 text-xs text-slate-400">
-            <span>Entree pour envoyer, Shift+Entree pour une nouvelle ligne.</span>
-            <span>{message.trim().length} caracteres</span>
-          </div>
         </div>
-      </section>
-      {sessionToDelete ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-white p-6 shadow-[0_30px_90px_rgba(109,40,217,0.24)]">
-            <div className="flex items-start gap-4">
-              <div className="rounded-2xl bg-rose-50 p-3 text-rose-600">
-                <Trash2 className="h-5 w-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="text-lg font-semibold text-dream-heading">Supprimer la session ?</h3>
-                <p className="mt-2 text-sm leading-6 text-[#7a6a99]">
-                  Cette action supprimera aussi les messages de cette session. Elle ne pourra pas
-                  etre annulee.
-                </p>
-                <p className="mt-3 truncate rounded-2xl bg-dream-soft px-3 py-2 text-sm font-medium text-[#4B3F72]">
-                  {sessionToDelete.title}
-                </p>
-              </div>
-            </div>
+      ) : (
+        <>
+          <p className="student-message-content">{multipleChoice?.prompt || item.content}</p>
 
-            <div className="mt-6 flex justify-end gap-3">
+          {!isMine && multipleChoice ? (
+            <div className="student-multiple-choice-stack">
+              {multipleChoice.choices.map((choice) => {
+                const checked = selectedChoices.includes(choice.label)
+
+                return (
+                  <label key={choice.label} className="student-choice-option">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(event) => {
+                        setSelectedChoicesByMessage((current) => {
+                          const currentValues = current[String(item.id)] ?? []
+                          const nextValues = event.target.checked
+                            ? [...currentValues, choice.label]
+                            : currentValues.filter((value) => value !== choice.label)
+
+                          return {
+                            ...current,
+                            [String(item.id)]: nextValues,
+                          }
+                        })
+                      }}
+                      className="student-choice-checkbox"
+                    />
+                    <span>
+                      <span className="font-semibold">{choice.label}.</span> {choice.text}
+                    </span>
+                  </label>
+                )
+              })}
+
               <button
                 type="button"
-                onClick={() => setSessionToDelete(null)}
-                className="rounded-2xl border border-border bg-white px-4 py-2 text-sm font-semibold text-[#4B3F72] transition hover:bg-dream-soft"
+                onClick={() => void sendSelectedChoices(item.id, multipleChoice.choices)}
+                disabled={selectedChoices.length === 0 || isLoading}
+                className="student-choice-submit"
               >
-                Annuler
-              </button>
-              <button
-                type="button"
-                onClick={() => void deleteSession(sessionToDelete.id)}
-                disabled={isLoading}
-                className="rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                Supprimer
+                Envoyer mon choix
               </button>
             </div>
-          </div>
-        </div>
+          ) : null}
+
+          {isMine ? (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingMessageId(item.id)
+                setEditingMessageContent(item.content)
+              }}
+              className="student-message-action"
+            >
+              <Pencil />
+              Modifier
+            </button>
+          ) : null}
+        </>
+      )}
+
+      {item.senderRole !== 'student' ? (
+        <button
+          type="button"
+          onClick={() => void playText(item.content)}
+          className="student-message-action"
+        >
+          <Volume2 />
+          Ecouter
+        </button>
       ) : null}
     </div>
-  )
-}
+  </div>
+)
+})}
+<div ref={messagesEndRef} />
+</div>
 
-function convertBlobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
+<div className="student-chat-composer">
+  {statusMessage ? <p className="student-status-message">{statusMessage}</p> : null}
 
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result)
-      } else {
-        reject(new Error('Conversion audio impossible.'))
+  <div className="student-composer-row">
+    <button
+      type="button"
+      onClick={() => void toggleRecording()}
+      disabled={!selectedSessionId || isLoading}
+      className={`student-recorder-button ${
+        isRecording ? 'student-recorder-button-recording' : 'student-recorder-button-idle'
+      }`}
+      title={isRecording ? 'Arreter' : 'Dicter'}
+    >
+      {isRecording ? <Square /> : <Mic />}
+    </button>
+
+    <textarea
+      value={message}
+      onChange={(event) => setMessage(event.target.value)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault()
+          void sendMessage()
+        }
+      }}
+      disabled={!selectedSessionId || selectedSession?.status === 'closed'}
+      rows={3}
+      placeholder={
+        selectedSessionId
+          ? 'Ecrivez votre message...'
+          : 'Demarrez ou selectionnez une session pour ecrire.'
       }
-    }
+      className="student-composer-textarea"
+    />
 
-    reader.onerror = () => reject(new Error('Lecture audio impossible.'))
-    reader.readAsDataURL(blob)
-  })
-}
+    <button
+      type="button"
+      onClick={() => void sendMessage()}
+      disabled={!message.trim() || !selectedSessionId || isLoading}
+      className="student-send-button"
+      title="Envoyer"
+    >
+      <Send />
+    </button>
+  </div>
 
-type MultipleChoiceOption = {
-  label: string
-  text: string
-}
+  <div className="student-composer-footer">
+    <span>Entree pour envoyer, Shift+Entree pour une nouvelle ligne.</span>
+    <span>{message.trim().length} caracteres</span>
+  </div>
+</div>
+</section>
 
-function parseMultipleChoice(
-  content: string,
-): { choices: MultipleChoiceOption[]; prompt: string } | null {
-  const lines = content.split('\n')
-  const choices: MultipleChoiceOption[] = []
-  const promptLines: string[] = []
+{sessionToDelete ? (
+  <div className="dream-modal-backdrop">
+    <div className="student-delete-modal-card">
+      <div className="student-media-row">
+        <div className="student-delete-modal-icon">
+          <Trash2 />
+        </div>
 
-  for (const line of lines) {
-    const match = line.trim().match(/^([A-D])[.)]\s+(.+)$/i)
+        <div className="student-flex-content">
+          <h3 className="student-section-title">Supprimer la session ?</h3>
+          <p className="student-delete-modal-text">
+            Cette action supprimera aussi les messages de cette session. Elle ne pourra pas etre
+            annulee.
+          </p>
+          <p className="student-delete-modal-preview">{sessionToDelete.title}</p>
+        </div>
+      </div>
 
-    if (match) {
-      choices.push({
-        label: match[1].toUpperCase(),
-        text: match[2].trim(),
-      })
-    } else {
-      promptLines.push(line)
-    }
-  }
+      <div className="student-modal-actions">
+        <button
+          type="button"
+          onClick={() => setSessionToDelete(null)}
+          className="student-modal-cancel"
+        >
+          Annuler
+        </button>
 
-  if (choices.length < 2) {
-    return null
-  }
-
-  return {
-    choices,
-    prompt: promptLines.join('\n').trim(),
-  }
-}
-
-function getCoachName(session: CoachingSession | null | undefined): string {
-  const coach = session?.coach
-  const fullName = `${coach?.firstName ?? ''} ${coach?.lastName ?? ''}`.trim()
-
-  return fullName || coach?.email || 'Coach humain'
+        <button
+          type="button"
+          onClick={() => void deleteSession(sessionToDelete.id)}
+          disabled={isLoading}
+          className="student-modal-delete"
+        >
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+) : null}
+</div>
+)
 }

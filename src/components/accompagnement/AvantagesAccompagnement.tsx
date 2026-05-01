@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 const avantages = [
   {
@@ -25,14 +26,15 @@ export function AvantagesAccompagnement() {
   return (
     <section className="mx-auto max-w-7xl px-6 py-10">
       <div className="mb-10 text-center">
-        <h2 className="text-3xl font-bold text-[#3d1f71] sm:text-4xl">
-          Comment ça marche
-        </h2>
+        <h2 className="text-3xl font-bold text-[#3d1f71] sm:text-4xl">Comment ça marche</h2>
       </div>
 
       <div className="grid gap-5 md:grid-cols-3">
         {avantages.map((avantage) => (
-          <Card key={avantage.titre} className="rounded-[28px] border border-border bg-card/85 p-6 shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]">
+          <Card
+            key={avantage.titre}
+            className="rounded-[28px] border border-border bg-card/85 p-6 shadow-[0_18px_45px_rgba(131,110,181,0.12)] backdrop-blur-[10px]"
+          >
             <CardContent className="p-0">
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#8c90ff] text-white">
                 ✓
@@ -50,7 +52,10 @@ export function AvantagesAccompagnement() {
 
       <div className="mt-10 grid gap-5 md:grid-cols-3">
         {temoignages.map((temoignage, index) => (
-          <Card key={index} className="rounded-[28px] border border-border bg-[#f8f2ff]/80 p-6 shadow-[0_12px_30px_rgba(131,110,181,0.08)] backdrop-blur-[10px]">
+          <Card
+            key={index}
+            className="rounded-[28px] border border-border bg-[#f8f2ff]/80 p-6 shadow-[0_12px_30px_rgba(131,110,181,0.08)] backdrop-blur-[10px]"
+          >
             <CardContent className="p-0 text-[#5c4e7f]">
               <p className="text-sm leading-8">{temoignage}</p>
             </CardContent>

@@ -165,31 +165,27 @@ export function NotificationBell() {
         aria-label="Notifications"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
-        className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card/80 text-[#4B2A82] shadow-[0_12px_28px_rgba(109,40,217,0.14)] transition hover:bg-white dark:border-border dark:bg-background/80 dark:text-foreground dark:hover:bg-accent"
+        className="dream-icon-button relative h-11 w-11"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#FF4D6D] px-1.5 text-[11px] font-bold text-white">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
+          <span className="dream-icon-button-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
         ) : null}
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 z-[100] mt-3 w-[min(92vw,380px)] overflow-hidden rounded-2xl border border-border bg-white shadow-[0_24px_70px_rgba(45,16,104,0.20)] dark:border-border dark:bg-card">
-          <div className="flex items-center justify-between border-b border-[#EEE8FF] px-4 py-3 dark:border-border">
+        <div className="dream-popover absolute right-0 z-[100] mt-3 w-[min(92vw,380px)]">
+          <div className="dream-popover-header">
             <div>
-              <p className="text-sm font-bold text-dream-heading dark:text-foreground">Notifications</p>
-              <p className="text-xs text-[#7B6B9A] dark:text-muted-foreground">
-                {unreadCount} non lue(s)
-              </p>
+              <p className="text-sm font-bold text-dream-heading">Notifications</p>
+              <p className="text-xs text-dream-muted">{unreadCount} non lue(s)</p>
             </div>
 
             <button
               type="button"
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-dream-accent transition hover:bg-[#F4EFFF] disabled:cursor-not-allowed disabled:text-[#C5BADB] dark:text-foreground dark:hover:bg-accent dark:disabled:text-muted-foreground"
+              className="dream-icon-button h-9 w-9"
               aria-label="Tout marquer comme lu"
             >
               <CheckCheck className="h-5 w-5" />
@@ -198,26 +194,24 @@ export function NotificationBell() {
 
           <div className="max-h-[420px] overflow-y-auto">
             {isLoading ? (
-              <p className="px-4 py-5 text-sm text-[#7B6B9A] dark:text-muted-foreground">
-                Chargement...
-              </p>
+              <p className="dream-list-empty">Chargement...</p>
             ) : latestNotifications.length === 0 ? (
-              <p className="px-4 py-5 text-sm text-[#7B6B9A] dark:text-muted-foreground">
-                Aucune notification.
-              </p>
+              <p className="dream-list-empty">Aucune notification.</p>
             ) : (
               latestNotifications.map((notification) => {
                 const createdAt = formatDate(notification.createdAt)
                 const content = (
                   <div
-                    className={`border-b border-[#F0EAFB] px-4 py-3 transition hover:bg-[#FAF7FF] dark:border-border dark:hover:bg-accent ${
-                      notification.status === 'unread' ? 'bg-[#FBF8FF]' : 'bg-white'
-                    } dark:bg-card`}
+                    className={`dream-notification-row px-4 py-3 ${
+                      notification.status === 'unread' ? 'dream-notification-row-unread' : ''
+                    }`}
                   >
                     <div className="flex gap-3">
                       <span
                         className={`mt-1 h-2.5 w-2.5 rounded-full ${
-                          notification.status === 'unread' ? 'bg-[#9B6BFF]' : 'bg-[#D8CDEF]'
+                          notification.status === 'unread'
+                            ? 'dream-notification-dot-unread'
+                            : 'dream-notification-dot'
                         }`}
                       />
                       <div className="min-w-0 flex-1">
@@ -228,9 +222,7 @@ export function NotificationBell() {
                           {notification.message}
                         </p>
                         {createdAt ? (
-                          <p className="mt-2 text-[11px] font-medium text-[#9B8BB7] dark:text-muted-foreground">
-                            {createdAt}
-                          </p>
+                          <p className="mt-2 text-xs font-medium text-dream-muted">{createdAt}</p>
                         ) : null}
                       </div>
                     </div>
