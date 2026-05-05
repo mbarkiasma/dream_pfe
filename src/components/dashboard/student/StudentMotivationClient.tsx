@@ -87,54 +87,46 @@ export function StudentMotivationClient({ announcements }: Props) {
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="student-motivation-root">
       {announcements.length === 0 ? (
-        <Card className="rounded-[28px] border border-dashed border-slate-200 bg-card/70 shadow-none dark:border-white/10 dark:bg-white/[0.04]">
-          <CardContent className="p-8 text-center text-sm leading-7 text-[#7A6A99] dark:text-muted-foreground">
+        <Card className="student-motivation-empty-card">
+          <CardContent className="student-motivation-empty-content">
             Aucune annonce de motivation n'est disponible pour le moment.
           </CardContent>
         </Card>
       ) : null}
 
       {announcements.map((announcement) => (
-        <article
-          key={announcement.id}
-          className="group rounded-[30px] border border-border bg-card/85 p-5 shadow-[0_16px_50px_rgba(148,163,184,0.12)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(109,40,217,0.16)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:hover:bg-white/[0.08]"
-        >
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="flex gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-dream-highlight text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
-                <Megaphone className="h-5 w-5" />
+        <article key={announcement.id} className="student-motivation-card">
+          <div className="student-motivation-header">
+            <div className="student-motivation-heading">
+              <div className="student-motivation-icon">
+                <Megaphone />
               </div>
 
               <div>
-                <h2 className="text-xl font-semibold text-dream-heading dark:text-foreground">
-                  {announcement.title}
-                </h2>
-                <p className="mt-2 text-sm text-[#7A6A99] dark:text-muted-foreground">
+                <h2 className="student-motivation-title">{announcement.title}</h2>
+                <p className="student-motivation-meta">
                   Publiee par {getAuthorName(announcement.author)} -{' '}
                   {formatDate(announcement.publishedAt || announcement.createdAt)}
                 </p>
               </div>
             </div>
 
-            <span className="w-fit rounded-full bg-dream-highlight px-3 py-1 text-xs font-semibold text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
-              Motivation
-            </span>
+            <span className="student-motivation-badge">Motivation</span>
           </div>
 
-          <div className="mt-5 rounded-[24px] border border-border bg-white/60 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-            <p className="line-clamp-4 whitespace-pre-line text-sm leading-8 text-dream-muted dark:text-muted-foreground">
-              {announcement.content}
-            </p>
+          <div className="student-motivation-content-box">
+            <p className="student-motivation-text">{announcement.content}</p>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="student-motivation-actions">
             <Button
               type="button"
               onClick={() => setSelectedAnnouncement(announcement)}
               variant="dreamGhost"
               size="xs"
+              className="student-motivation-action-button"
             >
               Voir plus
             </Button>
@@ -150,9 +142,13 @@ export function StudentMotivationClient({ announcements }: Props) {
                   disabled={pendingReactionId === announcement.id}
                   variant={isActive ? 'success' : 'dreamGhost'}
                   size="xs"
+                  className={
+                    isActive
+                      ? 'student-motivation-like-button student-motivation-like-button-active'
+                      : 'student-motivation-like-button'
+                  }
                 >
-                  <Heart className="h-3.5 w-3.5" />
-
+                  <Heart />
                   <span>{count}</span>
                 </Button>
               )
@@ -161,33 +157,27 @@ export function StudentMotivationClient({ announcements }: Props) {
         </article>
       ))}
 
-      {error ? (
-        <p className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-400/20 dark:bg-rose-500/10 dark:text-rose-200">
-          {error}
-        </p>
-      ) : null}
+      {error ? <p className="student-motivation-error">{error}</p> : null}
 
       {selectedAnnouncement ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d1068]/35 px-4 py-6 backdrop-blur-md dark:bg-black/55"
+          className="mindly-modal-backdrop"
           role="dialog"
           aria-modal="true"
           onClick={() => setSelectedAnnouncement(null)}
         >
           <div
-            className="relative flex max-h-[86vh] w-full max-w-3xl flex-col overflow-hidden rounded-[34px] border border-border bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_52%,#F3ECFF_100%)] shadow-dream-card-lg dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_34px_110px_rgba(0,0,0,0.45)]"
+            className="student-motivation-modal-panel"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="border-b border-border px-6 py-5 dark:border-white/10 md:px-7">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-dream-accent">
-                    Motivation
-                  </p>
-                  <h3 className="mt-2 line-clamp-2 text-2xl font-bold tracking-[-0.03em] text-dream-heading dark:text-foreground">
+            <div className="student-motivation-modal-header">
+              <div className="student-motivation-modal-heading">
+                <div>
+                  <p className="student-motivation-modal-label">Motivation</p>
+                  <h3 className="student-motivation-modal-title">
                     {selectedAnnouncement.title}
                   </h3>
-                  <p className="mt-2 text-sm font-medium text-[#7A6A99] dark:text-muted-foreground">
+                  <p className="student-motivation-modal-meta">
                     Publiee par {getAuthorName(selectedAnnouncement.author)} -{' '}
                     {formatDate(selectedAnnouncement.publishedAt || selectedAnnouncement.createdAt)}
                   </p>
@@ -196,27 +186,25 @@ export function StudentMotivationClient({ announcements }: Props) {
                 <button
                   type="button"
                   onClick={() => setSelectedAnnouncement(null)}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card/80 text-dream-accent shadow-dream-card transition hover:bg-white hover:text-rose-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:hover:bg-white/10 dark:hover:text-rose-300"
+                  className="student-motivation-modal-close"
                   aria-label="Fermer l'annonce"
                 >
-                  <X className="h-5 w-5" />
+                  <X />
                 </button>
               </div>
             </div>
 
-            <div className="min-h-0 overflow-y-auto px-6 py-5 md:px-7">
-              <div className="rounded-[26px] border border-border bg-card/75 p-5 shadow-dream-card dark:border-white/10 dark:bg-white/[0.06]">
-                <p className="whitespace-pre-line text-sm leading-8 text-[#4B3F72] dark:text-muted-foreground md:text-base">
-                  {selectedAnnouncement.content}
-                </p>
+            <div className="student-motivation-modal-body">
+              <div className="student-motivation-modal-content">
+                <p className="student-motivation-modal-text">{selectedAnnouncement.content}</p>
               </div>
             </div>
 
-            <div className="border-t border-border bg-white/45 px-6 py-4 dark:border-white/10 dark:bg-white/[0.04] md:px-7">
+            <div className="student-motivation-modal-footer">
               <button
                 type="button"
                 onClick={() => setSelectedAnnouncement(null)}
-                className="w-full rounded-full dream-brand-bg px-5 py-3 text-sm font-semibold text-white shadow-dream-card transition hover:brightness-105 sm:w-auto"
+                className="student-motivation-modal-main-button"
               >
                 Fermer
               </button>

@@ -102,19 +102,11 @@ function getAgendaStatusLabel(day: AgendaDay) {
 }
 
 function getAgendaStatusClass(day: AgendaDay, isSelected: boolean) {
-  if (isSelected) {
-    return 'border-violet-500 bg-dream-accent text-white shadow-[0_16px_34px_rgba(109,40,217,0.26)]'
-  }
+  if (isSelected) return 'student-psy-day-active'
+  if (day.status === 'available') return 'student-psy-day-available'
+  if (day.status === 'full') return 'student-psy-day-full'
 
-  if (day.status === 'available') {
-    return 'border-emerald-100 bg-emerald-50 text-emerald-800 hover:border-emerald-300 hover:bg-emerald-100'
-  }
-
-  if (day.status === 'full') {
-    return 'border-red-100 bg-red-50 text-red-700'
-  }
-
-  return 'border-slate-100 bg-slate-50 text-slate-500'
+  return 'student-psy-day-closed'
 }
 
 export function StudentRendezvousPsyForm() {
@@ -276,25 +268,23 @@ export function StudentRendezvousPsyForm() {
   const selectedAgendaDay = agendaDays.find((day) => day.date === selectedDate)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-4 lg:grid-cols-[330px_1fr]">
-        <section className="overflow-hidden rounded-[22px] border border-border bg-card/85 shadow-[0_14px_40px_rgba(109,40,217,0.08)] dark:border-white/10 dark:bg-white/[0.05]">
-          <div className="dream-brand-bg p-3.5 text-white">
-            <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-white/18 p-2">
-                <CalendarDays className="h-4 w-4" />
+    <form onSubmit={handleSubmit} className="student-psy-form">
+      <div className="student-psy-grid">
+        <section className="student-psy-card">
+          <div className="student-psy-card-header">
+            <div className="student-psy-card-header-row">
+              <div className="student-psy-card-header-icon">
+                <CalendarDays />
               </div>
               <div>
-                <p className="text-[13px] font-semibold uppercase tracking-[0.18em] text-white/75">
-                  Agenda
-                </p>
-                <p className="mt-0.5 text-xl font-bold">Prochains jours</p>
+                <p className="student-psy-card-label">Agenda</p>
+                <p className="student-psy-card-title">Prochains jours</p>
               </div>
             </div>
           </div>
 
-          <div className="p-3.5">
-            <div className="grid grid-cols-3 gap-2">
+          <div className="student-psy-card-body">
+            <div className="student-psy-days-grid">
               {(agendaDays.length > 0
                 ? agendaDays
                 : agendaDates.map((day) => ({
@@ -310,36 +300,19 @@ export function StudentRendezvousPsyForm() {
                     key={day.date}
                     type="button"
                     onClick={() => setSelectedDate(day.date)}
-                    variant={isSelected ? 'slotActive' : 'slot'}
-                    size="cardSm"
+                    className={`student-psy-day-button ${getAgendaStatusClass(day, isSelected)}`}
                   >
-                    <span className="block text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
-                      {day.dayName}
-                    </span>
-                    <span className="mt-1 block text-2xl font-black leading-none">
-                      {day.dayNumber}
-                    </span>
-                    <span className="mt-1 block text-[11px] font-semibold uppercase opacity-70">
-                      {day.monthName}
-                    </span>
-                    <span
-                      className={`mt-1.5 inline-flex rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                        isSelected
-                          ? 'bg-white/20 text-white'
-                          : day.status === 'available'
-                            ? 'bg-card/70 text-emerald-700'
-                            : 'bg-card/70 text-slate-500'
-                      }`}
-                    >
-                      {getAgendaStatusLabel(day)}
-                    </span>
+                    <span className="student-psy-day-name">{day.dayName}</span>
+                    <span className="student-psy-day-number">{day.dayNumber}</span>
+                    <span className="student-psy-day-month">{day.monthName}</span>
+                    <span className="student-psy-day-badge">{getAgendaStatusLabel(day)}</span>
                   </Button>
                 )
               })}
             </div>
 
-            <div className="mt-3 space-y-2">
-              <Label htmlFor="appointment-date" className="text-dream-heading dark:text-foreground">
+            <div className="student-psy-field student-psy-field-spaced">
+              <Label htmlFor="appointment-date" className="student-psy-label">
                 Autre date
               </Label>
               <Input
@@ -348,23 +321,21 @@ export function StudentRendezvousPsyForm() {
                 onChange={(event) => setSelectedDate(event.target.value)}
                 type="date"
                 value={selectedDate}
-                className="h-10 rounded-xl border-border bg-white text-dream-heading shadow-inner dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground"
+                className="student-psy-input"
               />
             </div>
           </div>
         </section>
 
-        <section className="rounded-[22px] border border-border bg-card/85 p-3.5 shadow-[0_14px_40px_rgba(109,40,217,0.08)] dark:border-white/10 dark:bg-white/[0.05]">
-          <div className="mb-3 flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-emerald-100 p-2.5 dark:bg-emerald-500/15">
-                <Clock className="h-4 w-4 text-emerald-600" />
+        <section className="student-psy-slots-card">
+          <div className="student-psy-slots-header">
+            <div className="student-psy-slots-title-row">
+              <div className="student-psy-slots-icon">
+                <Clock />
               </div>
               <div>
-                <p className="text-lg font-bold capitalize text-dream-heading dark:text-foreground">
-                  {getDateLabel(selectedDate)}
-                </p>
-                <p className="text-[15px] text-[#7A6A99] dark:text-muted-foreground">
+                <p className="student-psy-selected-date">{getDateLabel(selectedDate)}</p>
+                <p className="student-psy-selected-count">
                   {selectedAgendaDay
                     ? getAgendaStatusLabel(selectedAgendaDay)
                     : availableSlots.length > 0
@@ -376,12 +347,12 @@ export function StudentRendezvousPsyForm() {
           </div>
 
           {isLoadingDay ? (
-            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-dream-muted dark:bg-white/[0.05] dark:text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin text-dream-accent" />
+            <div className="student-psy-loading">
+              <Loader2 className="animate-spin" />
               Chargement des horaires...
             </div>
           ) : availableSlots.length > 0 ? (
-            <div className="relative space-y-3 before:absolute before:bottom-4 before:left-[22px] before:top-4 before:w-px before:bg-dream-highlight dark:before:bg-white/10">
+            <div className="student-psy-slots-list">
               {availableSlots.map((slot) => {
                 const active = startTime === slot.startTime
 
@@ -390,57 +361,38 @@ export function StudentRendezvousPsyForm() {
                     key={`${slot.startTime}-${slot.endTime}`}
                     type="button"
                     onClick={() => setStartTime(slot.startTime)}
-                    variant={active ? 'slotActive' : 'slot'}
-                    size="cardSm"
+                    className={`student-psy-slot-button ${active ? 'student-psy-slot-active' : ''}`}
                   >
-                    <span
-                      className={`z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                        active ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-700'
-                      }`}
-                    >
-                      {active ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        <Clock className="h-4 w-4" />
-                      )}
+                    <span className="student-psy-slot-icon">
+                      {active ? <CheckCircle2 /> : <Clock />}
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-lg font-bold">
+
+                    <span className="student-psy-slot-content">
+                      <span className="student-psy-slot-time">
                         {slot.startTime} - {slot.endTime}
                       </span>
-                      <span
-                        className={`mt-1 block text-xs ${active ? 'text-white/75' : 'text-dream-muted'}`}
-                      >
-                        Consultation disponible
-                      </span>
+                      <span className="student-psy-slot-caption">Consultation disponible</span>
                     </span>
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                        active ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-700'
-                      }`}
-                    >
-                      {active ? 'Choisi' : 'Libre'}
-                    </span>
+
+                    <span className="student-psy-slot-badge">{active ? 'Choisi' : 'Libre'}</span>
                   </Button>
                 )
               })}
             </div>
           ) : (
-            <div className="rounded-[18px] border border-dashed border-border bg-card/70 p-4 text-center dark:border-white/10 dark:bg-white/[0.04]">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-dream-highlight text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-100">
-                <Clock className="h-4 w-4" />
+            <div className="student-psy-empty-slots">
+              <div className="student-psy-empty-icon">
+                <Clock />
               </div>
-              <p className="mt-3 font-semibold text-dream-heading dark:text-foreground">
-                Aucun horaire disponible
-              </p>
-              <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-dream-muted dark:text-muted-foreground">
+              <p className="student-psy-empty-title">Aucun horaire disponible</p>
+              <p className="student-psy-empty-text">
                 {getSelectedDayMessage(selectedDayStatus)}
               </p>
             </div>
           )}
 
           {hiddenUnavailableSlots > 0 && availableSlots.length > 0 ? (
-            <p className="mt-4 text-center text-xs font-medium text-[#7A6A99] dark:text-muted-foreground">
+            <p className="student-psy-hidden-note">
               Les horaires passes ou deja reserves ne sont pas affiches.
             </p>
           ) : null}
@@ -448,20 +400,20 @@ export function StudentRendezvousPsyForm() {
       </div>
 
       {selectedSlot ? (
-        <div className="rounded-[24px] border border-border bg-dream-softer/80 px-4 py-3 text-sm font-medium text-dream-heading dark:border-violet-400/20 dark:bg-dream-softer0/10 dark:text-violet-100">
+        <div className="student-psy-selected-box">
           Rendez-vous selectionne : {getDateLabel(selectedDate)} de {selectedSlot.startTime} a{' '}
           {selectedSlot.endTime}.
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-[240px_1fr]">
-        <div className="space-y-2">
-          <Label className="text-dream-heading dark:text-foreground">Urgence</Label>
+      <div className="student-psy-details-grid">
+        <div className="student-psy-field">
+          <Label className="student-psy-label">Urgence</Label>
           <Select
             value={urgency}
             onValueChange={(value) => setUrgency(value as 'normal' | 'urgent')}
           >
-            <SelectTrigger className="h-12 rounded-2xl border-border bg-card/90 text-dream-heading dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground">
+            <SelectTrigger className="student-psy-select-trigger">
               <SelectValue placeholder="Niveau d'urgence" />
             </SelectTrigger>
             <SelectContent>
@@ -471,8 +423,8 @@ export function StudentRendezvousPsyForm() {
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="appointment-reason" className="text-dream-heading dark:text-foreground">
+        <div className="student-psy-field">
+          <Label htmlFor="appointment-reason" className="student-psy-label">
             Motif de la demande
           </Label>
           <Textarea
@@ -480,29 +432,21 @@ export function StudentRendezvousPsyForm() {
             value={reason}
             onChange={(event) => setReason(event.target.value)}
             placeholder="Explique brievement pourquoi tu souhaites rencontrer le psychologue."
-            className="min-h-32 rounded-2xl border-border bg-card/90 text-dream-heading dark:border-white/10 dark:bg-white/[0.06] dark:text-foreground dark:placeholder:text-muted-foreground"
+            className="student-psy-textarea"
           />
         </div>
       </div>
 
-      {error ? (
-        <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:bg-red-500/10 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
+      {error ? <div className="student-psy-error">{error}</div> : null}
 
-      {message ? (
-        <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
-          {message}
-        </div>
-      ) : null}
+      {message ? <div className="student-psy-success">{message}</div> : null}
 
       <Button
         type="submit"
         disabled={isSubmitting || isLoadingDay || !startTime || !reason.trim()}
-        className="h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-400 px-5 text-white shadow-md transition hover:opacity-95"
+        className="student-psy-submit"
       >
-        {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+        {isSubmitting ? <Loader2 className="animate-spin" /> : <Send />}
         Envoyer la demande
       </Button>
     </form>

@@ -12,7 +12,9 @@ export function LogoutButton({ showLabel = false }: { showLabel?: boolean }) {
       type="button"
       onClick={handleLogout}
       title="Deconnexion"
-      className={`dream-logout-button ${showLabel ? 'dream-logout-button-labeled' : 'dream-logout-button-icon'}`}
+      className={`mindly-logout-button ${
+        showLabel ? 'mindly-logout-button-labeled' : 'mindly-logout-button-icon'
+      }`}
     >
       <LogOut />
       {showLabel ? <span>Deconnexion</span> : null}

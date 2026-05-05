@@ -482,7 +482,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             <div className="student-flex-content">
               <div className="student-coaching-title-row">
                 <h2 className="student-section-title">Nouvel accompagnement</h2>
-                <span className="dream-badge">{mode === 'smart' ? 'Instantane' : 'Humain'}</span>
+                <span className="mindly-ui-badge">
+                  {mode === 'smart' ? 'Instantane' : 'Humain'}
+                </span>
               </div>
               <p className="student-coaching-copy">
                 Lancez une session adaptee a votre besoin du moment.
@@ -494,11 +496,15 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             <button
               type="button"
               onClick={() => setMode('smart')}
-              className={`student-choice-card ${mode === 'smart' ? 'student-choice-card-active' : ''}`}
+              className={`student-choice-card ${
+                mode === 'smart' ? 'student-choice-card-active' : ''
+              }`}
             >
               <div className="student-choice-content">
                 <div
-                  className={`student-choice-icon ${mode === 'smart' ? 'student-choice-icon-active' : ''}`}
+                  className={`student-choice-icon ${
+                    mode === 'smart' ? 'student-choice-icon-active' : ''
+                  }`}
                 >
                   <Bot />
                 </div>
@@ -507,22 +513,26 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   <span className="student-choice-description">
                     Disponible maintenant, avec voix et reponses courtes.
                   </span>
-                  <span className="dream-badge dream-badge-spaced">
+                  <span className="mindly-ui-badge mt-2">
                     Stress, motivation, organisation
                   </span>
                 </span>
-                {mode === 'smart' ? <span className="dream-badge">Choisi</span> : null}
+                {mode === 'smart' ? <span className="mindly-ui-badge">Choisi</span> : null}
               </div>
             </button>
 
             <button
               type="button"
               onClick={() => setMode('classic')}
-              className={`student-choice-card ${mode === 'classic' ? 'student-choice-card-active' : ''}`}
+              className={`student-choice-card ${
+                mode === 'classic' ? 'student-choice-card-active' : ''
+              }`}
             >
               <div className="student-choice-content">
                 <div
-                  className={`student-choice-icon ${mode === 'classic' ? 'student-choice-icon-active' : ''}`}
+                  className={`student-choice-icon ${
+                    mode === 'classic' ? 'student-choice-icon-active' : ''
+                  }`}
                 >
                   <UserRound />
                 </div>
@@ -531,9 +541,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   <span className="student-choice-description">
                     Une session suivie par un coach humain.
                   </span>
-                  <span className="dream-badge dream-badge-spaced">Suivi personnalise</span>
+                  <span className="mindly-ui-badge mt-2">Suivi personnalise</span>
                 </span>
-                {mode === 'classic' ? <span className="dream-badge">Choisi</span> : null}
+                {mode === 'classic' ? <span className="mindly-ui-badge">Choisi</span> : null}
               </div>
             </button>
           </div>
@@ -547,14 +557,16 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     Choisissez un coach humain disponible pour commencer la session.
                   </p>
                 </div>
-                {isLoadingCoaches ? <span className="dream-badge">Chargement</span> : null}
+                {isLoadingCoaches ? <span className="mindly-ui-badge">Chargement</span> : null}
               </div>
 
               <div className="student-list-stack">
-                {coachesError ? <div className="dream-danger-surface">{coachesError}</div> : null}
+                {coachesError ? (
+                  <div className="mindly-alert mindly-alert-danger">{coachesError}</div>
+                ) : null}
 
                 {!isLoadingCoaches && availableCoaches.length === 0 ? (
-                  <div className="dream-empty-surface">
+                  <div className="mindly-empty">
                     Aucun coach n'est disponible actuellement. Le Smart coach IA reste disponible
                     pour continuer l'accompagnement sans attente.
                     <button
@@ -563,7 +575,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         setMode('smart')
                         setSelectedCoachId(null)
                       }}
-                      className="dream-empty-cta"
+                      className="mindly-btn mindly-btn-primary mt-3 w-full"
                     >
                       Utiliser le Smart coach IA
                     </button>
@@ -587,7 +599,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       </span>
                       <span className="student-flex-content">
                         <span className="block truncate text-sm font-semibold">{coach.name}</span>
-                        <span className="dream-badge dream-badge-tight">{coach.specialty}</span>
+                        <span className="mindly-ui-badge mt-1">{coach.specialty}</span>
                         {coach.bio ? (
                           <span className="student-choice-description-clamped">{coach.bio}</span>
                         ) : null}
@@ -605,9 +617,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             size="pillLg"
             onClick={() => void startSession()}
             disabled={isLoading || isLoadingCoaches || (mode === 'classic' && !selectedCoachId)}
-            className="student-primary-action"
+            className="mindly-btn mindly-btn-primary student-primary-action"
           >
-            <Plus className="dream-action-icon" />
+            <Plus className="h-4 w-4" />
             Demarrer
           </Button>
         </div>
@@ -615,12 +627,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         <div className="student-coaching-panel-compact">
           <div className="student-between-row-inset">
             <h2 className="student-section-title">Mes sessions</h2>
-            <span className="dream-badge">{sessions.length}</span>
+            <span className="mindly-ui-badge">{sessions.length}</span>
           </div>
           <div className="student-list-stack">
             {sessions.length === 0 ? (
-              <div className="dream-empty-surface-soft">
-                <p className="font-semibold text-dream-heading">Aucune session pour le moment.</p>
+              <div className="mindly-empty">
+                <p className="font-semibold text-[var(--mindly-text-strong)]">
+                  Aucune session pour le moment.
+                </p>
                 <p className="mt-1">Demarrez un accompagnement pour retrouver vos échanges ici.</p>
               </div>
             ) : null}
@@ -649,7 +663,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         className="student-icon-action student-icon-action-md student-icon-action-primary"
                         title="Enregistrer"
                       >
-                        <Check className="h-4 w-4" />
+                        <Check />
                       </button>
                       <button
                         type="button"
@@ -660,7 +674,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         className="student-icon-action student-icon-action-md student-icon-action-muted"
                         title="Annuler"
                       >
-                        <X className="h-4 w-4" />
+                        <X />
                       </button>
                     </div>
                   </div>
@@ -688,7 +702,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         className="student-icon-action student-icon-action-sm"
                         title="Renommer"
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil />
                       </button>
                       {session.mode === 'smart' ? (
                         <button
@@ -697,7 +711,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                           className="student-icon-action student-icon-action-sm student-icon-action-danger"
                           title="Supprimer"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 />
                         </button>
                       ) : null}
                     </div>
@@ -717,19 +731,19 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 {selectedSession?.title ?? 'Aucune session selectionnee'}
               </h2>
               <div className="student-chat-badges">
-                <span className="dream-badge">
+                <span className="mindly-ui-badge">
                   {selectedSession?.mode === 'smart'
                     ? 'Smart coach IA'
                     : selectedSession
                       ? selectedCoachName
                       : 'Aucune session'}
                 </span>
-                <span className="dream-badge">
+                <span className="mindly-ui-badge">
                   {messageCount} message{messageCount > 1 ? 's' : ''}
                 </span>
-                {isLoading ? <span className="dream-badge">Reponse en cours</span> : null}
+                {isLoading ? <span className="mindly-ui-badge">Reponse en cours</span> : null}
                 {selectedSession?.status === 'closed' ? (
-                  <span className="dream-badge-muted rounded-full px-3 py-1">Fermee</span>
+                  <span className="mindly-ui-badge mindly-ui-badge-muted">Fermee</span>
                 ) : null}
               </div>
             </div>
@@ -742,18 +756,18 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         <div className="student-chat-scroll">
           {messages.length === 0 ? (
             <div className="student-chat-empty">
-              <p className="font-semibold text-dream-heading">Commencez simplement.</p>
+              <p className="font-semibold text-[var(--mindly-text-strong)]">Commencez simplement.</p>
               <p className="mt-1">
                 Ecrivez votre besoin actuel ou choisissez une suggestion pour lancer la discussion.
               </p>
-              <div className="dream-action-row mt-4">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {suggestedPrompts.map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
                     onClick={() => setMessage(prompt)}
                     disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-                    className="dream-badge border"
+                    className="mindly-ui-badge"
                   >
                     {prompt}
                   </button>
@@ -768,226 +782,289 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             const multipleChoice = parseMultipleChoice(item.content)
             const selectedChoices = selectedChoicesByMessage[String(item.id)] ?? []
 
-           return (
-  <div
-    key={item.id}
-    className={isMine ? 'student-message-row-mine' : 'student-message-row-assistant'}
-  >
-    <div
-      className={`student-message-bubble ${
-        isMine ? 'student-message-bubble-mine' : 'student-message-bubble-assistant'
-      }`}
-    >
-      <p className="student-message-meta">
-        {item.senderRole === 'ai'
-          ? 'Smart coach'
-          : item.senderRole === 'coach'
-            ? 'Coach'
-            : 'Vous'}
-      </p>
+            return (
+              <div
+                key={item.id}
+                className={isMine ? 'student-message-row-mine' : 'student-message-row-assistant'}
+              >
+                <div
+                  className={`student-message-bubble ${
+                    isMine ? 'student-message-bubble-mine' : 'student-message-bubble-assistant'
+                  }`}
+                >
+                  <p className="student-message-meta">
+                    {item.senderRole === 'ai'
+                      ? 'Smart coach'
+                      : item.senderRole === 'coach'
+                        ? 'Coach'
+                        : 'Vous'}
+                  </p>
 
-      {isEditingMessage ? (
-        <div className="student-edit-stack">
-          <textarea
-            value={editingMessageContent}
-            onChange={(event) => setEditingMessageContent(event.target.value)}
-            rows={4}
-            className="student-message-edit-textarea"
-          />
-          <div className="student-icon-action-row-end">
+                  {isEditingMessage ? (
+                    <div className="student-edit-stack">
+                      <textarea
+                        value={editingMessageContent}
+                        onChange={(event) => setEditingMessageContent(event.target.value)}
+                        rows={4}
+                        className="student-message-edit-textarea"
+                      />
+                      <div className="student-icon-action-row-end">
+                        <button
+                          type="button"
+                          onClick={() => void updateMessage(item.id)}
+                          className="student-icon-action student-icon-action-md student-icon-action-primary"
+                          title="Enregistrer"
+                        >
+                          <Check />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingMessageId(null)
+                            setEditingMessageContent('')
+                          }}
+                          className="student-icon-action student-icon-action-md student-icon-action-muted"
+                          title="Annuler"
+                        >
+                          <X />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="student-message-content">
+                        {multipleChoice?.prompt || item.content}
+                      </p>
+
+                      {!isMine && multipleChoice ? (
+                        <div className="student-multiple-choice-stack">
+                          {multipleChoice.choices.map((choice) => {
+                            const checked = selectedChoices.includes(choice.label)
+
+                            return (
+                              <label key={choice.label} className="student-choice-option">
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={(event) => {
+                                    setSelectedChoicesByMessage((current) => {
+                                      const currentValues = current[String(item.id)] ?? []
+                                      const nextValues = event.target.checked
+                                        ? [...currentValues, choice.label]
+                                        : currentValues.filter((value) => value !== choice.label)
+
+                                      return {
+                                        ...current,
+                                        [String(item.id)]: nextValues,
+                                      }
+                                    })
+                                  }}
+                                  className="student-choice-checkbox"
+                                />
+                                <span>
+                                  <span className="font-semibold">{choice.label}.</span>{' '}
+                                  {choice.text}
+                                </span>
+                              </label>
+                            )
+                          })}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void sendSelectedChoices(item.id, multipleChoice.choices)
+                            }
+                            disabled={selectedChoices.length === 0 || isLoading}
+                            className="student-choice-submit"
+                          >
+                            Envoyer mon choix
+                          </button>
+                        </div>
+                      ) : null}
+
+                      {isMine ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingMessageId(item.id)
+                            setEditingMessageContent(item.content)
+                          }}
+                          className="student-message-action"
+                        >
+                          <Pencil />
+                          Modifier
+                        </button>
+                      ) : null}
+                    </>
+                  )}
+
+                  {item.senderRole !== 'student' ? (
+                    <button
+                      type="button"
+                      onClick={() => void playText(item.content)}
+                      className="student-message-action"
+                    >
+                      <Volume2 />
+                      Ecouter
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            )
+          })}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="student-chat-composer">
+          {statusMessage ? <p className="student-status-message">{statusMessage}</p> : null}
+
+          <div className="student-composer-row">
             <button
               type="button"
-              onClick={() => void updateMessage(item.id)}
-              className="student-icon-action student-icon-action-md student-icon-action-primary"
-              title="Enregistrer"
+              onClick={() => void toggleRecording()}
+              disabled={!selectedSessionId || isLoading}
+              className={`student-recorder-button ${
+                isRecording ? 'student-recorder-button-recording' : 'student-recorder-button-idle'
+              }`}
+              title={isRecording ? 'Arreter' : 'Dicter'}
             >
-              <Check />
+              {isRecording ? <Square /> : <Mic />}
             </button>
+
+            <textarea
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault()
+                  void sendMessage()
+                }
+              }}
+              disabled={!selectedSessionId || selectedSession?.status === 'closed'}
+              rows={3}
+              placeholder={
+                selectedSessionId
+                  ? 'Ecrivez votre message...'
+                  : 'Demarrez ou selectionnez une session pour ecrire.'
+              }
+              className="student-composer-textarea"
+            />
+
             <button
               type="button"
-              onClick={() => {
-                setEditingMessageId(null)
-                setEditingMessageContent('')
-              }}
-              className="student-icon-action student-icon-action-md student-icon-action-muted"
-              title="Annuler"
+              onClick={() => void sendMessage()}
+              disabled={!message.trim() || !selectedSessionId || isLoading}
+              className="student-send-button"
+              title="Envoyer"
             >
-              <X />
+              <Send />
             </button>
           </div>
+
+          <div className="student-composer-footer">
+            <span>Entree pour envoyer, Shift+Entree pour une nouvelle ligne.</span>
+            <span>{message.trim().length} caracteres</span>
+          </div>
         </div>
-      ) : (
-        <>
-          <p className="student-message-content">{multipleChoice?.prompt || item.content}</p>
+      </section>
 
-          {!isMine && multipleChoice ? (
-            <div className="student-multiple-choice-stack">
-              {multipleChoice.choices.map((choice) => {
-                const checked = selectedChoices.includes(choice.label)
+      {sessionToDelete ? (
+        <div className="mindly-modal-backdrop">
+          <div className="student-delete-modal-card">
+            <div className="student-media-row">
+              <div className="student-delete-modal-icon">
+                <Trash2 />
+              </div>
 
-                return (
-                  <label key={choice.label} className="student-choice-option">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={(event) => {
-                        setSelectedChoicesByMessage((current) => {
-                          const currentValues = current[String(item.id)] ?? []
-                          const nextValues = event.target.checked
-                            ? [...currentValues, choice.label]
-                            : currentValues.filter((value) => value !== choice.label)
+              <div className="student-flex-content">
+                <h3 className="student-section-title">Supprimer la session ?</h3>
+                <p className="student-delete-modal-text">
+                  Cette action supprimera aussi les messages de cette session. Elle ne pourra pas
+                  etre annulee.
+                </p>
+                <p className="student-delete-modal-preview">{sessionToDelete.title}</p>
+              </div>
+            </div>
 
-                          return {
-                            ...current,
-                            [String(item.id)]: nextValues,
-                          }
-                        })
-                      }}
-                      className="student-choice-checkbox"
-                    />
-                    <span>
-                      <span className="font-semibold">{choice.label}.</span> {choice.text}
-                    </span>
-                  </label>
-                )
-              })}
-
+            <div className="student-modal-actions">
               <button
                 type="button"
-                onClick={() => void sendSelectedChoices(item.id, multipleChoice.choices)}
-                disabled={selectedChoices.length === 0 || isLoading}
-                className="student-choice-submit"
+                onClick={() => setSessionToDelete(null)}
+                className="student-modal-cancel"
               >
-                Envoyer mon choix
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={() => void deleteSession(sessionToDelete.id)}
+                disabled={isLoading}
+                className="student-modal-delete"
+              >
+                Supprimer
               </button>
             </div>
-          ) : null}
-
-          {isMine ? (
-            <button
-              type="button"
-              onClick={() => {
-                setEditingMessageId(item.id)
-                setEditingMessageContent(item.content)
-              }}
-              className="student-message-action"
-            >
-              <Pencil />
-              Modifier
-            </button>
-          ) : null}
-        </>
-      )}
-
-      {item.senderRole !== 'student' ? (
-        <button
-          type="button"
-          onClick={() => void playText(item.content)}
-          className="student-message-action"
-        >
-          <Volume2 />
-          Ecouter
-        </button>
+          </div>
+        </div>
       ) : null}
     </div>
-  </div>
-)
-})}
-<div ref={messagesEndRef} />
-</div>
+  )
+}
 
-<div className="student-chat-composer">
-  {statusMessage ? <p className="student-status-message">{statusMessage}</p> : null}
+function convertBlobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
 
-  <div className="student-composer-row">
-    <button
-      type="button"
-      onClick={() => void toggleRecording()}
-      disabled={!selectedSessionId || isLoading}
-      className={`student-recorder-button ${
-        isRecording ? 'student-recorder-button-recording' : 'student-recorder-button-idle'
-      }`}
-      title={isRecording ? 'Arreter' : 'Dicter'}
-    >
-      {isRecording ? <Square /> : <Mic />}
-    </button>
-
-    <textarea
-      value={message}
-      onChange={(event) => setMessage(event.target.value)}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-          event.preventDefault()
-          void sendMessage()
-        }
-      }}
-      disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-      rows={3}
-      placeholder={
-        selectedSessionId
-          ? 'Ecrivez votre message...'
-          : 'Demarrez ou selectionnez une session pour ecrire.'
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result)
+      } else {
+        reject(new Error('Conversion audio impossible.'))
       }
-      className="student-composer-textarea"
-    />
+    }
 
-    <button
-      type="button"
-      onClick={() => void sendMessage()}
-      disabled={!message.trim() || !selectedSessionId || isLoading}
-      className="student-send-button"
-      title="Envoyer"
-    >
-      <Send />
-    </button>
-  </div>
+    reader.onerror = () => reject(new Error('Lecture audio impossible.'))
+    reader.readAsDataURL(blob)
+  })
+}
 
-  <div className="student-composer-footer">
-    <span>Entree pour envoyer, Shift+Entree pour une nouvelle ligne.</span>
-    <span>{message.trim().length} caracteres</span>
-  </div>
-</div>
-</section>
+type MultipleChoiceOption = {
+  label: string
+  text: string
+}
 
-{sessionToDelete ? (
-  <div className="dream-modal-backdrop">
-    <div className="student-delete-modal-card">
-      <div className="student-media-row">
-        <div className="student-delete-modal-icon">
-          <Trash2 />
-        </div>
+function parseMultipleChoice(
+  content: string,
+): { choices: MultipleChoiceOption[]; prompt: string } | null {
+  const lines = content.split('\n')
+  const choices: MultipleChoiceOption[] = []
+  const promptLines: string[] = []
 
-        <div className="student-flex-content">
-          <h3 className="student-section-title">Supprimer la session ?</h3>
-          <p className="student-delete-modal-text">
-            Cette action supprimera aussi les messages de cette session. Elle ne pourra pas etre
-            annulee.
-          </p>
-          <p className="student-delete-modal-preview">{sessionToDelete.title}</p>
-        </div>
-      </div>
+  for (const line of lines) {
+    const match = line.trim().match(/^([A-D])[.)]\s+(.+)$/i)
 
-      <div className="student-modal-actions">
-        <button
-          type="button"
-          onClick={() => setSessionToDelete(null)}
-          className="student-modal-cancel"
-        >
-          Annuler
-        </button>
+    if (match) {
+      choices.push({
+        label: match[1].toUpperCase(),
+        text: match[2].trim(),
+      })
+    } else {
+      promptLines.push(line)
+    }
+  }
 
-        <button
-          type="button"
-          onClick={() => void deleteSession(sessionToDelete.id)}
-          disabled={isLoading}
-          className="student-modal-delete"
-        >
-          Supprimer
-        </button>
-      </div>
-    </div>
-  </div>
-) : null}
-</div>
-)
+  if (choices.length < 2) {
+    return null
+  }
+
+  return {
+    choices,
+    prompt: promptLines.join('\n').trim(),
+  }
+}
+
+function getCoachName(session: CoachingSession | null | undefined): string {
+  const coach = session?.coach
+  const fullName = `${coach?.firstName ?? ''} ${coach?.lastName ?? ''}`.trim()
+
+  return fullName || coach?.email || 'Coach humain'
 }

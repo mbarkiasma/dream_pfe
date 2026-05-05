@@ -63,35 +63,32 @@ export function CompleteProfileClient({
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-5xl items-center justify-center">
-        <section className="w-full max-w-xl rounded-[32px] border border-border bg-card/85 p-6 shadow-[0_28px_90px_rgba(82,45,145,0.18)] backdrop-blur-xl sm:p-8">
-          <div className="mb-8">
-            <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-400 text-white shadow-[0_12px_28px_rgba(139,92,246,0.24)]">
-              <UserRound className="h-7 w-7" />
+    <main className="complete-profile-page">
+      <div className="complete-profile-shell">
+        <section className="complete-profile-card">
+          <div className="complete-profile-header">
+            <div className="complete-profile-icon">
+              <UserRound />
             </div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-dream-accent">
-              Profil etudiant
-            </p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight text-dream-heading">
-              Completez votre profil
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-dream-muted">
+
+            <p className="complete-profile-eyebrow">Profil etudiant</p>
+
+            <h1 className="complete-profile-title">Completez votre profil</h1>
+
+            <p className="complete-profile-description">
               Ces informations seront utilisees dans votre dashboard, vos rapports et votre suivi.
             </p>
           </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label
-                  className="block text-sm font-semibold text-dream-heading"
-                  htmlFor="firstName"
-                >
+          <form className="complete-profile-form" onSubmit={handleSubmit}>
+            <div className="complete-profile-grid">
+              <div className="complete-profile-field">
+                <label className="complete-profile-label" htmlFor="firstName">
                   Prenom
                 </label>
+
                 <input
-                  className="mt-2 h-12 w-full rounded-2xl border border-border bg-white px-4 text-dream-heading outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition placeholder:text-[#9A8BB7] focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  className="complete-profile-input"
                   disabled={isSubmitting}
                   id="firstName"
                   onChange={(event) => setFirstName(event.target.value)}
@@ -101,15 +98,13 @@ export function CompleteProfileClient({
                 />
               </div>
 
-              <div>
-                <label
-                  className="block text-sm font-semibold text-dream-heading"
-                  htmlFor="lastName"
-                >
+              <div className="complete-profile-field">
+                <label className="complete-profile-label" htmlFor="lastName">
                   Nom
                 </label>
+
                 <input
-                  className="mt-2 h-12 w-full rounded-2xl border border-border bg-white px-4 text-dream-heading outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition placeholder:text-[#9A8BB7] focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  className="complete-profile-input"
                   disabled={isSubmitting}
                   id="lastName"
                   onChange={(event) => setLastName(event.target.value)}
@@ -121,18 +116,20 @@ export function CompleteProfileClient({
             </div>
 
             {errorMessage ? (
-              <div className="flex gap-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
-                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+              <div className="complete-profile-error">
+                <AlertCircle />
                 {errorMessage}
               </div>
             ) : null}
 
-            <Button variant="dream" size="lg" disabled={isSubmitting} type="submit">
-              {isSubmitting ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <ArrowRight className="h-5 w-5" />
-              )}
+            <Button
+              variant="dream"
+              size="lg"
+              disabled={isSubmitting}
+              type="submit"
+              className="complete-profile-submit"
+            >
+              {isSubmitting ? <Loader2 className="animate-spin" /> : <ArrowRight />}
               Continuer vers mon dashboard
             </Button>
           </form>

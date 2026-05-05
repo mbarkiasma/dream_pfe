@@ -7,10 +7,10 @@ export default async function StudentDashboardLayout({ children }: { children: R
   await requireDashboardRole('etudiant')
 
   return (
-    <section className="dream-dashboard-page">
-      <div className="dream-dashboard-shell">
+    <section className="mindly-dashboard-page">
+      <div className="mindly-dashboard-shell">
         <StudentSidebar />
-        <div className="dashboard-content dream-dashboard-content">{children}</div>
+        <div className="dashboard-content mindly-dashboard-content">{children}</div>
       </div>
     </section>
   )

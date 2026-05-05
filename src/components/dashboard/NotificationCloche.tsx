@@ -159,70 +159,64 @@ export function NotificationBell() {
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="notification-bell-root">
       <button
         type="button"
         aria-label="Notifications"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
-        className="dream-icon-button relative h-11 w-11"
+        className="notification-bell-button"
       >
-        <Bell className="h-5 w-5" />
+        <Bell />
         {unreadCount > 0 ? (
-          <span className="dream-icon-button-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
+          <span className="notification-bell-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
         ) : null}
       </button>
 
       {isOpen ? (
-        <div className="dream-popover absolute right-0 z-[100] mt-3 w-[min(92vw,380px)]">
-          <div className="dream-popover-header">
+        <div className="notification-bell-popover">
+          <div className="notification-bell-header">
             <div>
-              <p className="text-sm font-bold text-dream-heading">Notifications</p>
-              <p className="text-xs text-dream-muted">{unreadCount} non lue(s)</p>
+              <p className="notification-bell-title">Notifications</p>
+              <p className="notification-bell-count">{unreadCount} non lue(s)</p>
             </div>
 
             <button
               type="button"
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
-              className="dream-icon-button h-9 w-9"
+              className="notification-bell-mark-button"
               aria-label="Tout marquer comme lu"
             >
-              <CheckCheck className="h-5 w-5" />
+              <CheckCheck />
             </button>
           </div>
 
-          <div className="max-h-[420px] overflow-y-auto">
+          <div className="notification-bell-list">
             {isLoading ? (
-              <p className="dream-list-empty">Chargement...</p>
+              <p className="notification-bell-empty">Chargement...</p>
             ) : latestNotifications.length === 0 ? (
-              <p className="dream-list-empty">Aucune notification.</p>
+              <p className="notification-bell-empty">Aucune notification.</p>
             ) : (
               latestNotifications.map((notification) => {
                 const createdAt = formatDate(notification.createdAt)
                 const content = (
                   <div
-                    className={`dream-notification-row px-4 py-3 ${
-                      notification.status === 'unread' ? 'dream-notification-row-unread' : ''
+                    className={`notification-bell-row ${
+                      notification.status === 'unread' ? 'notification-bell-row-unread' : ''
                     }`}
                   >
-                    <div className="flex gap-3">
+                    <div className="notification-bell-row-inner">
                       <span
-                        className={`mt-1 h-2.5 w-2.5 rounded-full ${
-                          notification.status === 'unread'
-                            ? 'dream-notification-dot-unread'
-                            : 'dream-notification-dot'
+                        className={`notification-bell-dot ${
+                          notification.status === 'unread' ? 'notification-bell-dot-unread' : ''
                         }`}
                       />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-dream-heading dark:text-foreground">
-                          {notification.title}
-                        </p>
-                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-dream-muted dark:text-muted-foreground">
-                          {notification.message}
-                        </p>
+                      <div className="notification-bell-row-content">
+                        <p className="notification-bell-row-title">{notification.title}</p>
+                        <p className="notification-bell-row-message">{notification.message}</p>
                         {createdAt ? (
-                          <p className="mt-2 text-xs font-medium text-dream-muted">{createdAt}</p>
+                          <p className="notification-bell-row-date">{createdAt}</p>
                         ) : null}
                       </div>
                     </div>
@@ -249,7 +243,7 @@ export function NotificationBell() {
                     key={notification.id}
                     type="button"
                     onClick={() => void markAsRead(notification.id)}
-                    className="block w-full text-left"
+                    className="notification-bell-row-button"
                   >
                     {content}
                   </button>

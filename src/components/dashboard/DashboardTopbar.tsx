@@ -13,15 +13,15 @@ export function DashboardTopbar({
   title,
 }: DashboardTopbarProps) {
   return (
-    <div className="dream-dashboard-topbar">
-      <div className="dream-dashboard-topbar-inner">
+    <div className="mindly-dashboard-topbar">
+      <div className="mindly-dashboard-topbar-inner">
         <div>
-          <p className="dream-dashboard-eyebrow">{eyebrow}</p>
-          <h1 className="dream-dashboard-title">{title}</h1>
-          <p className="dream-dashboard-description">{description}</p>
+          <p className="mindly-dashboard-eyebrow">{eyebrow}</p>
+          <h1 className="mindly-dashboard-title">{title}</h1>
+          <p className="mindly-dashboard-description">{description}</p>
         </div>
 
-        <div className="dream-dashboard-actions">
+        <div className="mindly-dashboard-actions">
           <ThemeToggle />
           <NotificationBell />
         </div>

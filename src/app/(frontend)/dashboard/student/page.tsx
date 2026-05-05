@@ -1,6 +1,5 @@
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { StudentStatsCards } from '@/components/dashboard/student/StudentStatsCards'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 import config from '@payload-config'
 import { BarChart3, CalendarDays, ChevronRight, MoonStar } from 'lucide-react'
@@ -96,111 +95,91 @@ export default async function StudentDashboardPage() {
         dreamsCount={dreamsResult.totalDocs}
       />
 
-      <div className="grid items-start gap-6 xl:grid-cols-3">
+      <div className="mindly-dashboard-grid">
         <div className="xl:col-span-2">
-          <Link
-            href="/dashboard/student/dreams"
-            className="group block rounded-[32px] outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
-          >
-            <Card className="overflow-hidden rounded-[32px] border border-border bg-card/80 shadow-dream-card backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-border group-hover:bg-white group-hover:shadow-[0_24px_70px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
-              <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-dream-highlight text-dream-accent transition group-hover:bg-dream-softer0 group-hover:text-white dark:bg-dream-softer0/15 dark:text-violet-200">
-                    <MoonStar className="h-5 w-5" />
+          <Link href="/dashboard/student/dreams" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <div className="mindly-feature-heading">
+                  <span className="mindly-feature-icon">
+                    <MoonStar />
                   </span>
-                  <CardTitle className="text-xl text-dream-heading dark:text-foreground">
-                    Mon dernier reve
-                  </CardTitle>
+                  <h2 className="mindly-feature-title">Mon dernier reve</h2>
                 </div>
-                <span className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-dream-accent transition group-hover:bg-dream-softer dark:text-violet-200 dark:group-hover:bg-white/10">
-                  Voir
-                  <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                </span>
-              </CardHeader>
 
-              <CardContent className="px-6 pb-6">
+                <span className="mindly-feature-action">
+                  Voir
+                  <ChevronRight />
+                </span>
+              </div>
+
+              <div className="mindly-feature-content">
                 {latestDream ? (
-                  <div className="space-y-4">
-                    <p className="line-clamp-4 text-base leading-8 text-dream-muted dark:text-muted-foreground">
+                  <div className="mindly-stack-md">
+                    <p className="mindly-feature-text">
                       {latestDream.summary || latestDream.description}
                     </p>
-                    <span className="inline-flex rounded-full bg-dream-highlight px-3 py-1 text-xs font-semibold text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
+                    <span className="mindly-ui-badge">
                       Video : {latestDream.videoStatus}
                     </span>
                   </div>
                 ) : (
-                  <p className="leading-7 text-dream-muted dark:text-muted-foreground">
-                    Aucun reve enregistre pour le moment.
-                  </p>
+                  <p className="mindly-feature-text">Aucun reve enregistre pour le moment.</p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </article>
           </Link>
         </div>
 
-        <div className="space-y-6">
-          <Link
-            href="/dashboard/student/analyses"
-            className="group block rounded-[32px] outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
-          >
-            <Card className="overflow-hidden rounded-[32px] border border-border bg-card/80 shadow-dream-card backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-border group-hover:bg-white group-hover:shadow-[0_24px_70px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
-              <CardHeader className="flex-row items-center justify-between gap-4 pb-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-dream-highlight text-dream-accent transition group-hover:bg-dream-softer0 group-hover:text-white dark:bg-dream-softer0/15 dark:text-violet-200">
-                    <BarChart3 className="h-5 w-5" />
+        <div className="mindly-stack-lg">
+          <Link href="/dashboard/student/analyses" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <div className="mindly-feature-heading">
+                  <span className="mindly-feature-icon">
+                    <BarChart3 />
                   </span>
-                  <CardTitle className="text-xl text-dream-heading dark:text-foreground">
-                    Analyse IA
-                  </CardTitle>
+                  <h2 className="mindly-feature-title">Analyse IA</h2>
                 </div>
-                <ChevronRight className="h-4 w-4 text-dream-accent opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
-              </CardHeader>
 
-              <CardContent className="px-6 pb-6">
+                <ChevronRight className="mindly-feature-chevron" />
+              </div>
+
+              <div className="mindly-feature-content">
                 {latestAnalysis ? (
-                  <div className="space-y-3">
-                    <p className="text-sm font-semibold text-dream-heading dark:text-foreground">
-                      {latestAnalysis.reference}
-                    </p>
-                    <p className="line-clamp-4 leading-7 text-dream-muted dark:text-muted-foreground">
+                  <div className="mindly-stack-sm">
+                    <p className="mindly-feature-reference">{latestAnalysis.reference}</p>
+                    <p className="mindly-feature-text">
                       {latestAnalysis.overview || 'Analyse disponible dans votre espace analyses.'}
                     </p>
-                    <span className="inline-flex rounded-full bg-dream-highlight px-3 py-1 text-xs font-semibold text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
+                    <span className="mindly-ui-badge">
                       Confiance : {latestAnalysis.niveauConfiance || 'moyen'}
                     </span>
                   </div>
                 ) : (
-                  <p className="leading-7 text-dream-muted dark:text-muted-foreground">
-                    Aucune analyse generee pour le moment.
-                  </p>
+                  <p className="mindly-feature-text">Aucune analyse generee pour le moment.</p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </article>
           </Link>
 
-          <Link
-            href="/dashboard/student/rendez_vous"
-            className="group block rounded-[32px] outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
-          >
-            <Card className="overflow-hidden rounded-[32px] border border-border bg-card/80 shadow-dream-card backdrop-blur transition duration-200 group-hover:-translate-y-1 group-hover:border-border group-hover:bg-white group-hover:shadow-[0_24px_70px_rgba(109,40,217,0.18)] dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)] dark:group-hover:bg-white/[0.09]">
-              <CardHeader className="flex-row items-center justify-between gap-3 pb-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-dream-highlight text-dream-accent transition group-hover:bg-dream-softer0 group-hover:text-white dark:bg-dream-softer0/15 dark:text-violet-200">
-                    <CalendarDays className="h-5 w-5" />
+          <Link href="/dashboard/student/rendez_vous" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <div className="mindly-feature-heading">
+                  <span className="mindly-feature-icon">
+                    <CalendarDays />
                   </span>
-                  <CardTitle className="text-xl text-dream-heading dark:text-foreground">
-                    Prochain rendez-vous
-                  </CardTitle>
+                  <h2 className="mindly-feature-title">Prochain rendez-vous</h2>
                 </div>
-                <ChevronRight className="h-4 w-4 text-dream-accent opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
-              </CardHeader>
 
-              <CardContent className="px-6 pb-6">
-                <p className="leading-7 text-dream-muted dark:text-muted-foreground">
-                  Aucun rendez-vous planifie pour le moment.
-                </p>
-              </CardContent>
-            </Card>
+                <ChevronRight className="mindly-feature-chevron" />
+              </div>
+
+              <div className="mindly-feature-content">
+                <p className="mindly-feature-text">Aucun rendez-vous planifie pour le moment.</p>
+              </div>
+            </article>
           </Link>
         </div>
       </div>

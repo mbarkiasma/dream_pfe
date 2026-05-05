@@ -137,17 +137,13 @@ export function NotificationsPageClient() {
   }, [])
 
   return (
-    <div>
-      <div className="dream-card-glass mb-8 p-5 md:p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+    <div className="student-notifications-root">
+      <div className="student-notifications-hero">
+        <div className="student-notifications-hero-inner">
           <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.22em] text-dream-accent">
-              Centre notifications
-            </p>
-            <h1 className="text-3xl font-bold tracking-tight text-dream-heading md:text-4xl">
-              Notifications
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-dream-muted md:text-base">
+            <p className="student-notifications-eyebrow">Centre notifications</p>
+            <h1 className="student-notifications-title">Notifications</h1>
+            <p className="student-notifications-description">
               Consultez les nouvelles actions et ouvrez directement la page associee.
             </p>
           </div>
@@ -156,33 +152,33 @@ export function NotificationsPageClient() {
             type="button"
             onClick={() => void markAllAsRead()}
             disabled={unreadCount === 0}
-            className="dream-icon-button h-11 gap-2 px-4 text-sm font-bold"
+            className="student-notifications-mark-all"
           >
-            <CheckCheck className="h-5 w-5" />
+            <CheckCheck />
             Tout marquer comme lu
           </button>
         </div>
       </div>
 
-      <div className="dream-list-panel">
-        <div className="dream-list-header">
-          <div className="flex items-center gap-3">
-            <span className="dream-icon-soft flex h-10 w-10 items-center justify-center rounded-2xl">
-              <Bell className="h-5 w-5" />
+      <div className="student-notifications-panel">
+        <div className="student-notifications-panel-header">
+          <div className="student-notifications-panel-title-row">
+            <span className="student-notifications-icon">
+              <Bell />
             </span>
             <div>
-              <p className="text-sm font-bold text-dream-heading">Toutes les notifications</p>
-              <p className="text-xs text-dream-muted">{unreadCount} non lue(s)</p>
+              <p className="student-notifications-panel-title">Toutes les notifications</p>
+              <p className="student-notifications-panel-count">{unreadCount} non lue(s)</p>
             </div>
           </div>
         </div>
 
         {isLoading ? (
-          <p className="dream-list-empty">Chargement...</p>
+          <p className="student-notifications-empty">Chargement...</p>
         ) : !hasNotifications ? (
-          <p className="dream-list-empty">Aucune notification pour le moment.</p>
+          <p className="student-notifications-empty">Aucune notification pour le moment.</p>
         ) : (
-          <div>
+          <div className="student-notifications-list">
             {sortedNotifications.map((notification) => {
               const isUnread = notification.status === 'unread'
               const typeLabel = notification.type
@@ -194,36 +190,33 @@ export function NotificationsPageClient() {
                   key={notification.id}
                   type="button"
                   onClick={() => void openNotification(notification)}
-                  className={`dream-notification-row flex items-start gap-4 px-5 py-4 text-left ${
-                    isUnread ? 'dream-notification-row-unread' : ''
+                  className={`student-notifications-row ${
+                    isUnread ? 'student-notifications-row-unread' : ''
                   }`}
                 >
                   <span
-                    className={`mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${
-                      isUnread ? 'dream-notification-dot-unread' : 'dream-notification-dot'
+                    className={`student-notifications-status-icon ${
+                      isUnread ? 'student-notifications-status-icon-unread' : ''
                     }`}
                   >
-                    <Circle className={`h-3 w-3 ${isUnread ? 'fill-current' : ''}`} />
+                    <Circle className={isUnread ? 'fill-current' : ''} />
                   </span>
 
-                  <span className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-bold text-dream-heading">
+                  <span className="student-notifications-content">
+                    <span className="student-notifications-title-line">
+                      <span className="student-notifications-item-title">
                         {notification.title}
                       </span>
-                      <span className="dream-badge px-2 py-1 text-xs font-bold">{typeLabel}</span>
+                      <span className="student-notifications-type">{typeLabel}</span>
                     </span>
-                    <span className="mt-2 block text-sm leading-6 text-dream-muted">
-                      {notification.message}
-                    </span>
-                    <span className="mt-2 block text-xs font-medium text-dream-muted">
+
+                    <span className="student-notifications-message">{notification.message}</span>
+                    <span className="student-notifications-date">
                       {formatDate(notification.createdAt)}
                     </span>
                   </span>
 
-                  {notification.link ? (
-                    <ExternalLink className="mt-1 h-4 w-4 shrink-0 text-dream-muted" />
-                  ) : null}
+                  {notification.link ? <ExternalLink className="student-notifications-external" /> : null}
                 </button>
               )
             })}

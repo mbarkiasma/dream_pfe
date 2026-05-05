@@ -16,11 +16,11 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusClasses: Record<string, string> = {
-  pending: 'bg-amber-100 text-amber-700',
-  confirmed: 'bg-emerald-100 text-emerald-700',
-  rejected: 'bg-red-100 text-red-700',
-  cancelled: 'bg-slate-100 text-slate-600',
-  completed: 'bg-indigo-100 text-indigo-700',
+  pending: 'student-appointments-status-pending',
+  confirmed: 'student-appointments-status-confirmed',
+  rejected: 'student-appointments-status-rejected',
+  cancelled: 'student-appointments-status-cancelled',
+  completed: 'student-appointments-status-completed',
 }
 
 function formatDate(value: string | null | undefined) {
@@ -63,49 +63,50 @@ export default async function StudentAppointmentsPage() {
         description="Demande un accompagnement adapte avec le psychologue et suis l'etat de tes rendez-vous."
       />
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
+      <div className="student-appointments-grid">
+        <div className="student-appointments-main">
+          <Card className="student-appointments-card">
+            <CardHeader className="student-appointments-card-header">
+              <CardTitle className="student-appointments-title">
                 Demander un rendez-vous
               </CardTitle>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="student-appointments-card-content">
               <StudentRendezvousPsyForm />
             </CardContent>
           </Card>
 
-          <Card className="mt-6 rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
-                Mes demandes
-              </CardTitle>
+          <Card className="student-appointments-card">
+            <CardHeader className="student-appointments-card-header">
+              <CardTitle className="student-appointments-title">Mes demandes</CardTitle>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="student-appointments-card-content">
               {docs.length > 0 ? (
-                <div className="space-y-3">
+                <div className="student-appointments-list">
                   {docs.map((appointment) => (
-                    <div
-                      key={appointment.id}
-                      className="rounded-2xl border border-border bg-card/80 p-4 dark:border-white/10 dark:bg-white/[0.05]"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div key={appointment.id} className="student-appointments-request">
+                      <div className="student-appointments-request-header">
                         <div>
-                          <p className="font-semibold text-dream-heading dark:text-foreground">
+                          <p className="student-appointments-request-title">
                             {formatDate(appointment.date)} de {appointment.startTime} a{' '}
                             {appointment.endTime}
                           </p>
-                          <p className="mt-1 line-clamp-2 text-sm text-dream-muted dark:text-muted-foreground">
+
+                          <p className="student-appointments-request-reason">
                             {appointment.reason}
                           </p>
+
                           {appointment.status === 'rejected' && appointment.rejectionReason ? (
-                            <div className="mt-3 rounded-2xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-200">
-                              <p className="font-semibold">Cause du refus</p>
-                              <p className="mt-1">{appointment.rejectionReason}</p>
-                              <p className="mt-2 font-medium">
+                            <div className="student-appointments-rejection">
+                              <p className="student-appointments-rejection-title">
+                                Cause du refus
+                              </p>
+                              <p className="student-appointments-rejection-text">
+                                {appointment.rejectionReason}
+                              </p>
+                              <p className="student-appointments-rejection-help">
                                 Merci de choisir un autre rendez-vous disponible dans le calendrier.
                               </p>
                             </div>
@@ -113,8 +114,9 @@ export default async function StudentAppointmentsPage() {
                         </div>
 
                         <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                            statusClasses[appointment.status] || 'bg-slate-100 text-slate-600'
+                          className={`student-appointments-status ${
+                            statusClasses[appointment.status] ||
+                            'student-appointments-status-cancelled'
                           }`}
                         >
                           {statusLabels[appointment.status] || appointment.status}
@@ -124,16 +126,14 @@ export default async function StudentAppointmentsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]">
-                  <div className="rounded-2xl bg-indigo-100 p-3 dark:bg-indigo-500/15">
-                    <CalendarDays className="h-5 w-5 text-indigo-600" />
+                <div className="student-appointments-empty">
+                  <div className="student-appointments-empty-icon">
+                    <CalendarDays />
                   </div>
 
                   <div>
-                    <p className="font-medium text-dream-heading dark:text-foreground">
-                      Aucune demande envoyee
-                    </p>
-                    <p className="text-sm text-[#7A6A99] dark:text-muted-foreground">
+                    <p className="student-appointments-empty-title">Aucune demande envoyee</p>
+                    <p className="student-appointments-empty-text">
                       Tes demandes de rendez-vous apparaitront ici.
                     </p>
                   </div>
@@ -143,62 +143,54 @@ export default async function StudentAppointmentsPage() {
           </Card>
         </div>
 
-        <div className="space-y-6">
-          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
-                Prochaine seance
-              </CardTitle>
+        <div className="student-appointments-side">
+          <Card className="student-appointments-card">
+            <CardHeader className="student-appointments-card-header">
+              <CardTitle className="student-appointments-title">Prochaine seance</CardTitle>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="student-appointments-card-content">
               {nextAppointment ? (
-                <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
-                  <div className="rounded-2xl bg-emerald-100 p-3 dark:bg-emerald-500/15">
-                    <Clock className="h-5 w-5 text-emerald-600" />
+                <div className="student-appointments-next">
+                  <div className="student-appointments-next-icon">
+                    <Clock />
                   </div>
                   <div>
-                    <p className="font-medium text-dream-heading dark:text-foreground">
+                    <p className="student-appointments-next-title">
                       {formatDate(nextAppointment.date)}
                     </p>
-                    <p className="text-sm text-dream-muted dark:text-muted-foreground">
+                    <p className="student-appointments-next-text">
                       {nextAppointment.startTime} - {nextAppointment.endTime}
                     </p>
                   </div>
                 </div>
               ) : (
                 <>
-                  <p className="leading-7 text-dream-muted dark:text-muted-foreground">
+                  <p className="student-appointments-text">
                     Aucune seance n&apos;est encore confirmee pour le moment.
                   </p>
 
                   <div className="mt-4">
-                    <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-[#7A6A99] dark:bg-white/10 dark:text-muted-foreground">
-                      Aucun rendez-vous
-                    </span>
+                    <span className="student-appointments-badge">Aucun rendez-vous</span>
                   </div>
                 </>
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-[28px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,rgba(168,85,247,0.10)_100%)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-foreground">
-                Informations
-              </CardTitle>
+          <Card className="student-appointments-card-soft">
+            <CardHeader className="student-appointments-card-header">
+              <CardTitle className="student-appointments-title">Informations</CardTitle>
             </CardHeader>
 
-            <CardContent>
-              <p className="leading-7 text-dream-muted dark:text-muted-foreground">
+            <CardContent className="student-appointments-card-content">
+              <p className="student-appointments-text">
                 Les creneaux affiches viennent directement de l&apos;agenda du psychologue. Une fois
                 la demande envoyee, elle reste en attente jusqu&apos;a confirmation.
               </p>
 
               <div className="mt-4">
-                <span className="inline-flex rounded-full bg-dream-highlight px-3 py-1 text-xs font-medium text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-200">
-                  Agenda du psychologue
-                </span>
+                <span className="student-appointments-badge">Agenda du psychologue</span>
               </div>
             </CardContent>
           </Card>

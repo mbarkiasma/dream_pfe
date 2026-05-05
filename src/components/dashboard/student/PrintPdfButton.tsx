@@ -1,11 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-
 export function PrintPdfButton() {
   return (
-    <Button variant="dream" size="pill" onClick={() => window.print()}>
+    <button type="button" onClick={() => window.print()} className="mindly-btn mindly-btn-primary">
       Télécharger / Imprimer en PDF
-    </Button>
+    </button>
   )
 }
