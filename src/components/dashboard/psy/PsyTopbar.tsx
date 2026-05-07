@@ -5,11 +5,12 @@ type PsyTopbarProps = {
   description: string
 }
 
-export function PsyTopbar(_props: PsyTopbarProps) {
+export function PsyTopbar({ description, title }: PsyTopbarProps) {
   return (
     <DashboardTopbar
-      title="Espace psychologue"
-      description="Consultez les etudiants, les rendez-vous, les notifications et le suivi clinique depuis un espace unifie."
+      eyebrow="Espace psy"
+      title={title}
+      description={description}
     />
   )
 }

@@ -24,7 +24,6 @@ const navItems = [
   { title: 'Annonces de motivation', href: '/dashboard/student/motivation', icon: Megaphone },
   { title: 'Rendez-vous', href: '/dashboard/student/rendez_vous', icon: CalendarDays },
   { title: 'Notifications', href: '/dashboard/student/notifications', icon: Bell },
-  { title: 'Suivi quotidien', href: '/dashboard/student/checkin', icon: NotebookPen },
   { title: 'Mon profil', href: '/dashboard/student/profile', icon: UserRound },
 ]
 

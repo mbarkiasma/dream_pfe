@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 
+import type { PsyOrientation } from '@/payload-types'
 import { createNotification } from '@/utilities/createNotification'
 
 const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
@@ -9,10 +10,11 @@ const blockingStatuses = ['pending', 'confirmed', 'completed'] as const
 
 type AppointmentBody = {
   date?: string
-  startTime?: string
+  orientationId?: string | number
   reason?: string
-  urgency?: 'normal' | 'urgent'
+  startTime?: string
 }
+
 
 type UpdateAppointmentBody = {
   id?: string | number
@@ -87,13 +89,41 @@ export async function POST(request: Request) {
   const date = body.date?.trim()
   const startTime = body.startTime?.trim()
   const reason = body.reason?.trim()
-  const urgency = body.urgency === 'urgent' ? 'urgent' : 'normal'
+  const orientationId = body.orientationId
+  let urgency: 'normal' | 'urgent' = 'normal'
+  let orientation: PsyOrientation | null = null
 
   if (!date || !startTime || !reason) {
     return Response.json(
       { error: 'Date, heure et motif sont requis.' },
       { status: 400 },
     )
+  }
+
+  if (orientationId) {
+    orientation = await payload.findByID({
+      collection: 'psy-orientations',
+      id: orientationId,
+      user,
+      overrideAccess: false,
+      depth: 1,
+    })
+
+    const orientationStudentId =
+      typeof orientation.student === 'object' ? orientation.student.id : orientation.student
+
+    if (String(orientationStudentId) !== String(user.id)) {
+      return Response.json({ error: 'Orientation invalide.' }, { status: 403 })
+    }
+
+    if (orientation.status !== 'student_accepted') {
+      return Response.json(
+        { error: "Cette orientation n'est pas disponible pour une prise de rendez-vous." },
+        { status: 409 },
+      )
+    }
+
+    urgency = 'urgent'
   }
 
   const psychologists = await payload.find({
@@ -196,6 +226,7 @@ export async function POST(request: Request) {
       title: `Rendez-vous psy - ${date} ${selectedSlot.startTime}`,
       student: user.id,
       psychologist: psychologist.id,
+      orientation: orientation?.id,
       date,
       startTime: selectedSlot.startTime,
       endTime: selectedSlot.endTime,
@@ -205,12 +236,27 @@ export async function POST(request: Request) {
     },
   })
 
+  if (orientation) {
+    await payload.update({
+      collection: 'psy-orientations',
+      id: orientation.id,
+      user,
+      overrideAccess: false,
+      data: {
+        appointment: appointment.id,
+        status: 'appointment_requested',
+      },
+    })
+  }
+
   try {
     await createNotification({
       actor: user.id,
       event: 'rendezvous_created',
       link: '/dashboard/psy/rendez_vous',
-      message: `${getUserName(user)} a demande un rendez-vous le ${date} a ${selectedSlot.startTime}.`,
+      message: orientation
+        ? `${getUserName(user)} a demande un rendez-vous urgent suite a une orientation du coach. Date: ${date} a ${selectedSlot.startTime}.`
+        : `${getUserName(user)} a demande un rendez-vous le ${date} a ${selectedSlot.startTime}.`,
       payload,
       recipient: psychologist.id,
       sendEmail: true,

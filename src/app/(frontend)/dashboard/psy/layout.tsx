@@ -7,10 +7,10 @@ export default async function PsychologueDashboardLayout({ children }: { childre
   await requireDashboardRole('psy')
 
   return (
-    <section className="dream-dashboard-page">
-      <div className="dream-dashboard-shell">
+    <section className="mindly-dashboard-page">
+      <div className="mindly-dashboard-shell">
         <PsySidebar />
-        <div className="dashboard-content dream-dashboard-content">{children}</div>
+        <div className="dashboard-content mindly-dashboard-content">{children}</div>
       </div>
     </section>
   )

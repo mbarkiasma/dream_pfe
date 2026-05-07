@@ -44,7 +44,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-[var(--mindly-bg)] px-4 py-8 text-[var(--mindly-text-strong)] print:bg-white print:px-0 print:py-0 print:text-slate-900">
-      <div className="mx-auto max-w-4xl rounded-[var(--mindly-radius-2xl)] border border-[var(--mindly-border)] bg-white p-6 shadow-[var(--mindly-shadow-xl)] print:max-w-none print:rounded-none print:border-0 print:bg-white print:shadow-none md:p-10">
+      <div className="mx-auto max-w-4xl rounded-[var(--mindly-radius-2xl)] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-6 shadow-[var(--mindly-shadow-xl)] print:max-w-none print:rounded-none print:border-0 print:bg-white print:shadow-none md:p-10">
         <div className="mb-8 flex flex-col gap-4 border-b border-[var(--mindly-border)] pb-6 print:hidden md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.25em] text-[var(--mindly-primary)]">
@@ -88,7 +88,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
         </section>
 
         <section className="mt-6 grid gap-4 md:grid-cols-3">
-          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-white p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
+          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
             <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
               Forces dominantes
             </h3>
@@ -97,7 +97,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
             </p>
           </article>
 
-          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-white p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
+          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
             <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
               Points de vigilance
             </h3>
@@ -106,7 +106,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
             </p>
           </article>
 
-          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-white p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
+          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
             <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
               Style relationnel
             </h3>
@@ -125,7 +125,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
             {analyse.traits?.map((trait, index) => (
               <article
                 key={`${trait.name}-${index}`}
-                className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-white p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
+                className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
               >
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <h3 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">

@@ -9,16 +9,16 @@ export default function CoachExercisesPage() {
         description="Gerez les exercices et les taches attribues aux etudiants."
       />
 
-      <div className="space-y-6">
-        <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl text-dream-heading dark:text-white">
+      <div className="mindly-stack-lg">
+        <Card className="mindly-feature-card">
+          <CardHeader className="mindly-feature-header">
+            <CardTitle className="mindly-feature-title">
               Aucun exercice attribue
             </CardTitle>
           </CardHeader>
 
-          <CardContent>
-            <p className="leading-7 text-dream-muted dark:text-white/65">
+          <CardContent className="mindly-feature-content">
+            <p className="mindly-feature-text">
               Les exercices, taches et consignes crees par le coach apparaitront ici avec leur
               statut et leur echeance.
             </p>

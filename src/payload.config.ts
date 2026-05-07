@@ -24,6 +24,11 @@ import { Notifications } from './collections/Notifications'
 import { AnnonceMotivation } from './collections/AnnonceMotivation'
 import { AnnonceMotivationReactions } from './collections/AnnonceMotivationReactions'
 import { payloadEndpoints } from './endpoints/payloadEndpoints'
+import { CoachingEvents } from './collections/CoachingEvents'
+import { CoachingRegistrations } from './collections/CoachingRegistrations'
+import { PsyOrientations } from './collections/PsyOrientation'
+
+
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -122,6 +127,9 @@ export default buildConfig({
     Notifications,
     AnnonceMotivation,
     AnnonceMotivationReactions,
+    CoachingEvents,
+    CoachingRegistrations,
+    PsyOrientations,
   ],
   globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),

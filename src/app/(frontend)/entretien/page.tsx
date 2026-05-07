@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { InterviewChat } from '@/app/(frontend)/dashboard/student/interview/InterviewChat'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { getDashboardPath, requiresInitialInterview } from '@/utilities/dashboardAuth'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
@@ -25,31 +25,30 @@ export default async function EntretienPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] px-4 py-6 sm:px-6 lg:px-8 dark:bg-background">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-dream-accent">
-            Entretien initial
-          </p>
-          <h1 className="mt-3 text-3xl font-bold text-dream-heading dark:text-foreground">
-            Votre premier entretien
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-muted-foreground">
-            Repondez aux questions pour generer votre premier rapport personnalise.
-          </p>
+    <main className="interview-page">
+      <div className="interview-container">
+        <div className="interview-hero">
+          <div>
+            <p className="interview-kicker">Entretien initial</p>
+            <h1 className="interview-title">Votre premier entretien</h1>
+            <p className="interview-subtitle">
+              Repondez aux questions pour generer votre premier rapport personnalise, dans un
+              espace calme et confidentiel.
+            </p>
+          </div>
+
+          <ThemeToggle className="interview-theme-toggle" />
         </div>
 
-        <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-dream-heading dark:text-foreground">
-              Entretien en cours
-            </CardTitle>
-          </CardHeader>
+        <section className="interview-card">
+          <div className="interview-card-header">
+            <h2 className="interview-card-title">Entretien en cours</h2>
+          </div>
 
-          <CardContent>
+          <div className="interview-card-body">
             <InterviewChat />
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       </div>
     </main>
   )

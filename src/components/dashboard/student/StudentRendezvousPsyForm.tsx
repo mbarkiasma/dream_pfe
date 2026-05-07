@@ -1,19 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { CalendarDays, CheckCircle2, Clock, Loader2, Send } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 
 type DayStatus = 'available' | 'full' | 'weekend' | 'closed' | 'past'
@@ -111,6 +104,8 @@ function getAgendaStatusClass(day: AgendaDay, isSelected: boolean) {
 
 export function StudentRendezvousPsyForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const orientationId = searchParams.get('orientationId')
   const today = useMemo(() => formatDateValue(new Date()), [])
   const tomorrow = useMemo(() => formatDateValue(addDays(new Date(), 1)), [])
   const agendaDates = useMemo(() => buildAgendaDays(new Date(), 6), [])
@@ -121,11 +116,35 @@ export function StudentRendezvousPsyForm() {
   const [slots, setSlots] = useState<Slot[]>([])
   const [startTime, setStartTime] = useState('')
   const [reason, setReason] = useState('')
-  const [urgency, setUrgency] = useState<'normal' | 'urgent'>('normal')
   const [isLoadingDay, setIsLoadingDay] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    let isActive = true
+
+    async function loadOrientation() {
+      if (!orientationId) return
+
+      try {
+        const response = await fetch(`/api/psy-orientation/${orientationId}`)
+        const data = await response.json().catch(() => ({}))
+
+        if (!isActive || !response.ok) return
+
+        setReason(data.orientation.reason || '')
+      } catch {
+        // Keep the standard appointment form if the orientation cannot be loaded.
+      }
+    }
+
+    void loadOrientation()
+
+    return () => {
+      isActive = false
+    }
+  }, [orientationId])
 
   useEffect(() => {
     let isActive = true
@@ -238,9 +257,9 @@ export function StudentRendezvousPsyForm() {
         },
         body: JSON.stringify({
           date: selectedDate,
+          orientationId,
           startTime,
           reason,
-          urgency,
         }),
       })
 
@@ -409,18 +428,15 @@ export function StudentRendezvousPsyForm() {
       <div className="student-psy-details-grid">
         <div className="student-psy-field">
           <Label className="student-psy-label">Urgence</Label>
-          <Select
-            value={urgency}
-            onValueChange={(value) => setUrgency(value as 'normal' | 'urgent')}
-          >
-            <SelectTrigger className="student-psy-select-trigger">
-              <SelectValue placeholder="Niveau d'urgence" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="normal">Normale</SelectItem>
-              <SelectItem value="urgent">Urgente</SelectItem>
-            </SelectContent>
-          </Select>
+          {orientationId ? (
+            <div className="student-psy-selected-box">
+              Priorite urgente - orientation coach
+            </div>
+          ) : (
+            <div className="student-psy-selected-box">
+              Priorite normale
+            </div>
+          )}
         </div>
 
         <div className="student-psy-field">

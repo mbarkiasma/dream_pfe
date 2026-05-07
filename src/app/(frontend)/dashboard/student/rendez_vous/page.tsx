@@ -33,6 +33,20 @@ function formatDate(value: string | null | undefined) {
   }).format(new Date(value))
 }
 
+function getAppointmentDateTime(date: string | null | undefined, startTime: string | null | undefined) {
+  if (!date) return Number.POSITIVE_INFINITY
+
+  const appointmentDate = new Date(date)
+
+  if (Number.isNaN(appointmentDate.getTime())) return Number.POSITIVE_INFINITY
+
+  const [hours = '0', minutes = '0'] = (startTime || '00:00').split(':')
+
+  appointmentDate.setHours(Number(hours), Number(minutes), 0, 0)
+
+  return appointmentDate.getTime()
+}
+
 export default async function StudentAppointmentsPage() {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await getHeaders() })
@@ -54,7 +68,17 @@ export default async function StudentAppointmentsPage() {
     : null
 
   const docs = appointments?.docs || []
-  const nextAppointment = docs.find((appointment) => appointment.status === 'confirmed')
+  const sortedAppointments = [...docs].sort(
+    (a, b) =>
+      getAppointmentDateTime(a.date, a.startTime) - getAppointmentDateTime(b.date, b.startTime),
+  )
+  const now = Date.now()
+  const nextAppointment =
+    sortedAppointments.find(
+      (appointment) =>
+        appointment.status === 'confirmed' &&
+        getAppointmentDateTime(appointment.date, appointment.startTime) >= now,
+    ) || null
 
   return (
     <div>
@@ -85,7 +109,7 @@ export default async function StudentAppointmentsPage() {
             <CardContent className="student-appointments-card-content">
               {docs.length > 0 ? (
                 <div className="student-appointments-list">
-                  {docs.map((appointment) => (
+                  {sortedAppointments.map((appointment) => (
                     <div key={appointment.id} className="student-appointments-request">
                       <div className="student-appointments-request-header">
                         <div>

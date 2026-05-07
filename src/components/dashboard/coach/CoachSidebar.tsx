@@ -20,7 +20,6 @@ import { LogoutButton } from '@/components/dashboard/student/Logout'
 const navItems = [
   { title: 'Dashboard', href: '/dashboard/coach', icon: LayoutDashboard },
   { title: 'Etudiants', href: '/dashboard/coach/students', icon: UsersRound },
-  { title: 'Plan coaching', href: '/dashboard/coach/plan', icon: ClipboardList },
   { title: 'Sessions', href: '/dashboard/coach/coaching', icon: LifeBuoy },
   { title: 'Exercices', href: '/dashboard/coach/exercices', icon: BookOpenCheck },
   { title: 'Rendez-vous', href: '/dashboard/coach/rendez_vous', icon: CalendarDays },
@@ -42,18 +41,18 @@ export function CoachSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="dream-sidebar">
-      <div className="dream-sidebar-profile">
-        <div className="dream-sidebar-brand-icon">
+    <aside className="mindly-sidebar">
+      <div className="mindly-sidebar-profile">
+        <div className="mindly-sidebar-brand-icon">
           <LifeBuoy />
         </div>
         <div className="min-w-0">
-          <p className="dream-sidebar-title">Espace coach</p>
-          <p className="dream-sidebar-subtitle">Accompagnement</p>
+          <p className="mindly-sidebar-title">Espace coach</p>
+          <p className="mindly-sidebar-subtitle">Accompagnement</p>
         </div>
       </div>
 
-      <nav className="dream-sidebar-nav">
+      <nav className="mindly-sidebar-nav">
         {navItems.map((item) => {
           const Icon = item.icon
           const active = isActivePath(pathname, item.href)
@@ -63,9 +62,9 @@ export function CoachSidebar() {
               key={item.href}
               href={item.href}
               title={item.title}
-              className={active ? 'dream-sidebar-link-active' : 'dream-sidebar-link'}
+              className={active ? 'mindly-sidebar-link-active' : 'mindly-sidebar-link'}
             >
-              <span className="dream-sidebar-icon">
+              <span className="mindly-sidebar-icon">
                 <Icon />
               </span>
               <span className="truncate">{item.title}</span>
@@ -74,7 +73,7 @@ export function CoachSidebar() {
         })}
       </nav>
 
-      <div className="dream-sidebar-footer">
+      <div className="mindly-sidebar-footer">
         <LogoutButton showLabel />
       </div>
     </aside>

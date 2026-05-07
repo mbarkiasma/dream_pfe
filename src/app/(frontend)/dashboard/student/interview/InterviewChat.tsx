@@ -201,115 +201,87 @@ export function InterviewChat() {
       : isLoading
         ? 'Traitement en cours'
         : 'Disponible'
+
   const suggestedStarters = [
-    'Je suis pret a commencer l entretien.',
+    "Je suis pret a commencer l'entretien.",
     'Je veux parler de ma motivation et de mon stress.',
     'Je prefere repondre etape par etape.',
   ]
 
   return (
-    <div className="space-y-5">
-      <section className="overflow-hidden rounded-[30px] border border-border bg-[linear-gradient(135deg,#ffffff_0%,#FDF7FF_48%,#F3ECFF_100%)] shadow-[0_22px_70px_rgba(109,40,217,0.14)] backdrop-blur dark:!border-white/10 dark:!bg-[linear-gradient(135deg,rgba(18,16,26,0.96)_0%,rgba(36,24,52,0.92)_100%)] dark:!shadow-[0_22px_70px_rgba(0,0,0,0.24)]">
-        <div className="border-b border-border px-6 py-5 dark:border-white/10">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#7A6A99] dark:text-muted-foreground">
-                Cabinet D&apos;Entretien
-              </p>
-              <div>
-                <h3 className="text-2xl font-bold tracking-[-0.02em] text-dream-heading dark:text-foreground">
-                  Echange progressif et confidentiel
-                </h3>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-dream-muted dark:text-muted-foreground">
-                  Prenez le temps de repondre naturellement. Vous pouvez parler avec le micro,
-                  relire la transcription, la corriger, puis envoyer seulement quand vous etes pret.
-                </p>
-              </div>
-            </div>
+    <div className="interview-shell">
+      <section className="interview-card interview-intro">
+        <div className="interview-intro-main">
+          <div>
+            <p className="interview-kicker">Cabinet d'entretien</p>
+            <h3 className="interview-intro-title">Echange progressif et confidentiel</h3>
+            <p className="interview-intro-text">
+              Prenez le temps de repondre naturellement. Vous pouvez utiliser le micro, relire la
+              transcription, la corriger, puis envoyer seulement quand vous etes pret.
+            </p>
+          </div>
 
-            <div className="flex flex-wrap gap-2">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-4 py-2 text-xs font-semibold text-dream-accent shadow-sm dark:border-white/10 dark:bg-white/[0.06] dark:text-violet-200">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                {etat}
-              </div>
-              <div className="rounded-full border border-border bg-card/80 px-4 py-2 text-xs font-semibold text-dream-muted shadow-sm dark:border-white/10 dark:bg-white/[0.06] dark:text-muted-foreground">
-                {messages.length} echange{messages.length > 1 ? 's' : ''}
-              </div>
-              {isSaved ? (
-                <div className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-medium text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200">
-                  Analyse enregistree
-                </div>
-              ) : null}
-            </div>
+          <div className="interview-status-row">
+            <span className="interview-pill">
+              <CheckCircle2 className="h-4 w-4" />
+              {etat}
+            </span>
+            <span className="interview-pill interview-pill-muted">
+              {messages.length} echange{messages.length > 1 ? 's' : ''}
+            </span>
+            {isSaved ? <span className="interview-pill interview-pill-success">Analyse sauvee</span> : null}
           </div>
         </div>
 
-        <div className="grid gap-3 border-t border-border bg-white/45 px-6 py-4 dark:!border-white/10 dark:!bg-black/10 md:grid-cols-3">
-          <div className="rounded-[22px] border border-border bg-card/75 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.08)] dark:!border-white/10 dark:!bg-white/[0.06]">
-            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-dream-accent">
-              <Sparkles className="h-3.5 w-3.5" />
-              Ecriture
-            </p>
-            <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-muted-foreground">
-              Repondez librement, avec vos mots, comme dans un vrai entretien.
-            </p>
-          </div>
-          <div className="rounded-[22px] border border-border bg-card/75 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.08)] dark:!border-white/10 dark:!bg-white/[0.06]">
-            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-dream-accent">
-              <Mic className="h-3.5 w-3.5" />
-              Voix
-            </p>
-            <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-muted-foreground">
-              Le micro prepare le texte pour vous, mais vous gardez toujours la main avant
-              l&apos;envoi.
-            </p>
-          </div>
-          <div className="rounded-[22px] border border-border bg-card/75 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.08)] dark:!border-white/10 dark:!bg-white/[0.06]">
-            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-dream-accent">
-              <Bot className="h-3.5 w-3.5" />
-              Conseil
-            </p>
-            <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-muted-foreground">
-              Les exemples concrets aident l&apos;assistant a mieux comprendre votre fonctionnement.
-            </p>
-          </div>
+        <div className="interview-tips-grid">
+          <InfoTip
+            icon={<Sparkles className="h-4 w-4" />}
+            label="Ecriture"
+            text="Repondez librement avec vos mots, comme dans un vrai entretien."
+          />
+          <InfoTip
+            icon={<Mic className="h-4 w-4" />}
+            label="Voix"
+            text="Le micro prepare le texte, mais vous gardez toujours la main avant l'envoi."
+          />
+          <InfoTip
+            icon={<Bot className="h-4 w-4" />}
+            label="Conseil"
+            text="Les exemples concrets aident l'assistant a mieux comprendre votre situation."
+          />
         </div>
       </section>
 
-      <section className="rounded-[32px] border border-border bg-[linear-gradient(180deg,#ffffff_0%,#FDF7FF_100%)] p-4 shadow-dream-card backdrop-blur dark:!border-white/10 dark:!bg-[#121018] dark:!bg-none dark:!shadow-[0_18px_60px_rgba(0,0,0,0.22)]">
-        <div className="mb-4 flex items-center justify-between px-2">
+      <section className="interview-card interview-chat-card">
+        <div className="interview-chat-toolbar">
           <div>
-            <p className="text-sm font-semibold text-dream-heading dark:text-foreground">
-              Espace de parole
-            </p>
-            <p className="text-xs text-[#7A6A99] dark:text-muted-foreground">
+            <p className="interview-section-title">Espace de parole</p>
+            <p className="interview-section-subtitle">
               Un message a la fois, dans un cadre calme et clair.
             </p>
           </div>
-          <div className="rounded-full bg-dream-highlight px-3 py-1 text-xs font-semibold text-dream-accent dark:!bg-dream-softer0/15 dark:!text-violet-100">
-            Assistant Big Five
-          </div>
+          <span className="interview-chat-label">Assistant Big Five</span>
         </div>
 
-        <div className="max-h-[500px] min-h-[360px] space-y-4 overflow-y-auto rounded-[28px] border border-border bg-card/75 p-5 shadow-inner dark:!border-white/10 dark:!bg-[#0d0b12]">
+        <div className="interview-scroll">
           {messages.length === 0 ? (
-            <div className="rounded-[24px] border border-dashed border-[#D8C7FF] bg-dream-soft/80 p-6 dark:!border-violet-400/25 dark:!bg-[#1a1424]">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-dream-accent shadow-sm dark:!bg-dream-softer0/15 dark:!text-violet-100">
+            <div className="interview-empty">
+              <div className="interview-empty-icon">
                 <Bot className="h-5 w-5" />
               </div>
-              <p className="text-xl font-bold text-dream-heading dark:text-foreground">Bienvenue</p>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-dream-muted dark:text-muted-foreground">
+              <p className="interview-empty-title">Bienvenue</p>
+              <p className="interview-empty-text">
                 Commencez par un premier message simple, ou utilisez le microphone pour dicter votre
-                reponse. L&apos;assistant avancera progressivement pour recueillir les informations
+                reponse. L'assistant avancera progressivement pour recueillir les informations
                 necessaires a une analyse fiable.
               </p>
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="interview-starters">
                 {suggestedStarters.map((starter) => (
                   <button
                     key={starter}
                     type="button"
                     onClick={() => setMessage(starter)}
-                    className="rounded-full border border-[#D8C7FF] bg-white px-3 py-2 text-xs font-semibold text-dream-accent transition hover:bg-dream-highlight dark:!border-violet-400/25 dark:!bg-dream-softer0/10 dark:!text-violet-100 dark:hover:!bg-dream-softer0/20"
+                    className="interview-starter"
                   >
                     {starter}
                   </button>
@@ -321,39 +293,36 @@ export function InterviewChat() {
           {messages.map((item, index) => (
             <div
               key={index}
-              className={`flex ${item.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`interview-message-row ${
+                item.role === 'user' ? 'interview-message-row-user' : 'interview-message-row-ai'
+              }`}
             >
               <div
-                className={`max-w-[86%] rounded-[24px] px-4 py-3 shadow-sm ${
-                  item.role === 'user'
-                    ? 'dream-brand-bg text-white shadow-[0_12px_28px_rgba(109,40,217,0.18)]'
-                    : 'border border-border bg-white text-dream-heading shadow-[0_10px_28px_rgba(109,40,217,0.08)] dark:!border-white/10 dark:!bg-white/[0.07] dark:!text-foreground'
+                className={`interview-message ${
+                  item.role === 'user' ? 'interview-message-user' : 'interview-message-ai'
                 }`}
               >
-                <p
-                  className={`mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                    item.role === 'user' ? 'text-white/75' : 'text-dream-accent'
-                  }`}
-                >
+                <p className="interview-message-label">
                   {item.role === 'user' ? (
-                    <UserRound className="h-3.5 w-3.5" />
+                    <UserRound className="h-4 w-4" />
                   ) : (
-                    <Bot className="h-3.5 w-3.5" />
+                    <Bot className="h-4 w-4" />
                   )}
                   {item.role === 'user' ? 'Vous' : 'Assistant'}
                 </p>
-                <p className="text-sm leading-7">{item.content}</p>
+                <p className="interview-message-text">{item.content}</p>
               </div>
             </div>
           ))}
 
           {isLoading ? (
-            <div className="flex justify-start">
-              <div className="rounded-[24px] border border-border bg-white px-4 py-3 text-dream-heading shadow-[0_10px_28px_rgba(109,40,217,0.08)] dark:!border-white/10 dark:!bg-white/[0.07] dark:!text-foreground">
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-dream-accent">
+            <div className="interview-message-row interview-message-row-ai">
+              <div className="interview-message interview-message-ai">
+                <p className="interview-message-label">
+                  <Bot className="h-4 w-4" />
                   Assistant
                 </p>
-                <p className="text-sm leading-7">L&apos;assistant prepare sa reponse...</p>
+                <p className="interview-message-text">L'assistant prepare sa reponse...</p>
               </div>
             </div>
           ) : null}
@@ -362,38 +331,30 @@ export function InterviewChat() {
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section className="interview-shell">
         {isInterviewFinished ? (
-          <div className="rounded-[22px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200">
+          <div className="interview-notice interview-notice-success">
             {isSaved
               ? "L'entretien est termine et l'analyse a ete enregistree dans Payload."
               : "L'entretien est termine. Aucune nouvelle reponse ne peut etre envoyee."}
           </div>
         ) : null}
 
-        {messageMicro ? (
-          <div className="rounded-[22px] border border-border bg-card/75 px-4 py-3 text-sm text-dream-muted shadow-[0_10px_30px_rgba(109,40,217,0.08)] dark:border-white/10 dark:bg-white/[0.06] dark:text-muted-foreground">
-            {messageMicro}
-          </div>
-        ) : null}
+        {messageMicro ? <div className="interview-notice">{messageMicro}</div> : null}
 
-        <div className="rounded-[30px] border border-border bg-card/80 p-4 shadow-[0_18px_55px_rgba(109,40,217,0.12)] backdrop-blur dark:!border-white/10 dark:!bg-[#15131a] dark:!shadow-[0_18px_55px_rgba(0,0,0,0.22)]">
-          <div className="flex items-end gap-3">
+        <div className="interview-card interview-composer">
+          <div className="interview-composer-row">
             <button
               type="button"
               onClick={() => void handleToggleRecording()}
               disabled={isLoading || isInterviewFinished}
-              className={`inline-flex min-h-[56px] shrink-0 items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium transition ${
-                isRecording
-                  ? 'bg-rose-700 text-white hover:bg-rose-800'
-                  : 'bg-dream-highlight text-dream-accent hover:bg-[#E9DDFF] dark:bg-dream-softer0/15 dark:text-violet-200 dark:hover:bg-dream-softer0/20'
-              } disabled:cursor-not-allowed disabled:bg-slate-200`}
+              className={`interview-mic-button ${isRecording ? 'interview-mic-button-active' : ''}`}
             >
               {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               {isRecording ? 'Arreter' : 'Micro'}
             </button>
 
-            <div className="flex-1 rounded-[24px] border border-[#E6DAFF] bg-[#FBF8FF] px-4 py-3 dark:!border-white/10 dark:!bg-[#0f0d13]">
+            <div className="interview-textarea-wrap">
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -408,9 +369,9 @@ export function InterviewChat() {
                     ? "L'entretien est termine."
                     : 'Ecrivez ici votre reponse, ou utilisez le micro puis corrigez la transcription...'
                 }
-                rows={4}
+                rows={3}
                 disabled={isInterviewFinished}
-                className="min-h-[96px] w-full resize-none bg-transparent text-sm leading-7 text-dream-heading outline-none placeholder:text-slate-400 dark:text-foreground dark:placeholder:text-muted-foreground"
+                className="interview-textarea"
               />
             </div>
 
@@ -418,22 +379,42 @@ export function InterviewChat() {
               type="button"
               onClick={() => void handleSend()}
               disabled={isLoading || isInterviewFinished || !message.trim()}
-              className="inline-flex min-h-[56px] shrink-0 items-center gap-2 rounded-2xl dream-brand-bg px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,40,217,0.22)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:shadow-none dark:disabled:from-white/10 dark:disabled:to-white/10 dark:disabled:text-muted-foreground"
+              className="interview-send-button"
             >
               <Send className="h-4 w-4" />
               {isInterviewFinished ? 'Termine' : isLoading ? 'Envoi...' : 'Envoyer'}
             </button>
           </div>
 
-          <div className="mt-4 flex flex-col gap-2 border-t border-[#EEE5FF] pt-3 text-xs text-[#9A8BB7] dark:border-white/10 dark:text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div className="interview-composer-footer">
             <p>Entree pour envoyer, Shift+Entree pour revenir a la ligne.</p>
-            <div className="flex items-center gap-3">
+            <div className="interview-composer-meta">
               <p>{message.trim().length} caracteres</p>
               <p>{isRecording ? 'Enregistrement en cours' : 'Micro disponible'}</p>
             </div>
           </div>
         </div>
       </section>
+    </div>
+  )
+}
+
+function InfoTip({
+  icon,
+  label,
+  text,
+}: {
+  icon: React.ReactNode
+  label: string
+  text: string
+}) {
+  return (
+    <div className="interview-tip">
+      <p className="interview-tip-label">
+        {icon}
+        {label}
+      </p>
+      <p className="interview-tip-text">{text}</p>
     </div>
   )
 }

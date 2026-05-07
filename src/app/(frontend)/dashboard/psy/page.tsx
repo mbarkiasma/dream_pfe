@@ -2,13 +2,11 @@ import config from '@payload-config'
 import { headers as getHeaders } from 'next/headers'
 import Link from 'next/link'
 import { getPayload } from 'payload'
-import { AlertTriangle, CalendarDays, Clock, UserRound } from 'lucide-react'
+import { AlertTriangle, CalendarDays, ChevronRight, Clock, UserRound } from 'lucide-react'
 
 import type { RendezVousPsy, User } from '@/payload-types'
 import { PsyStatsCards } from '@/components/dashboard/psy/PsyStatsCards'
 import { PsyTopbar } from '@/components/dashboard/psy/PsyTopbar'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 function isUser(value: unknown): value is User {
   return Boolean(value && typeof value === 'object' && 'id' in value && 'email' in value)
@@ -81,6 +79,7 @@ export default async function PsyDashboardPage() {
       }, new Map<number, User>())
       .values(),
   ).slice(0, 4)
+  const latestStudent = latestAssignedStudents[0]
 
   return (
     <div>
@@ -109,138 +108,122 @@ export default async function PsyDashboardPage() {
         ]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="mindly-dashboard-grid">
         <div className="xl:col-span-2">
-          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
-            <CardHeader className="flex flex-row items-center justify-between gap-4 pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-white">
-                Etudiants assignes
-              </CardTitle>
-              <Link
-                className="text-sm font-semibold text-dream-accent hover:text-dream-accent dark:text-violet-200"
-                href="/dashboard/psy/students"
-              >
-                Voir tout
-              </Link>
-            </CardHeader>
+          <Link href="/dashboard/psy/students" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <div className="mindly-feature-heading">
+                  <span className="mindly-feature-icon">
+                    <UserRound />
+                  </span>
+                  <h2 className="mindly-feature-title">Etudiants assignes</h2>
+                </div>
 
-            <CardContent>
-              {latestAssignedStudents.length > 0 ? (
-                <div className="grid gap-3 md:grid-cols-2">
-                  {latestAssignedStudents.map((student) => (
-                    <Link
-                      key={student.id}
-                      className="flex items-center gap-3 rounded-2xl border border-border bg-card/85 p-4 transition hover:bg-dream-softer dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.10]"
-                      href="/dashboard/psy/students"
-                    >
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-dream-highlight text-dream-accent dark:bg-dream-softer0/15 dark:text-violet-100">
-                        <UserRound className="h-5 w-5" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-dream-heading dark:text-white">
-                          {getStudentName(student)}
-                        </p>
-                        <p className="truncate text-sm text-dream-muted dark:text-white/60">
-                          {student.email}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
-                  <UserRound className="h-5 w-5 text-dream-accent dark:text-violet-200" />
-                  <p className="text-sm text-dream-muted dark:text-white/65">
-                    Aucun etudiant assigne pour le moment.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                <span className="mindly-feature-action">
+                  Voir
+                  <ChevronRight />
+                </span>
+              </div>
+
+              <div className="mindly-feature-content">
+                {latestStudent ? (
+                  <div className="mindly-stack-md">
+                    <p className="mindly-feature-reference">{getStudentName(latestStudent)}</p>
+                    <p className="mindly-feature-text">{latestStudent.email}</p>
+                    <span className="mindly-ui-badge">
+                      {activeStudentIds.size} etudiant{activeStudentIds.size > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="mindly-feature-text">Aucun etudiant assigne pour le moment.</p>
+                )}
+              </div>
+            </article>
+          </Link>
         </div>
 
-        <div className="space-y-6">
-          <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-white">Rendez-vous</CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              {upcomingAppointments.length > 0 ? (
-                <div className="space-y-3">
-                  {upcomingAppointments.slice(0, 3).map((appointment) => (
-                    <Link
-                      key={appointment.id}
-                      className="flex items-start gap-3 rounded-2xl bg-emerald-50 p-3 transition hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/15"
-                      href="/dashboard/psy/rendez_vous"
-                    >
-                      <Clock className="mt-0.5 h-4 w-4 text-emerald-600 dark:text-emerald-200" />
-                      <div>
-                        <p className="text-sm font-medium text-dream-heading dark:text-white">
-                          {isUser(appointment.student)
-                            ? getStudentName(appointment.student)
-                            : 'Etudiant'}
-                        </p>
-                        <p className="text-xs text-dream-muted dark:text-white/60">
-                          {formatDate(appointment.date)} - {appointment.startTime}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
+        <div className="mindly-stack-lg">
+          <Link href="/dashboard/psy/rendez_vous" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <div className="mindly-feature-heading">
+                  <span className="mindly-feature-icon">
+                    <CalendarDays />
+                  </span>
+                  <h2 className="mindly-feature-title">Rendez-vous</h2>
                 </div>
-              ) : (
-                <p className="leading-7 text-dream-muted dark:text-white/65">
-                  Aucune consultation confirmee pour le moment.
-                </p>
-              )}
-            </CardContent>
-          </Card>
 
-          <Card className="rounded-[28px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:from-white/[0.08] dark:via-white/[0.06] dark:to-violet-500/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-white">
-                Suivi clinique
-              </CardTitle>
-            </CardHeader>
+                <ChevronRight className="mindly-feature-chevron" />
+              </div>
 
-            <CardContent>
-              {urgentAppointments.length > 0 ? (
-                <div className="space-y-3">
-                  {urgentAppointments.slice(0, 3).map((appointment) => (
-                    <Link
-                      key={appointment.id}
-                      className="block rounded-2xl border border-red-100 bg-red-50 p-3 transition hover:bg-red-100 dark:border-red-400/20 dark:bg-red-500/10"
-                      href="/dashboard/psy/rendez_vous"
-                    >
-                      <p className="flex items-center gap-2 text-sm font-semibold text-red-700 dark:text-red-200">
-                        <AlertTriangle className="h-4 w-4" />
-                        {isUser(appointment.student)
-                          ? getStudentName(appointment.student)
-                          : 'Etudiant'}
-                      </p>
-                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-red-700/80 dark:text-red-100/70">
-                        {appointment.reason}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 rounded-2xl bg-card/70 p-4 dark:bg-white/[0.06]">
-                    <CalendarDays className="h-5 w-5 text-dream-accent dark:text-violet-200" />
-                    <p className="text-sm leading-6 text-dream-muted dark:text-white/65">
-                      Aucun cas urgent actif.
+              <div className="mindly-feature-content">
+                {upcomingAppointments.length > 0 ? (
+                  <div className="mindly-stack-sm">
+                    <p className="mindly-feature-reference">
+                      {isUser(upcomingAppointments[0].student)
+                        ? getStudentName(upcomingAppointments[0].student)
+                        : 'Etudiant'}
                     </p>
+                    <p className="mindly-feature-text">
+                      {formatDate(upcomingAppointments[0].date)} - {upcomingAppointments[0].startTime}
+                    </p>
+                    <span className="mindly-ui-badge">
+                      {upcomingAppointments.length} consultation
+                      {upcomingAppointments.length > 1 ? 's' : ''}
+                    </span>
                   </div>
-                  {pendingAppointments.length > 0 ? (
-                    <Badge className="border-amber-200 bg-amber-50 text-amber-700">
-                      {pendingAppointments.length} demande(s) a traiter
-                    </Badge>
-                  ) : null}
+                ) : (
+                  <p className="mindly-feature-text">
+                    Aucune consultation confirmee pour le moment.
+                  </p>
+                )}
+              </div>
+            </article>
+          </Link>
+
+          <Link href="/dashboard/psy/rendez_vous" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <div className="mindly-feature-heading">
+                  <span className="mindly-feature-icon">
+                    <AlertTriangle />
+                  </span>
+                  <h2 className="mindly-feature-title">Suivi clinique</h2>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+
+                <ChevronRight className="mindly-feature-chevron" />
+              </div>
+
+              <div className="mindly-feature-content">
+                {urgentAppointments.length > 0 ? (
+                  <div className="mindly-stack-sm">
+                    <p className="mindly-feature-reference">
+                      {isUser(urgentAppointments[0].student)
+                        ? getStudentName(urgentAppointments[0].student)
+                        : 'Etudiant'}
+                    </p>
+                    <p className="mindly-feature-text line-clamp-3">
+                      {urgentAppointments[0].reason}
+                    </p>
+                    <span className="mindly-ui-badge">
+                      {urgentAppointments.length} urgent
+                    </span>
+                  </div>
+                ) : (
+                  <div className="mindly-stack-sm">
+                    <p className="mindly-feature-text">Aucun cas urgent actif.</p>
+                    {pendingAppointments.length > 0 ? (
+                      <span className="mindly-ui-badge">
+                        {pendingAppointments.length} demande
+                        {pendingAppointments.length > 1 ? 's' : ''} a traiter
+                      </span>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            </article>
+          </Link>
         </div>
       </div>
     </div>

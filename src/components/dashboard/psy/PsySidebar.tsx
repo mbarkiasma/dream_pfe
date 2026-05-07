@@ -33,18 +33,18 @@ export function PsySidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="dream-sidebar">
-      <div className="dream-sidebar-profile">
-        <div className="dream-sidebar-brand-icon">
+    <aside className="mindly-sidebar">
+      <div className="mindly-sidebar-profile">
+        <div className="mindly-sidebar-brand-icon">
           <HeartPulse />
         </div>
         <div className="min-w-0">
-          <p className="dream-sidebar-title">Espace psy</p>
-          <p className="dream-sidebar-subtitle">Suivi clinique</p>
+          <p className="mindly-sidebar-title">Espace psy</p>
+          <p className="mindly-sidebar-subtitle">Suivi clinique</p>
         </div>
       </div>
 
-      <nav className="dream-sidebar-nav">
+      <nav className="mindly-sidebar-nav">
         {navItems.map((item) => {
           const Icon = item.icon
           const active = isActivePath(pathname, item.href)
@@ -54,9 +54,9 @@ export function PsySidebar() {
               key={item.href}
               href={item.href}
               title={item.title}
-              className={active ? 'dream-sidebar-link-active' : 'dream-sidebar-link'}
+              className={active ? 'mindly-sidebar-link-active' : 'mindly-sidebar-link'}
             >
-              <span className="dream-sidebar-icon">
+              <span className="mindly-sidebar-icon">
                 <Icon />
               </span>
               <span className="truncate">{item.title}</span>
@@ -65,7 +65,7 @@ export function PsySidebar() {
         })}
       </nav>
 
-      <div className="dream-sidebar-footer">
+      <div className="mindly-sidebar-footer">
         <LogoutButton showLabel />
       </div>
     </aside>

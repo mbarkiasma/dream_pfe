@@ -10,22 +10,6 @@ import { PsyTopbar } from '@/components/dashboard/psy/PsyTopbar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const statusLabels: Record<RendezVousPsy['status'], string> = {
-  pending: 'En attente',
-  confirmed: 'Confirme',
-  rejected: 'Refuse',
-  cancelled: 'Annule',
-  completed: 'Termine',
-}
-
-const statusClasses: Record<RendezVousPsy['status'], string> = {
-  pending: 'border-border bg-dream-highlight text-dream-accent',
-  confirmed: 'border-border bg-white text-dream-accent',
-  rejected: 'border-border bg-dream-soft text-dream-accent',
-  cancelled: 'border-border bg-white text-dream-muted',
-  completed: 'border-border bg-dream-highlight text-dream-accent',
-}
-
 type AssignedStudent = {
   user: User
   appointments: RendezVousPsy[]
@@ -162,45 +146,45 @@ export default async function PsyStudentsPage() {
         ]}
       />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mindly-dashboard-grid">
         <div className="xl:col-span-2">
-          <Card className="overflow-hidden rounded-[32px] border border-border bg-card/85 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
-            <CardHeader className="border-b border-border/70 bg-white/65 pb-4 dark:border-white/10 dark:bg-white/[0.04]">
+          <Card className="mindly-feature-card overflow-hidden">
+            <CardHeader className="mindly-feature-header">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-dream-accent">
+                  <p className="mindly-dashboard-eyebrow">
                     Suivi clinique
                   </p>
-                  <CardTitle className="mt-1 text-2xl text-dream-heading dark:text-white">
+                  <CardTitle className="mindly-feature-title mt-1">
                     Etudiants assignes
                   </CardTitle>
                 </div>
-                <Badge className="border-border bg-dream-highlight text-dream-accent">
+                <Badge className="mindly-ui-badge">
                   {assignedStudents.length} dossier{assignedStudents.length > 1 ? 's' : ''}
                 </Badge>
               </div>
             </CardHeader>
 
-            <CardContent className="p-4">
+            <CardContent className="mindly-feature-content">
               {assignedStudents.length > 0 ? (
                 <div className="grid gap-3">
                   {assignedStudents.map((item) => (
                     <Link
                       key={item.user.id}
                       href="/dashboard/psy/rendez_vous"
-                      className="group block rounded-[26px] border border-border bg-card/90 p-4 shadow-[0_10px_30px_rgba(109,40,217,0.06)] transition hover:-translate-y-0.5 hover:border-border hover:bg-dream-softer hover:shadow-[0_18px_50px_rgba(109,40,217,0.12)] dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.09]"
+                      className="student-dreams-latest-box group block transition hover:-translate-y-0.5"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div className="min-w-0">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-[22px] bg-dream-highlight text-dream-accent transition group-hover:bg-dream-softer0 group-hover:text-white dark:bg-dream-softer0/15 dark:text-violet-100">
-                              <UserRound className="h-5 w-5" />
+                            <div className="mindly-feature-icon">
+                              <UserRound />
                             </div>
                             <div>
-                              <p className="text-lg font-semibold text-dream-heading dark:text-white">
+                              <p className="mindly-feature-reference">
                                 {getStudentName(item.user)}
                               </p>
-                              <p className="mt-1 flex items-center gap-1 text-sm text-dream-muted dark:text-white/60">
+                              <p className="mindly-feature-text mt-1 flex items-center gap-1">
                                 <Mail className="h-3.5 w-3.5" />
                                 {item.user.email}
                               </p>
@@ -208,33 +192,33 @@ export default async function PsyStudentsPage() {
                           </div>
 
                           <div className="mt-4 flex flex-wrap gap-2">
-                            <Badge className="border-border bg-dream-softer text-dream-accent">
+                            <Badge className="mindly-ui-badge">
                               {item.appointments.length} rendez-vous
                             </Badge>
                             {item.pendingCount > 0 ? (
-                              <Badge className="border-border bg-dream-highlight text-dream-accent">
+                              <Badge className="mindly-ui-badge">
                                 {item.pendingCount} en attente
                               </Badge>
                             ) : null}
                             {item.urgentCount > 0 ? (
-                              <Badge className="border-border bg-white text-dream-accent">
+                              <Badge className="mindly-ui-badge">
                                 {item.urgentCount} urgent
                               </Badge>
                             ) : null}
                           </div>
                         </div>
 
-                        <div className="min-w-[190px] rounded-[22px] border border-border bg-dream-soft p-3 dark:border-white/10 dark:bg-white/[0.06]">
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-dream-accent">
+                        <div className="student-dreams-latest-box min-w-[190px]">
+                          <p className="mindly-dashboard-eyebrow">
                             Prochaine consultation
                           </p>
                           {item.nextAppointment ? (
-                            <p className="mt-2 text-sm font-medium text-dream-heading dark:text-white">
+                            <p className="mindly-feature-reference mt-2">
                               {formatDate(item.nextAppointment.date)} a{' '}
                               {item.nextAppointment.startTime}
                             </p>
                           ) : (
-                            <p className="mt-2 text-sm text-dream-muted dark:text-white/60">
+                            <p className="mindly-feature-text mt-2">
                               Aucune consultation confirmee
                             </p>
                           )}
@@ -244,15 +228,15 @@ export default async function PsyStudentsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 rounded-[24px] border border-border bg-dream-softer p-5 dark:border-white/10 dark:bg-white/[0.06]">
-                  <div className="rounded-2xl bg-dream-highlight p-3 dark:bg-violet-400/15">
-                    <UserRound className="h-5 w-5 text-dream-accent dark:text-violet-200" />
+                <div className="student-dreams-latest-box flex items-center gap-3">
+                  <div className="mindly-feature-icon">
+                    <UserRound />
                   </div>
                   <div>
-                    <p className="font-medium text-dream-heading dark:text-white">
+                    <p className="mindly-feature-reference">
                       Aucun etudiant assigne
                     </p>
-                    <p className="text-sm text-[#7A6A99] dark:text-white/60">
+                    <p className="mindly-feature-text">
                       Les etudiants apparaitront ici apres une demande de rendez-vous.
                     </p>
                   </div>
@@ -262,29 +246,29 @@ export default async function PsyStudentsPage() {
           </Card>
         </div>
 
-        <div className="space-y-5">
-          <Card className="rounded-[30px] border border-border bg-card/85 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-white">Rendez-vous</CardTitle>
+        <div className="mindly-stack-lg">
+          <Card className="mindly-feature-card">
+            <CardHeader className="mindly-feature-header">
+              <CardTitle className="mindly-feature-title">Rendez-vous</CardTitle>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="mindly-feature-content">
               {upcomingAppointments.length > 0 ? (
                 <div className="space-y-3">
                   {upcomingAppointments.slice(0, 4).map((appointment) => (
                     <Link
                       key={appointment.id}
-                      className="flex items-start gap-3 rounded-[22px] border border-border bg-dream-softer p-3 transition hover:border-border hover:bg-dream-highlight dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.10]"
+                      className="student-dreams-latest-box flex items-start gap-3 transition hover:-translate-y-0.5"
                       href="/dashboard/psy/rendez_vous"
                     >
-                      <Clock className="mt-0.5 h-4 w-4 text-dream-accent dark:text-violet-200" />
+                      <Clock className="mt-0.5 h-4 w-4 text-[var(--mindly-primary)]" />
                       <div>
-                        <p className="text-sm font-medium text-dream-heading dark:text-white">
+                        <p className="mindly-feature-reference">
                           {isUser(appointment.student)
                             ? getStudentName(appointment.student)
                             : 'Etudiant'}
                         </p>
-                        <p className="text-xs text-dream-muted dark:text-white/60">
+                        <p className="mindly-feature-text">
                           {formatDate(appointment.date)} - {appointment.startTime}
                         </p>
                       </div>
@@ -292,45 +276,45 @@ export default async function PsyStudentsPage() {
                   ))}
                 </div>
               ) : (
-                <p className="leading-7 text-dream-muted dark:text-white/65">
+                <p className="mindly-feature-text">
                   Aucune consultation confirmee pour le moment.
                 </p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-[30px] border border-border bg-gradient-to-br from-white via-[#FDF7FF] to-[#F3ECFF] shadow-dream-card backdrop-blur dark:border-white/10 dark:from-white/[0.08] dark:via-white/[0.06] dark:to-violet-500/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-dream-heading dark:text-white">
+          <Card className="mindly-feature-card">
+            <CardHeader className="mindly-feature-header">
+              <CardTitle className="mindly-feature-title">
                 Suivi clinique
               </CardTitle>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="mindly-feature-content">
               {urgentAppointments.length > 0 ? (
                 <div className="space-y-3">
                   {urgentAppointments.slice(0, 4).map((appointment) => (
                     <Link
                       key={appointment.id}
-                      className="block rounded-[22px] border border-border bg-card/80 p-3 transition hover:border-border hover:bg-white dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.10]"
+                      className="student-dreams-latest-box block transition hover:-translate-y-0.5"
                       href="/dashboard/psy/rendez_vous"
                     >
-                      <p className="flex items-center gap-2 text-sm font-semibold text-dream-accent dark:text-violet-200">
+                      <p className="flex items-center gap-2 text-sm font-semibold text-[var(--mindly-primary)]">
                         <AlertTriangle className="h-4 w-4" />
                         {isUser(appointment.student)
                           ? getStudentName(appointment.student)
                           : 'Etudiant'}
                       </p>
-                      <p className="mt-1 text-xs leading-5 text-dream-muted dark:text-white/70">
+                      <p className="mindly-feature-text mt-1">
                         {appointment.reason}
                       </p>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 rounded-[22px] border border-border bg-card/70 p-4 dark:border-white/10 dark:bg-white/[0.06]">
-                  <CalendarDays className="h-5 w-5 text-dream-accent dark:text-violet-200" />
-                  <p className="text-sm leading-6 text-dream-muted dark:text-white/65">
+                <div className="student-dreams-latest-box flex items-center gap-3">
+                  <CalendarDays className="h-5 w-5 text-[var(--mindly-primary)]" />
+                  <p className="mindly-feature-text">
                     Aucun cas urgent actif. Les demandes urgentes seront affichees ici.
                   </p>
                 </div>

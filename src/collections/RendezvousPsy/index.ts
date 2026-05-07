@@ -70,6 +70,15 @@ export const RendezvousPsy: CollectionConfig = {
         },
       },
     },
+        {
+      name: 'orientation',
+      type: 'relationship',
+      relationTo: 'psy-orientations',
+      label: 'Orientation coach',
+      admin: {
+        description: "Renseigne si ce rendez-vous vient d'une orientation creee par un coach.",
+      },
+    },
     {
       name: 'date',
       type: 'date',

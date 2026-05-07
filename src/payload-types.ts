@@ -80,6 +80,9 @@ export interface Config {
     notifications: Notification;
     'annonce-motivation': AnnonceMotivation;
     'annonce-motivation-reactions': AnnonceMotivationReaction;
+    'coaching-events': CoachingEvent;
+    'coaching-registrations': CoachingRegistration;
+    'psy-orientations': PsyOrientation;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -105,6 +108,9 @@ export interface Config {
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     'annonce-motivation': AnnonceMotivationSelect<false> | AnnonceMotivationSelect<true>;
     'annonce-motivation-reactions': AnnonceMotivationReactionsSelect<false> | AnnonceMotivationReactionsSelect<true>;
+    'coaching-events': CoachingEventsSelect<false> | CoachingEventsSelect<true>;
+    'coaching-registrations': CoachingRegistrationsSelect<false> | CoachingRegistrationsSelect<true>;
+    'psy-orientations': PsyOrientationsSelect<false> | PsyOrientationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -832,6 +838,10 @@ export interface RendezVousPsy {
   title: string;
   student: number | User;
   psychologist: number | User;
+  /**
+   * Renseigne si ce rendez-vous vient d'une orientation creee par un coach.
+   */
+  orientation?: (number | null) | PsyOrientation;
   date: string;
   startTime: string;
   endTime: string;
@@ -842,6 +852,24 @@ export interface RendezVousPsy {
    * Expliquez pourquoi le rendez-vous est refuse afin d'orienter l'etudiant.
    */
   rejectionReason?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "psy-orientations".
+ */
+export interface PsyOrientation {
+  id: number;
+  title: string;
+  student: number | User;
+  coach: number | User;
+  reason: string;
+  observation?: string | null;
+  status: 'pending_student_response' | 'student_refused' | 'student_accepted' | 'appointment_requested' | 'cancelled';
+  studentRefusalReason?: string | null;
+  studentRespondedAt?: string | null;
+  appointment?: (number | null) | RendezVousPsy;
   updatedAt: string;
   createdAt: string;
 }
@@ -887,6 +915,41 @@ export interface AnnonceMotivationReaction {
   announcement: number | AnnonceMotivation;
   student: number | User;
   reaction: 'like';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-events".
+ */
+export interface CoachingEvent {
+  id: number;
+  title: string;
+  theme: string;
+  description: string;
+  coach: number | User;
+  scheduledAt: string;
+  durationMinutes: number;
+  teamsJoinUrl?: string | null;
+  status: 'draft' | 'published' | 'cancelled' | 'completed';
+  announcementSentAt?: string | null;
+  reminderSentAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-registrations".
+ */
+export interface CoachingRegistration {
+  id: number;
+  event: number | CoachingEvent;
+  student: number | User;
+  motivation: string;
+  questions?: string | null;
+  specialNeeds?: string | null;
+  status: 'registered' | 'cancelled';
+  registeredAt: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1125,6 +1188,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'annonce-motivation-reactions';
         value: number | AnnonceMotivationReaction;
+      } | null)
+    | ({
+        relationTo: 'coaching-events';
+        value: number | CoachingEvent;
+      } | null)
+    | ({
+        relationTo: 'coaching-registrations';
+        value: number | CoachingRegistration;
+      } | null)
+    | ({
+        relationTo: 'psy-orientations';
+        value: number | PsyOrientation;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1596,6 +1671,7 @@ export interface RendezVousPsySelect<T extends boolean = true> {
   title?: T;
   student?: T;
   psychologist?: T;
+  orientation?: T;
   date?: T;
   startTime?: T;
   endTime?: T;
@@ -1645,6 +1721,56 @@ export interface AnnonceMotivationReactionsSelect<T extends boolean = true> {
   announcement?: T;
   student?: T;
   reaction?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-events_select".
+ */
+export interface CoachingEventsSelect<T extends boolean = true> {
+  title?: T;
+  theme?: T;
+  description?: T;
+  coach?: T;
+  scheduledAt?: T;
+  durationMinutes?: T;
+  teamsJoinUrl?: T;
+  status?: T;
+  announcementSentAt?: T;
+  reminderSentAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaching-registrations_select".
+ */
+export interface CoachingRegistrationsSelect<T extends boolean = true> {
+  event?: T;
+  student?: T;
+  motivation?: T;
+  questions?: T;
+  specialNeeds?: T;
+  status?: T;
+  registeredAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "psy-orientations_select".
+ */
+export interface PsyOrientationsSelect<T extends boolean = true> {
+  title?: T;
+  student?: T;
+  coach?: T;
+  reason?: T;
+  observation?: T;
+  status?: T;
+  studentRefusalReason?: T;
+  studentRespondedAt?: T;
+  appointment?: T;
   updatedAt?: T;
   createdAt?: T;
 }
