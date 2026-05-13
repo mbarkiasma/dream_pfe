@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin } from '@/access/roles'
+
 export const AnalysePersonnalite: CollectionConfig = {
   slug: 'analyse-personnalite',
   labels: {
@@ -15,7 +17,7 @@ export const AnalysePersonnalite: CollectionConfig = {
     read: ({ req: { user } }) => {
       if (!user) return false
 
-      if (user.role === 'coach' || user.role === 'psy') {
+      if (isAdmin(user) || user.role === 'coach' || user.role === 'psy') {
         return true
       }
 
@@ -27,7 +29,7 @@ export const AnalysePersonnalite: CollectionConfig = {
     },
     create: ({ req: { user } }) => Boolean(user),
     update: () => false,
-    delete: () => false,
+    delete: ({ req: { user } }) => isAdmin(user),
   },
   fields: [
     {

@@ -11,6 +11,8 @@ const adminOnlyAccess: Access = ({ req: { user } }) => hasRole(user, ['admin'])
 
 const adminOnlyFieldAccess: FieldAccess = ({ req: { user } }) => hasRole(user, ['admin'])
 
+const generatedProfileFieldAccess: FieldAccess = ({ req: { user } }) => hasRole(user, ['admin'])
+
 const adminOrSelf: Access = ({ req: { user } }) => {
   if (!user) return false
   if (hasRole(user, ['admin'])) return true
@@ -48,6 +50,62 @@ export const Users: CollectionConfig = {
           depth: 0,
           req,
         })
+
+        const coachingEvents = await req.payload.find({
+          collection: 'coaching-events',
+          where: {
+            coach: {
+              equals: userId,
+            },
+          },
+          depth: 0,
+          limit: 1000,
+          overrideAccess: true,
+          req,
+        })
+        const coachingEventIds = coachingEvents.docs.map((event) => event.id)
+
+        if (coachingEventIds.length > 0) {
+          await req.payload.delete({
+            collection: 'coaching-registrations',
+            where: {
+              event: {
+                in: coachingEventIds,
+              },
+            },
+            overrideAccess: true,
+            req,
+          })
+        }
+
+        const motivationAnnouncements = await req.payload.find({
+          collection: 'annonce-motivation',
+          where: {
+            author: {
+              equals: userId,
+            },
+          },
+          depth: 0,
+          limit: 1000,
+          overrideAccess: true,
+          req,
+        })
+        const motivationAnnouncementIds = motivationAnnouncements.docs.map(
+          (announcement) => announcement.id,
+        )
+
+        if (motivationAnnouncementIds.length > 0) {
+          await req.payload.delete({
+            collection: 'annonce-motivation-reactions',
+            where: {
+              announcement: {
+                in: motivationAnnouncementIds,
+              },
+            },
+            overrideAccess: true,
+            req,
+          })
+        }
 
         await req.payload.delete({
           collection: 'coaching-messages',
@@ -90,6 +148,15 @@ export const Users: CollectionConfig = {
         })
 
         await req.payload.delete({
+          collection: 'psy-orientations',
+          where: {
+            or: [{ student: { equals: userId } }, { coach: { equals: userId } }],
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
           collection: 'rendez-vous-psy',
           where: {
             or: [{ student: { equals: userId } }, { psychologist: { equals: userId } }],
@@ -110,6 +177,28 @@ export const Users: CollectionConfig = {
         })
 
         await req.payload.delete({
+          collection: 'coaching-registrations',
+          where: {
+            student: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'coaching-events',
+          where: {
+            coach: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
           collection: 'annonce-motivation-reactions',
           where: {
             student: {
@@ -121,9 +210,56 @@ export const Users: CollectionConfig = {
         })
 
         await req.payload.delete({
+          collection: 'annonce-motivation',
+          where: {
+            author: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
           collection: 'analyse-personnalite',
           where: {
             user: {
+              equals: userId,
+            },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        const dreams = await req.payload.find({
+          collection: 'dreams',
+          where: {
+            user: {
+              equals: userId,
+            },
+          },
+          depth: 0,
+          limit: 1000,
+          overrideAccess: true,
+          req,
+        })
+
+        for (const dream of dreams.docs) {
+          await req.payload.update({
+            collection: 'dreams',
+            id: dream.id,
+            overrideAccess: true,
+            req,
+            data: {
+              videoAsset: null,
+            },
+          })
+        }
+
+        await req.payload.delete({
+          collection: 'media',
+          where: {
+            owner: {
               equals: userId,
             },
           },
@@ -256,6 +392,80 @@ export const Users: CollectionConfig = {
       admin: {
         condition: (_, siblingData) => siblingData?.role === 'coach',
       },
+    },
+    {
+      name: 'bigFiveProfile',
+      type: 'group',
+      label: 'Profil Big Five',
+      access: {
+        update: generatedProfileFieldAccess,
+      },
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'etudiant',
+        description:
+          "Derniers traits Big Five enregistres automatiquement apres l'entretien de personnalite.",
+      },
+      fields: [
+        {
+          name: 'analysisId',
+          type: 'number',
+          label: 'ID analyse',
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'date',
+          type: 'date',
+          admin: {
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
+            readOnly: true,
+          },
+        },
+        {
+          name: 'traits',
+          type: 'array',
+          label: 'Traits Big Five',
+          minRows: 5,
+          maxRows: 5,
+          admin: {
+            readOnly: true,
+          },
+          fields: [
+            {
+              name: 'name',
+              type: 'select',
+              required: true,
+              options: [
+                { label: 'Ouverture', value: 'Ouverture' },
+                { label: 'Conscienciosite', value: 'Conscienciosite' },
+                { label: 'Extraversion', value: 'Extraversion' },
+                { label: 'Agreabilite', value: 'Agreabilite' },
+                { label: 'Neuroticisme', value: 'Neuroticisme' },
+              ],
+            },
+            {
+              name: 'score',
+              type: 'number',
+              required: true,
+              min: 1,
+              max: 10,
+            },
+            {
+              name: 'confidence',
+              type: 'select',
+              options: [
+                { label: 'Eleve', value: 'eleve' },
+                { label: 'Moyen', value: 'moyen' },
+                { label: 'Faible', value: 'faible' },
+              ],
+              defaultValue: 'moyen',
+            },
+          ],
+        },
+      ],
     },
   ],
   timestamps: true,

@@ -2,11 +2,11 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { ChevronRight } from 'lucide-react'
 
 import type { AnalysePersonnalite, CoachingEvent, CoachingSession, User } from '@/payload-types'
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
 import { CoachStatsCards } from '@/components/dashboard/coach/CoachStatsCards'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getRelationId } from '@/lib/coaching'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
@@ -182,98 +182,112 @@ export default async function CoachDashboardPage() {
 
       <div className="mindly-dashboard-grid">
         <div className="xl:col-span-2">
-          <Card className="mindly-feature-card">
-            <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">Etudiants a suivre</CardTitle>
-            </CardHeader>
+          <Link href="/dashboard/coach/students" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <h2 className="mindly-feature-title">Etudiants a suivre</h2>
+                <span className="mindly-feature-action">
+                  Voir
+                  <ChevronRight />
+                </span>
+              </div>
 
-            <CardContent className="mindly-feature-content">
-              {studentList.length > 0 ? (
-                <div className="mindly-stack-sm">
-                  {studentList.map((student) => (
-                    <div key={student.id} className="student-dreams-latest-box">
-                      <div className="student-dreams-latest-header">
-                        <div>
-                          <p className="mindly-feature-reference">{student.name}</p>
-                          <p className="mindly-feature-text mt-1">
-                            {student.email || 'Email non renseigne'}
-                          </p>
+              <div className="mindly-feature-content">
+                {studentList.length > 0 ? (
+                  <div className="mindly-stack-sm">
+                    {studentList.map((student) => (
+                      <div key={student.id} className="student-dreams-latest-box">
+                        <div className="student-dreams-latest-header">
+                          <div>
+                            <p className="mindly-feature-reference">{student.name}</p>
+                            <p className="mindly-feature-text mt-1">
+                              {student.email || 'Email non renseigne'}
+                            </p>
+                          </div>
+                          <span className="mindly-ui-badge">{student.source}</span>
                         </div>
-                        <span className="mindly-ui-badge">{student.source}</span>
                       </div>
-                    </div>
-                  ))}
-
-                  <Link href="/dashboard/coach/students" className="mindly-ui-badge w-fit">
-                    Voir les etudiants
-                  </Link>
-                </div>
-              ) : (
-                <>
-                  <p className="mindly-feature-text">
-                    Aucun etudiant n&apos;est encore rattache a vos sessions ou seances.
-                  </p>
-
-                  <div className="mt-4">
-                    <span className="mindly-ui-badge">Aucun etudiant</span>
+                    ))}
                   </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <>
+                    <p className="mindly-feature-text">
+                      Aucun etudiant n&apos;est encore rattache a vos sessions ou seances.
+                    </p>
+
+                    <div className="mt-4">
+                      <span className="mindly-ui-badge">Aucun etudiant</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </article>
+          </Link>
         </div>
 
         <div className="mindly-stack-lg">
-          <Card className="mindly-feature-card">
-            <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">Exercices recents</CardTitle>
-            </CardHeader>
-
-            <CardContent className="mindly-feature-content">
-              <p className="mindly-feature-text">
-                Aucun exercice n&apos;est encore attribue. Le module exercices pourra etre connecte a
-                une collection dediee lorsque vous commencerez cette partie.
-              </p>
-
-              <div className="mt-4">
-                <span className="mindly-ui-badge">0 exercice actif</span>
+          <Link href="/dashboard/coach/exercices" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <h2 className="mindly-feature-title">Exercices recents</h2>
+                <span className="mindly-feature-action">
+                  Voir
+                  <ChevronRight />
+                </span>
               </div>
-            </CardContent>
-          </Card>
 
-          <Card className="mindly-feature-card">
-            <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">Orientation vers psychologue</CardTitle>
-            </CardHeader>
+              <div className="mindly-feature-content">
+                <p className="mindly-feature-text">
+                  Aucun exercice n&apos;est encore attribue. Le module exercices pourra etre connecte a
+                  une collection dediee lorsque vous commencerez cette partie.
+                </p>
 
-            <CardContent className="mindly-feature-content">
-              {orientationAnalyses.docs.length > 0 ? (
-                <div className="mindly-stack-sm">
-                  {(orientationAnalyses.docs as AnalysePersonnalite[]).map((analyse) => (
-                    <div key={analyse.id} className="student-dreams-latest-box">
-                      <p className="mindly-feature-reference">
-                        {isUser(analyse.user) ? getStudentName(analyse.user) : 'Etudiant'}
-                      </p>
-                      <p className="mindly-feature-text mt-1">
-                        Analyse du {formatDate(analyse.date)}
-                      </p>
-                      <span className="mindly-ui-badge mt-3">Confiance moderee</span>
-                    </div>
-                  ))}
+                <div className="mt-4">
+                  <span className="mindly-ui-badge">0 exercice actif</span>
                 </div>
-              ) : (
-                <>
-                  <p className="mindly-feature-text">
-                    Aucun cas prioritaire detecte parmi les etudiants suivis pour le moment.
-                  </p>
+              </div>
+            </article>
+          </Link>
 
-                  <div className="mt-4">
-                    <span className="mindly-ui-badge">Aucun cas</span>
+          <Link href="/dashboard/coach/orientation_psy" className="mindly-feature-link">
+            <article className="mindly-feature-card">
+              <div className="mindly-feature-header">
+                <h2 className="mindly-feature-title">Orientation vers psychologue</h2>
+                <span className="mindly-feature-action">
+                  Voir
+                  <ChevronRight />
+                </span>
+              </div>
+
+              <div className="mindly-feature-content">
+                {orientationAnalyses.docs.length > 0 ? (
+                  <div className="mindly-stack-sm">
+                    {(orientationAnalyses.docs as AnalysePersonnalite[]).map((analyse) => (
+                      <div key={analyse.id} className="student-dreams-latest-box">
+                        <p className="mindly-feature-reference">
+                          {isUser(analyse.user) ? getStudentName(analyse.user) : 'Etudiant'}
+                        </p>
+                        <p className="mindly-feature-text mt-1">
+                          Analyse du {formatDate(analyse.date)}
+                        </p>
+                        <span className="mindly-ui-badge mt-3">Confiance moderee</span>
+                      </div>
+                    ))}
                   </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <>
+                    <p className="mindly-feature-text">
+                      Aucun cas prioritaire detecte parmi les etudiants suivis pour le moment.
+                    </p>
+
+                    <div className="mt-4">
+                      <span className="mindly-ui-badge">Aucun cas</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </article>
+          </Link>
         </div>
       </div>
     </div>

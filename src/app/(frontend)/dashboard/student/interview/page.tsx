@@ -26,7 +26,7 @@ export default function StudentInterviewPage() {
           <section className="interview-card interview-side-card">
             <h2 className="interview-card-title">Statut</h2>
             <p className="interview-side-text">
-                Le statut de l'entretien apparaitra ici : en attente, commence ou termine.
+                Le statut de l&apos;entretien apparaitra ici : en attente, commence ou termine.
             </p>
 
             <span className="interview-badge">En attente</span>
@@ -35,8 +35,8 @@ export default function StudentInterviewPage() {
           <section className="interview-card interview-side-card">
             <h2 className="interview-card-title">Resultat futur</h2>
             <p className="interview-side-text">
-                Les reponses fournies par l'etudiant serviront plus tard a enrichir l'analyse et a
-                ameliorer l'accompagnement personnalise.
+                Les reponses fournies par l&apos;etudiant serviront plus tard a enrichir l&apos;analyse et a
+                ameliorer l&apos;accompagnement personnalise.
             </p>
           </section>
         </aside>

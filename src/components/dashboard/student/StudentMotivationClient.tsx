@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Heart, Megaphone, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -53,8 +54,33 @@ export function StudentMotivationClient({ announcements }: Props) {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<MotivationAnnouncement | null>(
     null,
   )
+  const [isMounted, setIsMounted] = useState(false)
   const [pendingReactionId, setPendingReactionId] = useState<string | number | null>(null)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!selectedAnnouncement) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setSelectedAnnouncement(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [selectedAnnouncement])
 
   async function reactToAnnouncement(announcementId: string | number, reaction: ReactionValue) {
     setError('')
@@ -91,7 +117,7 @@ export function StudentMotivationClient({ announcements }: Props) {
       {announcements.length === 0 ? (
         <Card className="student-motivation-empty-card">
           <CardContent className="student-motivation-empty-content">
-            Aucune annonce de motivation n'est disponible pour le moment.
+            Aucune annonce de motivation n&apos;est disponible pour le moment.
           </CardContent>
         </Card>
       ) : null}
@@ -159,59 +185,64 @@ export function StudentMotivationClient({ announcements }: Props) {
 
       {error ? <p className="student-motivation-error">{error}</p> : null}
 
-      {selectedAnnouncement ? (
-        <div
-          className="mindly-modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelectedAnnouncement(null)}
-        >
-          <div
-            className="student-motivation-modal-panel"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="student-motivation-modal-header">
-              <div className="student-motivation-modal-heading">
-                <div>
-                  <p className="student-motivation-modal-label">Motivation</p>
-                  <h3 className="student-motivation-modal-title">
-                    {selectedAnnouncement.title}
-                  </h3>
-                  <p className="student-motivation-modal-meta">
-                    Publiee par {getAuthorName(selectedAnnouncement.author)} -{' '}
-                    {formatDate(selectedAnnouncement.publishedAt || selectedAnnouncement.createdAt)}
-                  </p>
+      {isMounted && selectedAnnouncement
+        ? createPortal(
+            <div
+              className="mindly-modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              onClick={() => setSelectedAnnouncement(null)}
+            >
+              <div
+                className="student-motivation-modal-panel"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="student-motivation-modal-header">
+                  <div className="student-motivation-modal-heading">
+                    <div>
+                      <p className="student-motivation-modal-label">Motivation</p>
+                      <h3 className="student-motivation-modal-title">
+                        {selectedAnnouncement.title}
+                      </h3>
+                      <p className="student-motivation-modal-meta">
+                        Publiee par {getAuthorName(selectedAnnouncement.author)} -{' '}
+                        {formatDate(
+                          selectedAnnouncement.publishedAt || selectedAnnouncement.createdAt,
+                        )}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAnnouncement(null)}
+                      className="student-motivation-modal-close"
+                      aria-label="Fermer l'annonce"
+                    >
+                      <X />
+                    </button>
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedAnnouncement(null)}
-                  className="student-motivation-modal-close"
-                  aria-label="Fermer l'annonce"
-                >
-                  <X />
-                </button>
-              </div>
-            </div>
+                <div className="student-motivation-modal-body">
+                  <div className="student-motivation-modal-content">
+                    <p className="student-motivation-modal-text">{selectedAnnouncement.content}</p>
+                  </div>
+                </div>
 
-            <div className="student-motivation-modal-body">
-              <div className="student-motivation-modal-content">
-                <p className="student-motivation-modal-text">{selectedAnnouncement.content}</p>
+                <div className="student-motivation-modal-footer">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAnnouncement(null)}
+                    className="student-motivation-modal-main-button"
+                  >
+                    Fermer
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div className="student-motivation-modal-footer">
-              <button
-                type="button"
-                onClick={() => setSelectedAnnouncement(null)}
-                className="student-motivation-modal-main-button"
-              >
-                Fermer
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+            </div>,
+          document.body,
+        )
+        : null}
     </div>
   )
 }

@@ -83,6 +83,7 @@ export interface Config {
     'coaching-events': CoachingEvent;
     'coaching-registrations': CoachingRegistration;
     'psy-orientations': PsyOrientation;
+    'student-exercices': StudentExercice;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -111,6 +112,7 @@ export interface Config {
     'coaching-events': CoachingEventsSelect<false> | CoachingEventsSelect<true>;
     'coaching-registrations': CoachingRegistrationsSelect<false> | CoachingRegistrationsSelect<true>;
     'psy-orientations': PsyOrientationsSelect<false> | PsyOrientationsSelect<true>;
+    'student-exercices': StudentExercicesSelect<false> | StudentExercicesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -659,6 +661,21 @@ export interface User {
    */
   coachingSpecialty?: string | null;
   coachingBio?: string | null;
+  /**
+   * Derniers traits Big Five enregistres automatiquement apres l'entretien de personnalite.
+   */
+  bigFiveProfile?: {
+    analysisId?: number | null;
+    date?: string | null;
+    traits?:
+      | {
+          name: 'Ouverture' | 'Conscienciosite' | 'Extraversion' | 'Agreabilite' | 'Neuroticisme';
+          score: number;
+          confidence?: ('eleve' | 'moyen' | 'faible') | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -955,6 +972,26 @@ export interface CoachingRegistration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "student-exercices".
+ */
+export interface StudentExercice {
+  id: number;
+  title: string;
+  instructions: string;
+  student: number | User;
+  coach: number | User;
+  reason?: string | null;
+  status: 'assigned' | 'in_progress' | 'completed' | 'reviewed' | 'missed';
+  dueDate?: string | null;
+  studentResponse?: string | null;
+  coachFeedback?: string | null;
+  assignedAt: string;
+  completedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1200,6 +1237,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'psy-orientations';
         value: number | PsyOrientation;
+      } | null)
+    | ({
+        relationTo: 'student-exercices';
+        value: number | StudentExercice;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1492,6 +1533,20 @@ export interface UsersSelect<T extends boolean = true> {
   isAvailableForCoaching?: T;
   coachingSpecialty?: T;
   coachingBio?: T;
+  bigFiveProfile?:
+    | T
+    | {
+        analysisId?: T;
+        date?: T;
+        traits?:
+          | T
+          | {
+              name?: T;
+              score?: T;
+              confidence?: T;
+              id?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1771,6 +1826,25 @@ export interface PsyOrientationsSelect<T extends boolean = true> {
   studentRefusalReason?: T;
   studentRespondedAt?: T;
   appointment?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "student-exercices_select".
+ */
+export interface StudentExercicesSelect<T extends boolean = true> {
+  title?: T;
+  instructions?: T;
+  student?: T;
+  coach?: T;
+  reason?: T;
+  status?: T;
+  dueDate?: T;
+  studentResponse?: T;
+  coachFeedback?: T;
+  assignedAt?: T;
+  completedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

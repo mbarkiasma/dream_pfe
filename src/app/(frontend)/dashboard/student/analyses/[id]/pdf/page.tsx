@@ -1,9 +1,9 @@
-import { headers as getHeaders } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { PrintPdfButton } from '@/components/dashboard/student/PrintPdfButton'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 type PageProps = {
   params: Promise<{
@@ -22,8 +22,7 @@ function formatAnalysisDate(value: string) {
 export default async function StudentAnalysisPdfPage({ params }: PageProps) {
   const { id } = await params
   const payload = await getPayload({ config })
-  const headers = await getHeaders()
-  const { user } = await payload.auth({ headers })
+  const { user } = await getAuthenticatedDashboardUser()
 
   if (!user) {
     notFound()
@@ -48,7 +47,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
         <div className="mb-8 flex flex-col gap-4 border-b border-[var(--mindly-border)] pb-6 print:hidden md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.25em] text-[var(--mindly-primary)]">
-              Rapport d'analyse
+              Rapport d&apos;analyse
             </p>
             <h1 className="mt-2 text-3xl font-bold text-[var(--mindly-text-strong)]">
               {analyse.reference}
@@ -61,7 +60,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
         <div className="mb-8 hidden border-b border-slate-200 pb-6 print:block">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
-            Rapport d'analyse de personnalite
+            Rapport d&apos;analyse de personnalite
           </p>
           <h1 className="mt-2 text-3xl font-semibold">{analyse.reference}</h1>
           <p className="mt-2 text-sm text-slate-600">Date : {date}</p>
@@ -70,7 +69,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
         <section className="grid gap-4 md:grid-cols-2">
           <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Vue d'ensemble
+              Vue d&apos;ensemble
             </h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
               {analyse.overview || "Aucune vue d'ensemble disponible."}

@@ -258,7 +258,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                   <tr className="dream-surface-muted border-b border-border text-xs font-bold uppercase tracking-[0.12em] text-dream-muted">
                     <th className="px-5 py-4">Annonce</th>
                     <th className="px-4 py-4">Statut</th>
-                    <th className="px-4 py-4">J'aime</th>
+                    <th className="px-4 py-4">J&apos;aime</th>
                     <th className="px-4 py-4">Date</th>
                     <th className="px-5 py-4 text-right">Actions</th>
                   </tr>
@@ -358,7 +358,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                       {selectedLikesAnnouncement.title}
                     </h3>
                     <p className="dream-text-modal-subtitle">
-                      {selectedLikesAnnouncement.reactions?.likeCount ?? 0} J'aime
+                      {selectedLikesAnnouncement.reactions?.likeCount ?? 0} J&apos;aime
                     </p>
                   </div>
 
@@ -406,7 +406,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                   </div>
                 ) : (
                   <div className="dream-card-dashed rounded-[26px] border p-6 text-center dream-text-form-description">
-                    Aucun etudiant n'a encore aime cette motivation.
+                    Aucun etudiant n&apos;a encore aime cette motivation.
                   </div>
                 )}
               </div>

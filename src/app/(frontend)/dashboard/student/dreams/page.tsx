@@ -1,16 +1,15 @@
-import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { StudentDreamsClient } from '@/components/dashboard/student/StudentDreamsClient'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 const WEEKLY_LIMIT = 4
 
 export default async function StudentDreamsPage() {
   const payload = await getPayload({ config })
-  const headers = await getHeaders()
-  const { user } = await payload.auth({ headers })
+  const { user } = await getAuthenticatedDashboardUser()
 
   const now = new Date()
   const day = now.getDay()
@@ -19,44 +18,44 @@ export default async function StudentDreamsPage() {
   startOfWeek.setDate(now.getDate() - diffToMonday)
   startOfWeek.setHours(0, 0, 0, 0)
 
-  const dreams = user
-    ? await payload.find({
-        collection: 'dreams',
-        user,
-        overrideAccess: false,
-        where: {
-          user: {
-            equals: user.id,
+  const [dreams, dreamsThisWeek] = user
+    ? await Promise.all([
+        payload.find({
+          collection: 'dreams',
+          user,
+          overrideAccess: false,
+          where: {
+            user: {
+              equals: user.id,
+            },
           },
-        },
-        depth: 1,
-        sort: '-createdAt',
-        limit: 50,
-      })
-    : { docs: [], totalDocs: 0 }
-
-  const dreamsThisWeek = user
-    ? await payload.find({
-        collection: 'dreams',
-        user,
-        overrideAccess: false,
-        where: {
-          and: [
-            {
-              user: {
-                equals: user.id,
+          depth: 1,
+          sort: '-createdAt',
+          limit: 20,
+        }),
+        payload.find({
+          collection: 'dreams',
+          user,
+          overrideAccess: false,
+          where: {
+            and: [
+              {
+                user: {
+                  equals: user.id,
+                },
               },
-            },
-            {
-              createdAt: {
-                greater_than_equal: startOfWeek.toISOString(),
+              {
+                createdAt: {
+                  greater_than_equal: startOfWeek.toISOString(),
+                },
               },
-            },
-          ],
-        },
-        limit: 0,
-      })
-    : { totalDocs: 0 }
+            ],
+          },
+          depth: 0,
+          limit: 0,
+        }),
+      ])
+    : [{ docs: [], totalDocs: 0 }, { totalDocs: 0 }]
 
   return (
     <div>

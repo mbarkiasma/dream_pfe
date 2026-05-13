@@ -1,5 +1,4 @@
 import config from '@payload-config'
-import { headers as getHeaders } from 'next/headers'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import { AlertTriangle, CalendarDays, Clock, Mail, UserRound } from 'lucide-react'
@@ -7,8 +6,7 @@ import { AlertTriangle, CalendarDays, Clock, Mail, UserRound } from 'lucide-reac
 import type { RendezVousPsy, User } from '@/payload-types'
 import { PsyStatsCards } from '@/components/dashboard/psy/PsyStatsCards'
 import { PsyTopbar } from '@/components/dashboard/psy/PsyTopbar'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 type AssignedStudent = {
   user: User
@@ -90,7 +88,7 @@ function buildAssignedStudents(appointments: RendezVousPsy[]): AssignedStudent[]
 
 export default async function PsyStudentsPage() {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   const appointmentsResult = user
     ? await payload.find({
@@ -148,24 +146,15 @@ export default async function PsyStudentsPage() {
 
       <div className="mindly-dashboard-grid">
         <div className="xl:col-span-2">
-          <Card className="mindly-feature-card overflow-hidden">
-            <CardHeader className="mindly-feature-header">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="mindly-dashboard-eyebrow">
-                    Suivi clinique
-                  </p>
-                  <CardTitle className="mindly-feature-title mt-1">
-                    Etudiants assignes
-                  </CardTitle>
-                </div>
-                <Badge className="mindly-ui-badge">
-                  {assignedStudents.length} dossier{assignedStudents.length > 1 ? 's' : ''}
-                </Badge>
-              </div>
-            </CardHeader>
+          <article className="mindly-feature-card">
+            <div className="mindly-feature-header">
+              <h2 className="mindly-feature-title">Etudiants assignes</h2>
+              <span className="mindly-ui-badge">
+                {assignedStudents.length} dossier{assignedStudents.length > 1 ? 's' : ''}
+              </span>
+            </div>
 
-            <CardContent className="mindly-feature-content">
+            <div className="mindly-feature-content">
               {assignedStudents.length > 0 ? (
                 <div className="grid gap-3">
                   {assignedStudents.map((item) => (
@@ -192,18 +181,18 @@ export default async function PsyStudentsPage() {
                           </div>
 
                           <div className="mt-4 flex flex-wrap gap-2">
-                            <Badge className="mindly-ui-badge">
+                            <span className="mindly-ui-badge">
                               {item.appointments.length} rendez-vous
-                            </Badge>
+                            </span>
                             {item.pendingCount > 0 ? (
-                              <Badge className="mindly-ui-badge">
+                              <span className="mindly-ui-badge">
                                 {item.pendingCount} en attente
-                              </Badge>
+                              </span>
                             ) : null}
                             {item.urgentCount > 0 ? (
-                              <Badge className="mindly-ui-badge">
+                              <span className="mindly-ui-badge">
                                 {item.urgentCount} urgent
-                              </Badge>
+                              </span>
                             ) : null}
                           </div>
                         </div>
@@ -242,17 +231,17 @@ export default async function PsyStudentsPage() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </article>
         </div>
 
         <div className="mindly-stack-lg">
-          <Card className="mindly-feature-card">
-            <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">Rendez-vous</CardTitle>
-            </CardHeader>
+          <article className="mindly-feature-card">
+            <div className="mindly-feature-header">
+              <h2 className="mindly-feature-title">Rendez-vous</h2>
+            </div>
 
-            <CardContent className="mindly-feature-content">
+            <div className="mindly-feature-content">
               {upcomingAppointments.length > 0 ? (
                 <div className="space-y-3">
                   {upcomingAppointments.slice(0, 4).map((appointment) => (
@@ -280,17 +269,15 @@ export default async function PsyStudentsPage() {
                   Aucune consultation confirmee pour le moment.
                 </p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </article>
 
-          <Card className="mindly-feature-card">
-            <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">
-                Suivi clinique
-              </CardTitle>
-            </CardHeader>
+          <article className="mindly-feature-card">
+            <div className="mindly-feature-header">
+              <h2 className="mindly-feature-title">Suivi clinique</h2>
+            </div>
 
-            <CardContent className="mindly-feature-content">
+            <div className="mindly-feature-content">
               {urgentAppointments.length > 0 ? (
                 <div className="space-y-3">
                   {urgentAppointments.slice(0, 4).map((appointment) => (
@@ -319,8 +306,8 @@ export default async function PsyStudentsPage() {
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </article>
         </div>
       </div>
     </div>

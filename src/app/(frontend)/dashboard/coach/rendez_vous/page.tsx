@@ -1,4 +1,3 @@
-import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
@@ -6,10 +5,11 @@ import { CoachCoachingEventManager } from '@/components/dashboard/coach/CoachCoa
 import { CoachCoachingEventForm } from '@/components/dashboard/coach/CoachingEventForm'
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 export default async function CoachAppointmentsPage() {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   const events = user
     ? await payload.find({

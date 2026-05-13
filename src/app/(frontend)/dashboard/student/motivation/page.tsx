@@ -1,13 +1,13 @@
 import config from '@payload-config'
-import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 
 import { StudentMotivationClient } from '@/components/dashboard/student/StudentMotivationClient'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 export default async function StudentMotivationPage() {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   const announcements = user
     ? await payload.find({

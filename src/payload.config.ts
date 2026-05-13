@@ -27,6 +27,7 @@ import { payloadEndpoints } from './endpoints/payloadEndpoints'
 import { CoachingEvents } from './collections/CoachingEvents'
 import { CoachingRegistrations } from './collections/CoachingRegistrations'
 import { PsyOrientations } from './collections/PsyOrientation'
+import { StudentExercices } from './collections/StudentExercices'
 
 
 
@@ -130,6 +131,7 @@ export default buildConfig({
     CoachingEvents,
     CoachingRegistrations,
     PsyOrientations,
+    StudentExercices,
   ],
   globals: [Header, Footer],
   cors: [getServerSideURL()].filter(Boolean),

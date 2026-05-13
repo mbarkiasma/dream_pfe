@@ -3,6 +3,8 @@
 import { useSignIn, useSignUp, useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, CheckCircle2, Loader2, Mail, MailCheck, Moon } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { useTheme } from '@/providers/Theme'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -45,6 +47,7 @@ export function LoginClient() {
   const { isLoaded, isSignedIn } = useUser()
   const { signIn, fetchStatus } = useSignIn()
   const { signUp } = useSignUp()
+  const { setTheme, theme } = useTheme()
   const [email, setEmail] = useState('')
   const [successEmail, setSuccessEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -56,6 +59,12 @@ export function LoginClient() {
       window.location.assign('/auth/redirect')
     }
   }, [isLoaded, isSignedIn, router])
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      setTheme('light')
+    }
+  }, [isLoaded, isSignedIn, setTheme])
 
   async function handleGoogleSignIn() {
     if (!signIn || !signUp) return
@@ -188,6 +197,11 @@ export function LoginClient() {
 
   return (
     <main className="login-page">
+      <div className="login-theme-switch">
+        <span className="login-theme-label">Thème</span>
+        <ThemeToggle className="login-theme-toggle" />
+      </div>
+
       <section className="login-card">
         <div className="login-header">
           <div className="login-icon">
@@ -248,7 +262,7 @@ export function LoginClient() {
             className="login-captcha"
             data-cl-language="fr-FR"
             data-cl-size="flexible"
-            data-cl-theme="light"
+            data-cl-theme={theme === 'dark' ? 'dark' : 'light'}
             id="clerk-captcha"
           />
 

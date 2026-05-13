@@ -29,7 +29,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       variant="ghost"
       size="icon"
-      className={cn('h-11 w-11', className)}
+      className={cn('h-10 w-10 shrink-0', className)}
     >
       {ready && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
     </Button>

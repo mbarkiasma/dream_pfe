@@ -16,15 +16,16 @@ const canReadCoachingEvent: Access = ({ req: { user } }) => {
     return where
   }
 
-  if (user.role === 'etudiant') {
-    const where: Where = {
-      status: {
-        equals: 'published',
-      },
-    }
-
-    return where
+if (user.role === 'etudiant') {
+  const where: Where = {
+    status: {
+      equals: 'published',
+    },
   }
+
+  return where
+}
+
 
   return false
 }

@@ -3,6 +3,25 @@ import type { Endpoint, File } from 'payload'
 import { createNotification } from '@/utilities/createNotification'
 import { getServerSideURL } from '@/utilities/getURL'
 
+type NormalizedBigFiveTrait = {
+  name: BigFiveTraitName
+  score: number
+  analysis: string
+  interpretation: string
+  confidence: 'eleve' | 'moyen' | 'faible'
+  confidenceReason: string
+  observedIndicators: {
+    indicator: string
+  }[]
+}
+
+type BigFiveTraitName =
+  | 'Ouverture'
+  | 'Conscienciosite'
+  | 'Extraversion'
+  | 'Agreabilite'
+  | 'Neuroticisme'
+
 export const payloadEndpoints: Endpoint[] = [
   // Gere le chat d'entretien, la transcription audio et les reponses IA en temps reel.
   {
@@ -14,7 +33,17 @@ export const payloadEndpoints: Endpoint[] = [
       }
 
       const body = await (req as Request).json()
-      const { textMessage, audioBase64, sessionId, sttOnly } = body
+      const {
+        textMessage,
+        audioBase64,
+        sessionId,
+        sttOnly,
+        interviewLanguage,
+        interviewerGender,
+        studentMessageCount,
+        supportsInteractiveQuestions,
+        interactiveQuestionMode,
+      } = body
 
       let userText = typeof textMessage === 'string' ? textMessage.trim() : ''
 
@@ -51,8 +80,16 @@ export const payloadEndpoints: Endpoint[] = [
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          assistantName: 'Mindly',
           chatInput: userText,
           sessionId: sessionId || `session-${req.user.id}`,
+          interviewLanguage: interviewLanguage === 'en' ? 'en' : 'fr',
+          interviewerGender: interviewerGender === 'male' ? 'male' : 'female',
+          studentMessageCount:
+            typeof studentMessageCount === 'number' ? studentMessageCount : undefined,
+          supportsInteractiveQuestions: supportsInteractiveQuestions === true,
+          interactiveQuestionMode:
+            interactiveQuestionMode === 'occasional' ? 'occasional' : 'text',
         }),
       })
 
@@ -74,8 +111,9 @@ export const payloadEndpoints: Endpoint[] = [
         n8nData.output || n8nData.texte || n8nData.text || n8nData.message || n8nData.response || ''
 
       const isFinished = n8nData.isFinished || iaText.includes('[FIN]') || false
-      const cleanText = iaText.replace('[FIN]', '').trim()
+      const cleanText = normaliserTexteAssistant(iaText.replace('[FIN]', '')).trim()
       const analysisData = isFinished ? extraireAnalysisData(n8nData) : null
+      const interactiveQuestion = extraireQuestionInteractive(n8nData)
 
       let audioBase64Reponse: string | null = null
 
@@ -83,7 +121,12 @@ export const payloadEndpoints: Endpoint[] = [
         const googleTtsKey = process.env.GOOGLE_TTS_KEY?.trim()
 
         if (googleTtsKey) {
-          audioBase64Reponse = await genererAudioAvecGoogle(cleanText, googleTtsKey)
+          audioBase64Reponse = await genererAudioAvecGoogle(
+            cleanText,
+            googleTtsKey,
+            interviewLanguage === 'en' ? 'en' : 'fr',
+            interviewerGender === 'male' ? 'male' : 'female',
+          )
         }
       }
 
@@ -93,6 +136,7 @@ export const payloadEndpoints: Endpoint[] = [
         isFinished,
         sessionId: sessionId || `session-${req.user.id}`,
         analysisData,
+        interactiveQuestion,
         audioBase64: audioBase64Reponse,
       })
     },
@@ -106,6 +150,13 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
+      if (req.user.role !== 'etudiant') {
+        return Response.json(
+          { error: 'Seuls les etudiants peuvent enregistrer une analyse de personnalite.' },
+          { status: 403 },
+        )
+      }
+
       try {
         const body = await (req as Request).json()
         const { sessionId, conversation, analysisData } = body
@@ -116,11 +167,36 @@ export const payloadEndpoints: Endpoint[] = [
 
         const analysis = typeof analysisData === 'string' ? JSON.parse(analysisData) : analysisData
         const traits = Array.isArray(analysis?.traits) ? analysis.traits : []
+
+        if (traits.length < 5) {
+          return Response.json(
+            { error: 'Rapport Big Five incomplet: les 5 traits sont requis.' },
+            { status: 400 },
+          )
+        }
+
         const recs = Array.isArray(analysis?.recommendations) ? analysis.recommendations : []
         const resumeExecutif = analysis?.executive_summary || {}
         const donneesProfilEmotionnel = analysis?.emotional_profile || {}
         const now = new Date()
         const reference = `BIG5-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Date.now().toString(36).toUpperCase()}`
+        const normalizedTraits: NormalizedBigFiveTrait[] = traits.map((trait: any) => ({
+          name: normaliserNomTrait(trait.name),
+          score: Math.max(1, Math.min(10, Number(trait.score || 5))),
+          analysis: trait.analysis || '',
+          interpretation: trait.interpretation || '',
+          confidence: normaliserConfianceTrait(trait.confidence),
+          confidenceReason: trait.confidence_reason || trait.confidenceReason || '',
+          observedIndicators: Array.isArray(trait.observed_indicators)
+            ? trait.observed_indicators.map((indicator: string) => ({
+                indicator,
+              }))
+            : Array.isArray(trait.observedIndicators)
+              ? trait.observedIndicators.map((indicator: any) => ({
+                  indicator: typeof indicator === 'string' ? indicator : indicator?.indicator || '',
+                }))
+              : [],
+        }))
 
         const doc = await req.payload.create({
           collection: 'analyse-personnalite',
@@ -141,24 +217,7 @@ export const payloadEndpoints: Endpoint[] = [
                   source: msg.source || 'text',
                 }))
               : [],
-            traits: traits.map((trait: any) => ({
-              name: normaliserNomTrait(trait.name),
-              score: Math.max(1, Math.min(10, Number(trait.score || 5))),
-              analysis: trait.analysis || '',
-              interpretation: trait.interpretation || '',
-              confidence: normaliserConfianceTrait(trait.confidence),
-              confidenceReason: trait.confidence_reason || trait.confidenceReason || '',
-              observedIndicators: Array.isArray(trait.observed_indicators)
-                ? trait.observed_indicators.map((indicator: string) => ({
-                    indicator,
-                  }))
-                : Array.isArray(trait.observedIndicators)
-                  ? trait.observedIndicators.map((indicator: any) => ({
-                      indicator:
-                        typeof indicator === 'string' ? indicator : indicator?.indicator || '',
-                    }))
-                  : [],
-            })),
+            traits: normalizedTraits,
             profilEmotionnel: {
               dominantEmotion: donneesProfilEmotionnel.dominant_emotion || '',
               emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
@@ -180,9 +239,16 @@ export const payloadEndpoints: Endpoint[] = [
           collection: 'users',
           id: req.user.id,
           req,
-          user: req.user,
-          overrideAccess: false,
           data: {
+            bigFiveProfile: {
+              analysisId: doc.id,
+              date: now.toISOString(),
+              traits: normalizedTraits.map((trait) => ({
+                name: trait.name,
+                score: trait.score,
+                confidence: trait.confidence,
+              })),
+            },
             onboardingStep: 'completed',
           },
         })
@@ -796,7 +862,23 @@ async function transcrireAudioAvecGoogle(audioBase64: string, cleApi: string): P
   return transcription
 }
 
-async function genererAudioAvecGoogle(texte: string, cleApi: string): Promise<string | null> {
+async function genererAudioAvecGoogle(
+  texte: string,
+  cleApi: string,
+  language: 'fr' | 'en',
+  gender: 'female' | 'male',
+): Promise<string | null> {
+  const voice =
+    language === 'en'
+      ? {
+          languageCode: 'en-US',
+          name: gender === 'male' ? 'en-US-Neural2-D' : 'en-US-Neural2-F',
+        }
+      : {
+          languageCode: 'fr-FR',
+          name: gender === 'male' ? 'fr-FR-Neural2-B' : 'fr-FR-Neural2-A',
+        }
+
   const response = await fetch(
     `https://texttospeech.googleapis.com/v1/text:synthesize?key=${cleApi}`,
     {
@@ -808,10 +890,7 @@ async function genererAudioAvecGoogle(texte: string, cleApi: string): Promise<st
         input: {
           text: texte,
         },
-        voice: {
-          languageCode: 'fr-FR',
-          name: 'fr-FR-Neural2-B',
-        },
+        voice,
         audioConfig: {
           audioEncoding: 'MP3',
         },
@@ -886,10 +965,62 @@ function extraireAnalysisData(n8nData: any): any {
   return null
 }
 
-function normaliserNomTrait(nom: string): string {
+function extraireQuestionInteractive(n8nData: any) {
+  const source =
+    n8nData?.interactiveQuestion ||
+    n8nData?.questionInteractive ||
+    n8nData?.question ||
+    n8nData?.ui ||
+    null
+
+  const type = source?.type || n8nData?.questionType || n8nData?.inputType
+  const options = source?.options || n8nData?.options || n8nData?.choices
+
+  if ((type !== 'radio' && type !== 'checkbox') || !Array.isArray(options)) {
+    return null
+  }
+
+  const normalizedOptions = options
+    .map((option: any) => {
+      if (typeof option === 'string') {
+        return {
+          label: option,
+          value: option,
+        }
+      }
+
+      return {
+        label: String(option?.label || option?.text || option?.value || ''),
+        value: String(option?.value || option?.label || option?.text || ''),
+      }
+    })
+    .filter((option: { label: string; value: string }) => option.label && option.value)
+
+  if (normalizedOptions.length === 0) {
+    return null
+  }
+
+  return {
+    type,
+    options: normalizedOptions,
+  }
+}
+
+function normaliserTexteAssistant(texte: string): string {
+  return texte
+    .replace(
+      /Je m'appelle Mindly[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
+      'Je suis votre assistant de la plateforme Mindly.',
+    )
+    .replace(/Je m'appelle Mindly[,.]?/gi, 'Je suis votre assistant de la plateforme Mindly.')
+    .replace(/\[(?:nom|name|assistant_name|assistant name)\]/gi, 'Mindly')
+    .replace(/\{\{\s*(?:nom|name|assistant_name|assistant name)\s*\}\}/gi, 'Mindly')
+}
+
+function normaliserNomTrait(nom: string): BigFiveTraitName {
   const nomNettoye = (nom || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
-  const correspondances: Record<string, string> = {
+  const correspondances: Record<string, BigFiveTraitName> = {
     Ouverture: 'Ouverture',
     Conscienciosite: 'Conscienciosite',
     Extraversion: 'Extraversion',

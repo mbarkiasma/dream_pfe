@@ -59,6 +59,13 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Date invalide.' }, { status: 400 })
   }
 
+  if (scheduledDate.getTime() <= Date.now()) {
+    return Response.json(
+      { error: 'La date de la seance doit etre dans le futur.' },
+      { status: 400 },
+    )
+  }
+
   const event = await payload.create({
     collection: 'coaching-events',
     user,

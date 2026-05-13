@@ -99,6 +99,15 @@ export async function POST(
     )
   }
 
+  const eventTime = new Date(event.scheduledAt).getTime()
+
+  if (Number.isNaN(eventTime) || eventTime <= Date.now()) {
+    return Response.json(
+      { error: 'Cette seance est deja passee.' },
+      { status: 409 },
+    )
+  }
+
   const body = (await request.json().catch(() => ({}))) as RegisterBody
   const motivation = sanitizeText(body.motivation)
   const questions = sanitizeText(body.questions)

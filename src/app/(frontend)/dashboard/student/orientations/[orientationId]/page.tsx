@@ -1,10 +1,10 @@
-import { headers as getHeaders } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { StudentPsyOrientationClient } from '@/components/dashboard/student/StudentPsyOrientation'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 export default async function StudentPsyOrientationPage({
   params,
@@ -12,7 +12,7 @@ export default async function StudentPsyOrientationPage({
   params: Promise<{ orientationId: string }>
 }) {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   if (!user) {
     redirect('/login')

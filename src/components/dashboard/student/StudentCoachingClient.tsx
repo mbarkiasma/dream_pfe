@@ -567,8 +567,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
                 {!isLoadingCoaches && availableCoaches.length === 0 ? (
                   <div className="mindly-empty">
-                    Aucun coach n'est disponible actuellement. Le Smart coach IA reste disponible
-                    pour continuer l'accompagnement sans attente.
+                    Aucun coach n&apos;est disponible actuellement. Le Smart coach IA reste disponible
+                    pour continuer l&apos;accompagnement sans attente.
                     <button
                       type="button"
                       onClick={() => {

@@ -390,6 +390,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                   key={latestDreamVideoUrl}
                   controls
                   className="student-dreams-video"
+                  preload="none"
                   src={latestDreamVideoUrl}
                 />
               ) : (
@@ -476,6 +477,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                           key={dreamVideoUrl}
                           controls
                           className="student-dreams-video"
+                          preload="none"
                           src={dreamVideoUrl}
                         />
                       ) : (

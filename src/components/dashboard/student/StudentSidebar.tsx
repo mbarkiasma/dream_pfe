@@ -19,8 +19,10 @@ import { LogoutButton } from '@/components/dashboard/student/Logout'
 const navItems = [
   { title: 'Dashboard', href: '/dashboard/student', icon: LayoutDashboard },
   { title: 'Mes reves', href: '/dashboard/student/dreams', icon: MoonStar },
-  { title: 'Mes analyses', href: '/dashboard/student/analyses', icon: FileSearch },
+  { title: 'Mon rapport', href: '/dashboard/student/analyses', icon: FileSearch },
   { title: 'Smart coaching', href: '/dashboard/student/coaching', icon: LifeBuoy },
+  { title: 'Check-in', href: '/dashboard/student/checkin', icon: NotebookPen },
+  { title: 'Seances coach', href: '/dashboard/student/seances', icon: CalendarDays },
   { title: 'Annonces de motivation', href: '/dashboard/student/motivation', icon: Megaphone },
   { title: 'Rendez-vous', href: '/dashboard/student/rendez_vous', icon: CalendarDays },
   { title: 'Notifications', href: '/dashboard/student/notifications', icon: Bell },

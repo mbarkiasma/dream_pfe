@@ -1,10 +1,10 @@
-import { headers as getHeaders } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { StudentCoachingRegistrationClient } from '@/components/dashboard/student/StudentCoachingRegistrationClient'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 export default async function StudentCoachingEventPage({
   params,
@@ -12,7 +12,7 @@ export default async function StudentCoachingEventPage({
   params: Promise<{ eventId: string }>
 }) {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   if (!user) {
     redirect('/login')
@@ -32,7 +32,13 @@ export default async function StudentCoachingEventPage({
     depth: 1,
   })
 
-  if (!event || event.status !== 'published') {
+  if (!event) {
+    notFound()
+  }
+
+  const eventTime = new Date(event.scheduledAt).getTime()
+
+  if (event.status !== 'published' || Number.isNaN(eventTime) || eventTime <= Date.now()) {
     notFound()
   }
 

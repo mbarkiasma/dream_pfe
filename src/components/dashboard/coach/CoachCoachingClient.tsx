@@ -37,6 +37,16 @@ type CoachingMessage = {
 }
 
 type CoachNote = {
+  canManage?: boolean
+  coach?:
+    | {
+        email?: string
+        firstName?: string
+        id: string | number
+        lastName?: string
+      }
+    | string
+    | number
   id: string | number
   content: string
   createdAt?: string
@@ -219,7 +229,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         throw new Error(data.error || 'Note non enregistree.')
       }
 
-      setSavedNotes((current) => [data.note, ...current])
+      setSavedNotes((current) => [{ ...data.note, canManage: true }, ...current])
       setNote('')
       setStatusMessage('Note de suivi enregistree.')
     } catch (error) {
@@ -441,7 +451,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
             {messages.length === 0 ? (
               <div className="dream-card-dashed rounded-[24px] border p-6 text-sm leading-7 text-dream-muted">
                 Aucun message pour cette session. Vous pouvez attendre le premier message de
-                l'etudiant ou envoyer un message d'accueil.
+                l&apos;etudiant ou envoyer un message d&apos;accueil.
               </div>
             ) : null}
 
@@ -560,7 +570,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                 <div>
                   <h3 className="text-sm font-semibold text-dream-heading">Notes precedentes</h3>
                   <p className="mt-1 text-xs text-dream-muted">
-                    Historique de suivi pour cette session.
+                    Historique partage pour cet etudiant.
                   </p>
                 </div>
                 <span className="dream-badge rounded-full border px-3 py-1 text-xs font-semibold">
@@ -590,31 +600,38 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                             {formatShortDate(savedNote.createdAt)}
                           </time>
                         ) : null}
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            setEditingNoteId(savedNote.id)
-                            setEditingNoteContent(savedNote.content)
-                          }}
-                          variant="dreamSoft"
-                          size="iconSm"
-                          className="h-8 w-8"
-                          title="Modifier la note"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={() => setNoteToDelete(savedNote)}
-                          variant="destructive"
-                          size="iconSm"
-                          className="h-8 w-8"
-                          title="Supprimer la note"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        {savedNote.canManage ? (
+                          <>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                setEditingNoteId(savedNote.id)
+                                setEditingNoteContent(savedNote.content)
+                              }}
+                              variant="dreamSoft"
+                              size="iconSm"
+                              className="h-8 w-8"
+                              title="Modifier la note"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => setNoteToDelete(savedNote)}
+                              variant="destructive"
+                              size="iconSm"
+                              className="h-8 w-8"
+                              title="Supprimer la note"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </>
+                        ) : null}
                       </div>
                     </div>
+                    <p className="mt-2 text-xs font-semibold text-dream-accent">
+                      Coach : {getCoachName(savedNote.coach)}
+                    </p>
                     {String(editingNoteId) === String(savedNote.id) ? (
                       <div className="mt-3 space-y-3">
                         <textarea
@@ -674,7 +691,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                   Supprimer cette note ?
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-dream-muted">
-                  Cette note sera supprimee de l'historique de suivi et de Payload. Cette action ne
+                  Cette note sera supprimee de l&apos;historique de suivi et de Payload. Cette action ne
                   pourra pas etre annulee.
                 </p>
                 <div className="dream-surface mt-4 rounded-[20px] border p-4">
@@ -738,6 +755,14 @@ function getStudentName(session: CoachingSession | null | undefined): string {
   const fullName = `${student?.firstName ?? ''} ${student?.lastName ?? ''}`.trim()
 
   return fullName || student?.email || 'Etudiant'
+}
+
+function getCoachName(coach: CoachNote['coach']): string {
+  if (!coach || typeof coach !== 'object') return 'Coach'
+
+  const fullName = `${coach.firstName ?? ''} ${coach.lastName ?? ''}`.trim()
+
+  return fullName || coach.email || 'Coach'
 }
 
 function areSameMessages(current: CoachingMessage[], next: CoachingMessage[]): boolean {

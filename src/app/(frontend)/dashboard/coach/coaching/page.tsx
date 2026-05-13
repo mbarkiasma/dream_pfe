@@ -1,13 +1,13 @@
-import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { CoachCoachingClient } from '@/components/dashboard/coach/CoachCoachingClient'
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 export default async function CoachCoachingPage() {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   const sessions = user
     ? await payload.find({

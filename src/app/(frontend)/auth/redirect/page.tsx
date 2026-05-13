@@ -64,15 +64,15 @@ export default function AuthRedirectPage() {
   }, [isLoaded, isSignedIn])
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] px-4">
-      <div className="flex w-full max-w-sm flex-col items-center rounded-[28px] border border-border bg-card/80 px-8 py-10 text-center shadow-[0_24px_80px_rgba(82,45,145,0.16)] backdrop-blur-xl">
+    <main className="auth-status-page">
+      <div className="auth-status-card">
         {errorMessage ? (
           <>
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="mt-5 text-2xl font-bold text-dream-heading">Connexion incomplete</h1>
-            <p className="mt-2 text-sm leading-6 text-dream-muted">{errorMessage}</p>
+            <AlertCircle className="auth-status-icon auth-status-icon-error" />
+            <h1 className="auth-status-title">Connexion incomplete</h1>
+            <p className="auth-status-text">{errorMessage}</p>
             <button
-              className="mt-6 rounded-2xl bg-dream-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700"
+              className="auth-status-button"
               onClick={() => window.location.reload()}
               type="button"
             >
@@ -81,9 +81,9 @@ export default function AuthRedirectPage() {
           </>
         ) : (
           <>
-            <Loader2 className="h-8 w-8 animate-spin text-dream-accent" />
-            <h1 className="mt-5 text-2xl font-bold text-dream-heading">Connexion en cours</h1>
-            <p className="mt-2 text-sm leading-6 text-dream-muted">
+            <Loader2 className="auth-status-icon auth-status-icon-spin" />
+            <h1 className="auth-status-title">Connexion en cours</h1>
+            <p className="auth-status-text">
               Nous preparons votre espace personnel.
             </p>
           </>

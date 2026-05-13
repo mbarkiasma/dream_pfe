@@ -1,11 +1,11 @@
 import config from '@payload-config'
-import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import { CalendarDays, Clock } from 'lucide-react'
 
 import { StudentRendezvousPsyForm } from '@/components/dashboard/student/StudentRendezvousPsyForm'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 const statusLabels: Record<string, string> = {
   pending: 'En attente',
@@ -49,7 +49,7 @@ function getAppointmentDateTime(date: string | null | undefined, startTime: stri
 
 export default async function StudentAppointmentsPage() {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   const appointments = user
     ? await payload.find({

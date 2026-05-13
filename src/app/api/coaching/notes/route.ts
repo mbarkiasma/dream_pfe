@@ -48,16 +48,21 @@ export async function GET(request: Request) {
     user,
     overrideAccess: false,
     where: {
-      session: {
-        equals: session.id,
+      student: {
+        equals: getRelationId(session.student),
       },
     },
-    depth: 0,
+    depth: 1,
     sort: '-createdAt',
     limit: 20,
   })
 
-  return Response.json({ notes: notes.docs })
+  return Response.json({
+    notes: notes.docs.map((note) => ({
+      ...note,
+      canManage: isSameId(note.coach, user.id),
+    })),
+  })
 }
 
 export async function POST(request: Request) {
@@ -127,7 +132,7 @@ export async function POST(request: Request) {
     console.error('Failed to create coach note notification:', error)
   }
 
-  return Response.json({ note })
+  return Response.json({ note: { ...note, canManage: true } })
 }
 
 export async function PATCH(request: Request) {
@@ -173,7 +178,7 @@ export async function PATCH(request: Request) {
     },
   })
 
-  return Response.json({ note })
+  return Response.json({ note: { ...note, canManage: true } })
 }
 
 export async function DELETE(request: Request) {

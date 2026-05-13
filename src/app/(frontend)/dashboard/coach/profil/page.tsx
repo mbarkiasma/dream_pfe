@@ -1,7 +1,35 @@
+import { redirect } from 'next/navigation'
+import { Mail, UserRound } from 'lucide-react'
+
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
-export default function CoachProfilePage() {
+function getDisplayName(user: {
+  email?: string | null
+  firstName?: string | null
+  lastName?: string | null
+}) {
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
+
+  return fullName || user.email || 'Coach'
+}
+
+export default async function CoachProfilePage() {
+  const { user } = await getAuthenticatedDashboardUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const displayName = getDisplayName(user)
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
+
   return (
     <div>
       <CoachTopbar
@@ -9,27 +37,55 @@ export default function CoachProfilePage() {
         description="Consultez vos informations generales et les parametres lies a votre activite de coach."
       />
 
-      <div className="mindly-dashboard-grid">
-        <div className="xl:col-span-2">
-          <Card className="mindly-feature-card">
-            <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">
-                Informations personnelles
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="mindly-feature-content">
-              <p className="mindly-feature-text">
-                Cette section affichera plus tard les informations du coach connecte : nom, email,
-                role et informations generales.
-              </p>
-
-              <div className="mt-4">
-                <span className="mindly-ui-badge">Donnees utilisateur</span>
+      <div className="grid gap-6">
+        <Card className="mindly-feature-card overflow-hidden border-white/80 shadow-dream-card-lg dark:border-white/10">
+          <CardHeader className="mindly-feature-header border-b border-border/70 bg-white/80 backdrop-blur dark:bg-white/[0.04]">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[30px] bg-[var(--mindly-primary)] text-3xl font-black text-white shadow-dream-card-lg ring-8 ring-violet-100/70 dark:ring-white/10">
+                  {initials || <UserRound className="h-8 w-8" />}
+                </div>
+                <div>
+                  <p className="mindly-feature-reference">Profil coach</p>
+                  <CardTitle className="mt-2 text-3xl font-black text-dream-heading dark:text-white">
+                    {displayName}
+                  </CardTitle>
+                  <p className="mt-2 flex items-center gap-2 text-sm text-dream-muted dark:text-white/65">
+                    <Mail className="h-4 w-4 shrink-0" />
+                    <span className="break-all">{user.email || 'Non renseigne'}</span>
+                  </p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+
+              <span className="mindly-ui-badge self-start md:self-center">Compte actif</span>
+            </div>
+          </CardHeader>
+
+          <CardContent className="mindly-feature-content">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[24px] border border-border bg-slate-50 p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.06]">
+                <p className="mindly-feature-reference">Nom complet</p>
+                <p className="mt-2 text-lg font-semibold text-dream-heading dark:text-white">
+                  {displayName}
+                </p>
+              </div>
+
+              <div className="rounded-[24px] border border-border bg-slate-50 p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.06]">
+                <p className="mindly-feature-reference">Email</p>
+                <p className="mt-2 break-words text-lg font-semibold text-dream-heading dark:text-white">
+                  {user.email || 'Non renseigne'}
+                </p>
+              </div>
+
+              <div className="rounded-[24px] border border-border bg-slate-50 p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.06] md:col-span-2">
+                <p className="mindly-feature-reference">Specialite</p>
+                <p className="mt-2 text-lg font-semibold text-dream-heading dark:text-white">
+                  {user.coachingSpecialty || 'Non renseignee'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

@@ -1,13 +1,13 @@
 import config from '@payload-config'
-import { headers as getHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 
 import { CoachAnnouncementsClient } from '@/components/dashboard/coach/CoachAnnonce'
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
+import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 export default async function CoachAnnouncementsPage() {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
+  const { user } = await getAuthenticatedDashboardUser()
 
   const announcements = user
     ? await payload.find({

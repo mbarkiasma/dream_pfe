@@ -1,16 +1,56 @@
-import type { Access, CollectionConfig } from 'payload'
+import type { Access, CollectionConfig, Where } from 'payload'
 
 import { isAdmin } from '@/access/roles'
+import { getRelationId } from '@/lib/coaching'
 
-const canReadCoachNote: Access = ({ req: { user } }) => {
+const canReadCoachNote: Access = async ({ req: { payload, user } }) => {
   if (!user) return false
   if (isAdmin(user) || user.role === 'psy') return true
 
-  return {
-    coach: {
-      equals: user.id,
+  if (user.role !== 'coach') return false
+
+  const sessions = await payload.find({
+    collection: 'coaching-sessions',
+    user,
+    overrideAccess: false,
+    where: {
+      and: [
+        {
+          coach: {
+            equals: user.id,
+          },
+        },
+        {
+          mode: {
+            equals: 'classic',
+          },
+        },
+      ],
     },
+    depth: 0,
+    limit: 100,
+  })
+
+  const assignedStudentIds = sessions.docs
+    .map((session) => getRelationId(session.student))
+    .filter((studentId): studentId is string | number => studentId !== null)
+
+  const where: Where = {
+    or: [
+      {
+        coach: {
+          equals: user.id,
+        },
+      },
+      {
+        student: {
+          in: assignedStudentIds,
+        },
+      },
+    ],
   }
+
+  return where
 }
 
 export const CoachNotes: CollectionConfig = {
