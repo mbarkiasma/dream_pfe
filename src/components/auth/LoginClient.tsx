@@ -8,17 +8,36 @@ import { useTheme } from '@/providers/Theme'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-function getErrorMessage(error: unknown) {
-  if (
-    error &&
-    typeof error === 'object' &&
-    'errors' in error &&
-    Array.isArray((error as { errors?: unknown }).errors)
-  ) {
-    const firstError = (error as { errors: Array<{ longMessage?: string; message?: string }> })
-      .errors[0]
+type ClerkFlowError = {
+  code?: string
+  longMessage?: string
+  message?: string
+}
 
-    return firstError?.longMessage || firstError?.message || 'Une erreur est survenue.'
+type EmailLinkFactor = {
+  emailAddressId?: string
+  strategy?: string
+}
+
+function getFirstClerkError(error: unknown): ClerkFlowError | null {
+  if (!error || typeof error !== 'object') return null
+
+  if (
+    'errors' in error &&
+    Array.isArray((error as { errors?: unknown }).errors) &&
+    (error as { errors: unknown[] }).errors.length > 0
+  ) {
+    return (error as { errors: ClerkFlowError[] }).errors[0]
+  }
+
+  return error as ClerkFlowError
+}
+
+function getErrorMessage(error: unknown) {
+  const clerkError = getFirstClerkError(error)
+
+  if (clerkError) {
+    return clerkError.longMessage || clerkError.message || 'Une erreur est survenue.'
   }
 
   if (error instanceof Error) {
@@ -29,9 +48,10 @@ function getErrorMessage(error: unknown) {
 }
 
 function isAccountNotFoundError(error: unknown) {
-  if (!error || typeof error !== 'object') return false
+  const clerkError = getFirstClerkError(error)
 
-  const clerkError = error as { code?: string; longMessage?: string; message?: string }
+  if (!clerkError) return false
+
   const message = `${clerkError.longMessage || ''} ${clerkError.message || ''}`.toLowerCase()
 
   return (
@@ -42,7 +62,11 @@ function isAccountNotFoundError(error: unknown) {
   )
 }
 
-export function LoginClient() {
+type LoginClientProps = {
+  initialMessage?: string
+}
+
+export function LoginClient({ initialMessage = '' }: LoginClientProps) {
   const router = useRouter()
   const { isLoaded, isSignedIn } = useUser()
   const { signIn, fetchStatus } = useSignIn()
@@ -51,6 +75,7 @@ export function LoginClient() {
   const [email, setEmail] = useState('')
   const [successEmail, setSuccessEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [infoMessage, setInfoMessage] = useState(initialMessage)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [emailLoading, setEmailLoading] = useState(false)
 
@@ -99,6 +124,7 @@ export function LoginClient() {
 
     setErrorMessage('')
     setSuccessEmail('')
+    setInfoMessage('')
 
     if (!cleanEmail) {
       setErrorMessage('Veuillez saisir votre adresse email.')
@@ -109,6 +135,8 @@ export function LoginClient() {
 
     try {
       const sendSignUpLink = async (fallbackError?: { longMessage?: string; message?: string }) => {
+        await signUp.reset()
+
         const { error: signUpError } = await signUp.create({
           emailAddress: cleanEmail,
         })
@@ -139,11 +167,22 @@ export function LoginClient() {
 
         setSuccessEmail(cleanEmail)
         setEmail('')
+
+        void signUp.verifications.waitForEmailLinkVerification().then(async ({ error }) => {
+          if (error) return
+
+          const { error: finalizeError } = await signUp.finalize()
+
+          if (!finalizeError) {
+            window.location.assign('/auth/redirect')
+          }
+        })
       }
+
+      await signIn.reset()
 
       const { error: createError } = await signIn.create({
         identifier: cleanEmail,
-        signUpIfMissing: true,
       })
 
       if (createError) {
@@ -156,10 +195,21 @@ export function LoginClient() {
         return
       }
 
-      const { error: linkError } = await signIn.emailLink.sendLink({
-        emailAddress: cleanEmail,
-        verificationUrl: `${window.location.origin}/auth/verify-email`,
-      })
+      const emailLinkFactor = (signIn.supportedFirstFactors as EmailLinkFactor[] | null)?.find(
+        (factor) => factor.strategy === 'email_link',
+      )
+
+      const linkParams = emailLinkFactor?.emailAddressId
+        ? {
+            emailAddressId: emailLinkFactor.emailAddressId,
+            verificationUrl: `${window.location.origin}/auth/verify-email`,
+          }
+        : {
+            emailAddress: cleanEmail,
+            verificationUrl: `${window.location.origin}/auth/verify-email`,
+          }
+
+      const { error: linkError } = await signIn.emailLink.sendLink(linkParams)
 
       if (linkError) {
         if (isAccountNotFoundError(linkError)) {
@@ -270,6 +320,13 @@ export function LoginClient() {
             <div className="login-alert login-alert-error">
               <AlertCircle />
               {errorMessage}
+            </div>
+          ) : null}
+
+          {infoMessage ? (
+            <div className="login-alert login-alert-info">
+              <MailCheck />
+              {infoMessage}
             </div>
           ) : null}
 

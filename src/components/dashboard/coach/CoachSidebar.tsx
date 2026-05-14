@@ -9,11 +9,14 @@ import {
   ClipboardList,
   LayoutDashboard,
   LifeBuoy,
+  Menu,
   Megaphone,
   Stethoscope,
   UserRound,
   UsersRound,
+  X,
 } from 'lucide-react'
+import { useState } from 'react'
 
 import { LogoutButton } from '@/components/dashboard/student/Logout'
 
@@ -39,20 +42,34 @@ function isActivePath(pathname: string, href: string) {
 
 export function CoachSidebar() {
   const pathname = usePathname()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <aside className="mindly-sidebar">
-      <div className="mindly-sidebar-profile">
-        <div className="mindly-sidebar-brand-icon">
-          <LifeBuoy />
+    <aside className={menuOpen ? 'mindly-sidebar mindly-sidebar-open' : 'mindly-sidebar'}>
+      <div className="mindly-sidebar-mobile-bar">
+        <div className="mindly-sidebar-profile">
+          <div className="mindly-sidebar-brand-icon">
+            <LifeBuoy />
+          </div>
+          <div className="min-w-0">
+            <p className="mindly-sidebar-title">Espace coach</p>
+            <p className="mindly-sidebar-subtitle">Accompagnement</p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="mindly-sidebar-title">Espace coach</p>
-          <p className="mindly-sidebar-subtitle">Accompagnement</p>
-        </div>
+
+        <button
+          type="button"
+          className="mindly-sidebar-mobile-toggle"
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          {menuOpen ? <X /> : <Menu />}
+          <span>Menu</span>
+        </button>
       </div>
 
-      <nav className="mindly-sidebar-nav">
+      <nav className={menuOpen ? 'mindly-sidebar-nav mindly-sidebar-nav-open' : 'mindly-sidebar-nav'}>
         {navItems.map((item) => {
           const Icon = item.icon
           const active = isActivePath(pathname, item.href)
@@ -63,6 +80,7 @@ export function CoachSidebar() {
               href={item.href}
               title={item.title}
               className={active ? 'mindly-sidebar-link-active' : 'mindly-sidebar-link'}
+              onClick={() => setMenuOpen(false)}
             >
               <span className="mindly-sidebar-icon">
                 <Icon />

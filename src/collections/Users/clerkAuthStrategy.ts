@@ -4,6 +4,18 @@ import type { AuthStrategy, AuthStrategyFunctionArgs, AuthStrategyResult, Payloa
 
 type PayloadAuthUser = NonNullable<AuthStrategyResult['user']>
 
+function getConfiguredAdminEmails() {
+  return [process.env.ADMIN_EMAIL, process.env.ADMIN_EMAILS]
+    .filter(Boolean)
+    .flatMap((value) => value?.split(',') ?? [])
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean)
+}
+
+function isConfiguredAdminEmail(email: string) {
+  return getConfiguredAdminEmails().includes(email.toLowerCase())
+}
+
 async function getOrCreatePayloadUser({
   payload,
 }: {
@@ -22,6 +34,8 @@ async function getOrCreatePayloadUser({
   if (!email) {
     return null
   }
+
+  const shouldBeAdmin = isConfiguredAdminEmail(email)
 
   const existingUserByClerkId = await payload.find({
     collection: 'users',
@@ -55,7 +69,8 @@ async function getOrCreatePayloadUser({
     const shouldSyncClerkProfile =
       !payloadUser.clerkUserId ||
       (!payloadUser.firstName && clerkUser.firstName) ||
-      (!payloadUser.lastName && clerkUser.lastName)
+      (!payloadUser.lastName && clerkUser.lastName) ||
+      (shouldBeAdmin && payloadUser.role !== 'admin')
 
     if (shouldSyncClerkProfile) {
       payloadUser = await payload.update({
@@ -65,6 +80,7 @@ async function getOrCreatePayloadUser({
           clerkUserId: userId,
           firstName: clerkUser.firstName || payloadUser.firstName,
           lastName: clerkUser.lastName || payloadUser.lastName,
+          role: shouldBeAdmin ? 'admin' : payloadUser.role,
         },
       })
     }
@@ -84,7 +100,7 @@ async function getOrCreatePayloadUser({
       firstName: clerkUser.firstName || '',
       lastName: clerkUser.lastName || '',
       onboardingStep: 'profile',
-      role: 'etudiant',
+      role: shouldBeAdmin ? 'admin' : 'etudiant',
     },
   })
 

@@ -650,6 +650,34 @@ export interface User {
   magic_login_expires_at?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  studentBranch?: ('LI' | 'LEA' | 'LPE' | 'PC' | 'MP' | 'LM' | 'LSE' | 'master') | null;
+  studentLevel?:
+    | (
+        | 'MP1'
+        | 'MP2'
+        | 'PC1'
+        | 'PC2'
+        | 'LMI1'
+        | 'LMI2'
+        | 'LMI3'
+        | 'LI1'
+        | 'LI2'
+        | 'LI3'
+        | 'LEA1'
+        | 'LEE2'
+        | 'LEE3'
+        | 'LSE1'
+        | 'LSE2'
+        | 'LSE3'
+        | 'LPE1'
+        | 'LPE2'
+        | 'LPE3'
+        | 'MR1PHY'
+        | 'MP1IASER'
+        | 'MP1BIO'
+        | 'MR1MATH'
+      )
+    | null;
   onboardingStep: 'profile' | 'interview' | 'completed';
   role: 'admin' | 'etudiant' | 'coach' | 'psy';
   /**
@@ -1528,6 +1556,8 @@ export interface UsersSelect<T extends boolean = true> {
   magic_login_expires_at?: T;
   firstName?: T;
   lastName?: T;
+  studentBranch?: T;
+  studentLevel?: T;
   onboardingStep?: T;
   role?: T;
   isAvailableForCoaching?: T;

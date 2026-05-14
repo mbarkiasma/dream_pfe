@@ -99,6 +99,18 @@ export default async function StudentProfilePage() {
                     <p className="student-profile-label">Email</p>
                     <p className="student-profile-value">{user?.email || 'Non renseigne'}</p>
                   </div>
+
+                  <div className="student-profile-info-box">
+                    <p className="student-profile-label">Branche</p>
+                    <p className="student-profile-value">
+                      {user?.studentBranch || 'Non renseigne'}
+                    </p>
+                  </div>
+
+                  <div className="student-profile-info-box">
+                    <p className="student-profile-label">Niveau</p>
+                    <p className="student-profile-value">{user?.studentLevel || 'Non renseigne'}</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -140,8 +152,8 @@ export default async function StudentProfilePage() {
                 ) : (
                   <div className="student-profile-empty">
                     <p className="student-profile-text">
-                      Aucun rapport n&apos;est encore disponible. Des que votre analyse est prete, le
-                      rapport PDF apparaitra ici.
+                      Aucun rapport n&apos;est encore disponible. Des que votre analyse est prete,
+                      le rapport PDF apparaitra ici.
                     </p>
                   </div>
                 )}

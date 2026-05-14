@@ -40,14 +40,14 @@ export function StudentExerciseCheckinForm({
         const data = await result.json().catch(() => null)
 
         if (!result.ok) {
-          setError(data?.error || "Impossible d'envoyer ce check-in.")
+          setError(data?.error || "Impossible d'envoyer votre progression.")
           return
         }
 
-        setSuccess('Check-in envoye au coach.')
+        setSuccess('Progression envoyee au coach.')
         router.refresh()
       } catch {
-        setError("Erreur reseau pendant l'envoi du check-in.")
+        setError("Erreur reseau pendant l'envoi de votre progression.")
       }
     })
   }
@@ -55,7 +55,7 @@ export function StudentExerciseCheckinForm({
   return (
     <form onSubmit={handleSubmit} className="mt-4 grid gap-3">
       <label className="text-sm font-semibold text-dream-heading dark:text-white">
-        Mon check-in
+        Ma progression
       </label>
       <label className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3 text-sm text-dream-muted dark:border-white/10 dark:bg-white/[0.06] dark:text-white/70">
         <input
@@ -79,10 +79,10 @@ export function StudentExerciseCheckinForm({
         {missed
           ? 'Exercice non fait'
           : completed
-            ? 'Check-in deja envoye'
+            ? 'Exercice deja fait'
             : pending
               ? 'Envoi...'
-              : 'Envoyer mon check-in'}
+              : 'Envoyer ma progression'}
       </button>
     </form>
   )

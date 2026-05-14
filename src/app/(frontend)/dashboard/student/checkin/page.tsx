@@ -98,19 +98,58 @@ export default async function StudentCheckinPage() {
     status: overdueIds.has(String(exercise.id)) ? 'missed' : exercise.status,
   }))
 
-  const todoCount = displayedExercises.filter(
-    (exercise) => exercise.status === 'assigned' || exercise.status === 'in_progress',
-  ).length
-  const completedCount = displayedExercises.filter(
-    (exercise) => exercise.status === 'completed' || exercise.status === 'reviewed',
-  ).length
+  const sentCount = displayedExercises.filter((exercise) => exercise.status === 'completed').length
+  const reviewedCount = displayedExercises.filter((exercise) => exercise.status === 'reviewed').length
+  const finishedCount = sentCount + reviewedCount
+  const todoCount = Math.max(displayedExercises.length - finishedCount, 0)
+  const progressPercent =
+    displayedExercises.length > 0
+      ? Math.round((reviewedCount / displayedExercises.length) * 100)
+      : 0
 
   return (
     <div>
       <StudentTopbar
-        title="Check-in exercices"
-        description="Consultez les exercices donnes par votre coach, realisez-les puis envoyez votre suivi."
+        title="Ma progression"
+        description="Suivez votre evolution selon les exercices donnes par votre coach et valides apres feedback."
       />
+
+      <section className="mindly-card mb-6 p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-[var(--mindly-primary)]">
+              Progression globale
+            </p>
+            <h2 className="mt-2 text-3xl font-bold text-[var(--mindly-text-strong)]">
+              {progressPercent}%
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--mindly-text-soft)]">
+              La barre avance quand votre coach valide un exercice avec un feedback.
+            </p>
+          </div>
+
+          <div className="w-full md:max-w-md">
+            <div
+              className="h-4 overflow-hidden rounded-full bg-slate-100 dark:bg-white/[0.08]"
+              aria-label={`Progression globale ${progressPercent}%`}
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progressPercent}
+            >
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-indigo-500 transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <div className="mt-2 flex justify-between text-xs font-medium text-[var(--mindly-text-soft)]">
+              <span>0%</span>
+              <span>{reviewedCount} exercices valides sur {displayedExercises.length}</span>
+              <span>100%</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         <article className="mindly-card p-5">
@@ -135,9 +174,9 @@ export default async function StudentCheckinPage() {
           <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--mindly-primary-soft-3)] text-[var(--mindly-primary)]">
             <CheckCircle2 className="h-5 w-5" />
           </div>
-          <p className="text-sm text-[var(--mindly-text-soft)]">Check-ins envoyes</p>
+          <p className="text-sm text-[var(--mindly-text-soft)]">Exercices termines</p>
           <p className="mt-2 text-2xl font-bold text-[var(--mindly-text-strong)]">
-            {completedCount}
+            {finishedCount}
           </p>
         </article>
       </div>
@@ -199,6 +238,15 @@ export default async function StudentCheckinPage() {
                       </p>
                       <p className="mt-2 text-sm leading-6 text-emerald-700 dark:text-emerald-100/80">
                         {exercise.coachFeedback}
+                      </p>
+                    </div>
+                  ) : completed ? (
+                    <div className="mt-4 rounded-2xl bg-sky-50 p-4 dark:bg-sky-500/10">
+                      <p className="text-sm font-semibold text-sky-800 dark:text-sky-100">
+                        En attente du feedback du coach
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-sky-700 dark:text-sky-100/80">
+                        Votre exercice est envoye. La progression augmentera apres validation du coach.
                       </p>
                     </div>
                   ) : null}

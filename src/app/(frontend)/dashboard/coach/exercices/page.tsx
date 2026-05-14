@@ -52,9 +52,9 @@ function getStatusLabel(status: string) {
     case 'in_progress':
       return 'En cours'
     case 'completed':
-      return 'Termine'
+      return 'Deja fait'
     case 'reviewed':
-      return 'Corrige'
+      return 'Feedback donne'
     case 'missed':
       return 'Non fait'
     default:
@@ -109,21 +109,22 @@ export default async function CoachExercisesPage() {
 
   const assignedStudentIds = assignedStudents.map((student) => student.id)
 
-  const exercices = user && assignedStudentIds.length > 0
-    ? await payload.find({
-        collection: 'student-exercices',
-        user,
-        overrideAccess: false,
-        where: {
-          student: {
-            in: assignedStudentIds,
+  const exercices =
+    user && assignedStudentIds.length > 0
+      ? await payload.find({
+          collection: 'student-exercices',
+          user,
+          overrideAccess: false,
+          where: {
+            student: {
+              in: assignedStudentIds,
+            },
           },
-        },
-        depth: 1,
-        sort: '-createdAt',
-        limit: 50,
-      })
-    : { docs: [] }
+          depth: 1,
+          sort: '-createdAt',
+          limit: 50,
+        })
+      : { docs: [] }
 
   return (
     <div>
@@ -210,7 +211,6 @@ export default async function CoachExercisesPage() {
                     ) : null}
 
                     {String(getRelationId(exercice.coach)) === String(user?.id) &&
-                    exercice.status !== 'completed' &&
                     exercice.status !== 'reviewed' ? (
                       <CoachExerciseActions
                         exercise={{
@@ -219,6 +219,7 @@ export default async function CoachExercisesPage() {
                           id: exercice.id,
                           instructions: exercice.instructions,
                           reason: exercice.reason,
+                          status: exercice.status,
                           title: exercice.title,
                         }}
                       />
@@ -227,9 +228,7 @@ export default async function CoachExercisesPage() {
                 ))}
               </div>
             ) : (
-              <p className="mindly-feature-text">
-                Aucun exercice attribue pour le moment.
-              </p>
+              <p className="mindly-feature-text">Aucun exercice attribue pour le moment.</p>
             )}
           </CardContent>
         </Card>

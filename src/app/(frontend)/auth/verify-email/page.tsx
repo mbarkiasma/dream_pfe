@@ -1,13 +1,23 @@
 'use client'
 
 import { useClerk } from '@clerk/nextjs'
-import { Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { AlertCircle, Loader2, MailPlus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+type VerificationStatus = 'checking' | 'expired'
 
 export default function VerifyEmailPage() {
   const clerk = useClerk()
+  const [status, setStatus] = useState<VerificationStatus>('checking')
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+
+    if (params.get('__clerk_status') === 'expired') {
+      setStatus('expired')
+      return
+    }
+
     void clerk
       .handleEmailLinkVerification(
         {
@@ -23,16 +33,35 @@ export default function VerifyEmailPage() {
       )
       .catch((error) => {
         console.error('Clerk email link verification error:', error)
-        window.location.assign('/login?error=invalid-or-expired-link')
+        setStatus('expired')
       })
   }, [clerk])
 
+  if (status === 'expired') {
+    return (
+      <main className="auth-status-page">
+        <div className="auth-status-card">
+          <AlertCircle className="auth-status-icon auth-status-icon-error" />
+          <h1 className="auth-status-title">Votre lien magique a expire</h1>
+          <p className="auth-status-text">
+            Le delai de connexion est ecoule. Pour proteger votre compte, demandez un nouveau lien
+            magique et ouvrez le dernier email recu.
+          </p>
+          <a className="auth-status-button" href="/login?message=magic-link-expired">
+            <MailPlus />
+            Generer un nouveau lien magique
+          </a>
+        </div>
+      </main>
+    )
+  }
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,#F1E7FF_0%,#F8F3FF_34%,#EEF4FF_70%,#FFF7FB_100%)] px-4">
-      <div className="flex w-full max-w-sm flex-col items-center rounded-[28px] border border-border bg-card/80 px-8 py-10 text-center shadow-[0_24px_80px_rgba(82,45,145,0.16)] backdrop-blur-xl">
-        <Loader2 className="h-8 w-8 animate-spin text-dream-accent" />
-        <h1 className="mt-5 text-2xl font-bold text-dream-heading">Verification en cours</h1>
-        <p className="mt-2 text-sm leading-6 text-dream-muted">
+    <main className="auth-status-page">
+      <div className="auth-status-card">
+        <Loader2 className="auth-status-icon auth-status-icon-spin" />
+        <h1 className="auth-status-title">Verification en cours</h1>
+        <p className="auth-status-text">
           Nous validons votre lien magique avant de vous rediriger.
         </p>
       </div>

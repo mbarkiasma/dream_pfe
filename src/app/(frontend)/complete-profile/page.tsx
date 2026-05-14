@@ -19,6 +19,8 @@ export default async function CompleteProfilePage() {
     <CompleteProfileClient
       defaultFirstName={user.firstName ?? ''}
       defaultLastName={user.lastName ?? ''}
+      defaultStudentBranch={user.studentBranch ?? ''}
+      defaultStudentLevel={user.studentLevel ?? ''}
     />
   )
 }

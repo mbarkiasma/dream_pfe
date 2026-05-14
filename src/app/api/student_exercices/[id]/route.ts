@@ -6,6 +6,7 @@ import { getDisplayName, getRelationId } from '@/lib/coaching'
 import { createNotification } from '@/utilities/createNotification'
 
 type UpdateExerciseBody = {
+  action?: 'feedback'
   checked?: boolean
   coachFeedback?: string
   dueDate?: string
@@ -38,6 +39,62 @@ export async function PATCH(
   const body = (await request.json().catch(() => ({}))) as UpdateExerciseBody
 
   if (user.role === 'coach') {
+    const exercise = await payload.findByID({
+      collection: 'student-exercices',
+      id,
+      user,
+      overrideAccess: false,
+      depth: 0,
+    })
+
+    if (body.action === 'feedback') {
+      const coachFeedback = sanitizeText(body.coachFeedback)
+
+      if (exercise.status !== 'completed') {
+        return Response.json(
+          { error: "Le feedback est disponible apres que l'etudiant a fait l'exercice." },
+          { status: 409 },
+        )
+      }
+
+      if (!coachFeedback) {
+        return Response.json({ error: 'Le feedback du coach est obligatoire.' }, { status: 400 })
+      }
+
+      const updatedExercise = await payload.update({
+        collection: 'student-exercices',
+        id: exercise.id,
+        user,
+        overrideAccess: false,
+        data: {
+          coachFeedback,
+          status: 'reviewed',
+        },
+      })
+
+      const studentId = getRelationId(exercise.student)
+
+      if (studentId) {
+        try {
+          await createNotification({
+            actor: user.id,
+            event: 'student_exercise_feedback_given',
+            link: '/dashboard/student/checkin',
+            message: `Votre coach a donne un feedback pour l'exercice "${exercise.title}". Consultez-le dans votre espace.`,
+            payload,
+            recipient: Number(studentId),
+            sendEmail: true,
+            title: 'Nouveau feedback du coach',
+            type: 'coaching',
+          })
+        } catch (error) {
+          console.error('Failed to create exercise feedback notification:', error)
+        }
+      }
+
+      return Response.json({ exercise: updatedExercise })
+    }
+
     const title = sanitizeText(body.title)
     const instructions = sanitizeText(body.instructions)
     const reason = sanitizeText(body.reason)
@@ -51,18 +108,17 @@ export async function PATCH(
       )
     }
 
-    const exercise = await payload.findByID({
-      collection: 'student-exercices',
-      id,
-      user,
-      overrideAccess: false,
-      depth: 0,
-    })
-
-    if (exercise.status === 'completed' || exercise.status === 'reviewed') {
+    if (exercise.status === 'reviewed') {
       return Response.json(
-        { error: 'Un exercice deja confirme ne peut plus etre modifie.' },
+        { error: 'Un exercice deja valide ne peut plus etre modifie.' },
         { status: 409 },
+      )
+    }
+
+    if (exercise.status === 'completed' && !coachFeedback) {
+      return Response.json(
+        { error: 'Le feedback du coach est obligatoire pour valider la progression.' },
+        { status: 400 },
       )
     }
 
@@ -76,9 +132,32 @@ export async function PATCH(
         dueDate,
         instructions,
         reason,
+        status: exercise.status === 'completed' ? 'reviewed' : exercise.status,
         title,
       },
     })
+
+    if (exercise.status === 'completed') {
+      const studentId = getRelationId(exercise.student)
+
+      if (studentId) {
+        try {
+          await createNotification({
+            actor: user.id,
+            event: 'student_exercise_reviewed',
+            link: '/dashboard/student/checkin',
+            message: `Votre coach a donne un feedback pour l'exercice "${exercise.title}". Consultez-le dans votre espace.`,
+            payload,
+            recipient: Number(studentId),
+            sendEmail: true,
+            title: 'Nouveau feedback du coach',
+            type: 'coaching',
+          })
+        } catch (error) {
+          console.error('Failed to create exercise review notification:', error)
+        }
+      }
+    }
 
     return Response.json({ exercise: updatedExercise })
   }
@@ -88,7 +167,7 @@ export async function PATCH(
   }
 
   if (body.checked !== true) {
-    return Response.json({ error: 'Vous devez confirmer la realisation.' }, { status: 400 })
+    return Response.json({ error: "Vous devez cocher que l'exercice est fait." }, { status: 400 })
   }
 
   const exercise = await payload.findByID({
@@ -132,7 +211,7 @@ export async function PATCH(
     data: {
       completedAt: new Date().toISOString(),
       status: 'completed',
-      studentResponse: 'Check-in confirme par l etudiant.',
+      studentResponse: "Exercice deja fait par l'etudiant.",
     },
   })
 
@@ -142,11 +221,11 @@ export async function PATCH(
         actor: user.id,
         event: 'student_exercise_completed',
         link: '/dashboard/coach/exercices',
-        message: `${getDisplayName(user)} a termine l'exercice "${exercise.title}" et a envoye son check-in.`,
+        message: `${getDisplayName(user)} a termine l'exercice "${exercise.title}" et a envoye sa progression.`,
         payload,
         recipient: Number(coachId),
         sendEmail: true,
-        title: 'Check-in exercice recu',
+        title: 'Progression exercice recue',
         type: 'coaching',
       })
     } catch (error) {
@@ -173,10 +252,7 @@ export async function DELETE(
   }
 
   if (user.role !== 'coach') {
-    return Response.json(
-      { error: 'Seul un coach peut supprimer un exercice.' },
-      { status: 403 },
-    )
+    return Response.json({ error: 'Seul un coach peut supprimer un exercice.' }, { status: 403 })
   }
 
   const { id } = await context.params
@@ -190,7 +266,7 @@ export async function DELETE(
 
   if (exercise.status === 'completed' || exercise.status === 'reviewed') {
     return Response.json(
-      { error: 'Un exercice deja confirme ne peut plus etre supprime.' },
+      { error: 'Un exercice deja fait ne peut plus etre supprime.' },
       { status: 409 },
     )
   }

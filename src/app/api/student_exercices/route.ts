@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       actor: user.id,
       event: 'student_exercise_assigned',
       link: '/dashboard/student/checkin',
-      message: `Votre coach vous a attribue un nouvel exercice: ${title}. Pensez a faire votre check-in apres l'avoir realise.`,
+      message: `Votre coach vous a attribue un nouvel exercice: ${title}. Pensez a mettre a jour votre progression apres l'avoir realise.`,
       payload,
       recipient: studentId,
       sendEmail: true,
