@@ -1,7 +1,18 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Bot, CheckCircle2, FileText, Home, Mic, Send, Square, UserRound } from 'lucide-react'
+import {
+  Bot,
+  Check,
+  CheckCircle2,
+  Copy,
+  FileText,
+  Home,
+  Mic,
+  Send,
+  Square,
+  UserRound,
+} from 'lucide-react'
 import Link from 'next/link'
 
 type Message = {
@@ -54,6 +65,7 @@ export function InterviewChat() {
   const [interviewLanguage, setInterviewLanguage] = useState<InterviewLanguage>('fr')
   const [interviewerGender, setInterviewerGender] = useState<InterviewerGender>('female')
   const [interactiveSelections, setInteractiveSelections] = useState<Record<number, string[]>>({})
+  const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null)
   const [sessionId] = useState(() => `session-${crypto.randomUUID()}`)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
@@ -238,6 +250,16 @@ export function InterviewChat() {
     await envoyerMessage(labels.join(', '), true)
   }
 
+  const handleCopyMessage = async (messageIndex: number, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopiedMessageIndex(messageIndex)
+      window.setTimeout(() => setCopiedMessageIndex(null), 1400)
+    } catch {
+      setMessageMicro('Copie impossible. Selectionnez le message manuellement.')
+    }
+  }
+
   const handleToggleRecording = async () => {
     if (isLoading || isInterviewFinished || !interviewStarted) return
 
@@ -322,11 +344,11 @@ export function InterviewChat() {
     ? 'Entretien termine'
     : !interviewStarted
       ? 'Configuration'
-    : isRecording
-      ? 'Micro actif'
-      : isLoading
-        ? 'Traitement en cours'
-        : 'Disponible'
+      : isRecording
+        ? 'Micro actif'
+        : isLoading
+          ? 'Traitement en cours'
+          : 'Disponible'
 
   return (
     <div className="interview-shell">
@@ -350,7 +372,9 @@ export function InterviewChat() {
             <span className="interview-pill interview-pill-muted">
               {messages.length} echange{messages.length > 1 ? 's' : ''}
             </span>
-            {isSaved ? <span className="interview-pill interview-pill-success">Analyse sauvee</span> : null}
+            {isSaved ? (
+              <span className="interview-pill interview-pill-success">Analyse sauvee</span>
+            ) : null}
           </div>
         </div>
       </section>
@@ -376,7 +400,7 @@ export function InterviewChat() {
                 {interviewStarted
                   ? 'Bienvenue'
                   : setupStep === 'language'
-                    ? "Choix de la langue"
+                    ? 'Choix de la langue'
                     : 'Choix de la voix'}
               </p>
               <p className="interview-empty-text">
@@ -446,20 +470,38 @@ export function InterviewChat() {
                   item.role === 'user' ? 'interview-message-user' : 'interview-message-ai'
                 }`}
               >
-                <p className="interview-message-label">
-                  {item.role === 'user' ? (
-                    <UserRound className="h-4 w-4" />
-                  ) : (
-                    <Bot className="h-4 w-4" />
-                  )}
-                  {item.role === 'user' ? 'Vous' : 'Assistant'}
-                </p>
+                <div className="interview-message-head">
+                  <p className="interview-message-label">
+                    {item.role === 'user' ? (
+                      <UserRound className="h-4 w-4" />
+                    ) : (
+                      <Bot className="h-4 w-4" />
+                    )}
+                    {item.role === 'user' ? 'Vous' : 'Assistant'}
+                  </p>
+
+                  <button
+                    type="button"
+                    className="interview-copy-button"
+                    onClick={() => void handleCopyMessage(index, item.content)}
+                    aria-label="Copier le message"
+                    title="Copier le message"
+                  >
+                    {copiedMessageIndex === index ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
                 <p className="interview-message-text">{item.content}</p>
                 {item.interactiveQuestion ? (
                   <InteractiveQuestionBlock
                     disabled={isLoading || isInterviewFinished}
                     messageIndex={index}
-                    onSubmit={() => void handleSendInteractiveAnswer(index, item.interactiveQuestion!)}
+                    onSubmit={() =>
+                      void handleSendInteractiveAnswer(index, item.interactiveQuestion!)
+                    }
                     onToggle={(value) =>
                       handleInteractiveToggle(index, value, item.interactiveQuestion!.type)
                     }
@@ -492,58 +534,58 @@ export function InterviewChat() {
 
         {!isInterviewFinished ? (
           <div className="interview-card interview-composer">
-          <div className="interview-composer-row">
-            <button
-              type="button"
-              onClick={() => void handleToggleRecording()}
-              disabled={isLoading || isInterviewFinished || !interviewStarted}
-              className={`interview-mic-button ${isRecording ? 'interview-mic-button-active' : ''}`}
-            >
-              {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              {isRecording ? 'Arreter' : 'Micro'}
-            </button>
+            <div className="interview-composer-row">
+              <button
+                type="button"
+                onClick={() => void handleToggleRecording()}
+                disabled={isLoading || isInterviewFinished || !interviewStarted}
+                className={`interview-mic-button ${isRecording ? 'interview-mic-button-active' : ''}`}
+              >
+                {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {isRecording ? 'Arreter' : 'Micro'}
+              </button>
 
-            <div className="interview-textarea-wrap">
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    void handleSend()
+              <div className="interview-textarea-wrap">
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      void handleSend()
+                    }
+                  }}
+                  placeholder={
+                    isInterviewFinished
+                      ? "L'entretien est termine."
+                      : !interviewStarted
+                        ? 'Choisissez la langue et la voix avant de commencer.'
+                        : 'Ecrivez ici votre reponse, ou utilisez le micro puis corrigez la transcription...'
                   }
-                }}
-                placeholder={
-                  isInterviewFinished
-                    ? "L'entretien est termine."
-                    : !interviewStarted
-                      ? "Choisissez la langue et la voix avant de commencer."
-                    : 'Ecrivez ici votre reponse, ou utilisez le micro puis corrigez la transcription...'
-                }
-                rows={3}
-                disabled={isInterviewFinished || !interviewStarted}
-                className="interview-textarea"
-              />
+                  rows={3}
+                  disabled={isInterviewFinished || !interviewStarted}
+                  className="interview-textarea"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => void handleSend()}
+                disabled={isLoading || isInterviewFinished || !interviewStarted || !message.trim()}
+                className="interview-send-button"
+              >
+                <Send className="h-4 w-4" />
+                {isLoading ? 'Envoi...' : 'Envoyer'}
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={() => void handleSend()}
-              disabled={isLoading || isInterviewFinished || !interviewStarted || !message.trim()}
-              className="interview-send-button"
-            >
-              <Send className="h-4 w-4" />
-              {isLoading ? 'Envoi...' : 'Envoyer'}
-            </button>
-          </div>
-
-          <div className="interview-composer-footer">
-            <p>Entree pour envoyer, Shift+Entree pour revenir a la ligne.</p>
-            <div className="interview-composer-meta">
-              <p>{message.trim().length} caracteres</p>
-              <p>{isRecording ? 'Enregistrement en cours' : 'Micro disponible'}</p>
+            <div className="interview-composer-footer">
+              <p>Entree pour envoyer, Shift+Entree pour revenir a la ligne.</p>
+              <div className="interview-composer-meta">
+                <p>{message.trim().length} caracteres</p>
+                <p>{isRecording ? 'Enregistrement en cours' : 'Micro disponible'}</p>
+              </div>
             </div>
-          </div>
           </div>
         ) : null}
       </section>
@@ -646,9 +688,7 @@ function InteractiveQuestionBlock({
             >
               <span
                 className={
-                  question.type === 'checkbox'
-                    ? 'interview-checkbox-mark'
-                    : 'interview-radio-mark'
+                  question.type === 'checkbox' ? 'interview-checkbox-mark' : 'interview-radio-mark'
                 }
                 aria-hidden="true"
               >

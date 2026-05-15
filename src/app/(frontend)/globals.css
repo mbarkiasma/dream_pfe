@@ -8697,11 +8697,19 @@ html[data-static='true'] {
   color: var(--mindly-text-strong);
 }
 
+.interview-message-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.2rem;
+}
+
 .interview-message-label {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  margin: 0 0 0.2rem;
+  margin: 0;
   color: var(--mindly-primary);
   font-size: 0.68rem;
   font-weight: 850;
@@ -8709,8 +8717,41 @@ html[data-static='true'] {
   text-transform: uppercase;
 }
 
+.interview-copy-button {
+  display: inline-grid;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  background: transparent;
+  color: var(--mindly-text-muted);
+}
+
+.interview-copy-button:hover {
+  border-color: var(--mindly-border);
+  background: #f7f2ff;
+  color: var(--mindly-primary);
+}
+
+.interview-copy-button:focus-visible {
+  outline: 3px solid rgb(124 58 237 / 0.18);
+  outline-offset: 2px;
+}
+
 .interview-message-user .interview-message-label {
   color: rgb(255 255 255 / 0.78);
+}
+
+.interview-message-user .interview-copy-button {
+  color: rgb(255 255 255 / 0.72);
+}
+
+.interview-message-user .interview-copy-button:hover {
+  border-color: rgb(255 255 255 / 0.28);
+  background: rgb(255 255 255 / 0.14);
+  color: #ffffff;
 }
 
 .interview-message-text {
@@ -9081,6 +9122,16 @@ html[data-static='true'] {
 [data-theme='dark'] .interview-checkbox-mark {
   border-color: rgb(196 166 255 / 0.42);
   background: rgb(255 255 255 / 0.08);
+}
+
+[data-theme='dark'] .interview-copy-button {
+  color: rgb(233 221 255 / 0.7);
+}
+
+[data-theme='dark'] .interview-copy-button:hover {
+  border-color: rgb(196 166 255 / 0.2);
+  background: rgb(169 135 255 / 0.14);
+  color: #ffffff;
 }
 
 [data-theme='dark'] .interview-textarea {
