@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState } from 'react'
 import type { ComponentType } from 'react'
 import { Handshake, LifeBuoy, Mail } from 'lucide-react'
@@ -52,7 +52,7 @@ function EmailCard({
           width: 36,
           height: 36,
           borderRadius: 10,
-          background: 'var(--mindly-gradient-cta)',
+          background: 'var(--mindly-gradient-primary)',
           border: '1.5px solid rgb(255 255 255 / 0.35)',
           display: 'flex',
           alignItems: 'center',
@@ -204,12 +204,12 @@ export default function ContactInfosBlock({
   const EMAILS = isFr
     ? [
         { icon: 'mail', tag: 'Email direct', address: 'contact@mindbloom.app', desc: 'Reponse sous 24h ouvrables' },
-        { icon: 'lifebuoy', tag: 'Support technique', address: 'support@mindbloom.app', desc: 'Priorite haute — sous 4h' },
+        { icon: 'lifebuoy', tag: 'Support technique', address: 'support@mindbloom.app', desc: 'Priorite haute - sous 4h' },
         { icon: 'handshake', tag: 'Partenariats', address: 'partners@mindbloom.app', desc: 'Universites & etablissements' },
       ]
     : [
         { icon: 'mail', tag: 'Direct email', address: 'contact@mindbloom.app', desc: 'Reply within 24 business hours' },
-        { icon: 'lifebuoy', tag: 'Tech support', address: 'support@mindbloom.app', desc: 'High priority — within 4h' },
+        { icon: 'lifebuoy', tag: 'Tech support', address: 'support@mindbloom.app', desc: 'High priority - within 4h' },
         { icon: 'handshake', tag: 'Partnerships', address: 'partners@mindbloom.app', desc: 'Universities & institutions' },
       ]
 
@@ -329,4 +329,6 @@ export default function ContactInfosBlock({
     </div>
   )
 }
+
+
 

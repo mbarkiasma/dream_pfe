@@ -27,11 +27,6 @@ type ClerkFlowError = {
   message?: string
 }
 
-type EmailLinkFactor = {
-  emailAddressId?: string
-  strategy?: string
-}
-
 function getFirstClerkError(error: unknown): ClerkFlowError | null {
   if (!error || typeof error !== 'object') return null
 
@@ -245,37 +240,10 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
         })
       }
 
-      await signIn.reset()
-
-      const { error: createError } = await signIn.create({
-        identifier: cleanEmail,
+      const { error: linkError } = await signIn.emailLink.sendLink({
+        emailAddress: cleanEmail,
+        verificationUrl: `${window.location.origin}/auth/verify-email`,
       })
-
-      if (createError) {
-        if (isAccountNotFoundError(createError)) {
-          await sendSignUpLink(createError)
-          return
-        }
-
-        setErrorMessage(createError.longMessage || createError.message || copy.invalidEmail)
-        return
-      }
-
-      const emailLinkFactor = (signIn.supportedFirstFactors as EmailLinkFactor[] | null)?.find(
-        (factor) => factor.strategy === 'email_link',
-      )
-
-      const linkParams = emailLinkFactor?.emailAddressId
-        ? {
-            emailAddressId: emailLinkFactor.emailAddressId,
-            verificationUrl: `${window.location.origin}/auth/verify-email`,
-          }
-        : {
-            emailAddress: cleanEmail,
-            verificationUrl: `${window.location.origin}/auth/verify-email`,
-          }
-
-      const { error: linkError } = await signIn.emailLink.sendLink(linkParams)
 
       if (linkError) {
         if (isAccountNotFoundError(linkError)) {

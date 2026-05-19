@@ -49,7 +49,7 @@ function ProgressBar({ form, label }: { form: FormState; label: string }) {
             height: '100%',
             width: `${score}%`,
             borderRadius: 999,
-            background: 'var(--mindly-gradient-cta)',
+            background: 'var(--mindly-gradient-primary)',
             transition: 'width .4s cubic-bezier(.34,1.2,.64,1)',
           }}
         />
@@ -255,13 +255,13 @@ function MessageField({
           transition: 'border-color .2s, box-shadow .2s',
         }}
       />
-      <div style={{ height: 2, borderRadius: 999, background: 'var(--mindly-gradient-cta)', marginTop: 5, overflow: 'hidden' }}>
+      <div style={{ height: 2, borderRadius: 999, background: 'var(--mindly-gradient-primary)', marginTop: 5, overflow: 'hidden' }}>
         <div
           style={{
             height: '100%',
             width: `${pct}%`,
             borderRadius: 999,
-            background: value.length > 450 ? 'var(--mindly-danger)' : value.length > 300 ? 'var(--mindly-orange)' : 'var(--mindly-gradient-cta)',
+            background: value.length > 450 ? 'var(--mindly-danger)' : value.length > 300 ? 'var(--mindly-orange)' : 'var(--mindly-gradient-primary)',
             transition: 'width .2s, background .2s',
           }}
         />
@@ -509,3 +509,4 @@ export default function ContactFormBlock() {
     </Card>
   )
 }
+

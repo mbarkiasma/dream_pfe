@@ -710,7 +710,8 @@
     min-height: 100vh;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: var(--mindly-page-gradient);
     padding: 2rem 1rem;
   }
@@ -1071,8 +1072,10 @@
   }
 
   .login-page {
-    display: block;
+    display: flex;
     min-height: 100vh;
+    align-items: center;
+    justify-content: center;
     padding: 1.5rem;
     background:
       radial-gradient(circle at 15% 18%, var(--mindly-primary-soft-3) 0, transparent 26%),
@@ -1092,11 +1095,11 @@
     z-index: 1;
     display: grid;
     width: min(100%, 980px);
-    min-height: calc(100vh - 3rem);
+    min-height: auto;
     margin-inline: auto;
     align-items: center;
     gap: 1.25rem;
-    padding-top: 3rem;
+    padding-block: 4rem 2rem;
   }
 
   @media (width >= 64rem) {
@@ -1105,7 +1108,7 @@
       gap: 1.4rem;
       align-items: center;
       justify-content: center;
-      padding-top: 0;
+      padding-block: 0;
     }
   }
 
@@ -1317,14 +1320,13 @@
     margin-inline: auto;
     border-color: var(--mindly-border-violet);
     background: var(--mindly-surface-glass);
-    padding: 1.25rem;
+    padding: 1.35rem 1.25rem 1.65rem;
     box-shadow: 0 20px 48px rgb(111 77 215 / 0.15);
   }
 
   @media (width >= 64rem) {
     .login-visual,
     .login-card {
-      height: 32.5rem;
       min-height: 32.5rem;
     }
 
@@ -1337,7 +1339,29 @@
 
   @media (width >= 40rem) {
     .login-card {
-      padding: 1.65rem;
+      padding: 1.7rem 1.65rem 1.9rem;
+    }
+  }
+
+  @media (width < 40rem) {
+    .login-page {
+      padding-inline: 0.9rem;
+    }
+
+    .login-card {
+      border-radius: 1.35rem;
+    }
+
+    .login-header {
+      margin-bottom: 1.1rem;
+    }
+
+    .login-divider {
+      margin-block: 1.35rem;
+    }
+
+    .login-form {
+      gap: 0.9rem;
     }
   }
 
