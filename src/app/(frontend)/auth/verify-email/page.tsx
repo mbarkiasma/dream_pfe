@@ -2,6 +2,7 @@
 
 import { useClerk } from '@clerk/nextjs'
 import { AlertCircle, Loader2, MailPlus } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 type VerificationStatus = 'checking' | 'expired'
@@ -47,10 +48,10 @@ export default function VerifyEmailPage() {
             Le delai de connexion est ecoule. Pour proteger votre compte, demandez un nouveau lien
             magique et ouvrez le dernier email recu.
           </p>
-          <a className="auth-status-button" href="/login?message=magic-link-expired">
+          <Link className="auth-status-button" href="/login?message=magic-link-expired">
             <MailPlus />
             Generer un nouveau lien magique
-          </a>
+          </Link>
         </div>
       </main>
     )

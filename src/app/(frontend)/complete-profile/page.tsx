@@ -4,6 +4,8 @@ import { CompleteProfileClient } from '@/components/auth/CompleteProfileClient'
 import { getDashboardPath } from '@/utilities/dashboardAuth'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CompleteProfilePage() {
   const { user } = await getAuthenticatedDashboardUser()
 

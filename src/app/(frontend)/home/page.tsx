@@ -1,6 +1,5 @@
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
-import { queryPageBySlug } from '@/utilities/queryPageBySlug'
 import { draftMode } from 'next/headers'
 
 const fallbackLayout = [
@@ -9,10 +8,8 @@ const fallbackLayout = [
   { blockType: 'accompagnementProcess' },
 ]
 
-export default async function PageAccompagnement() {
+export default async function HomePage() {
   const { isEnabled: draft } = await draftMode()
-  const page = await queryPageBySlug({ slug: 'accompagnement' })
-  const layout = page?.layout?.length ? page.layout : fallbackLayout
 
   return (
     <main
@@ -23,7 +20,7 @@ export default async function PageAccompagnement() {
       }}
     >
       {draft && <LivePreviewListener />}
-      <RenderBlocks blocks={layout} />
+      <RenderBlocks blocks={fallbackLayout} />
     </main>
   )
 }

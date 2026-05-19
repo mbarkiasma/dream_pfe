@@ -21,14 +21,13 @@ export function Navbar() {
   }, [])
 
   const navLinks = [
-    { label: t.navbar.accueil, href: '/' },
+    { label: t.navbar.accueil, href: '/home' },
     { label: t.navbar.fonctionnalites, href: '/fonctionnalites' },
     { label: t.navbar.aPropos, href: '/a-propos' },
     { label: t.navbar.contact, href: '/contact' },
   ]
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href)
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   const toggleTheme = () => {
     setTheme(isDark ? 'light' : 'dark')
@@ -37,7 +36,7 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-[100] border-b border-[var(--mindly-border)] bg-[var(--mindly-surface-glass)] backdrop-blur-[18px]">
       <div className="relative mx-auto flex h-[70px] w-full max-w-none items-center justify-between px-5 lg:px-14">
-        <Link href="/" className="flex flex-col lg:translate-x-4" onClick={() => setOpen(false)}>
+        <Link href="/home" className="flex flex-col lg:translate-x-4" onClick={() => setOpen(false)}>
           <span className="bg-gradient-to-r from-[#895EF8] to-[#A987FF] bg-clip-text font-[family-name:var(--font-zain)] text-[19px] font-bold leading-none text-transparent">
             MindBloom
           </span>

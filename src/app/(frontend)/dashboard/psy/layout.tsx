@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 import { PsySidebar } from '@/components/dashboard/psy/PsySidebar'
 import { requireDashboardRole } from '@/utilities/dashboardAuth'
 
+export const dynamic = 'force-dynamic'
+
 export default async function PsychologueDashboardLayout({ children }: { children: ReactNode }) {
   await requireDashboardRole('psy')
 

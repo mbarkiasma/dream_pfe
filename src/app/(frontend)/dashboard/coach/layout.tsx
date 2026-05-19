@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 import { CoachSidebar } from '@/components/dashboard/coach/CoachSidebar'
 import { requireDashboardRole } from '@/utilities/dashboardAuth'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CoachDashboardLayout({ children }: { children: ReactNode }) {
   await requireDashboardRole('coach')
 

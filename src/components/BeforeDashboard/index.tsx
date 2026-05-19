@@ -1,4 +1,5 @@
 import { Banner } from '@payloadcms/ui/elements/Banner'
+import Link from 'next/link'
 import React from 'react'
 
 import './index.scss'
@@ -12,12 +13,16 @@ const BeforeDashboard: React.FC = () => {
         <h4>Bienvenue dans le tableau de bord administrateur</h4>
       </Banner>
       <div className={`${baseClass}__actions`}>
-        <a className={`${baseClass}__logout`} href="/logout">
+        <Link className={`${baseClass}__logout`} href="/logout">
           Deconnecter ce navigateur
-        </a>
-        <a className={`${baseClass}__logout ${baseClass}__logout--secondary`} href="/api/auth/logout">
+        </Link>
+        <Link
+          className={`${baseClass}__logout ${baseClass}__logout--secondary`}
+          href="/api/auth/logout"
+          prefetch={false}
+        >
           Forcer la fermeture de session
-        </a>
+        </Link>
       </div>
       <p className={`${baseClass}__help`}>
         Si vous avez ouvert l&apos;admin avec un mauvais compte dans ce navigateur, utilisez

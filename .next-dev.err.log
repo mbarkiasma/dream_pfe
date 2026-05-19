@@ -1,0 +1,2 @@
+ ⚠ Port 3000 is in use by process 28984, using available port 3001 instead.
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (200kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
