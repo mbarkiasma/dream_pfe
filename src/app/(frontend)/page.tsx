@@ -1,5 +1,29 @@
-import PageTemplate, { generateMetadata } from './[slug]/page'
+import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { queryPageBySlug } from '@/utilities/queryPageBySlug'
+import { draftMode } from 'next/headers'
 
-export default PageTemplate
+const fallbackLayout = [
+  { blockType: 'accompagnementHero' },
+  { blockType: 'accompagnementStress' },
+  { blockType: 'accompagnementProcess' },
+]
 
-export { generateMetadata }
+export default async function AccueilPage() {
+  const { isEnabled: draft } = await draftMode()
+  const page = await queryPageBySlug({ slug: 'home' })
+  const layout = page?.layout?.length ? page.layout : fallbackLayout
+
+  return (
+    <main
+      className="bg-[var(--mindly-bg)] font-[family-name:var(--font-zain)]"
+      style={{
+        backgroundImage:
+          'radial-gradient(circle at 24% 8%, rgba(137,94,248,0.08), transparent 30%), radial-gradient(circle at 82% 22%, rgba(137,94,248,0.10), transparent 34%), radial-gradient(circle at 48% 74%, rgba(169,135,255,0.08), transparent 36%)',
+      }}
+    >
+      {draft && <LivePreviewListener />}
+      <RenderBlocks blocks={layout} />
+    </main>
+  )
+}

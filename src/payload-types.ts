@@ -177,6 +177,19 @@ export interface Page {
   id: number;
   title: string;
   layout: (
+    | {
+        title?: string | null;
+        subtitle?: string | null;
+        emailPlaceholder?: string | null;
+        passwordPlaceholder?: string | null;
+        buttonLabel?: string | null;
+        signupText?: string | null;
+        signupLabel?: string | null;
+        signupUrl?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'loginBlock';
+      }
     | CallToActionBlock
     | ContentBlock
     | MediaBlock
@@ -272,6 +285,117 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'roleCards';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'accompagnementHero';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'accompagnementStress';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'accompagnementProcess';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'aboutHero';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'aboutTeam';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'aboutEthics';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'aboutVision';
+      }
+    | {
+        brand: string;
+        titleFr: string;
+        titleEn: string;
+        descriptionFr: string;
+        descriptionEn: string;
+        stats?:
+          | {
+              icon: 'sparkles' | 'shieldCheck' | 'star' | 'users';
+              value: string;
+              labelFr: string;
+              labelEn: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'contactHero';
+      }
+    | {
+        emailsTitleFr: string;
+        emailsTitleEn: string;
+        emails?:
+          | {
+              icon: 'mail' | 'lifebuoy' | 'handshake';
+              tagFr: string;
+              tagEn: string;
+              address: string;
+              descFr: string;
+              descEn: string;
+              id?: string | null;
+            }[]
+          | null;
+        teamTextFr: string;
+        teamTextEn: string;
+        teamAvatars?:
+          | {
+              initials: string;
+              id?: string | null;
+            }[]
+          | null;
+        faqTitleFr: string;
+        faqTitleEn: string;
+        faqItems?:
+          | {
+              qFr: string;
+              qEn: string;
+              aFr: string;
+              aEn: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'contactContent';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'featuresHero';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'featuresTabs';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'featureHighlight';
+      }
+    | {
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'nutrition';
       }
   )[];
   meta?: {
@@ -1337,6 +1461,20 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
+        loginBlock?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              emailPlaceholder?: T;
+              passwordPlaceholder?: T;
+              buttonLabel?: T;
+              signupText?: T;
+              signupLabel?: T;
+              signupUrl?: T;
+              id?: T;
+              blockName?: T;
+            };
         cta?: T | CallToActionBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
@@ -1448,6 +1586,130 @@ export interface PagesSelect<T extends boolean = true> {
                     link?: T;
                     id?: T;
                   };
+              id?: T;
+              blockName?: T;
+            };
+        accompagnementHero?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        accompagnementStress?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        accompagnementProcess?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        aboutHero?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        aboutTeam?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        aboutEthics?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        aboutVision?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        contactHero?:
+          | T
+          | {
+              brand?: T;
+              titleFr?: T;
+              titleEn?: T;
+              descriptionFr?: T;
+              descriptionEn?: T;
+              stats?:
+                | T
+                | {
+                    icon?: T;
+                    value?: T;
+                    labelFr?: T;
+                    labelEn?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        contactContent?:
+          | T
+          | {
+              emailsTitleFr?: T;
+              emailsTitleEn?: T;
+              emails?:
+                | T
+                | {
+                    icon?: T;
+                    tagFr?: T;
+                    tagEn?: T;
+                    address?: T;
+                    descFr?: T;
+                    descEn?: T;
+                    id?: T;
+                  };
+              teamTextFr?: T;
+              teamTextEn?: T;
+              teamAvatars?:
+                | T
+                | {
+                    initials?: T;
+                    id?: T;
+                  };
+              faqTitleFr?: T;
+              faqTitleEn?: T;
+              faqItems?:
+                | T
+                | {
+                    qFr?: T;
+                    qEn?: T;
+                    aFr?: T;
+                    aEn?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        featuresHero?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        featuresTabs?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        featureHighlight?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        nutrition?:
+          | T
+          | {
               id?: T;
               blockName?: T;
             };

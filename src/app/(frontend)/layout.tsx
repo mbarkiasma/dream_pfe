@@ -5,6 +5,7 @@ import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import React from 'react'
 
+import { FrontendChrome } from '@/components/layout/FrontendChrome'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
@@ -19,7 +20,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { isEnabled } = await draftMode()
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(GeistSans.variable, GeistMono.variable)}
+      lang="fr"
+      suppressHydrationWarning
+    >
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
@@ -33,7 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           signUpForceRedirectUrl="/auth/redirect"
         >
           <Providers>
-            {children}
+            <FrontendChrome>{children}</FrontendChrome>
           </Providers>
         </ClerkProvider>
       </body>

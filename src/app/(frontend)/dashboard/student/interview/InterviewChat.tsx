@@ -45,10 +45,10 @@ type ReponseChat = {
 function normalizeAssistantText(text: string) {
   return text
     .replace(
-      /Je m'appelle Mindly[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
-      'Je suis votre assistant de la plateforme Mindly.',
+      /Je m'appelle MindBloom[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
+      'Je suis votre assistant de la plateforme MindBloom.',
     )
-    .replace(/Je m'appelle Mindly[,.]?/gi, 'Je suis votre assistant de la plateforme Mindly.')
+    .replace(/Je m'appelle MindBloom[,.]?/gi, 'Je suis votre assistant de la plateforme MindBloom.')
 }
 
 export function InterviewChat() {
@@ -735,3 +735,4 @@ function convertirAudioEnBase64(audioBlob: Blob): Promise<string> {
     reader.readAsDataURL(audioBlob)
   })
 }
+

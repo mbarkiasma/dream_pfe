@@ -12,12 +12,26 @@ import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
+import { LoginBlock } from '../../blocks/LoginBlock/config'
 import { LandingHeroBlock } from '@/blocks/HeroBlock/config'
 import { SecondBlocAccueil } from '@/blocks/secondBlocAccueil/config'
 import { TroisiemeBlocAccueil } from '@/blocks/thirdBlocAccueil/config'
 import { QuatriemeBlocAccueil } from '@/blocks/quatriemeBlocAccueil/config'
 import { CinquiemeBlocAccueil } from '@/blocks/CinquiemeBlocAccueil/config'
 import { RoleCards } from '@/blocks/RoleCards/config'
+import { AccompagnementHero } from '@/blocks/AccompagnementHero/config'
+import { AccompagnementStress } from '@/blocks/AccompagnementStress/config'
+import { AccompagnementProcess } from '@/blocks/AccompagnementProcess/config'
+import { AboutHero } from '@/blocks/AboutHero/config'
+import { AboutTeam } from '@/blocks/AboutTeam/config'
+import { AboutEthics } from '@/blocks/AboutEthics/config'
+import { AboutVision } from '@/blocks/AboutVision/config'
+import { ContactHero } from '@/blocks/ContactHero/config'
+import { ContactContent } from '@/blocks/ContactContent/config'
+import { FeaturesHero } from '@/blocks/FeaturesHero/config'
+import { FeaturesTabs } from '@/blocks/FeaturesTabs/config'
+import { FeatureHighlight } from '@/blocks/FeatureHighlight/config'
+import { Nutrition } from '@/blocks/Nutrition/config'
 import {
   MetaDescriptionField,
   MetaTitleField,
@@ -77,6 +91,7 @@ export const Pages: CollectionConfig<'pages'> = {
               name: 'layout',
               type: 'blocks',
               blocks: [
+                LoginBlock,
                 CallToAction,
                 Content,
                 MediaBlock,
@@ -88,6 +103,19 @@ export const Pages: CollectionConfig<'pages'> = {
                 QuatriemeBlocAccueil,
                 CinquiemeBlocAccueil,
                 RoleCards,
+                AccompagnementHero,
+                AccompagnementStress,
+                AccompagnementProcess,
+                AboutHero,
+                AboutTeam,
+                AboutEthics,
+                AboutVision,
+                ContactHero,
+                ContactContent,
+                FeaturesHero,
+                FeaturesTabs,
+                FeatureHighlight,
+                Nutrition,
               ],
               required: true,
               admin: {

@@ -10,7 +10,12 @@ export default function LogoutPage() {
   useEffect(() => {
     window.localStorage.setItem('payload-theme', 'light')
     document.documentElement.setAttribute('data-theme', 'light')
-    void signOut({ redirectUrl: '/login' })
+
+    void fetch('/api/auth/logout', {
+      method: 'POST',
+    }).finally(() => {
+      void signOut({ redirectUrl: '/login' })
+    })
   }, [signOut])
 
   return (

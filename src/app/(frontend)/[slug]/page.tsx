@@ -69,7 +69,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   const isLoginPage = decodedSlug.toLowerCase() === 'login'
 
   return (
-    <article className={isLoginPage ? 'min-h-screen' : 'min-h-screen bg-[#f3eef8]'}>
+    <article className={isLoginPage ? 'min-h-screen' : 'min-h-screen bg-[var(--mindly-bg-strong)]'}>
       <PageClient />
       <PayloadRedirects disableNotFound url={url} />
 

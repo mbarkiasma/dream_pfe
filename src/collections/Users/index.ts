@@ -1,7 +1,6 @@
-import type { Access, CollectionConfig, FieldAccess } from 'payload'
+import { APIError, type Access, type CollectionConfig, type FieldAccess, type Where } from 'payload'
 import type { User } from '@/payload-types'
 import { hasRole } from '@/access/roles'
-import { authenticated } from '../../access/authenticated'
 import { clerkAuthStrategy } from './clerkAuthStrategy'
 
 const adminOnly = ({ req: { user } }: { req: { user: User | null } }): boolean =>
@@ -13,9 +12,46 @@ const adminOnlyFieldAccess: FieldAccess = ({ req: { user } }) => hasRole(user, [
 
 const generatedProfileFieldAccess: FieldAccess = ({ req: { user } }) => hasRole(user, ['admin'])
 
+const managedStaffRoles = ['coach', 'psy'] as const
+
+const adminManagedUsersWhere: Where = {
+  role: {
+    in: managedStaffRoles,
+  },
+}
+
+const adminVisibleUsersWhere: Where = {
+  role: {
+    in: ['etudiant', ...managedStaffRoles],
+  },
+}
+
+function adminManagedUsersOrSelfWhere(user: User): Where {
+  return {
+    or: [
+      adminVisibleUsersWhere,
+      {
+        id: {
+          equals: user.id,
+        },
+      },
+    ],
+  }
+}
+
+function isManagedStaffRole(role: unknown): role is (typeof managedStaffRoles)[number] {
+  return role === 'coach' || role === 'psy'
+}
+
+function assertAdminManagesOnlyStaff(data: Partial<User> | undefined) {
+  if (data?.role && !isManagedStaffRole(data.role)) {
+    throw new APIError("L'administrateur peut gerer uniquement les comptes coach et psy.", 403)
+  }
+}
+
 const adminOrSelf: Access = ({ req: { user } }) => {
   if (!user) return false
-  if (hasRole(user, ['admin'])) return true
+  if (hasRole(user, ['admin'])) return adminManagedUsersWhere
 
   return {
     id: {
@@ -30,10 +66,24 @@ export const Users: CollectionConfig = {
     admin: adminOnly,
     create: adminOnlyAccess,
     delete: adminOnlyAccess,
-    read: authenticated,
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      if (hasRole(user, ['admin'])) return adminManagedUsersOrSelfWhere(user as User)
+
+      return {
+        id: {
+          equals: user.id,
+        },
+      }
+    },
     update: adminOrSelf,
   },
   admin: {
+    baseListFilter: ({ req }) => {
+      if (hasRole(req.user as User | null, ['admin'])) return adminVisibleUsersWhere
+
+      return null
+    },
     defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isAvailableForCoaching'],
     useAsTitle: 'email',
   },
@@ -41,6 +91,41 @@ export const Users: CollectionConfig = {
     strategies: [clerkAuthStrategy],
   },
   hooks: {
+    beforeValidate: [
+      async ({ data, operation, req }) => {
+        if (operation === 'create' && hasRole(req.user as User | null, ['admin'])) {
+          if (!data?.role) {
+            data = {
+              ...data,
+              role: 'coach',
+            }
+          }
+
+          assertAdminManagesOnlyStaff(data as Partial<User> | undefined)
+        }
+
+        return data
+      },
+    ],
+    beforeChange: [
+      async ({ data, operation, originalDoc, req }) => {
+        if (!hasRole(req.user as User | null, ['admin'])) {
+          return data
+        }
+
+        const targetRole = data?.role || originalDoc?.role
+
+        if (operation === 'create') {
+          assertAdminManagesOnlyStaff(data as Partial<User> | undefined)
+        }
+
+        if (operation === 'update' && !isManagedStaffRole(targetRole)) {
+          throw new APIError("L'administrateur peut modifier uniquement les comptes coach et psy.", 403)
+        }
+
+        return data
+      },
+    ],
     beforeDelete: [
       async ({ id, req }) => {
         const userId = String(id)
@@ -50,6 +135,10 @@ export const Users: CollectionConfig = {
           depth: 0,
           req,
         })
+
+        if (hasRole(req.user as User | null, ['admin']) && !isManagedStaffRole(userToDelete.role)) {
+          throw new APIError("L'administrateur peut supprimer uniquement les comptes coach et psy.", 403)
+        }
 
         const coachingEvents = await req.payload.find({
           collection: 'coaching-events',

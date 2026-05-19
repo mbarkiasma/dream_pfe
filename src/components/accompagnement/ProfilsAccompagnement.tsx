@@ -14,13 +14,13 @@ const profils = [
     accent: 'from-[#f3b6ff] to-[#b79ef6]',
   },
   {
-    emoji: '🏋️',
+    emoji: '🤝',
     titre: 'Coach',
     texte: "Plan coaching, tâches, progression, espace professionnel.",
     accent: 'from-[#ffbb82] to-[#ff8d9b]',
   },
   {
-    emoji: '⚙️',
+    emoji: '🛠️',
     titre: 'Support technique',
     texte: 'Aide accès, bug, compte, automatisation, alertes.',
     accent: 'from-[#b49dff] to-[#8c90ff]',
@@ -34,25 +34,31 @@ export function ProfilsAccompagnement() {
         <div className="rounded-[28px] border border-border bg-card/80 p-8 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]">
           <h3 className="text-2xl font-semibold text-[#3d1f71]">Ce que vous pouvez faire ici</h3>
           <ul className="mt-6 space-y-4 text-sm leading-8 text-[#6e5d8d]">
-            <li>• Créer et consulter votre journal de rêves</li>
-            <li>• Lancer une analyse IA de vos données</li>
-            <li>• Planifier et centraliser vos rendez-vous</li>
-            <li>• Télécharger des templates de séance</li>
+            <li>Créer et consulter votre journal de rêves</li>
+            <li>Lancer une analyse IA de vos données</li>
+            <li>Planifier et centraliser vos rendez-vous</li>
+            <li>Télécharger des templates de séance</li>
           </ul>
         </div>
 
         <div className="rounded-[28px] border border-border bg-[#f8f3ff]/90 p-6 shadow-[0_18px_45px_rgba(131,110,181,0.14)] backdrop-blur-[10px]">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-[24px] bg-card/80 p-4 text-center text-dream-heading shadow-sm">
-              <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#8c90ff] text-white">1</div>
+              <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#8c90ff] text-white">
+                1
+              </div>
               <p className="text-sm font-semibold">Sélectionnez votre profil</p>
             </div>
             <div className="rounded-[24px] bg-card/80 p-4 text-center text-dream-heading shadow-sm">
-              <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#8c90ff] text-white">2</div>
+              <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#8c90ff] text-white">
+                2
+              </div>
               <p className="text-sm font-semibold">Parcourez les outils dédiés</p>
             </div>
             <div className="rounded-[24px] bg-card/80 p-4 text-center text-dream-heading shadow-sm">
-              <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#8c90ff] text-white">3</div>
+              <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#8c90ff] text-white">
+                3
+              </div>
               <p className="text-sm font-semibold">Recevez assistance IA</p>
             </div>
           </div>

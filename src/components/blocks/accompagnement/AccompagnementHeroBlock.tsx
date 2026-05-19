@@ -1,0 +1,279 @@
+'use client'
+
+import Link from 'next/link'
+import { BlurFade } from '@/components/ui/blur-fade'
+import { OrbitingCircles } from '@/components/ui/orbiting-circles'
+import {
+  AppBadge,
+  appBadgeCtaClass,
+  appBadgeCtaSecondaryClass,
+  sectionBadgeClass,
+  sectionBadgeDotClass,
+} from '@/components/ui/badge'
+import { useLanguage } from '@/contexts/LanguageContext'
+import {
+  BrainCircuit,
+  Building2,
+  Heart,
+  Handshake,
+  Mic,
+  MoonStar,
+  Play,
+  Sparkles,
+  ClipboardList,
+} from 'lucide-react'
+
+const NODE_SIZE = 104
+
+export default function AccompagnementHeroBlock() {
+  const { lang, t } = useLanguage()
+
+  const nodes = [
+    {
+      icon: 'mic',
+      title: lang === 'fr' ? 'Entretien' : 'Interview',
+      subtitle: lang === 'fr' ? 'Analyse vocale' : 'Voice analysis',
+      badge: lang === 'fr' ? 'Actif' : 'Active',
+    },
+    {
+      icon: 'clipboard',
+      title: lang === 'fr' ? 'Analyse personnalité' : 'Personality analysis',
+      subtitle: lang === 'fr' ? 'Profil psycho' : 'Psy profile',
+    },
+    {
+      icon: 'heart',
+      title: lang === 'fr' ? 'Bien-être global' : 'Global wellness',
+      subtitle: lang === 'fr' ? 'Cette semaine' : 'This week',
+      badge: '87%',
+    },
+    {
+      icon: 'play',
+      title: lang === 'fr' ? 'Vidéo de rêve' : 'Dream video',
+      subtitle: lang === 'fr' ? 'Résumé IA' : 'AI summary',
+      badge: 'NEW',
+    },
+    {
+      icon: 'handshake',
+      title: 'Coaching',
+      subtitle: lang === 'fr' ? 'réel-smart' : 'real-smart',
+    },
+    {
+      icon: 'moon',
+      title: lang === 'fr' ? 'Analyse de rêve' : 'Dream analysis',
+      subtitle: lang === 'fr' ? '4 essais' : '4 trials',
+    },
+  ]
+
+  const renderNodeIcon = (icon: string) => (
+    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(90deg,#895ef8,#a987ff)] shadow-[0_10px_22px_rgba(137,94,248,0.24)]">
+      {icon === 'mic' && <Mic className="h-5 w-5 text-white" />}
+      {icon === 'clipboard' && <ClipboardList className="h-5 w-5 text-white" />}
+      {icon === 'heart' && <Heart className="h-5 w-5 text-white" />}
+      {icon === 'play' && <Play className="h-5 w-5 text-white" />}
+      {icon === 'handshake' && <Handshake className="h-5 w-5 text-white" />}
+      {icon === 'moon' && <MoonStar className="h-5 w-5 text-white" />}
+    </div>
+  )
+
+  const renderNode = (node: (typeof nodes)[number], index: number) => (
+    <div
+      key={index}
+      className="relative flex h-full w-full flex-col items-center justify-center rounded-full border border-[var(--mindly-primary-soft)] bg-[var(--mindly-primary-soft-3)] text-center shadow-[0_14px_35px_rgba(137,94,248,0.14)]"
+    >
+      {node.badge && (
+        <div className="absolute -right-2 -top-2 rounded-full bg-[var(--mindly-primary)] px-2.5 py-1 text-[10px] font-bold text-white shadow-[0_8px_18px_rgba(137,94,248,0.25)]">
+          {node.badge}
+        </div>
+      )}
+
+      {renderNodeIcon(node.icon)}
+
+      <p className="max-w-[108px] px-1 font-[family-name:var(--font-zain)] text-[13px] font-normal leading-[1.15] text-[var(--mindly-text-strong)]">
+        {node.title}
+      </p>
+
+      <p className="mt-1 max-w-[108px] px-1 font-[family-name:var(--font-zain)] text-[11px] font-normal leading-tight text-[var(--mindly-purple-muted)]">
+        {node.subtitle}
+      </p>
+    </div>
+  )
+
+  return (
+    <section className="relative w-full overflow-hidden bg-transparent px-5 pb-10 pt-10 font-[family-name:var(--font-zain)] sm:pt-12 lg:pt-14">
+      <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_24%_20%,rgba(137,94,248,0.08),transparent_34%),radial-gradient(circle_at_82%_48%,rgba(137,94,248,0.10),transparent_36%)]" />
+
+      <div className="relative z-10 mx-auto grid max-w-[1320px] gap-8 lg:grid-cols-[minmax(0,690px)_minmax(430px,1fr)] lg:items-center lg:gap-8 xl:gap-10">
+        {/* Texte à gauche */}
+        <div className="order-1 max-w-[760px]">
+          <BlurFade delay={0.15} inView>
+            <AppBadge dot dotClassName={sectionBadgeDotClass} className={sectionBadgeClass}>
+              {t.hero.badge}
+            </AppBadge>
+          </BlurFade>
+
+          <BlurFade delay={0.25} inView>
+            <h1 className="mt-6 max-w-[760px] font-[family-name:var(--font-zain)] text-[38px] font-bold leading-[1.08] tracking-normal text-[var(--mindly-text)] sm:text-[46px] lg:text-[50px] xl:text-[54px]">
+              {lang === 'fr' ? (
+                <>
+                  <span className="block whitespace-nowrap">
+                    <span className="inline-block pb-[0.08em] bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
+                      MindBloom
+                    </span>
+                    , une cellule d&apos;écoute
+                  </span>
+
+                  <span className="block">pour les étudiants</span>
+                </>
+              ) : (
+                <>
+                  <span className="block whitespace-nowrap">
+                    <span className="inline-block pb-[0.08em] bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
+                      MindBloom
+                    </span>
+                    , a listening space
+                  </span>
+
+                  <span className="block">for students</span>
+                </>
+              )}
+            </h1>
+          </BlurFade>
+
+          <BlurFade delay={0.3} inView>
+            <p className="mt-4 font-[family-name:var(--font-zain)] text-[18px] font-bold tracking-normal text-[var(--mindly-purple-muted)] sm:text-[20px]">
+              {lang === 'fr'
+                ? "Accompagnement intelligent avec l’IA."
+                : 'Intelligent support powered by AI.'}
+            </p>
+          </BlurFade>
+
+          <BlurFade delay={0.35} inView>
+            <div className="mt-5 overflow-x-auto pb-1">
+              <div className="flex min-w-max flex-nowrap gap-3">
+                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-[var(--mindly-border)] bg-white px-4 py-2.5 font-[family-name:var(--font-zain)] text-[14px] font-normal tracking-normal text-[var(--mindly-primary)] shadow-[0_8px_20px_rgba(137,94,248,0.07)]">
+                  <Building2 className="h-4 w-4 text-[var(--mindly-primary)]" />
+                  <span>ESSTHS · Sousse</span>
+                </div>
+
+                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-[var(--mindly-border)] bg-white px-4 py-2.5 font-[family-name:var(--font-zain)] text-[14px] font-normal tracking-normal text-[var(--mindly-primary)] shadow-[0_8px_20px_rgba(137,94,248,0.07)]">
+                  <Heart className="h-4 w-4 text-[var(--mindly-primary)]" />
+                  <span>{lang === 'fr' ? '100% gratuit' : '100% free'}</span>
+                </div>
+
+                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-[var(--mindly-border)] bg-white px-4 py-2.5 font-[family-name:var(--font-zain)] text-[14px] font-normal tracking-normal text-[var(--mindly-primary)] shadow-[0_8px_20px_rgba(137,94,248,0.07)]">
+                  <Sparkles className="h-4 w-4 text-[var(--mindly-primary)]" />
+                  <span>{lang === 'fr' ? 'IA intégrée' : 'Integrated AI'}</span>
+                </div>
+              </div>
+            </div>
+          </BlurFade>
+
+          <BlurFade delay={0.45} inView>
+            <p className="mt-6 max-w-[700px] font-[family-name:var(--font-zain)] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]">
+              {lang === 'fr' ? (
+                <>
+                  Une plateforme innovante dédiée au{' '}
+                  <strong className="font-normal text-[var(--mindly-purple-muted)]">bien-être étudiant</strong>,
+                  reliant les étudiants à des{' '}
+                  <strong className="font-normal text-[var(--mindly-purple-muted)]">
+                    professionnels certifiés
+                  </strong>{' '}
+                  tout en s&apos;appuyant sur l&apos;intelligence artificielle pour offrir un
+                  accompagnement personnalisé.
+                </>
+              ) : (
+                <>
+                  An innovative platform dedicated to{' '}
+                  <strong className="font-normal text-[var(--mindly-purple-muted)]">student wellness</strong>,
+                  connecting students with{' '}
+                  <strong className="font-normal text-[var(--mindly-purple-muted)]">
+                    certified professionals
+                  </strong>{' '}
+                  while using artificial intelligence to provide personalized support.
+                </>
+              )}
+            </p>
+          </BlurFade>
+
+          <BlurFade delay={0.55} inView>
+            <div className="mt-7">
+              <div className="flex flex-wrap gap-4">
+                <Link href="/login" className={`${appBadgeCtaClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
+                  {t.hero.ctaMain}
+                </Link>
+
+                <AppBadge asChild size="md" className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
+                  <Link href="/fonctionnalites">
+                    {t.hero.ctaSecondary}
+                  </Link>
+                </AppBadge>
+              </div>
+            </div>
+          </BlurFade>
+        </div>
+
+        {/* Diagramme à droite */}
+        <BlurFade
+          delay={0.2}
+          inView
+          className="relative order-2 flex h-[420px] w-full items-center justify-center lg:h-[470px] lg:translate-x-0 xl:translate-x-4"
+        >
+          <svg
+            className="pointer-events-none absolute h-[430px] w-[430px] lg:h-[470px] lg:w-[470px]"
+            viewBox="0 0 620 620"
+            fill="none"
+          >
+            <circle
+              cx="310"
+              cy="310"
+              r="202"
+              stroke="var(--mindly-primary-light)"
+              strokeWidth="1.8"
+              strokeDasharray="5 8"
+              opacity="0.58"
+            />
+            <circle
+              cx="310"
+              cy="310"
+              r="152"
+              stroke="var(--mindly-primary)"
+              strokeWidth="1.5"
+              strokeDasharray="4 8"
+              opacity="0.48"
+            />
+          </svg>
+
+          <div className="absolute z-20 flex h-[92px] w-[92px] items-center justify-center rounded-full border border-[var(--mindly-primary-light)]/45 bg-[linear-gradient(90deg,#895ef8,#a987ff)] shadow-[0_18px_36px_rgba(137,94,248,0.28)]">
+            <div className="absolute inset-2 rounded-full border border-white/40" />
+            <div className="absolute inset-5 rounded-full border border-white/30" />
+            <BrainCircuit className="relative h-10 w-10 text-white" />
+          </div>
+
+          <OrbitingCircles
+            radius={202}
+            duration={36}
+            iconSize={NODE_SIZE}
+            path={false}
+            className="z-10"
+          >
+            {nodes.slice(0, 3).map(renderNode)}
+          </OrbitingCircles>
+
+          <OrbitingCircles
+            radius={152}
+            reverse
+            duration={30}
+            iconSize={NODE_SIZE}
+            path={false}
+            className="z-10"
+          >
+            {nodes.slice(3).map(renderNode)}
+          </OrbitingCircles>
+        </BlurFade>
+      </div>
+
+    </section>
+  )
+}
+
+

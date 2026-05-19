@@ -20,7 +20,7 @@ const besoins = [
     bubble: 'bg-[#f2eaff]',
   },
   {
-    icon: '🏋️',
+    icon: '🤝',
     title: 'Coach',
     description:
       "Besoin d'aide pour le plan coaching, les tâches, la progression ou l'espace professionnel.",
@@ -29,7 +29,7 @@ const besoins = [
     bubble: 'bg-[#fff1e6]',
   },
   {
-    icon: '⚙️',
+    icon: '🛠️',
     title: 'Support technique',
     description:
       "Problème d'accès, bug, compte, automatisation, réassignation ou alerte urgente.",
@@ -43,9 +43,7 @@ export function BesoinsContact() {
   return (
     <section className="mx-auto max-w-7xl px-6 py-8">
       <div className="mb-10 text-center">
-        <h2 className="text-4xl font-bold text-dream-heading">
-          Quel est votre besoin ?
-        </h2>
+        <h2 className="text-4xl font-bold text-dream-heading">Quel est votre besoin ?</h2>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -70,9 +68,7 @@ export function BesoinsContact() {
                 <span>{item.icon}</span>
               </div>
 
-              <h3 className="relative text-2xl font-semibold text-dream-heading">
-                {item.title}
-              </h3>
+              <h3 className="relative text-2xl font-semibold text-dream-heading">{item.title}</h3>
 
               <p className="relative mt-4 text-[15px] leading-7 text-dream-muted">
                 {item.description}
@@ -80,7 +76,7 @@ export function BesoinsContact() {
 
               <div className="relative mt-6 flex items-center gap-2 text-sm font-medium text-[#8d76b7] opacity-80">
                 <span>Découvrir</span>
-                <span>→</span>
+                <span>?</span>
               </div>
             </CardContent>
           </Card>

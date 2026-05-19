@@ -10,6 +10,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        primary:
+          "relative overflow-hidden border-transparent bg-[image:var(--mindly-gradient-primary)] font-[family-name:var(--font-zain)] font-bold text-[var(--mindly-white)] shadow-[var(--mindly-shadow-sm)] transition-all duration-300 hover:-translate-y-[3px] hover:shadow-[var(--mindly-shadow-xl)]",
         dream:
           "dream-brand-bg text-dream-accent-foreground shadow-dream-card hover:brightness-105",
         dreamSoft:
@@ -50,10 +52,15 @@ const buttonVariants = cva(
         iconSm: "h-9 w-9 rounded-xl",
         iconLg: "h-11 w-11 rounded-full",
       },
+      fullWidth: {
+        true: "w-full",
+        false: "",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      fullWidth: false,
     },
   }
 )
@@ -65,11 +72,11 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, fullWidth, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, fullWidth, className }))}
         ref={ref}
         {...props}
       />

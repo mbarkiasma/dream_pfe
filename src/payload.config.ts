@@ -2,7 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import sharp from 'sharp'
 import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
+import { buildConfig, type CollectionConfig, type GlobalConfig, PayloadRequest } from 'payload'
 import { gcsStorage } from '@payloadcms/storage-gcs'
 import { fileURLToPath } from 'url'
 import { Header } from '@/Header/config'
@@ -66,6 +66,31 @@ const smtpPort = Number(process.env.SMTP_PORT || 587)
 const smtpSecure = process.env.SMTP_SECURE === 'true'
 const smtpUser = process.env.SMTP_USER?.trim()
 const smtpPass = process.env.SMTP_PASS?.replace(/\s+/g, '')
+const adminVisibleCollectionSlugs = new Set(['users'])
+
+function hideNonAdminManagedCollection(collection: CollectionConfig): CollectionConfig {
+  if (adminVisibleCollectionSlugs.has(collection.slug)) {
+    return collection
+  }
+
+  return {
+    ...collection,
+    admin: {
+      ...collection.admin,
+      hidden: true,
+    },
+  }
+}
+
+function hideGlobalInAdmin(global: GlobalConfig): GlobalConfig {
+  return {
+    ...global,
+    admin: {
+      ...global.admin,
+      hidden: true,
+    },
+  }
+}
 
 export default buildConfig({
   endpoints: payloadEndpoints,
@@ -73,7 +98,11 @@ export default buildConfig({
   admin: {
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
-      beforeDashboard: ['@/components/BeforeDashboard'],
+      beforeDashboard: ['@/components/AdminKPI',
+        '@/components/BeforeDashboard'],
+      logout: {
+        Button: '@/components/AdminLogoutButton',
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname),
@@ -132,8 +161,8 @@ export default buildConfig({
     CoachingRegistrations,
     PsyOrientations,
     StudentExercices,
-  ],
-  globals: [Header, Footer],
+  ].map(hideNonAdminManagedCollection),
+  globals: [Header, Footer].map(hideGlobalInAdmin),
   cors: [getServerSideURL()].filter(Boolean),
   plugins: [
     ...plugins,

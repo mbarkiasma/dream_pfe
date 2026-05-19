@@ -80,7 +80,7 @@ export const payloadEndpoints: Endpoint[] = [
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          assistantName: 'Mindly',
+          assistantName: 'MindBloom',
           chatInput: userText,
           sessionId: sessionId || `session-${req.user.id}`,
           interviewLanguage: interviewLanguage === 'en' ? 'en' : 'fr',
@@ -1009,12 +1009,12 @@ function extraireQuestionInteractive(n8nData: any) {
 function normaliserTexteAssistant(texte: string): string {
   return texte
     .replace(
-      /Je m'appelle Mindly[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
-      'Je suis votre assistant de la plateforme Mindly.',
+      /Je m'appelle MindBloom[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
+      'Je suis votre assistant de la plateforme MindBloom.',
     )
-    .replace(/Je m'appelle Mindly[,.]?/gi, 'Je suis votre assistant de la plateforme Mindly.')
-    .replace(/\[(?:nom|name|assistant_name|assistant name)\]/gi, 'Mindly')
-    .replace(/\{\{\s*(?:nom|name|assistant_name|assistant name)\s*\}\}/gi, 'Mindly')
+    .replace(/Je m'appelle MindBloom[,.]?/gi, 'Je suis votre assistant de la plateforme MindBloom.')
+    .replace(/\[(?:nom|name|assistant_name|assistant name)\]/gi, 'MindBloom')
+    .replace(/\{\{\s*(?:nom|name|assistant_name|assistant name)\s*\}\}/gi, 'MindBloom')
 }
 
 function normaliserNomTrait(nom: string): BigFiveTraitName {
@@ -1105,3 +1105,4 @@ async function fetchRemoteFile({
     size: arrayBuffer.byteLength,
   }
 }
+

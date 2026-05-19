@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 @config '../../../tailwind.config.mjs';
 
@@ -36,11 +37,12 @@
 }
 
 /* ============================= */
-/* PALETTE MINDLY */
+/* PALETTE MINDBLOOM */
 /* ============================= */
 
 :root {
   color-scheme: light;
+  --font-zain: var(--font-geist-sans);
 
   /* Backgrounds */
   --mindly-bg: #f8f5ff;
@@ -147,6 +149,18 @@
     var(--mindly-bg-strong) 100%
   );
 
+  --mindly-actor-active-bg: linear-gradient(135deg, #895ef8 0%, #a987ff 100%);
+  --mindly-actor-active-shadow: 0 18px 44px rgb(137 94 248 / 0.22);
+  --mindly-actor-chip-bg: rgb(255 255 255 / 0.2);
+  --mindly-actor-chip-border: rgb(255 255 255 / 0.28);
+  --mindly-video-overlay:
+    linear-gradient(135deg, rgb(137 94 248 / 0.22), rgb(169 135 255 / 0.10)),
+    linear-gradient(0deg, rgb(31 10 78 / 0.18), transparent 48%);
+  --mindly-video-progress-bg: rgb(255 255 255 / 0.32);
+  --mindly-video-progress-fill: rgb(255 255 255 / 0.72);
+  --mindly-video-badge-bg: rgb(137 94 248 / 0.76);
+  --mindly-video-badge-border: rgb(255 255 255 / 0.22);
+
   /* Ombres */
   --mindly-shadow-xs: 0 8px 20px rgb(110 75 206 / 0.1);
   --mindly-shadow-sm: 0 12px 28px rgb(111 77 215 / 0.16);
@@ -213,7 +227,7 @@
   --error: var(--mindly-danger);
 }
 
-/* Pour l’instant le dark garde la palette Mindly claire */
+/* Pour l’instant le dark garde la palette MindBloom claire */
 [data-theme='dark'] {
   color-scheme: dark;
 
@@ -283,6 +297,18 @@
     rgb(36 24 62 / 0.9) 100%
   );
 
+  --mindly-actor-active-bg: linear-gradient(135deg, #6f48d8 0%, #8b61f2 58%, #a987ff 100%);
+  --mindly-actor-active-shadow: 0 18px 44px rgb(124 77 240 / 0.26);
+  --mindly-actor-chip-bg: rgb(255 255 255 / 0.16);
+  --mindly-actor-chip-border: rgb(255 255 255 / 0.22);
+  --mindly-video-overlay:
+    linear-gradient(135deg, rgb(124 77 240 / 0.26), rgb(196 166 255 / 0.12)),
+    linear-gradient(0deg, rgb(18 11 36 / 0.16), transparent 55%);
+  --mindly-video-progress-bg: rgb(196 166 255 / 0.28);
+  --mindly-video-progress-fill: rgb(196 166 255 / 0.92);
+  --mindly-video-badge-bg: rgb(124 77 240 / 0.72);
+  --mindly-video-badge-border: rgb(196 166 255 / 0.28);
+
   --mindly-shadow-xs: 0 8px 20px rgb(0 0 0 / 0.22);
   --mindly-shadow-sm: 0 12px 28px rgb(0 0 0 / 0.26);
   --mindly-shadow-md: 0 16px 38px rgb(0 0 0 / 0.3);
@@ -329,6 +355,47 @@
   --success: var(--mindly-success);
   --warning: var(--mindly-warning);
   --error: var(--mindly-danger);
+}
+
+/* Public marketing pages share the same dashboard theme source: data-theme + globals tokens. */
+.mindly-public {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+[data-theme='dark'] .mindly-public {
+  color-scheme: dark;
+}
+
+[data-theme='dark'] .mindly-public [class*='bg-white'],
+[data-theme='dark'] .mindly-public [style*='background: white'],
+[data-theme='dark'] .mindly-public [style*='background: rgb(255'] {
+  background-color: var(--mindly-surface) !important;
+}
+
+[data-theme='dark'] .mindly-public [class*='text-[#1F0A4E]'],
+[data-theme='dark'] .mindly-public [class*='text-[#1f0a4e]'],
+[data-theme='dark'] .mindly-public [class*='text-[var(--mindly-text-strong)]'],
+[data-theme='dark'] .mindly-public [class*='text-[var(--mindly-text-dark)]'] {
+  color: var(--mindly-text-strong) !important;
+}
+
+[data-theme='dark'] .mindly-public input,
+[data-theme='dark'] .mindly-public textarea,
+[data-theme='dark'] .mindly-public select {
+  background-color: var(--mindly-input-soft) !important;
+  color: var(--mindly-text-strong) !important;
+  border-color: var(--mindly-border-violet) !important;
+}
+
+[data-theme='dark'] .mindly-public input::placeholder,
+[data-theme='dark'] .mindly-public textarea::placeholder {
+  color: var(--mindly-text-muted) !important;
+}
+
+[data-theme='dark'] .mindly-public video,
+[data-theme='dark'] .mindly-public img {
+  color-scheme: light;
 }
 
 /* ============================= */
@@ -629,12 +696,12 @@
 }
 
 /* ============================= */
-/* DASHBOARD MINDLY */
+/* DASHBOARD MINDBLOOM */
 /* ============================= */
 
 @layer components {
   /* ============================= */
-  /* LOGIN PAGE — MINDLY */
+  /* LOGIN PAGE — MINDBLOOM */
   /* ============================= */
 
   .login-page {
@@ -1003,6 +1070,337 @@
     color: #ffffff;
   }
 
+  .login-page {
+    display: block;
+    min-height: 100vh;
+    padding: 1.5rem;
+    background:
+      radial-gradient(circle at 15% 18%, var(--mindly-primary-soft-3) 0, transparent 26%),
+      radial-gradient(circle at 85% 80%, var(--mindly-primary-soft-3) 0, transparent 28%),
+      var(--mindly-page-gradient);
+    color: var(--mindly-text-strong);
+    font-family: var(--font-zain), var(--font-geist-sans), sans-serif;
+  }
+
+  .login-page::before {
+    display: none;
+    content: none;
+  }
+
+  .login-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: min(100%, 980px);
+    min-height: calc(100vh - 3rem);
+    margin-inline: auto;
+    align-items: center;
+    gap: 1.25rem;
+    padding-top: 3rem;
+  }
+
+  @media (width >= 64rem) {
+    .login-shell {
+      grid-template-columns: repeat(2, minmax(360px, 420px));
+      gap: 1.4rem;
+      align-items: center;
+      justify-content: center;
+      padding-top: 0;
+    }
+  }
+
+  .login-visual {
+    display: none;
+  }
+
+  @media (width >= 64rem) {
+    .login-visual {
+      position: relative;
+      display: grid;
+      min-height: 520px;
+      align-content: start;
+      gap: 1rem;
+      overflow: hidden;
+      border: 1px solid var(--mindly-border-violet);
+      border-radius: 1.45rem;
+      background:
+        linear-gradient(135deg, var(--mindly-primary) 0%, var(--mindly-primary-light) 100%);
+      padding: 1.45rem;
+      box-shadow: 0 18px 42px rgb(111 77 215 / 0.16);
+      color: var(--mindly-white);
+    }
+
+    .login-visual::after {
+      position: absolute;
+      right: -120px;
+      bottom: -130px;
+      width: 320px;
+      height: 320px;
+      border: 1px solid rgb(255 255 255 / 0.26);
+      border-radius: 999px;
+      content: '';
+      opacity: 0.48;
+    }
+  }
+
+  .login-visual-badge,
+  .login-visual-card {
+    border: 1px solid rgb(255 255 255 / 0.28);
+    background: rgb(255 255 255 / 0.1);
+    backdrop-filter: blur(16px);
+  }
+
+  .login-visual-badge {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--mindly-radius-pill);
+    padding: 0.42rem 0.8rem;
+    font-size: 0.84rem;
+    font-weight: 850;
+  }
+
+  .login-visual-copy {
+    padding-top: 0.45rem;
+  }
+
+  .login-visual-badge svg,
+  .login-visual-item svg,
+  .login-visual-card-icon svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .login-visual-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 850;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  .login-visual-title {
+    max-width: 14ch;
+    margin-top: 0.75rem;
+    font-size: clamp(1.95rem, 2.6vw, 2.35rem);
+    font-weight: 850;
+    line-height: 1.08;
+    letter-spacing: 0;
+  }
+
+  .login-visual-text {
+    max-width: 32rem;
+    margin-top: 0.8rem;
+    color: rgb(255 255 255 / 0.82);
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  .login-visual-list {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.78rem;
+    margin-top: 0.25rem;
+  }
+
+  .login-visual-item {
+    display: flex;
+    min-height: auto;
+    align-items: center;
+    gap: 0.72rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 0;
+    font-size: 0.88rem;
+    font-weight: 800;
+    backdrop-filter: none;
+  }
+
+  .login-visual-item svg {
+    box-sizing: border-box;
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    border-radius: 0.7rem;
+    background: rgb(255 255 255 / 0.13);
+    padding: 0.42rem;
+  }
+
+  .login-visual-card {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-color: rgb(255 255 255 / 0.22);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.13);
+    padding: 0.78rem;
+    margin-top: 0.3rem;
+  }
+
+  .login-visual-card-icon {
+    display: flex;
+    width: 2.45rem;
+    height: 2.45rem;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.2);
+  }
+
+  .login-visual-card p {
+    font-size: 0.9rem;
+    font-weight: 850;
+    line-height: 1.1;
+  }
+
+  .login-visual-card span {
+    display: block;
+    margin-top: 0.3rem;
+    color: rgb(255 255 255 / 0.74);
+    font-size: 0.84rem;
+  }
+
+  .login-theme-switch {
+    border-color: var(--mindly-border-violet);
+    background: transparent;
+    min-height: auto;
+    gap: 0.55rem;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .login-action-button {
+    display: inline-flex;
+    height: 2.55rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border: 1px solid var(--mindly-border-violet);
+    border-radius: var(--mindly-radius-pill);
+    background: var(--mindly-surface-glass);
+    padding-inline: 0.85rem;
+    color: var(--mindly-primary);
+    font-size: 0.82rem;
+    font-weight: 850;
+    line-height: 1;
+    box-shadow: var(--mindly-shadow-xs);
+    backdrop-filter: blur(18px);
+  }
+
+  .login-action-button:hover {
+    background: var(--mindly-surface);
+    color: var(--mindly-primary-dark);
+    transform: translateY(-1px);
+  }
+
+  .login-action-button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .login-action-icon {
+    width: 2.55rem;
+    padding-inline: 0;
+  }
+
+  .login-card {
+    width: min(100%, 26.25rem);
+    max-width: 26.25rem;
+    margin-inline: auto;
+    border-color: var(--mindly-border-violet);
+    background: var(--mindly-surface-glass);
+    padding: 1.25rem;
+    box-shadow: 0 20px 48px rgb(111 77 215 / 0.15);
+  }
+
+  @media (width >= 64rem) {
+    .login-visual,
+    .login-card {
+      height: 32.5rem;
+      min-height: 32.5rem;
+    }
+
+    .login-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+
+  @media (width >= 40rem) {
+    .login-card {
+      padding: 1.65rem;
+    }
+  }
+
+  .login-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .login-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.9rem;
+    background: var(--mindly-gradient-primary);
+  }
+
+  .login-icon svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .login-title {
+    margin-top: 0.55rem;
+    font-size: 1.82rem;
+    font-weight: 850;
+    letter-spacing: 0;
+  }
+
+  .login-description {
+    margin-inline: auto;
+    max-width: 20rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .login-google-button,
+  .login-input,
+  .login-submit-button {
+    min-height: 2.95rem;
+    border-radius: 0.85rem;
+  }
+
+  .login-google-button,
+  .login-input {
+    border-color: var(--mindly-border-violet);
+    background: var(--mindly-surface);
+  }
+
+  [data-theme='dark'] .login-card {
+    border-color: var(--mindly-border-violet);
+    background: var(--mindly-surface-glass);
+    box-shadow: var(--mindly-shadow-xl);
+  }
+
+  [data-theme='dark'] .login-visual {
+    background: linear-gradient(135deg, #6f48d8 0%, #8b61f2 58%, #a987ff 100%);
+  }
+
+  [data-theme='dark'] .login-google-button,
+  [data-theme='dark'] .login-input {
+    border-color: var(--mindly-border-violet);
+    background: var(--mindly-bg-strong);
+    color: var(--mindly-text-strong);
+  }
+
   .auth-status-page {
     display: flex;
     min-height: 100vh;
@@ -1111,7 +1509,7 @@
   }
 
   /* ============================= */
-  /* COMPLETE PROFILE — MINDLY */
+  /* COMPLETE PROFILE — MINDBLOOM */
   /* ============================= */
 
   .complete-profile-page {
@@ -1349,7 +1747,7 @@
     color: rgb(255 255 255 / 0.45);
   }
   /* ============================= */
-  /* STUDENT RENDEZ-VOUS FORM — MINDLY */
+  /* STUDENT RENDEZ-VOUS FORM — MINDBLOOM */
   /* ============================= */
 
   .student-psy-form {
@@ -1835,7 +2233,7 @@
     height: 1rem;
   }
   /* ============================= */
-  /* STUDENT RENDEZ-VOUS — MINDLY */
+  /* STUDENT RENDEZ-VOUS — MINDBLOOM */
   /* ============================= */
 
   .student-appointments-grid {
@@ -2055,7 +2453,7 @@
     color: var(--mindly-primary);
   }
   /* ============================= */
-  /* STUDENT PROFILE — MINDLY */
+  /* STUDENT PROFILE — MINDBLOOM */
   /* ============================= */
 
   .student-profile-grid {
@@ -2277,7 +2675,7 @@
     color: var(--mindly-text-soft);
   }
   /* ============================= */
-  /* NOTIFICATION BELL — MINDLY FIX */
+  /* NOTIFICATION BELL — MINDBLOOM FIX */
   /* ============================= */
 
   .notification-bell-root {
@@ -2602,7 +3000,7 @@
   }
 
   /* ============================= */
-  /* NOTIFICATIONS PAGE — MINDLY */
+  /* NOTIFICATIONS PAGE — MINDBLOOM */
   /* ============================= */
 
   .student-notifications-root {
@@ -2865,7 +3263,7 @@
     text-align: left;
   }
   /* ============================= */
-  /* STUDENT MOTIVATION — MINDLY */
+  /* STUDENT MOTIVATION — MINDBLOOM */
   /* ============================= */
 
   .student-motivation-root {
@@ -3189,11 +3587,11 @@
   }
 
   /* ============================= */
-  /* STUDENT DREAMS — MINDLY FIX UI/UX */
+  /* STUDENT DREAMS — MINDBLOOM FIX UI/UX */
   /* ============================= */
 
   /* ============================= */
-  /* STUDENT DREAMS — MINDLY FINAL */
+  /* STUDENT DREAMS — MINDBLOOM FINAL */
   /* ============================= */
 
   .student-dreams-root {
@@ -9277,3 +9675,4 @@ html[data-static='true'] {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
+

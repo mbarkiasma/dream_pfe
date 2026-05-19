@@ -21,4 +21,33 @@
   & a:hover {
     opacity: 0.85;
   }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: base(0.5);
+    margin-top: base(0.75);
+  }
+
+  &__logout {
+    display: inline-flex;
+    align-items: center;
+    min-height: base(1.8);
+    border-radius: 4px;
+    background: var(--theme-success-500);
+    color: var(--theme-success-50);
+    font-weight: 600;
+    padding: 0 base(0.75);
+    text-decoration: none;
+  }
+
+  &__logout--secondary {
+    background: var(--theme-elevation-150);
+    color: var(--theme-text);
+  }
+
+  &__help {
+    color: var(--theme-elevation-600);
+    margin: base(0.75) 0 0;
+  }
 }
