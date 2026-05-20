@@ -348,15 +348,16 @@ export default function AboutTeamBlock() {
           {specialistes.map((specialiste, index) => (
             <motion.div
               key={specialiste.nom}
+              className="h-full"
               initial={specialistCardInitial}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, amount: 0.25 }}
               transition={{ duration: 0.65, delay: 0.1 + index * 0.1, ease: smoothEase }}
             >
               <Card
-                className="group relative min-h-[300px] overflow-hidden rounded-[1.5rem] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-5 shadow-[0_14px_36px_rgba(111,77,215,0.10)] transition-all duration-300 hover:-translate-y-[3px] hover:border-[var(--mindly-purple-border)] hover:shadow-[0_20px_52px_rgba(111,77,215,0.16)]"
+                className="group relative flex h-full overflow-hidden rounded-[1.5rem] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-5 shadow-[0_14px_36px_rgba(111,77,215,0.10)] transition-all duration-300 hover:-translate-y-[3px] hover:border-[var(--mindly-purple-border)] hover:shadow-[0_20px_52px_rgba(111,77,215,0.16)]"
               >
-                <CardContent className="relative flex flex-col p-0">
+                <CardContent className="relative flex h-full w-full flex-col p-0">
                   <div className="flex items-start justify-between gap-3">
                     <AppBadge size="sm" className={familyBadgeClass}>
                       {lang === 'fr' ? specialiste.titreFr : specialiste.titreEn}
@@ -399,7 +400,7 @@ export default function AboutTeamBlock() {
                     <span className="text-[13px] font-semibold text-[var(--mindly-primary-muted)]">{specialiste.note}</span>
                   </motion.div>
                   <motion.p
-                    className={descriptionTextClass}
+                    className={`${descriptionTextClass} flex-1`}
                     initial={specialistItemInitial}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.4 }}
@@ -408,7 +409,7 @@ export default function AboutTeamBlock() {
                     {lang === 'fr' ? specialiste.descriptionFr : specialiste.descriptionEn}
                   </motion.p>
                   <motion.div
-                    className="mt-4 flex flex-wrap gap-2"
+                    className="mt-5 flex flex-wrap gap-2"
                     initial={specialistItemInitial}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.4 }}

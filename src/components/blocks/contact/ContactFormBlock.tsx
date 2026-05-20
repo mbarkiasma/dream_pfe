@@ -347,6 +347,7 @@ export default function ContactFormBlock() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const copy = isFr
     ? {
@@ -364,6 +365,7 @@ export default function ContactFormBlock() {
         message: 'Message',
         messagePlaceholder: 'Decrivez votre demande avec le plus de details possible…',
         privacy: 'Votre message est confidentiel. Vos donnees ne sont utilisees que pour vous repondre et ne sont jamais partagees avec des tiers.',
+        submitError: "Impossible d'envoyer le message. Veuillez reessayer.",
         successTitle: 'Message envoye !',
         successLine1: 'Merci ! Notre equipe vous repondra a',
         successLine2: 'sous 24 heures ouvrables.',
@@ -390,6 +392,7 @@ export default function ContactFormBlock() {
         message: 'Message',
         messagePlaceholder: 'Describe your request with as much detail as possible…',
         privacy: 'Your message is confidential. Your data is only used to reply and is never shared with third parties.',
+        submitError: 'Unable to send the message. Please try again.',
         successTitle: 'Message sent!',
         successLine1: 'Thanks! Our team will reply to',
         successLine2: 'within 24 business hours.',
@@ -431,18 +434,37 @@ export default function ContactFormBlock() {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return
+    setSubmitError(null)
     setLoading(true)
-    setTimeout(() => {
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      })
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as { error?: string }
+        throw new Error(data.error || copy.submitError)
+      }
+
       setLoading(false)
       setSubmitted(true)
-    }, 1400)
+    } catch (error) {
+      setLoading(false)
+      setSubmitError(error instanceof Error ? error.message : copy.submitError)
+    }
   }
 
   const handleReset = () => {
     setForm({ prenom: '', nom: '', email: '', subject: 'general', message: '' })
     setErrors({})
+    setSubmitError(null)
     setSubmitted(false)
   }
 
@@ -496,6 +518,12 @@ export default function ContactFormBlock() {
           {copy.privacy}
         </p>
       </div>
+
+      {submitError && (
+        <p style={{ color: 'var(--mindly-danger)', fontSize: 12, fontWeight: 700, marginBottom: 12 }}>
+          {submitError}
+        </p>
+      )}
 
       <Button
         type="button"

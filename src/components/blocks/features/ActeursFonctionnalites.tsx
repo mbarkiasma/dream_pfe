@@ -7,7 +7,6 @@ import {
   GraduationCap,
   LayoutDashboard,
   MessageCircle,
-  ShieldCheck,
   Users,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -20,7 +19,7 @@ const actorDescriptionClass =
   'font-[family-name:var(--font-zain)] text-[14.5px] font-normal leading-[1.6] tracking-normal'
 
 const featureItemTextClass =
-  'font-[family-name:var(--font-zain)] text-[14.5px] font-normal leading-[1.45] tracking-normal text-[var(--mindly-purple-muted)]'
+  'font-[family-name:var(--font-zain)] text-[15.5px] font-semibold leading-[1.35] tracking-normal text-[var(--mindly-text-strong)]'
 
 const getActorCardClass = (isActive: boolean) =>
   `rounded-[22px] border p-5 text-left transition-all duration-300 ease-out hover:-translate-y-1 sm:p-6 ${
@@ -68,7 +67,7 @@ const actorFeatures: Record<
   }
 > = {
   student: {
-    title: 'Espace Étudiant·e',
+    title: 'Espace Étudiant',
     subtitle: "Tout ce que l'étudiant peut faire dans MindBloom",
     count: '8 fonctionnalités',
     items: [
@@ -203,7 +202,7 @@ const actorFeatures: Record<
 }
 
 function Highlight({ children }: { children: ReactNode }) {
-  return <span className="font-normal text-[var(--mindly-purple-muted)]">{children}</span>
+  return <span className="font-inherit text-[var(--mindly-text-strong)]">{children}</span>
 }
 
 function InfoBadge({
@@ -244,7 +243,7 @@ export function ActeursFonctionnalites() {
 
           <h2 className="mt-4 text-[34px] font-bold leading-[1.08] tracking-normal text-[var(--color-text-strong)] sm:text-[42px] lg:text-[48px]">
             Qui utilise{' '}
-            <span className="bg-gradient-to-r from-[var(--color-primary-violet)] to-[var(--color-primary-violet-light)] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
               MindBloom
             </span>{' '}
             ?
@@ -277,7 +276,7 @@ export function ActeursFonctionnalites() {
             </div>
 
             <h3 className={`relative ${getActorTitleClass(activeActor === 'student', 'text-[26px]')}`}>
-              Étudiant·e
+              Étudiant
             </h3>
             <p
               className={`relative ${getActorSubtitleClass(activeActor === 'student')}`}
@@ -375,22 +374,20 @@ export function ActeursFonctionnalites() {
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
               <InfoBadge variant={activeActor === 'psychologist' ? 'white' : 'light'}>Certifiés</InfoBadge>
-              <InfoBadge variant={activeActor === 'psychologist' ? 'white' : 'light'}>
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Agréé
-              </InfoBadge>
             </div>
           </button>
         </div>
 
-        <article className="mt-10 rounded-[22px] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-5 shadow-[var(--mindly-shadow-lg)] sm:p-7">
-          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <article className="relative mt-10 overflow-hidden rounded-[24px] border border-[var(--mindly-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,245,255,0.88))] p-5 shadow-[var(--mindly-shadow-lg)] sm:p-7">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(137,94,248,0.38),transparent)]" />
+
+          <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-[var(--color-primary-violet-soft)] text-[var(--color-primary-violet)]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-[var(--mindly-primary-soft-3)] text-[var(--mindly-primary)] shadow-[0_10px_24px_rgba(137,94,248,0.12)]">
                 <LayoutDashboard className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-[24px] font-bold leading-none text-[var(--mindly-text-strong)]">{currentFeatures.title}</h3>
+                <h3 className="text-[24px] font-bold leading-tight text-[var(--mindly-text-strong)]">{currentFeatures.title}</h3>
                 <p className="mt-2 font-[family-name:var(--font-zain)] text-[14.5px] font-normal leading-[1.6] tracking-normal text-[var(--mindly-purple-muted)]">
                   {currentFeatures.subtitle}
                 </p>
@@ -403,18 +400,17 @@ export function ActeursFonctionnalites() {
             </span>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {currentFeatures.items.map((item, index) => (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {currentFeatures.items.map((item) => (
               <div
                 key={item.number}
-                className={`flex min-h-[58px] items-center gap-3 rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-bg)] px-4 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-[var(--mindly-border-strong)] hover:bg-[var(--mindly-bg-strong)] hover:shadow-[var(--mindly-shadow-sm)] ${
-                  index >= 6 ? 'xl:col-span-2' : ''
-                }`}
+                className="group relative flex min-h-[112px] flex-col justify-between overflow-hidden rounded-[18px] border border-[var(--mindly-border-violet)] bg-white p-4 text-left shadow-[0_10px_26px_rgba(137,94,248,0.06)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--mindly-border-strong)] hover:shadow-[0_18px_34px_rgba(137,94,248,0.14)]"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--mindly-primary)] text-[15px] font-bold text-white shadow-[0_8px_18px_rgba(137,94,248,0.24)]">
+                <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[var(--mindly-primary-soft-3)] opacity-70 transition-transform duration-300 ease-out group-hover:scale-125" />
+                <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[image:var(--mindly-gradient-primary)] text-[16px] font-bold text-white shadow-[0_10px_22px_rgba(137,94,248,0.26)]">
                   {item.number}
                 </span>
-                <span className={featureItemTextClass}>{item.content}</span>
+                <span className={`relative mt-4 block ${featureItemTextClass}`}>{item.content}</span>
               </div>
             ))}
           </div>

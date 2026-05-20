@@ -21,20 +21,8 @@ export const EMAILS: EmailEntry[] = [
   {
     icon: 'mail',
     tag: 'Email direct',
-    address: 'contact@mindbloom.app',
+    address: 'adminpfe0@gmail.com',
     desc: 'Réponse sous 24h ouvrables',
-  },
-  {
-    icon: 'lifebuoy',
-    tag: 'Support technique',
-    address: 'support@mindbloom.app',
-    desc: 'Priorité haute — sous 4h',
-  },
-  {
-    icon: 'handshake',
-    tag: 'Partenariats',
-    address: 'partners@mindbloom.app',
-    desc: 'Universités & établissements',
   },
 ]
 
@@ -51,7 +39,7 @@ export const FAQ_ITEMS: FaqEntry[] = [
   },
   {
     q: 'Problème technique : que faire ?',
-    a: 'Écrivez à support@mindbloom.app : priorité haute, réponse sous 4h maximum.',
+    a: 'Écrivez à adminpfe0@gmail.com et nous vous répondrons rapidement.',
   },
   {
     q: 'Comment contacter un coach ou psy ?',

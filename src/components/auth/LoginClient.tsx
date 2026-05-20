@@ -18,7 +18,6 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useTheme } from '@/providers/Theme'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 type ClerkFlowError = {
@@ -89,6 +88,7 @@ const loginCopy = {
     title: 'Connectez-vous',
     description: 'Accedez a votre espace personnel avec Google ou un lien magique securise.',
     google: 'Continuer avec Google',
+    googleLoading: 'Connexion avec Google...',
     divider: 'ou',
     emailLabel: 'Adresse email',
     emailPlaceholder: 'votre@email.com',
@@ -114,6 +114,7 @@ const loginCopy = {
     title: 'Sign in',
     description: 'Access your personal space with Google or a secure magic link.',
     google: 'Continue with Google',
+    googleLoading: 'Connecting with Google...',
     divider: 'or',
     emailLabel: 'Email address',
     emailPlaceholder: 'your@email.com',
@@ -129,7 +130,6 @@ const loginCopy = {
 } as const
 
 export function LoginClient({ initialMessage = '' }: LoginClientProps) {
-  const router = useRouter()
   const { isLoaded, isSignedIn } = useUser()
   const { signIn, fetchStatus } = useSignIn()
   const { signUp } = useSignUp()
@@ -150,28 +150,27 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
     if (isLoaded && isSignedIn) {
       window.location.assign('/auth/redirect')
     }
-  }, [isLoaded, isSignedIn, router])
+  }, [isLoaded, isSignedIn])
 
   async function handleGoogleSignIn() {
-    if (!signIn || !signUp) return
-
     setErrorMessage('')
     setSuccessEmail('')
     setGoogleLoading(true)
 
-    try {
-      const { error } = await signIn.sso({
-        strategy: 'oauth_google',
-        redirectCallbackUrl: '/sso-callback',
-        redirectUrl: '/auth/redirect',
-      })
+    if (!signIn) {
+      setErrorMessage(copy.googleError)
+      setGoogleLoading(false)
+      return
+    }
 
-      if (error) {
-        setErrorMessage(error.longMessage || error.message || copy.googleError)
-        setGoogleLoading(false)
-      }
+    try {
+      await signIn.sso({
+        strategy: 'oauth_google',
+        redirectUrl: '/auth/redirect',
+        redirectCallbackUrl: '/sso-callback',
+      })
     } catch (error) {
-      setErrorMessage(getErrorMessage(error))
+      setErrorMessage(getErrorMessage(error) || copy.googleError)
       setGoogleLoading(false)
     }
   }
@@ -278,6 +277,7 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
 
   const isClerkBusy = fetchStatus === 'fetching'
   const isSubmitting = googleLoading || emailLoading || isClerkBusy
+  const isGoogleDisabled = googleLoading || emailLoading || !signIn
   const isDark = mounted && theme === 'dark'
 
   const toggleTheme = () => {
@@ -369,17 +369,17 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
           <Button
             variant="outline"
             size="lg"
-            disabled={isSubmitting || !signIn}
+            disabled={isGoogleDisabled}
             onClick={handleGoogleSignIn}
             type="button"
-            className="login-google-button"
+            className={`login-google-button ${googleLoading ? 'login-google-button-loading' : ''}`}
           >
             {googleLoading ? (
               <Loader2 className="animate-spin" />
             ) : (
               <span className="login-google-icon">G</span>
             )}
-            {copy.google}
+            {googleLoading ? copy.googleLoading : copy.google}
           </Button>
 
           <div className="login-divider">

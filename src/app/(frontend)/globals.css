@@ -851,6 +851,23 @@
     color: var(--mindly-primary);
   }
 
+  .login-google-button:active {
+    transform: translateY(1px) scale(0.99);
+  }
+
+  .login-google-button-loading,
+  .login-google-button:disabled {
+    border-color: var(--mindly-primary-soft);
+    background: var(--mindly-primary-soft-3);
+    color: var(--mindly-primary);
+    cursor: wait;
+    opacity: 1;
+  }
+
+  .login-google-button-loading {
+    box-shadow: 0 0 0 3px rgb(137 94 248 / 0.12), var(--mindly-shadow-xs);
+  }
+
   .login-google-icon {
     display: flex;
     width: 1.5rem;

@@ -53,17 +53,17 @@ export default function FeaturesHeroBlock() {
     <section className="relative overflow-hidden bg-transparent px-5 py-14 sm:px-8 lg:px-10 lg:py-16">
       <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_16%_20%,rgba(137,94,248,0.10),transparent_28%),radial-gradient(circle_at_82%_22%,rgba(137,94,248,0.10),transparent_30%),radial-gradient(circle_at_50%_80%,rgba(169,135,255,0.08),transparent_30%)]" />
 
-      <div className="relative z-10 mx-auto grid max-w-[1280px] items-start gap-10 lg:grid-cols-[minmax(0,540px)_minmax(560px,1fr)] xl:gap-12">
+      <div className="relative z-10 mx-auto grid max-w-[1280px] items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(420px,600px)] lg:gap-14 xl:gap-16">
         <div className="pt-2 lg:pt-0">
           <div className={`mb-5 ${sectionBadgeClass}`}>
             <span className={sectionBadgeDotClass} />
             {isFr ? 'Solution de bien-être étudiant' : 'Student well-being solution'}
           </div>
 
-          <h1 className="max-w-[620px] font-[var(--font-poppins)] text-[34px] font-bold leading-[1.12] tracking-normal text-[var(--mindly-text-strong)] sm:text-[40px] lg:text-[44px] xl:text-[48px]">
+          <h1 className="max-w-[660px] font-[var(--font-poppins)] text-[34px] font-bold leading-[1.12] tracking-normal text-[var(--mindly-text-strong)] sm:text-[40px] lg:text-[42px] xl:text-[46px]">
             {isFr ? (
               <>
-                <span className="block whitespace-nowrap">
+                <span className="block">
                   <SplitText
                     text="MindBloom"
                     className="inline-block bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text pb-2 text-transparent"
@@ -77,14 +77,14 @@ export default function FeaturesHeroBlock() {
                 </span>
                 <SplitText
                   text="transforme l'écoute"
-                  className="block whitespace-nowrap"
+                  className="block"
                   onLetterAnimationComplete={handleTitleAnimationComplete}
                   showCallback
                   {...splitProps}
                 />
                 <SplitText
                   text="en accompagnement"
-                  className="block whitespace-nowrap"
+                  className="block"
                   {...splitProps}
                 />
               </>
@@ -160,10 +160,10 @@ export default function FeaturesHeroBlock() {
           </div>
         </div>
 
-        <div className="relative lg:translate-y-4">
+        <div className="relative lg:max-w-[600px] lg:translate-y-4 lg:justify-self-end">
           <div className="grid gap-3 lg:gap-4">
             <article className="overflow-hidden rounded-[24px] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] shadow-[0_20px_45px_rgba(137,94,248,0.12)]">
-              <div className="relative h-[190px] overflow-hidden bg-[var(--mindly-bg-strong)] sm:h-[210px] lg:h-[230px]">
+              <div className="relative h-[180px] overflow-hidden bg-[var(--mindly-bg-strong)] sm:h-[200px] lg:h-[210px]">
                 <video
                   className="h-full w-full object-cover"
                   src="/videos/video_reve_front.mp4"

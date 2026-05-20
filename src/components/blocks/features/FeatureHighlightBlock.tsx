@@ -182,14 +182,13 @@ export default function FeatureHighlightBlock() {
           </motion.h2>
 
           <motion.p
-            className="mt-4 max-w-[720px] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]"
+            className="mt-4 max-w-[1080px] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)] lg:whitespace-nowrap"
             initial={fadeUpDescriptionInitial}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.16, ease: smoothEase }}
           >
-            De l&apos;analyse de personnalité à la prise en charge urgente, MindBloom couvre chaque
-            étape de ton bien-être.
+            De l&apos;analyse de personnalité à la prise en charge urgente, MindBloom couvre chaque étape de ton bien-être.
           </motion.p>
         </div>
 

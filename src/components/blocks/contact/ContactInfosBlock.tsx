@@ -33,7 +33,7 @@ function EmailCard({
 
   return (
     <Card
-      variant={copied ? 'gradient' : 'soft'}
+      variant="soft"
       radius="md"
       padding="sm"
       onClick={handleCopy}
@@ -70,14 +70,14 @@ function EmailCard({
             fontWeight: 700,
             letterSpacing: '0.13em',
             textTransform: 'uppercase',
-            color: copied ? 'rgb(255 255 255 / 0.78)' : 'var(--mindly-purple-muted)',
+            color: 'var(--mindly-purple-muted)',
             marginBottom: 2,
           }}
         >
           {entry.tag}
         </div>
-        <div style={{ fontSize: 13, fontWeight: 800, color: copied ? 'var(--mindly-white)' : 'var(--mindly-purple-muted)', marginBottom: 1 }}>{entry.address}</div>
-        <div style={{ fontSize: 11.5, color: copied ? 'rgb(255 255 255 / 0.82)' : 'var(--mindly-purple-muted)' }}>{entry.desc}</div>
+        <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--mindly-purple-muted)', marginBottom: 1 }}>{entry.address}</div>
+        <div style={{ fontSize: 11.5, color: 'var(--mindly-purple-muted)' }}>{entry.desc}</div>
       </div>
       <div className={`${appBadgeCtaCompactClass} shrink-0`}>
         {copied ? copiedLabel : copyLabel}
@@ -203,28 +203,24 @@ export default function ContactInfosBlock({
 
   const EMAILS = isFr
     ? [
-        { icon: 'mail', tag: 'Email direct', address: 'contact@mindbloom.app', desc: 'Reponse sous 24h ouvrables' },
-        { icon: 'lifebuoy', tag: 'Support technique', address: 'support@mindbloom.app', desc: 'Priorite haute - sous 4h' },
-        { icon: 'handshake', tag: 'Partenariats', address: 'partners@mindbloom.app', desc: 'Universites & etablissements' },
+        { icon: 'mail', tag: 'Email direct', address: 'adminpfe0@gmail.com', desc: 'Reponse sous 24h ouvrables' },
       ]
     : [
-        { icon: 'mail', tag: 'Direct email', address: 'contact@mindbloom.app', desc: 'Reply within 24 business hours' },
-        { icon: 'lifebuoy', tag: 'Tech support', address: 'support@mindbloom.app', desc: 'High priority - within 4h' },
-        { icon: 'handshake', tag: 'Partnerships', address: 'partners@mindbloom.app', desc: 'Universities & institutions' },
+        { icon: 'mail', tag: 'Direct email', address: 'adminpfe0@gmail.com', desc: 'Reply within 24 business hours' },
       ]
 
   const FAQ_ITEMS = isFr
     ? [
         { q: 'Comment puis-je contacter MindBloom ?', a: 'Via le formulaire, par email ou par telephone. Nous repondons rapidement.' },
         { q: 'Mes donnees sont-elles securisees ?', a: 'Oui, vos donnees sont chiffrees de bout en bout et jamais revendues.' },
-        { q: 'Probleme technique : que faire ?', a: 'Ecrivez a support@mindbloom.app : priorite haute, reponse sous 4h.' },
+        { q: 'Probleme technique : que faire ?', a: 'Ecrivez a adminpfe0@gmail.com et nous vous repondrons rapidement.' },
         { q: 'Comment contacter un coach ou psy ?', a: "La plateforme vous oriente automatiquement vers l'accompagnement adapte." },
         { q: 'Delai de reponse moyen ?', a: 'Nous repondons en general sous 24h ouvrables.' },
       ]
     : [
         { q: 'How can I contact MindBloom?', a: 'Via the form, email, or phone. We reply quickly.' },
         { q: 'Is my data secure?', a: 'Yes, your data is end-to-end encrypted and never resold.' },
-        { q: 'Technical issue: what should I do?', a: 'Write to support@mindbloom.app: high priority, reply within 4h.' },
+        { q: 'Technical issue: what should I do?', a: 'Write to adminpfe0@gmail.com and we will reply quickly.' },
         { q: 'How can I contact a coach or psychologist?', a: 'The platform automatically routes you to the right support.' },
         { q: 'Average response time?', a: 'We usually reply within 24 business hours.' },
       ]
@@ -240,7 +236,7 @@ export default function ContactInfosBlock({
             key={i}
             entry={e}
             copyLabel={isFr ? 'Copier' : 'Copy'}
-            copiedLabel={isFr ? '? Copie' : '? Copied'}
+            copiedLabel={isFr ? 'Copié !' : 'Copied !'}
           />
         ))}
       </Card>

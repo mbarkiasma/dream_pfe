@@ -79,7 +79,7 @@ export default function AboutEthicsBlock() {
         {valeurs.map((valeur, index) => (
           <motion.article
             key={valeur.titre}
-            className="group relative overflow-hidden rounded-[20px] border border-[var(--mindly-primary-soft)]/70 bg-[var(--mindly-surface)] p-5 text-[var(--mindly-text-dark)] shadow-[0_16px_40px_rgba(74,35,176,0.10)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--mindly-primary)] hover:shadow-[0_22px_54px_rgba(74,35,176,0.22)]"
+            className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-[var(--mindly-primary-soft)]/70 bg-[var(--mindly-surface)] p-5 text-[var(--mindly-text-dark)] shadow-[0_16px_40px_rgba(74,35,176,0.10)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--mindly-primary)] hover:shadow-[0_22px_54px_rgba(74,35,176,0.22)]"
             style={{ animationDelay: `${index * 80}ms` }}
             initial={cardInitial}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -118,7 +118,7 @@ export default function AboutEthicsBlock() {
             </motion.h3>
 
             <motion.p
-              className={`relative mt-4 min-h-[112px] ${descriptionTextClass}`}
+              className={`relative mt-4 min-h-[112px] flex-1 ${descriptionTextClass}`}
               initial={itemInitial}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
@@ -128,7 +128,7 @@ export default function AboutEthicsBlock() {
             </motion.p>
 
             <motion.p
-              className="relative mt-6 rounded-full border border-[var(--mindly-primary-soft)] bg-[var(--mindly-lavender-200)] px-4 py-2 text-[13px] font-bold leading-tight text-[var(--mindly-primary)]"
+              className="relative mt-auto rounded-full border border-[var(--mindly-primary-soft)] bg-[var(--mindly-lavender-200)] px-4 py-2 text-[13px] font-bold leading-tight text-[var(--mindly-primary)]"
               initial={itemInitial}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}

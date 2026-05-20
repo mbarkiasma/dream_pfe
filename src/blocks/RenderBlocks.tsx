@@ -28,7 +28,7 @@ import { FeaturesTabsBlockComponent } from '@/blocks/FeaturesTabs/Component'
 import { FeatureHighlightBlockComponent } from '@/blocks/FeatureHighlight/Component'
 import { NutritionBlockComponent } from '@/blocks/Nutrition/Component'
 
-type LayoutBlock = {
+export type LayoutBlock = {
   blockType?: string | null
   id?: string | null
   [key: string]: unknown
