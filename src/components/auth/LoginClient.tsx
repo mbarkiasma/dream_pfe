@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useSignIn, useSignUp, useUser } from '@clerk/nextjs'
+import { useClerk, useSignIn, useSignUp, useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import {
   AlertCircle,
@@ -69,8 +69,20 @@ function isAccountNotFoundError(error: unknown) {
   )
 }
 
+function isMissingActiveSessionError(error: unknown) {
+  const clerkError = getFirstClerkError(error)
+  const message = `${clerkError?.longMessage || ''} ${clerkError?.message || ''}`.toLowerCase()
+
+  return message.includes('supply an active session') || message.includes('active session')
+}
+
+function waitForClerkAttempt() {
+  return new Promise((resolve) => window.setTimeout(resolve, 250))
+}
+
 type LoginClientProps = {
   initialMessage?: string
+  shouldSwitchAccount?: boolean
 }
 
 const loginCopy = {
@@ -129,7 +141,11 @@ const loginCopy = {
   },
 } as const
 
-export function LoginClient({ initialMessage = '' }: LoginClientProps) {
+export function LoginClient({
+  initialMessage = '',
+  shouldSwitchAccount = false,
+}: LoginClientProps) {
+  const { signOut } = useClerk()
   const { isLoaded, isSignedIn } = useUser()
   const { signIn, fetchStatus } = useSignIn()
   const { signUp } = useSignUp()
@@ -147,10 +163,15 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
   useEffect(() => {
     setMounted(true)
 
+    if (isLoaded && isSignedIn && shouldSwitchAccount) {
+      void signOut({ redirectUrl: '/login?switchAccount=1' })
+      return
+    }
+
     if (isLoaded && isSignedIn) {
       window.location.assign('/auth/redirect')
     }
-  }, [isLoaded, isSignedIn])
+  }, [isLoaded, isSignedIn, shouldSwitchAccount, signOut])
 
   async function handleGoogleSignIn() {
     setErrorMessage('')
@@ -166,6 +187,7 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
     try {
       await signIn.sso({
         strategy: 'oauth_google',
+        oidcPrompt: 'select_account consent',
         redirectUrl: '/auth/redirect',
         redirectCallbackUrl: '/sso-callback',
       })
@@ -239,10 +261,39 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
         })
       }
 
-      const { error: linkError } = await signIn.emailLink.sendLink({
+      const { error: signInCreateError } = await signIn.create({
+        identifier: cleanEmail,
+      })
+
+      if (signInCreateError) {
+        if (isAccountNotFoundError(signInCreateError)) {
+          await sendSignUpLink(signInCreateError)
+          return
+        }
+
+        setErrorMessage(
+          signInCreateError.longMessage || signInCreateError.message || copy.magicError,
+        )
+        return
+      }
+
+      await waitForClerkAttempt()
+
+      let { error: linkError } = await signIn.emailLink.sendLink({
         emailAddress: cleanEmail,
         verificationUrl: `${window.location.origin}/auth/verify-email`,
       })
+
+      if (linkError && isMissingActiveSessionError(linkError)) {
+        await waitForClerkAttempt()
+
+        const retry = await signIn.emailLink.sendLink({
+          emailAddress: cleanEmail,
+          verificationUrl: `${window.location.origin}/auth/verify-email`,
+        })
+
+        linkError = retry.error
+      }
 
       if (linkError) {
         if (isAccountNotFoundError(linkError)) {
@@ -258,16 +309,6 @@ export function LoginClient({ initialMessage = '' }: LoginClientProps) {
 
       setSuccessEmail(cleanEmail)
       setEmail('')
-
-      void signIn.emailLink.waitForVerification().then(async ({ error }) => {
-        if (error) return
-
-        const { error: finalizeError } = await signIn.finalize()
-
-        if (!finalizeError) {
-          window.location.assign('/auth/redirect')
-        }
-      })
     } catch (error) {
       setErrorMessage(getErrorMessage(error))
     } finally {

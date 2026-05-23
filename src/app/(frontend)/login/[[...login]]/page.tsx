@@ -7,6 +7,7 @@ import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashb
 type LoginPageProps = {
   searchParams?: Promise<{
     message?: string | string[]
+    switchAccount?: string | string[]
   }>
 }
 
@@ -25,13 +26,23 @@ function getLoginMessage(message?: string | string[]) {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const { user } = await getAuthenticatedDashboardUser()
+  const params = await searchParams
+  const switchAccount = Array.isArray(params?.switchAccount)
+    ? params?.switchAccount[0]
+    : params?.switchAccount
 
-  if (user) {
-    redirect(getDashboardPath(user.role))
+  if (switchAccount !== '1') {
+    const { user } = await getAuthenticatedDashboardUser()
+
+    if (user) {
+      redirect(getDashboardPath(user.role))
+    }
   }
 
-  const params = await searchParams
-
-  return <LoginClient initialMessage={getLoginMessage(params?.message)} />
+  return (
+    <LoginClient
+      initialMessage={getLoginMessage(params?.message)}
+      shouldSwitchAccount={switchAccount === '1'}
+    />
+  )
 }

@@ -85,7 +85,7 @@ export default async function StudentDashboardPage() {
   return (
     <div>
       <StudentTopbar
-        title="Dashboard Etudiant"
+        title="Espace étudiant"
         description="Bienvenue dans votre espace personnel de suivi des reves, des analyses et des rendez-vous."
       />
 

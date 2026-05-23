@@ -32,6 +32,8 @@ type InteractiveQuestion = {
   }[]
 }
 
+const OTHER_INTERACTIVE_VALUE = '__other__'
+
 type ReponseChat = {
   userText?: string
   iaText?: string
@@ -42,13 +44,30 @@ type ReponseChat = {
   interactiveQuestion?: InteractiveQuestion | null
 }
 
-function normalizeAssistantText(text: string) {
+function normalizeAssistantText(text: string, language: InterviewLanguage = 'fr') {
+  const replacement =
+    language === 'en'
+      ? 'I am your assistant from the MindBloom platform.'
+      : 'Je suis votre assistant de la plateforme MindBloom.'
+
+  if (language === 'en' && /L'entretien est termin|Merci pour vos reponses/i.test(text)) {
+    return 'The interview is complete. Thank you for your answers.'
+  }
+
+  if (
+    language === 'en' &&
+    /Je suis votre assistant de la plateforme MindBloom|Pouvons-nous commencer/i.test(text)
+  ) {
+    return 'I am your assistant from the MindBloom platform. I am happy to share this moment with you. Can we start with a short introduction? What do you like to do to relax and feel well?'
+  }
+
   return text
     .replace(
       /Je m'appelle MindBloom[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
-      'Je suis votre assistant de la plateforme MindBloom.',
+      replacement,
     )
-    .replace(/Je m'appelle MindBloom[,.]?/gi, 'Je suis votre assistant de la plateforme MindBloom.')
+    .replace(/Je suis votre assistant de la plateforme MindBloom[,.]?/gi, replacement)
+    .replace(/Je m'appelle MindBloom[,.]?/gi, replacement)
 }
 
 export function InterviewChat() {
@@ -65,11 +84,64 @@ export function InterviewChat() {
   const [interviewLanguage, setInterviewLanguage] = useState<InterviewLanguage>('fr')
   const [interviewerGender, setInterviewerGender] = useState<InterviewerGender>('female')
   const [interactiveSelections, setInteractiveSelections] = useState<Record<number, string[]>>({})
+  const [answeredInteractiveQuestions, setAnsweredInteractiveQuestions] = useState<Record<number, boolean>>({})
+  const [interactiveOtherAnswers, setInteractiveOtherAnswers] = useState<Record<number, string>>({})
+  const [hasAskedRequiredInteractive, setHasAskedRequiredInteractive] = useState(false)
   const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null)
   const [sessionId] = useState(() => `session-${crypto.randomUUID()}`)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const scrollRef = useRef<HTMLDivElement | null>(null)
+  const uiLang: InterviewLanguage = interviewLanguage
+  const i18n = {
+    toolbarSubtitle:
+      uiLang === 'en'
+        ? 'Answer simply, one message at a time.'
+        : 'Repondez simplement, un message a la fois.',
+    readyTitle: uiLang === 'en' ? 'Ready for your interview' : 'Pret pour votre entretien',
+    welcomeTitle: uiLang === 'en' ? 'Welcome' : 'Bienvenue',
+    readyText:
+      uiLang === 'en'
+        ? 'Choose the language and voice in the startup window.'
+        : 'Choisissez la langue et la voix dans la fenetre de demarrage.',
+    welcomeText:
+      uiLang === 'en'
+        ? 'The assistant is preparing the first question.'
+        : "L'assistant prépare la première question.",
+    you: uiLang === 'en' ? 'You' : 'Vous',
+    copy: uiLang === 'en' ? 'Copy message' : 'Copier le message',
+    loading:
+      uiLang === 'en'
+        ? 'The assistant is preparing a response...'
+        : "L'assistant prépare sa réponse...",
+    placeholderFinished:
+      uiLang === 'en' ? 'The interview is finished.' : "L'entretien est terminé.",
+    placeholderSetup:
+      uiLang === 'en'
+        ? 'Choose the language and voice before starting.'
+        : 'Choisissez la langue et la voix avant de commencer.',
+    placeholderActive:
+      uiLang === 'en'
+        ? 'Write your answer here, or use the microphone then edit the transcript...'
+        : 'Écrivez ici votre réponse, ou utilisez le micro puis corrigez la transcription...',
+    sending: uiLang === 'en' ? 'Sending...' : 'Envoi...',
+    send: uiLang === 'en' ? 'Send' : 'Envoyer',
+    setupKicker: uiLang === 'en' ? 'Initial interview' : 'Entretien initial',
+    chooseLanguage: uiLang === 'en' ? 'Choose language' : 'Choisir la langue',
+    chooseVoice: uiLang === 'en' ? 'Choose voice' : 'Choisir la voix',
+    chooseLanguageText:
+      uiLang === 'en'
+        ? 'Select the interview language.'
+        : "Sélectionnez la langue de l'entretien.",
+    chooseVoiceText:
+      uiLang === 'en'
+        ? "Select the assistant's voice."
+        : "Sélectionnez la voix de l'assistant.",
+    french: uiLang === 'en' ? 'French' : 'Français',
+    female: uiLang === 'en' ? 'Female' : 'Femme',
+    male: uiLang === 'en' ? 'Male' : 'Homme',
+    back: uiLang === 'en' ? 'Back' : 'Retour',
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -79,6 +151,7 @@ export function InterviewChat() {
     texteBrut: string,
     afficherDansConversation = true,
     selectedGender = interviewerGender,
+    selectedLanguage = uiLang,
   ) => {
     const texte = texteBrut.trim()
 
@@ -87,9 +160,11 @@ export function InterviewChat() {
     const conversationLocale = afficherDansConversation
       ? [...messages, { role: 'user' as const, content: texte }]
       : messages
+    const visibleStudentMessageCount = conversationLocale.filter((item) => item.role === 'user').length
 
     setMessages(conversationLocale)
     setMessage('')
+    setMessageMicro('')
 
     try {
       setIsLoading(true)
@@ -102,22 +177,34 @@ export function InterviewChat() {
         body: JSON.stringify({
           textMessage: texte,
           sessionId,
-          interviewLanguage,
+          interviewLanguage: selectedLanguage,
           interviewerGender: selectedGender,
-          studentMessageCount: messages.filter((item) => item.role === 'user').length + 1,
+          studentMessageCount: visibleStudentMessageCount,
+          conversationHistory: conversationLocale.map((item) => ({
+            role: item.role,
+            content: item.content,
+          })),
           supportsInteractiveQuestions: true,
           interactiveQuestionMode: 'occasional',
+          hasAskedRequiredInteractive,
         }),
       })
 
       const data: ReponseChat & { error?: string } = await response.json()
+
+      if (data.interactiveQuestion) {
+        setHasAskedRequiredInteractive(true)
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "Erreur lors de l'entretien.")
       }
 
       if (data.iaText) {
-        const normalizedIaText = normalizeAssistantText(data.iaText)
+        const normalizedIaText =
+          data.isFinished && selectedLanguage === 'en'
+            ? 'The interview is complete. Thank you for your answers.'
+            : normalizeAssistantText(data.iaText, selectedLanguage)
 
         setMessages((prev) => [
           ...prev,
@@ -135,9 +222,13 @@ export function InterviewChat() {
       }
 
       if (data.isFinished) {
+        setIsLoading(false)
+
         if (!data.analysisData) {
           throw new Error(
-            "L'entretien est termine, mais le rapport n'a pas ete genere par le workflow. Attendez quelques secondes puis renvoyez votre derniere reponse.",
+            selectedLanguage === 'en'
+              ? 'The interview ended, but the report was not generated. Please answer one more message so the assistant can complete the analysis.'
+              : "L'entretien s'est terminé, mais le rapport n'a pas été généré. Répondez encore à un message pour compléter l'analyse.",
           )
         }
 
@@ -151,7 +242,7 @@ export function InterviewChat() {
             conversation: [
               ...conversationLocale,
               ...(data.iaText
-                ? [{ role: 'ai' as const, content: normalizeAssistantText(data.iaText) }]
+                ? [{ role: 'ai' as const, content: normalizeAssistantText(data.iaText, selectedLanguage) }]
                 : []),
             ].map((item) => ({
               role: item.role === 'user' ? 'human' : 'ai',
@@ -182,7 +273,7 @@ export function InterviewChat() {
   }
 
   const handleSend = async () => {
-    await envoyerMessage(message, true)
+    await envoyerMessage(message, true, interviewerGender, uiLang)
   }
 
   const handleSelectLanguage = (language: InterviewLanguage) => {
@@ -192,22 +283,25 @@ export function InterviewChat() {
 
   const handleSelectVoice = async (gender: InterviewerGender) => {
     setInterviewerGender(gender)
-    await handleStartInterview(gender)
+    await handleStartInterview(gender, interviewLanguage)
   }
 
-  const handleStartInterview = async (selectedGender = interviewerGender) => {
+  const handleStartInterview = async (
+    selectedGender = interviewerGender,
+    selectedLanguage = interviewLanguage,
+  ) => {
     setInterviewStarted(true)
 
     const texte =
-      interviewLanguage === 'fr'
-        ? `Je veux commencer l'entretien en francais avec une voix ${
+      selectedLanguage === 'fr'
+        ? `Commence l'entretien maintenant. Reponds uniquement en francais avec une voix ${
             selectedGender === 'female' ? 'feminine' : 'masculine'
-          }.`
-        : `I want to start the interview in English with a ${
+          }. Presente-toi brievement en francais, puis pose une seule question courte.`
+        : `Start the interview now. Reply only in English with a ${
             selectedGender === 'female' ? 'female' : 'male'
-          } voice.`
+          } voice. Introduce yourself briefly in English, then ask exactly one short question.`
 
-    await envoyerMessage(texte, false, selectedGender)
+    await envoyerMessage(texte, false, selectedGender, selectedLanguage)
   }
 
   const handleInteractiveToggle = (
@@ -215,6 +309,8 @@ export function InterviewChat() {
     value: string,
     type: 'radio' | 'checkbox',
   ) => {
+    if (answeredInteractiveQuestions[messageIndex]) return
+
     setInteractiveSelections((prev) => {
       if (type === 'radio') {
         return {
@@ -239,13 +335,31 @@ export function InterviewChat() {
     messageIndex: number,
     question: InteractiveQuestion,
   ) => {
+    if (answeredInteractiveQuestions[messageIndex]) return
+
     const values = interactiveSelections[messageIndex] || []
 
     if (values.length === 0) return
 
-    const labels = question.options
+    const otherAnswer = (interactiveOtherAnswers[messageIndex] || '').trim()
+
+    if (values.includes(OTHER_INTERACTIVE_VALUE) && !otherAnswer) return
+
+    const labels = getInteractiveOptionsWithOther(question, interviewLanguage)
       .filter((option) => values.includes(option.value))
-      .map((option) => option.label)
+      .map((option) =>
+        isOtherInteractiveOption(option)
+          ? otherAnswer
+          : translateInteractiveOption(option.label, interviewLanguage),
+      )
+      .filter(Boolean)
+
+    if (labels.length === 0) return
+
+    setAnsweredInteractiveQuestions((prev) => ({
+      ...prev,
+      [messageIndex]: true,
+    }))
 
     await envoyerMessage(labels.join(', '), true)
   }
@@ -256,7 +370,7 @@ export function InterviewChat() {
       setCopiedMessageIndex(messageIndex)
       window.setTimeout(() => setCopiedMessageIndex(null), 1400)
     } catch {
-      setMessageMicro('Copie impossible. Selectionnez le message manuellement.')
+      setMessageMicro('Copie impossible. Sélectionnez le message manuellement.')
     }
   }
 
@@ -316,7 +430,8 @@ export function InterviewChat() {
 
           if (data.userText) {
             setMessage(data.userText)
-            setMessageMicro("Texte transcrit. Vous pouvez le modifier avant l'envoi.")
+            setMessageMicro('Texte transcrit dans la zone de réponse.')
+            window.setTimeout(() => setMessageMicro(''), 2500)
           } else {
             setMessageMicro('Aucun texte detecte.')
           }
@@ -335,126 +450,57 @@ export function InterviewChat() {
       setMessageMicro('Enregistrement...')
     } catch (error) {
       setMessageMicro(
-        error instanceof Error ? error.message : "Impossible d'acceder au microphone.",
+        error instanceof Error ? error.message : "Impossible d'accéder au microphone.",
       )
     }
   }
 
   const etat = isInterviewFinished
-    ? 'Entretien termine'
+    ? uiLang === 'en'
+      ? 'Interview finished'
+      : 'Entretien terminé'
     : !interviewStarted
       ? 'Configuration'
       : isRecording
-        ? 'Micro actif'
+        ? uiLang === 'en'
+          ? 'Mic active'
+          : 'Micro actif'
         : isLoading
-          ? 'Traitement en cours'
-          : 'Disponible'
+          ? uiLang === 'en'
+            ? 'Processing'
+            : 'Traitement en cours'
+          : uiLang === 'en'
+            ? 'Available'
+            : 'Disponible'
 
   return (
     <div className="interview-shell">
-      <section className="interview-card interview-intro">
-        <div className="interview-intro-main">
+      <section className="interview-card interview-chat-card">
+        <div className="interview-chat-toolbar">
           <div>
-            <p className="interview-kicker">Cabinet d&apos;entretien</p>
-            <h3 className="interview-intro-title">Echange progressif et confidentiel</h3>
-            <p className="interview-intro-text">
-              {interviewStarted
-                ? 'Repondez naturellement, un message a la fois.'
-                : "Choisissez la langue et la voix pour commencer l'entretien."}
-            </p>
+            <p className="interview-section-title">Discussion</p>
+            <p className="interview-section-subtitle">{i18n.toolbarSubtitle}</p>
           </div>
-
           <div className="interview-status-row">
             <span className="interview-pill">
               <CheckCircle2 className="h-4 w-4" />
               {etat}
             </span>
-            <span className="interview-pill interview-pill-muted">
-              {messages.length} echange{messages.length > 1 ? 's' : ''}
-            </span>
-            {isSaved ? (
-              <span className="interview-pill interview-pill-success">Analyse sauvee</span>
-            ) : null}
           </div>
-        </div>
-      </section>
-
-      <section className="interview-card interview-chat-card">
-        <div className="interview-chat-toolbar">
-          <div>
-            <p className="interview-section-title">Espace de parole</p>
-            <p className="interview-section-subtitle">
-              Un message a la fois, dans un cadre calme et clair.
-            </p>
-          </div>
-          <span className="interview-chat-label">Assistant Big Five</span>
         </div>
 
         <div className="interview-scroll">
-          {messages.length === 0 ? (
+          {messages.length === 0 && !isLoading ? (
             <div className="interview-empty">
               <div className="interview-empty-icon">
                 <Bot className="h-5 w-5" />
               </div>
               <p className="interview-empty-title">
-                {interviewStarted
-                  ? 'Bienvenue'
-                  : setupStep === 'language'
-                    ? 'Choix de la langue'
-                    : 'Choix de la voix'}
+                {interviewStarted ? i18n.welcomeTitle : i18n.readyTitle}
               </p>
               <p className="interview-empty-text">
-                {interviewStarted
-                  ? "L'assistant prepare la premiere question."
-                  : setupStep === 'language'
-                    ? "Dans quelle langue voulez-vous faire l'entretien ?"
-                    : "Quelle voix voulez-vous entendre pendant l'entretien ?"}
+                {interviewStarted ? i18n.welcomeText : i18n.readyText}
               </p>
-
-              {!interviewStarted ? (
-                <div className="interview-setup">
-                  {setupStep === 'language' ? (
-                    <div className="interview-choice-group">
-                      <ChoiceButton
-                        checked={interviewLanguage === 'fr'}
-                        label="Francais"
-                        name="interview-language"
-                        onClick={() => handleSelectLanguage('fr')}
-                      />
-                      <ChoiceButton
-                        checked={interviewLanguage === 'en'}
-                        label="English"
-                        name="interview-language"
-                        onClick={() => handleSelectLanguage('en')}
-                      />
-                    </div>
-                  ) : (
-                    <div className="interview-choice-group">
-                      <ChoiceButton
-                        checked={interviewerGender === 'female'}
-                        label="Femme"
-                        name="interviewer-gender"
-                        onClick={() => void handleSelectVoice('female')}
-                      />
-                      <ChoiceButton
-                        checked={interviewerGender === 'male'}
-                        label="Homme"
-                        name="interviewer-gender"
-                        onClick={() => void handleSelectVoice('male')}
-                      />
-
-                      <button
-                        type="button"
-                        className="interview-back-button"
-                        onClick={() => setSetupStep('language')}
-                        disabled={isLoading}
-                      >
-                        Retour au choix de langue
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : null}
             </div>
           ) : null}
 
@@ -477,15 +523,15 @@ export function InterviewChat() {
                     ) : (
                       <Bot className="h-4 w-4" />
                     )}
-                    {item.role === 'user' ? 'Vous' : 'Assistant'}
+                    {item.role === 'user' ? i18n.you : 'Assistant'}
                   </p>
 
                   <button
                     type="button"
                     className="interview-copy-button"
                     onClick={() => void handleCopyMessage(index, item.content)}
-                    aria-label="Copier le message"
-                    title="Copier le message"
+                    aria-label={i18n.copy}
+                    title={i18n.copy}
                   >
                     {copiedMessageIndex === index ? (
                       <Check className="h-4 w-4" />
@@ -497,8 +543,19 @@ export function InterviewChat() {
                 <p className="interview-message-text">{item.content}</p>
                 {item.interactiveQuestion ? (
                   <InteractiveQuestionBlock
-                    disabled={isLoading || isInterviewFinished}
+                    disabled={
+                      isLoading ||
+                      isInterviewFinished ||
+                      answeredInteractiveQuestions[index] === true
+                    }
+                    language={uiLang}
                     messageIndex={index}
+                    onOtherChange={(value) =>
+                      setInteractiveOtherAnswers((prev) => ({
+                        ...prev,
+                        [index]: value,
+                      }))
+                    }
                     onSubmit={() =>
                       void handleSendInteractiveAnswer(index, item.interactiveQuestion!)
                     }
@@ -506,6 +563,7 @@ export function InterviewChat() {
                       handleInteractiveToggle(index, value, item.interactiveQuestion!.type)
                     }
                     question={item.interactiveQuestion}
+                    otherValue={interactiveOtherAnswers[index] || ''}
                     selectedValues={interactiveSelections[index] || []}
                   />
                 ) : null}
@@ -513,14 +571,14 @@ export function InterviewChat() {
             </div>
           ))}
 
-          {isLoading ? (
+          {isLoading && !isInterviewFinished ? (
             <div className="interview-message-row interview-message-row-ai">
               <div className="interview-message interview-message-ai">
                 <p className="interview-message-label">
                   <Bot className="h-4 w-4" />
                   Assistant
                 </p>
-                <p className="interview-message-text">L&apos;assistant prepare sa reponse...</p>
+                <p className="interview-message-text">{i18n.loading}</p>
               </div>
             </div>
           ) : null}
@@ -540,9 +598,10 @@ export function InterviewChat() {
                 onClick={() => void handleToggleRecording()}
                 disabled={isLoading || isInterviewFinished || !interviewStarted}
                 className={`interview-mic-button ${isRecording ? 'interview-mic-button-active' : ''}`}
+                aria-label={isRecording ? 'Arreter l’enregistrement' : 'Activer le micro'}
+                title={isRecording ? 'Arreter' : 'Micro'}
               >
                 {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                {isRecording ? 'Arreter' : 'Micro'}
               </button>
 
               <div className="interview-textarea-wrap">
@@ -557,10 +616,10 @@ export function InterviewChat() {
                   }}
                   placeholder={
                     isInterviewFinished
-                      ? "L'entretien est termine."
+                      ? i18n.placeholderFinished
                       : !interviewStarted
-                        ? 'Choisissez la langue et la voix avant de commencer.'
-                        : 'Ecrivez ici votre reponse, ou utilisez le micro puis corrigez la transcription...'
+                        ? i18n.placeholderSetup
+                        : i18n.placeholderActive
                   }
                   rows={3}
                   disabled={isInterviewFinished || !interviewStarted}
@@ -575,7 +634,7 @@ export function InterviewChat() {
                 className="interview-send-button"
               >
                 <Send className="h-4 w-4" />
-                {isLoading ? 'Envoi...' : 'Envoyer'}
+                {isLoading ? i18n.sending : i18n.send}
               </button>
             </div>
 
@@ -591,39 +650,101 @@ export function InterviewChat() {
       </section>
 
       {isInterviewFinished ? (
-        <div className="interview-finish-overlay" role="dialog" aria-modal="true">
-          <div className="interview-finish-modal">
-            <div className="interview-finish-icon">
-              <CheckCircle2 />
+        <section className="interview-card interview-finish-inline" aria-live="polite">
+          <div className="interview-finish-icon">
+            <CheckCircle2 />
+          </div>
+
+          <div className="interview-finish-inline-content">
+            <p className="interview-kicker">
+              {uiLang === 'en' ? 'Interview finished' : 'Entretien terminé'}
+            </p>
+            <h3 className="interview-finish-title">
+              {uiLang === 'en' ? 'What would you like to do next?' : 'Que voulez-vous faire ?'}
+            </h3>
+            <p className="interview-finish-text">
+              {uiLang === 'en'
+                ? 'You can read the last answer above, then go to your dashboard or open your report.'
+                : 'Vous pouvez lire la dernière réponse au-dessus, puis accéder au dashboard ou consulter votre rapport.'}
+            </p>
+          </div>
+
+          <div className="interview-finish-actions">
+            <Link href="/dashboard/student" className="interview-space-button">
+              <Home className="h-4 w-4" />
+              {uiLang === 'en' ? 'Go to my dashboard' : 'Acceder au dashboard'}
+            </Link>
+
+            <Link
+              href={
+                savedAnalysisId
+                  ? `/dashboard/student/analyses/${savedAnalysisId}/pdf`
+                  : '/dashboard/student/analyses'
+              }
+              className="interview-report-button"
+            >
+              <FileText className="h-4 w-4" />
+              {uiLang === 'en' ? 'View my report' : 'Voir mon rapport'}
+            </Link>
+          </div>
+        </section>
+      ) : null}
+
+      {!interviewStarted ? (
+        <div className="interview-setup-overlay" role="dialog" aria-modal="true">
+          <div className="interview-setup-modal">
+            <div className="interview-setup-icon">
+              <Bot className="h-5 w-5" />
             </div>
 
-            <p className="interview-kicker">Entretien termine</p>
-            <h3 className="interview-finish-title">Votre rapport est pret</h3>
-            <p className="interview-finish-text">
-              Votre analyse a ete enregistree. Vous pouvez consulter le rapport maintenant ou
-              rejoindre votre espace et y revenir plus tard.
+            <p className="interview-kicker">{i18n.setupKicker}</p>
+            <h3 className="interview-setup-title">
+              {setupStep === 'language' ? i18n.chooseLanguage : i18n.chooseVoice}
+            </h3>
+            <p className="interview-setup-text">
+              {setupStep === 'language' ? i18n.chooseLanguageText : i18n.chooseVoiceText}
             </p>
 
-            <div className="interview-finish-actions">
-              <Link
-                href={
-                  savedAnalysisId
-                    ? `/dashboard/student/analyses/${savedAnalysisId}/pdf`
-                    : '/dashboard/student/analyses'
-                }
-                className={`interview-report-button ${isSaved ? '' : 'interview-report-button-disabled'}`}
-                aria-disabled={!isSaved}
-                tabIndex={isSaved ? 0 : -1}
-              >
-                <FileText className="h-4 w-4" />
-                Voir mon rapport
-              </Link>
+            {setupStep === 'language' ? (
+              <div className="interview-choice-group interview-setup-choices">
+                <ChoiceButton
+                  checked={interviewLanguage === 'fr'}
+                  label={i18n.french}
+                  name="interview-language"
+                  onClick={() => handleSelectLanguage('fr')}
+                />
+                <ChoiceButton
+                  checked={interviewLanguage === 'en'}
+                  label="English"
+                  name="interview-language"
+                  onClick={() => handleSelectLanguage('en')}
+                />
+              </div>
+            ) : (
+              <div className="interview-choice-group interview-setup-choices">
+                <ChoiceButton
+                  checked={interviewerGender === 'female'}
+                  label={i18n.female}
+                  name="interviewer-gender"
+                  onClick={() => void handleSelectVoice('female')}
+                />
+                <ChoiceButton
+                  checked={interviewerGender === 'male'}
+                  label={i18n.male}
+                  name="interviewer-gender"
+                  onClick={() => void handleSelectVoice('male')}
+                />
 
-              <Link href="/dashboard/student" className="interview-space-button">
-                <Home className="h-4 w-4" />
-                Acceder a mon espace
-              </Link>
-            </div>
+                <button
+                  type="button"
+                  className="interview-back-button"
+                  onClick={() => setSetupStep('language')}
+                  disabled={isLoading}
+                >
+                  {i18n.back}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : null}
@@ -659,64 +780,156 @@ function ChoiceButton({
 
 function InteractiveQuestionBlock({
   disabled,
+  language,
   messageIndex,
+  onOtherChange,
   onSubmit,
   onToggle,
+  otherValue,
   question,
   selectedValues,
 }: {
   disabled: boolean
+  language: InterviewLanguage
   messageIndex: number
+  onOtherChange: (value: string) => void
   onSubmit: () => void
   onToggle: (value: string) => void
+  otherValue: string
   question: InteractiveQuestion
   selectedValues: string[]
 }) {
-  return (
-    <div className="interview-interactive">
-      <div className="interview-interactive-options">
-        {question.options.map((option) => {
-          const checked = selectedValues.includes(option.value)
+  const isEnglish = language === 'en'
+  const options = getInteractiveOptionsWithOther(question, language)
+  const isOtherSelected = selectedValues.includes(OTHER_INTERACTIVE_VALUE)
+  const isSubmitDisabled =
+    disabled || selectedValues.length === 0 || (isOtherSelected && !otherValue.trim())
 
-          return (
-            <button
-              key={`${messageIndex}-${option.value}`}
-              type="button"
-              className={`interview-option-button ${checked ? 'interview-option-button-active' : ''}`}
-              onClick={() => onToggle(option.value)}
-              disabled={disabled}
-            >
-              <span
-                className={
-                  question.type === 'checkbox' ? 'interview-checkbox-mark' : 'interview-radio-mark'
-                }
-                aria-hidden="true"
+  return (
+    <div className={`interview-interactive ${disabled ? 'interview-interactive-disabled' : ''}`}>
+      <p className="interview-interactive-title">
+        {question.type === 'checkbox'
+          ? isEnglish
+            ? 'Choose one or more options'
+            : 'Choisissez une ou plusieurs options'
+          : isEnglish
+            ? 'Choose one option'
+            : 'Choisissez une option'}
+      </p>
+      <div className="interview-interactive-options">
+        {options
+          .filter((option) => !isFinOption(option))
+          .map((option) => {
+            const checked = selectedValues.includes(option.value)
+
+            return (
+              <label
+                key={`${messageIndex}-${option.value}`}
+                className={`interview-option-button ${checked ? 'interview-option-button-active' : ''}`}
               >
-                {checked ? <span /> : null}
-              </span>
-              <span>{option.label}</span>
-              <input
-                checked={checked}
-                name={`interactive-${messageIndex}`}
-                onChange={() => onToggle(option.value)}
-                type={question.type}
-                value={option.value}
-              />
-            </button>
-          )
-        })}
+                <input
+                  checked={checked}
+                  className="interview-option-native"
+                  disabled={disabled}
+                  name={`interactive-${messageIndex}`}
+                  onChange={() => onToggle(option.value)}
+                  type={question.type}
+                  value={option.value}
+                />
+                <span>{translateInteractiveOption(option.label, language)}</span>
+              </label>
+            )
+          })}
       </div>
+
+      {isOtherSelected ? (
+        <textarea
+          className="interview-other-input"
+          disabled={disabled}
+          onChange={(event) => onOtherChange(event.target.value)}
+          placeholder={isEnglish ? 'Write your answer here...' : 'Ecrivez votre reponse ici...'}
+          rows={3}
+          value={otherValue}
+        />
+      ) : null}
 
       <button
         type="button"
         className="interview-option-submit"
         onClick={onSubmit}
-        disabled={disabled || selectedValues.length === 0}
+        disabled={isSubmitDisabled}
       >
-        Valider ma reponse
+        {disabled
+          ? isEnglish
+            ? 'Answer submitted'
+            : 'Reponse validee'
+          : isEnglish
+            ? 'Submit my answer'
+            : 'Valider ma reponse'}
       </button>
     </div>
   )
+}
+
+function getInteractiveOptionsWithOther(
+  question: InteractiveQuestion,
+  language: InterviewLanguage,
+) {
+  const hasOther = question.options.some((option) => isOtherInteractiveOption(option))
+
+  if (hasOther) {
+    return question.options.map((option) =>
+      isOtherInteractiveOption(option)
+        ? {
+            label: language === 'en' ? 'Other' : 'Autre',
+            value: OTHER_INTERACTIVE_VALUE,
+          }
+        : option,
+    )
+  }
+
+  return [
+    ...question.options,
+    {
+      label: language === 'en' ? 'Other' : 'Autre',
+      value: OTHER_INTERACTIVE_VALUE,
+    },
+  ]
+}
+
+function translateInteractiveOption(label: string, language: InterviewLanguage) {
+  if (language !== 'en') return label
+
+  const normalized = label.toLowerCase()
+  const translations: Record<string, string> = {
+    'stress ou pression': 'Stress or pressure',
+    'organisation ou gestion du temps': 'Organization or time management',
+    'relations ou travail en groupe': 'Relationships or group work',
+    'motivation ou confiance': 'Motivation or confidence',
+    autre: 'Other',
+  }
+
+  return translations[normalized] || label
+}
+
+function isOtherInteractiveOption(option: { label: string; value: string }) {
+  const label = option.label.trim().toLowerCase()
+  const value = option.value.trim().toLowerCase()
+
+  return (
+    value === OTHER_INTERACTIVE_VALUE ||
+    value === 'other' ||
+    value === 'autre' ||
+    label === 'other' ||
+    label === 'autre'
+  )
+}
+
+function isFinOption(option: { label: string; value: string }) {
+  const label = option.label.trim().toLowerCase()
+  const value = option.value.trim().toLowerCase()
+
+  return label === '[fin]' || value === '[fin]' || label === 'fin' || value === 'fin'
 }
 
 function convertirAudioEnBase64(audioBlob: Blob): Promise<string> {
@@ -735,4 +948,3 @@ function convertirAudioEnBase64(audioBlob: Blob): Promise<string> {
     reader.readAsDataURL(audioBlob)
   })
 }
-

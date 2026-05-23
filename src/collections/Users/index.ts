@@ -13,6 +13,7 @@ const adminOnlyFieldAccess: FieldAccess = ({ req: { user } }) => hasRole(user, [
 const generatedProfileFieldAccess: FieldAccess = ({ req: { user } }) => hasRole(user, ['admin'])
 
 const managedStaffRoles = ['coach', 'psy'] as const
+const adminDeletableRoles = ['etudiant', ...managedStaffRoles] as const
 
 const adminManagedUsersWhere: Where = {
   role: {
@@ -41,6 +42,10 @@ function adminManagedUsersOrSelfWhere(user: User): Where {
 
 function isManagedStaffRole(role: unknown): role is (typeof managedStaffRoles)[number] {
   return role === 'coach' || role === 'psy'
+}
+
+function isAdminDeletableRole(role: unknown): role is (typeof adminDeletableRoles)[number] {
+  return role === 'etudiant' || role === 'coach' || role === 'psy'
 }
 
 function assertAdminManagesOnlyStaff(data: Partial<User> | undefined) {
@@ -136,8 +141,11 @@ export const Users: CollectionConfig = {
           req,
         })
 
-        if (hasRole(req.user as User | null, ['admin']) && !isManagedStaffRole(userToDelete.role)) {
-          throw new APIError("L'administrateur peut supprimer uniquement les comptes coach et psy.", 403)
+        if (hasRole(req.user as User | null, ['admin']) && !isAdminDeletableRole(userToDelete.role)) {
+          throw new APIError(
+            "L'administrateur peut supprimer uniquement les comptes etudiant, coach et psy.",
+            403,
+          )
         }
 
         const coachingEvents = await req.payload.find({

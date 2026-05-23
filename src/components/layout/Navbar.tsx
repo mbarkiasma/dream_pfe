@@ -1,5 +1,6 @@
 ﻿'use client'
 
+import { useUser } from '@clerk/nextjs'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -12,13 +13,47 @@ export function Navbar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [accountHref, setAccountHref] = useState('/auth/redirect')
   const { setTheme, theme } = useTheme()
   const { lang, t, toggleLang } = useLanguage()
+  const { isLoaded, isSignedIn } = useUser()
   const isDark = mounted && theme === 'dark'
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) {
+      return
+    }
+
+    let cancelled = false
+
+    async function resolveAccountHref() {
+      try {
+        const response = await fetch('/api/auth/dashboard-redirect', {
+          cache: 'no-store',
+          credentials: 'include',
+        })
+        const data = (await response.json()) as { path?: string }
+
+        if (!cancelled && response.ok && data.path) {
+          setAccountHref(data.path)
+        }
+      } catch {
+        if (!cancelled) {
+          setAccountHref('/auth/redirect')
+        }
+      }
+    }
+
+    void resolveAccountHref()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isLoaded, isSignedIn])
 
   const navLinks = [
     { label: t.navbar.accueil, href: '/home' },
@@ -32,6 +67,9 @@ export function Navbar() {
   const toggleTheme = () => {
     setTheme(isDark ? 'light' : 'dark')
   }
+
+  const accountLabel = isLoaded && isSignedIn ? 'Mon compte' : t.navbar.login
+  const accountLink = isLoaded && isSignedIn ? accountHref : '/login'
 
   return (
     <nav className="sticky top-0 z-[100] border-b border-[var(--mindly-border)] bg-[var(--mindly-surface-glass)] backdrop-blur-[18px]">
@@ -72,10 +110,10 @@ export function Navbar() {
 
         <div className="absolute right-8 top-1/2 hidden -translate-y-1/2 items-center gap-8 md:flex lg:right-10">
           <Link
-            href="/login"
+            href={accountLink}
             className={`${appBadgeCtaClass} !min-h-[38px] !min-w-[145px] !w-[145px] px-3 py-1.5 text-[14px]`}
           >
-            <span className="relative z-10">{t.navbar.login}</span>
+            <span className="relative z-10">{accountLabel}</span>
           </Link>
 
           <div className="flex items-center gap-2">
@@ -169,11 +207,11 @@ export function Navbar() {
             </div>
 
             <Link
-              href="/login"
+              href={accountLink}
               onClick={() => setOpen(false)}
               className={`${appBadgeCtaClass} mt-2 min-w-0`}
             >
-              {t.navbar.login}
+              {accountLabel}
             </Link>
           </div>
         </div>

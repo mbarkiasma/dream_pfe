@@ -14,7 +14,7 @@ export default function LogoutPage() {
     void fetch('/api/auth/logout', {
       method: 'POST',
     }).finally(() => {
-      void signOut({ redirectUrl: '/login' })
+      void signOut({ redirectUrl: '/login?switchAccount=1' })
     })
   }, [signOut])
 

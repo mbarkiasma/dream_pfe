@@ -52,8 +52,7 @@ export function StudentSidebar() {
             <MoonStar />
           </div>
           <div className="min-w-0">
-            <p className="mindly-sidebar-title">Espace etudiant</p>
-            <p className="mindly-sidebar-subtitle">Dream coaching</p>
+            <p className="mindly-sidebar-title">Espace étudiant</p>
           </div>
         </div>
 

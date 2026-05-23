@@ -41,8 +41,10 @@ export const payloadEndpoints: Endpoint[] = [
         interviewLanguage,
         interviewerGender,
         studentMessageCount,
+        conversationHistory,
         supportsInteractiveQuestions,
         interactiveQuestionMode,
+        hasAskedRequiredInteractive,
       } = body
 
       let userText = typeof textMessage === 'string' ? textMessage.trim() : ''
@@ -87,9 +89,18 @@ export const payloadEndpoints: Endpoint[] = [
           interviewerGender: interviewerGender === 'male' ? 'male' : 'female',
           studentMessageCount:
             typeof studentMessageCount === 'number' ? studentMessageCount : undefined,
+          conversationHistory: Array.isArray(conversationHistory)
+            ? conversationHistory
+                .map((message: any) => ({
+                  role: message?.role === 'ai' ? 'ai' : 'user',
+                  content: String(message?.content || message?.message || '').trim(),
+                }))
+                .filter((message: { content: string }) => message.content)
+            : [],
           supportsInteractiveQuestions: supportsInteractiveQuestions === true,
           interactiveQuestionMode:
             interactiveQuestionMode === 'occasional' ? 'occasional' : 'text',
+          hasAskedRequiredInteractive: hasAskedRequiredInteractive === true,
         }),
       })
 
@@ -107,13 +118,38 @@ export const payloadEndpoints: Endpoint[] = [
         n8nData = { output: n8nRawText }
       }
 
+      if (Array.isArray(n8nData)) {
+        n8nData = n8nData[0] || {}
+      }
+
       const iaText =
         n8nData.output || n8nData.texte || n8nData.text || n8nData.message || n8nData.response || ''
+      const embeddedInteractive = extraireQuestionInteractiveDepuisTexte(iaText)
+      const iaTextNettoye = embeddedInteractive?.output || retirerJsonInteractifDuTexte(iaText)
 
-      const isFinished = n8nData.isFinished || iaText.includes('[FIN]') || false
-      const cleanText = normaliserTexteAssistant(iaText.replace('[FIN]', '')).trim()
-      const analysisData = isFinished ? extraireAnalysisData(n8nData) : null
-      const interactiveQuestion = extraireQuestionInteractive(n8nData)
+      const rawIsFinished = n8nData.isFinished || iaTextNettoye.includes('[FIN]') || false
+      const analysisData = rawIsFinished ? extraireAnalysisData(n8nData) : null
+      const isPrematureFinish = rawIsFinished && !analysisData
+      const isFinished = rawIsFinished && Boolean(analysisData)
+      const cleanText = isPrematureFinish
+        ? interviewLanguage === 'en'
+          ? 'Before finishing, could you share one recent situation where you had to make an important study-related decision?'
+          : "Avant de terminer, pouvez-vous me parler d'une situation r\u00e9cente o\u00f9 vous avez d\u00fb prendre une d\u00e9cision importante li\u00e9e \u00e0 vos \u00e9tudes ?"
+        : normaliserTexteAssistant(
+            iaTextNettoye.replace(/\[FIN\]/gi, ''),
+            interviewLanguage === 'en' ? 'en' : 'fr',
+          ).trim()
+      const interactiveQuestion =
+        isFinished
+          ? null
+          : extraireQuestionInteractive(n8nData) ||
+            embeddedInteractive?.interactiveQuestion ||
+            creerQuestionInteractiveSecours({
+              interviewLanguage: interviewLanguage === 'en' ? 'en' : 'fr',
+              studentMessageCount:
+                typeof studentMessageCount === 'number' ? studentMessageCount : undefined,
+              supportsInteractiveQuestions: supportsInteractiveQuestions === true,
+            })
 
       let audioBase64Reponse: string | null = null
 
@@ -142,6 +178,33 @@ export const payloadEndpoints: Endpoint[] = [
     },
   },
   // Enregistre le rapport final d'analyse de personnalite genere apres la conversation.
+  {
+    path: '/complete-interview',
+    method: 'post',
+    handler: async (req) => {
+      if (!req.user) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      if (req.user.role !== 'etudiant') {
+        return Response.json(
+          { error: 'Seuls les etudiants peuvent terminer un entretien initial.' },
+          { status: 403 },
+        )
+      }
+
+      await req.payload.update({
+        collection: 'users',
+        id: req.user.id,
+        req,
+        data: {
+          onboardingStep: 'completed',
+        },
+      })
+
+      return Response.json({ success: true })
+    },
+  },
   {
     path: '/save-analysis',
     method: 'post',
@@ -995,6 +1058,12 @@ function extraireQuestionInteractive(n8nData: any) {
       }
     })
     .filter((option: { label: string; value: string }) => option.label && option.value)
+    .filter((option: { label: string; value: string }) => {
+      const label = option.label.trim().toLowerCase()
+      const value = option.value.trim().toLowerCase()
+
+      return label !== '[fin]' && value !== '[fin]' && label !== 'fin' && value !== 'fin'
+    })
 
   if (normalizedOptions.length === 0) {
     return null
@@ -1006,13 +1075,115 @@ function extraireQuestionInteractive(n8nData: any) {
   }
 }
 
-function normaliserTexteAssistant(texte: string): string {
+function extraireQuestionInteractiveDepuisTexte(texte: string) {
+  if (!texte || !texte.includes('interactiveQuestion')) {
+    return null
+  }
+
+  const debut = texte.indexOf('{')
+  const fin = texte.lastIndexOf('}')
+
+  if (debut === -1 || fin <= debut) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(texte.slice(debut, fin + 1))
+    const interactiveQuestion = extraireQuestionInteractive(parsed)
+
+    if (!interactiveQuestion) {
+      return null
+    }
+
+    return {
+      output:
+        typeof parsed.output === 'string'
+          ? parsed.output
+          : typeof parsed.message === 'string'
+            ? parsed.message
+            : retirerJsonInteractifDuTexte(texte),
+      interactiveQuestion,
+    }
+  } catch {
+    return null
+  }
+}
+
+function retirerJsonInteractifDuTexte(texte: string) {
+  if (!texte || !texte.includes('interactiveQuestion')) {
+    return texte
+  }
+
+  const debut = texte.indexOf('{')
+  const fin = texte.lastIndexOf('}')
+
+  if (debut === -1 || fin <= debut) {
+    return texte
+  }
+
+  return `${texte.slice(0, debut)}${texte.slice(fin + 1)}`.trim()
+}
+
+function creerQuestionInteractiveSecours({
+  interviewLanguage,
+  studentMessageCount,
+  supportsInteractiveQuestions,
+}: {
+  interviewLanguage: 'fr' | 'en'
+  studentMessageCount?: number
+  supportsInteractiveQuestions: boolean
+}) {
+  if (!supportsInteractiveQuestions || studentMessageCount !== 4) {
+    return null
+  }
+
+  if (interviewLanguage === 'en') {
+    return {
+      type: 'checkbox',
+      options: [
+        { label: 'Stress or pressure', value: 'stress_pressure' },
+        { label: 'Organization or time management', value: 'organization_time' },
+        { label: 'Relationships or group work', value: 'relationships_group' },
+        { label: 'Motivation or confidence', value: 'motivation_confidence' },
+      ],
+    }
+  }
+
+  return {
+    type: 'checkbox',
+    options: [
+      { label: 'Stress ou pression', value: 'stress_pression' },
+      { label: 'Organisation ou gestion du temps', value: 'organisation_temps' },
+      { label: 'Relations ou travail en groupe', value: 'relations_groupe' },
+      { label: 'Motivation ou confiance', value: 'motivation_confiance' },
+    ],
+  }
+}
+
+function normaliserTexteAssistant(texte: string, langue: 'fr' | 'en' = 'fr'): string {
+  const remplacement =
+    langue === 'en'
+      ? 'I am your assistant from the MindBloom platform.'
+      : 'Je suis votre assistant de la plateforme MindBloom.'
+
+  if (langue === 'en' && /L'entretien est termin|Merci pour vos r(?:e|é)ponses/i.test(texte)) {
+    return 'The interview is complete. Thank you for your answers.'
+  }
+
+  if (
+    langue === 'en' &&
+    /Je suis votre assistant de la plateforme MindBloom|Pouvons-nous commencer/i.test(texte)
+  ) {
+    return 'I am your assistant from the MindBloom platform. I am happy to share this moment with you. Can we start with a short introduction? What do you like to do to relax and feel well?'
+  }
+
   return texte
     .replace(
       /Je m'appelle MindBloom[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
-      'Je suis votre assistant de la plateforme MindBloom.',
+      remplacement,
     )
-    .replace(/Je m'appelle MindBloom[,.]?/gi, 'Je suis votre assistant de la plateforme MindBloom.')
+    .replace(/Je suis votre assistant de la plateforme MindBloom[,.]?/gi, remplacement)
+    .replace(/Je m'appelle MindBloom[,.]?/gi, remplacement)
     .replace(/\[(?:nom|name|assistant_name|assistant name)\]/gi, 'MindBloom')
     .replace(/\{\{\s*(?:nom|name|assistant_name|assistant name)\s*\}\}/gi, 'MindBloom')
 }

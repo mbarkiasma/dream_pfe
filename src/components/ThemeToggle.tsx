@@ -29,9 +29,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       variant="ghost"
       size="icon"
-      className={cn('h-10 w-10 shrink-0', className)}
+      className={cn('mindly-theme-toggle h-9 w-9 shrink-0 rounded-full', className)}
     >
-      {ready && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      {ready && isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </Button>
   )
 }

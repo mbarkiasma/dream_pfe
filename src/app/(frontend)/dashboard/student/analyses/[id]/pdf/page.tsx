@@ -4,6 +4,7 @@ import config from '@payload-config'
 
 import { PrintPdfButton } from '@/components/dashboard/student/PrintPdfButton'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
+import { getReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
 
 type PageProps = {
   params: Promise<{
@@ -40,11 +41,12 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
   }
 
   const date = formatAnalysisDate(analyse.date)
+  const reportWellbeing = getReportWellbeingTheme(analyse.traits)
 
   return (
-    <main className="min-h-screen bg-[var(--mindly-bg)] px-4 py-8 text-[var(--mindly-text-strong)] print:bg-white print:px-0 print:py-0 print:text-slate-900">
-      <div className="mx-auto max-w-4xl rounded-[var(--mindly-radius-2xl)] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-6 shadow-[var(--mindly-shadow-xl)] print:max-w-none print:rounded-none print:border-0 print:bg-white print:shadow-none md:p-10">
-        <div className="mb-8 flex flex-col gap-4 border-b border-[var(--mindly-border)] pb-6 print:hidden md:flex-row md:items-center md:justify-between">
+    <main className={`report-print-page report-print-page-${reportWellbeing.theme} min-h-screen bg-[var(--mindly-bg)] px-4 py-8 text-[var(--mindly-text-strong)] print:px-0 print:py-0 print:text-slate-900`}>
+      <div className={`report-pdf-card report-theme-card report-theme-${reportWellbeing.theme} mx-auto max-w-4xl rounded-[var(--mindly-radius-2xl)] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-6 shadow-[var(--mindly-shadow-xl)] print:max-w-none print:rounded-none print:border-0 print:shadow-none md:p-10`}>
+        <div className="report-print-header mb-8 flex flex-col gap-4 border-b border-[var(--mindly-border)] pb-6 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.25em] text-[var(--mindly-primary)]">
               Rapport d&apos;analyse
@@ -52,13 +54,24 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
             <h1 className="mt-2 text-3xl font-bold text-[var(--mindly-text-strong)]">
               {analyse.reference}
             </h1>
-            <p className="mt-2 text-sm text-[var(--mindly-text-soft)]">Genere le {date}</p>
+            <p className="mt-2 text-sm text-[var(--mindly-text-soft)]">Généré le {date}</p>
           </div>
 
-          <PrintPdfButton />
+          <div className="flex flex-col gap-3 md:items-end">
+            <div className="report-wellbeing-pill">
+              <span>{reportWellbeing.label}</span>
+              {reportWellbeing.score !== null ? (
+                <strong>{reportWellbeing.score.toFixed(1)}/10</strong>
+              ) : null}
+            </div>
+
+            <div className="print:hidden">
+              <PrintPdfButton analysisId={analyse.id} />
+            </div>
+          </div>
         </div>
 
-        <div className="mb-8 hidden border-b border-slate-200 pb-6 print:block">
+        <div className="hidden">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
             Rapport d&apos;analyse de personnalite
           </p>
@@ -67,7 +80,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
         </div>
 
         <section className="grid gap-4 md:grid-cols-2">
-          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
+          <article className="report-highlight-panel rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
               Vue d&apos;ensemble
             </h2>
@@ -76,7 +89,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
             </p>
           </article>
 
-          <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
+          <article className="report-highlight-panel rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
               Conclusion
             </h2>
@@ -84,6 +97,23 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
               {analyse.conclusion || 'Aucune conclusion disponible.'}
             </p>
           </article>
+        </section>
+
+        <section className="report-balance-panel mt-6 rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] p-5 print:border-slate-200 print:bg-white">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
+            Indice d&apos;equilibre
+          </p>
+          <h2 className="mt-2 text-xl font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
+            {reportWellbeing.label}
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
+            {reportWellbeing.description}
+          </p>
+          {reportWellbeing.score !== null ? (
+            <p className="mt-3 text-sm font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
+              Score d&apos;equilibre : {reportWellbeing.score.toFixed(1)}/10
+            </p>
+          ) : null}
         </section>
 
         <section className="mt-6 grid gap-4 md:grid-cols-3">
@@ -115,7 +145,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
           </article>
         </section>
 
-        <section className="mt-8">
+        <section className="report-traits-section mt-8">
           <h2 className="text-2xl font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
             Traits Big Five
           </h2>
@@ -124,14 +154,14 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
             {analyse.traits?.map((trait, index) => (
               <article
                 key={`${trait.name}-${index}`}
-                className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
+                className="report-trait-card rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
               >
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <h3 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
                     {trait.name}
                   </h3>
 
-                  <span className="inline-flex w-fit rounded-full bg-[var(--mindly-gradient-primary)] px-3 py-1 text-sm font-bold text-white print:bg-slate-900 print:text-white">
+                  <span className="report-trait-score inline-flex w-fit rounded-full border border-[#c4b5fd] bg-white px-3 py-1 text-sm font-bold !text-[#1f114f] print:!bg-white print:!text-slate-900">
                     Score : {trait.score}/10
                   </span>
                 </div>

@@ -6,7 +6,7 @@ type StudentTopbarProps = {
 }
 
 export function StudentTopbar({
-  title = 'Espace etudiant',
+  title = 'Espace étudiant',
   description = 'Suivez vos reves, vos analyses, vos rendez-vous et votre accompagnement dans un espace unifie.',
 }: StudentTopbarProps) {
   return <DashboardTopbar title={title} description={description} />

@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { CalendarDays, CheckCircle2, Clock, Loader2, Send } from 'lucide-react'
+import { CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock, Loader2, Send } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -85,6 +85,14 @@ function getDateLabel(dateValue: string) {
   return selectedDateFormatter.format(new Date(`${dateValue}T00:00:00`))
 }
 
+function getDateInputLabel(dateValue: string) {
+  const [year, month, day] = dateValue.split('-')
+
+  if (!year || !month || !day) return dateValue
+
+  return `${day}/${month}/${year}`
+}
+
 function getAgendaStatusLabel(day: AgendaDay) {
   if (day.status === 'available')
     return `${day.availableSlots} libre${day.availableSlots > 1 ? 's' : ''}`
@@ -95,20 +103,27 @@ function getAgendaStatusLabel(day: AgendaDay) {
 }
 
 function getAgendaStatusClass(day: AgendaDay, isSelected: boolean) {
-  if (isSelected) return 'student-psy-day-active'
-  if (day.status === 'available') return 'student-psy-day-available'
-  if (day.status === 'full') return 'student-psy-day-full'
+  const classes = ['student-psy-day-button-status']
 
-  return 'student-psy-day-closed'
+  if (day.status === 'available') classes.push('student-psy-day-available')
+  else if (day.status === 'full') classes.push('student-psy-day-full')
+  else if (day.status === 'weekend') classes.push('student-psy-day-weekend')
+  else if (day.status === 'past') classes.push('student-psy-day-past')
+  else classes.push('student-psy-day-closed')
+
+  if (isSelected) classes.push('student-psy-day-active')
+
+  return classes.join(' ')
 }
 
 export function StudentRendezvousPsyForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const orientationId = searchParams.get('orientationId')
+  const agendaScrollRef = useRef<HTMLDivElement>(null)
   const today = useMemo(() => formatDateValue(new Date()), [])
   const tomorrow = useMemo(() => formatDateValue(addDays(new Date(), 1)), [])
-  const agendaDates = useMemo(() => buildAgendaDays(new Date(), 6), [])
+  const agendaDates = useMemo(() => buildAgendaDays(new Date(), 14), [])
 
   const [agendaDays, setAgendaDays] = useState<AgendaDay[]>([])
   const [selectedDate, setSelectedDate] = useState(today)
@@ -281,6 +296,13 @@ export function StudentRendezvousPsyForm() {
     }
   }
 
+  function scrollAgenda(direction: 'left' | 'right') {
+    agendaScrollRef.current?.scrollBy({
+      behavior: 'smooth',
+      left: direction === 'left' ? -240 : 240,
+    })
+  }
+
   const availableSlots = slots.filter((slot) => slot.available)
   const selectedSlot = slots.find((slot) => slot.startTime === startTime)
   const hiddenUnavailableSlots = slots.length - availableSlots.length
@@ -303,45 +325,70 @@ export function StudentRendezvousPsyForm() {
           </div>
 
           <div className="student-psy-card-body">
-            <div className="student-psy-days-grid">
-              {(agendaDays.length > 0
-                ? agendaDays
-                : agendaDates.map((day) => ({
-                    ...day,
-                    availableSlots: 0,
-                    status: 'closed' as DayStatus,
-                  }))
-              ).map((day) => {
-                const isSelected = selectedDate === day.date
+            <div className="student-psy-days-carousel">
+              <button
+                type="button"
+                className="student-psy-days-arrow"
+                aria-label="Voir les jours precedents"
+                onClick={() => scrollAgenda('left')}
+              >
+                <ChevronLeft />
+              </button>
 
-                return (
-                  <Button
-                    key={day.date}
-                    type="button"
-                    onClick={() => setSelectedDate(day.date)}
-                    className={`student-psy-day-button ${getAgendaStatusClass(day, isSelected)}`}
-                  >
-                    <span className="student-psy-day-name">{day.dayName}</span>
-                    <span className="student-psy-day-number">{day.dayNumber}</span>
-                    <span className="student-psy-day-month">{day.monthName}</span>
-                    <span className="student-psy-day-badge">{getAgendaStatusLabel(day)}</span>
-                  </Button>
-                )
-              })}
+              <div className="student-psy-days-scroll" ref={agendaScrollRef}>
+                {(agendaDays.length > 0
+                  ? agendaDays
+                  : agendaDates.map((day) => ({
+                      ...day,
+                      availableSlots: 0,
+                      status: 'closed' as DayStatus,
+                    }))
+                ).map((day) => {
+                  const isSelected = selectedDate === day.date
+
+                  return (
+                    <Button
+                      key={day.date}
+                      type="button"
+                      onClick={() => setSelectedDate(day.date)}
+                      className={`student-psy-day-button ${getAgendaStatusClass(day, isSelected)}`}
+                    >
+                      <span className="student-psy-day-name">{day.dayName}</span>
+                      <span className="student-psy-day-number">{day.dayNumber}</span>
+                      <span className="student-psy-day-month">{day.monthName}</span>
+                      <span className="student-psy-day-badge">{getAgendaStatusLabel(day)}</span>
+                    </Button>
+                  )
+                })}
+              </div>
+
+              <button
+                type="button"
+                className="student-psy-days-arrow"
+                aria-label="Voir les jours suivants"
+                onClick={() => scrollAgenda('right')}
+              >
+                <ChevronRight />
+              </button>
             </div>
 
             <div className="student-psy-field student-psy-field-spaced">
               <Label htmlFor="appointment-date" className="student-psy-label">
                 Autre date
               </Label>
-              <Input
-                id="appointment-date"
-                min={today}
-                onChange={(event) => setSelectedDate(event.target.value)}
-                type="date"
-                value={selectedDate}
-                className="student-psy-input"
-              />
+              <div className="student-psy-date-input-wrap">
+                <Input
+                  id="appointment-date"
+                  min={today}
+                  onChange={(event) => setSelectedDate(event.target.value)}
+                  type="date"
+                  value={selectedDate}
+                  className="student-psy-input student-psy-date-input"
+                />
+                <span className="student-psy-date-input-value">
+                  {getDateInputLabel(selectedDate)}
+                </span>
+              </div>
             </div>
           </div>
         </section>

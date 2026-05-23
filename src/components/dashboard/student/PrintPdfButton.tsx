@@ -1,9 +1,13 @@
 'use client'
 
-export function PrintPdfButton() {
+type PrintPdfButtonProps = {
+  analysisId: string | number
+}
+
+export function PrintPdfButton({ analysisId }: PrintPdfButtonProps) {
   return (
-    <button type="button" onClick={() => window.print()} className="mindly-btn mindly-btn-primary">
-      Télécharger / Imprimer en PDF
-    </button>
+    <a href={`/api/analysis-pdf/${analysisId}`} className="mindly-btn mindly-btn-primary">
+      Télécharger le PDF
+    </a>
   )
 }

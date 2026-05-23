@@ -1,9 +1,11 @@
 import Link from 'next/link'
+import { ArrowRight, Download, FileText } from 'lucide-react'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
+import { getReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
 
 function formatAnalysisDate(value: string) {
   return new Date(value).toLocaleDateString('fr-FR', {
@@ -33,72 +35,98 @@ export default async function StudentAnalysesPage() {
     : { docs: [], totalDocs: 0 }
 
   const latestAnalysis = analyses.docs[0]
+  const reportWellbeing = getReportWellbeingTheme(latestAnalysis?.traits)
 
   return (
     <div>
       <StudentTopbar
         title="Mon rapport d'entretien"
-        description="Retrouvez le resume de votre entretien, les points principaux identifies et votre rapport PDF."
+        description="Retrouvez le résumé de votre entretien, les points principaux identifiés et votre rapport PDF."
       />
 
       <div className="mindly-stack-lg">
-        <section className="mindly-card p-6">
-          <div className="mb-5">
-            <h2 className="text-2xl font-bold text-[var(--mindly-text-strong)]">
-              {latestAnalysis ? 'Rapport disponible' : 'Rapport en attente'}
-            </h2>
-          </div>
+        <section
+          className={`mindly-card report-theme-card report-overview-card report-theme-${reportWellbeing.theme} p-6`}
+        >
+          <div className="report-overview-head">
+            <div>
+              <p className="report-overview-kicker">Synthèse personnelle</p>
+              <h2 className="report-overview-title">
+                {latestAnalysis ? 'Rapport disponible' : 'Rapport en attente'}
+              </h2>
+            </div>
 
-          <div className="mb-4 flex flex-wrap gap-2">
-            <span
-              className={
-                latestAnalysis ? 'mindly-ui-badge mindly-ui-badge-success' : 'mindly-ui-badge'
-              }
-            >
-              {latestAnalysis ? 'Entretien termine' : 'En attente'}
-            </span>
+            <div className="report-overview-badges">
+              <span
+                className={
+                  latestAnalysis ? 'mindly-ui-badge mindly-ui-badge-success' : 'mindly-ui-badge'
+                }
+              >
+                {latestAnalysis ? 'Entretien terminé' : 'En attente'}
+              </span>
 
-            <span className="mindly-ui-badge">Rapport unique</span>
+              <span className="mindly-ui-badge">Rapport unique</span>
+            </div>
           </div>
 
           {latestAnalysis ? (
-            <div className="mindly-stack-md">
-              <div className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5">
-                <p className="text-sm font-bold text-[var(--mindly-text-strong)]">
-                  {latestAnalysis.reference}
-                </p>
+            <div className="report-overview-body">
+              <div className="report-summary-card">
+                <div className="report-summary-top">
+                  <div>
+                    <p className="report-reference">{latestAnalysis.reference}</p>
 
-                <p className="mt-1 text-sm text-[var(--mindly-text-soft)]">
-                  Generee le {formatAnalysisDate(latestAnalysis.date)}
-                </p>
+                    <p className="report-date">Généré le {formatAnalysisDate(latestAnalysis.date)}</p>
+                  </div>
 
-                <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)]">
-                  {latestAnalysis.overview ||
-                    latestAnalysis.conclusion ||
-                    'Resume non disponible.'}
-                </p>
+                  <div className="report-wellbeing-pill">
+                    <span>{reportWellbeing.label}</span>
+                    {reportWellbeing.score !== null ? (
+                      <strong>{reportWellbeing.score.toFixed(1)}/10</strong>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="report-summary-grid">
+                  <div>
+                    <p className="report-mini-label">Vue d'ensemble</p>
+                    <p className="report-summary-text">
+                      {latestAnalysis.overview ||
+                        latestAnalysis.conclusion ||
+                        'Résumé non disponible.'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="report-mini-label">Indice d'équilibre</p>
+                    <p className="report-summary-text">{reportWellbeing.description}</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="report-action-row">
                 <Link
                   href={`/dashboard/student/analyses/${latestAnalysis.id}/pdf`}
-                  className="mindly-btn mindly-btn-secondary"
+                  className="report-action-secondary"
                 >
+                  <FileText className="h-4 w-4" />
                   Voir le rapport
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
 
                 <Link
                   href={`/dashboard/student/analyses/${latestAnalysis.id}/pdf`}
                   target="_blank"
-                  className="mindly-btn mindly-btn-primary"
+                  className="report-action-primary"
                 >
-                  Telecharger en PDF
+                  <Download className="h-4 w-4" />
+                  Télécharger en PDF
                 </Link>
               </div>
             </div>
           ) : (
             <p className="leading-7 text-[var(--mindly-text-soft)]">
-              Votre rapport apparaitra ici automatiquement apres la fin de votre entretien unique.
+              Votre rapport apparaîtra ici automatiquement après la fin de votre entretien unique.
             </p>
           )}
         </section>
@@ -106,11 +134,11 @@ export default async function StudentAnalysesPage() {
         <section className="mindly-card-soft p-6">
           <div>
             <h2 className="text-xl font-bold text-[var(--mindly-text-strong)]">
-              A propos de ce rapport
+              À propos de ce rapport
             </h2>
             <p className="mt-4 leading-7 text-[var(--mindly-text-soft)]">
-              Ce rapport est genere a partir de votre entretien unique. Il sert de synthese
-              personnelle et peut etre consulte a tout moment depuis cet espace.
+              Ce rapport est généré à partir de votre entretien unique. Il sert de synthèse
+              personnelle et peut être consulté à tout moment depuis cet espace.
             </p>
           </div>
         </section>

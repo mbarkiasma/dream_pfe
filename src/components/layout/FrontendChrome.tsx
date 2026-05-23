@@ -11,6 +11,7 @@ const chromeExcludedPrefixes = [
   '/auth',
   '/complete-profile',
   '/dashboard',
+  '/entretien',
   '/login',
   '/logout',
   '/next',
