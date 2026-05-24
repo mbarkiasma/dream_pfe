@@ -1,9 +1,9 @@
 ﻿'use client'
 
 import { ShieldCheck, Sparkles, Star, Users } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { AppBadge } from '@/components/ui/badge'
 import { TextAnimate } from '@/components/ui/text-animate'
-import { useLanguage } from '@/contexts/LanguageContext'
 
 type ContactHeroBlockProps = {
   brand?: string
@@ -27,8 +27,7 @@ export default function ContactHeroBlock({
   descriptionEn = 'A question, bug, or partnership request? Our team replies personally within 24h.',
   stats,
 }: ContactHeroBlockProps) {
-  const { lang } = useLanguage()
-  const isFr = lang === 'fr'
+  const isFr = useLocale() !== 'en'
 
   const iconMap = {
     sparkles: Sparkles,

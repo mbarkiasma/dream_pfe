@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import { useLocale } from 'next-intl'
 import { sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 
 type ActorId = 'student' | 'coach' | 'psychologist'
@@ -205,6 +206,44 @@ function Highlight({ children }: { children: ReactNode }) {
   return <span className="font-inherit text-[var(--mindly-text-strong)]">{children}</span>
 }
 
+const actorFeaturesEn: typeof actorFeatures = {
+  student: {
+    title: 'Student space',
+    subtitle: 'Everything students can do in MindBloom',
+    count: '8 features',
+    items: [
+      { number: 1, content: <>Take the <Highlight>Big Five</Highlight> interview</> },
+      { number: 2, content: <>Download the <Highlight>PDF analysis</Highlight></> },
+      { number: 3, content: <>Write and analyze <Highlight>dreams</Highlight></> },
+      { number: 4, content: <>Watch the <Highlight>AI video</Highlight> of a dream</> },
+      { number: 5, content: <>Chat with an <Highlight>AI coach</Highlight> or a human coach</> },
+      { number: 6, content: <>Book a <Highlight>psychologist appointment</Highlight></> },
+      { number: 7, content: <>Track <Highlight>weekly progress</Highlight></> },
+      { number: 8, content: <>Access a <Highlight>personal journal</Highlight></> },
+    ],
+  },
+  coach: {
+    title: 'Coach space',
+    subtitle: 'Everything coaches can do in MindBloom',
+    count: '4 features',
+    items: [
+      { number: 1, content: <>Follow <Highlight>students</Highlight></> },
+      { number: 2, content: <>Reply to <Highlight>secure messages</Highlight></> },
+      { number: 3, content: <>Schedule <Highlight>coaching sessions</Highlight></> },
+      { number: 4, content: <>Suggest <Highlight>personalized exercises</Highlight></> },
+    ],
+  },
+  psychologist: {
+    title: 'Psychologist space',
+    subtitle: 'Everything psychologists can do in MindBloom',
+    count: '2 features',
+    items: [
+      { number: 1, content: <>Accept <Highlight>appointments</Highlight></> },
+      { number: 2, content: <>Decline <Highlight>appointments</Highlight></> },
+    ],
+  },
+}
+
 function InfoBadge({
   children,
   variant = 'light',
@@ -227,8 +266,54 @@ function InfoBadge({
 }
 
 export function ActeursFonctionnalites() {
+  const isFr = useLocale() !== 'en'
   const [activeActor, setActiveActor] = useState<ActorId>('student')
-  const currentFeatures = actorFeatures[activeActor]
+  const currentFeatures = (isFr ? actorFeatures : actorFeaturesEn)[activeActor]
+  const copy = isFr
+    ? {
+        badge: 'Les acteurs de la plateforme',
+        headingPrefix: 'Qui utilise',
+        mainActor: "L'ACTEUR PRINCIPAL",
+        studentTitle: 'Etudiant',
+        studentSubtitle: 'Utilisateur central de la plateforme',
+        studentDescription:
+          "Accede a un espace complet de bien-etre mental : entretiens IA, journal de reves, coaching et suivi personnalise tout en un seul endroit securise.",
+        users: '12 400+ utilisateurs',
+        active: 'Actif',
+        coachPill: "L'ACCOMPAGNATEUR",
+        coachSubtitle: 'Suivi actif et bienveillant',
+        coachDescription:
+          "Suit les etudiants en difficulte, repond a leurs messages et propose des seances d'accompagnement personnalisees.",
+        coachBadge: 'Humain ou IA',
+        psychologistPill: "L'EXPERT CLINIQUE",
+        psychologistTitle: 'Psychologue',
+        psychologistSubtitle: 'Intervention et suivi clinique',
+        psychologistDescription:
+          'Recoit les etudiants en etat critique, gere les rendez-vous et accede aux analyses de personnalite partagees.',
+        psychologistBadge: 'Certifies',
+      }
+    : {
+        badge: 'Platform users',
+        headingPrefix: 'Who uses',
+        mainActor: 'MAIN USER',
+        studentTitle: 'Student',
+        studentSubtitle: 'Core user of the platform',
+        studentDescription:
+          'Access a complete mental well-being space: AI interviews, dream journal, coaching and personalized tracking in one secure place.',
+        users: '12,400+ users',
+        active: 'Active',
+        coachPill: 'SUPPORT GUIDE',
+        coachSubtitle: 'Active and caring follow-up',
+        coachDescription:
+          'Follows students in difficulty, replies to their messages and offers personalized support sessions.',
+        coachBadge: 'Human or AI',
+        psychologistPill: 'CLINICAL EXPERT',
+        psychologistTitle: 'Psychologist',
+        psychologistSubtitle: 'Clinical intervention and follow-up',
+        psychologistDescription:
+          'Receives students in critical situations, manages appointments and accesses shared personality analyses.',
+        psychologistBadge: 'Certified',
+      }
 
   return (
     <section className="relative overflow-hidden bg-transparent px-5 py-14 sm:px-8 lg:px-10">
@@ -238,11 +323,11 @@ export function ActeursFonctionnalites() {
         <div className="mb-10 text-left">
           <span className={sectionBadgeClass}>
             <span className={sectionBadgeDotClass} />
-            Les acteurs de la plateforme
+            {copy.badge}
           </span>
 
           <h2 className="mt-4 text-[34px] font-bold leading-[1.08] tracking-normal text-[var(--color-text-strong)] sm:text-[42px] lg:text-[48px]">
-            Qui utilise{' '}
+            {copy.headingPrefix}{' '}
             <span className="bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
               MindBloom
             </span>{' '}
@@ -271,34 +356,33 @@ export function ActeursFonctionnalites() {
               <span
                 className={getActorPillClass(activeActor === 'student')}
               >
-                L&apos;ACTEUR PRINCIPAL
+                {copy.mainActor}
               </span>
             </div>
 
             <h3 className={`relative ${getActorTitleClass(activeActor === 'student', 'text-[26px]')}`}>
-              Étudiant
+              {copy.studentTitle}
             </h3>
             <p
               className={`relative ${getActorSubtitleClass(activeActor === 'student')}`}
             >
-              Utilisateur central de la plateforme
+              {copy.studentSubtitle}
             </p>
 
             <p
               className={getActorDescriptionClass(activeActor === 'student', 'relative mt-5 max-w-[500px]')}
             >
-              Accède à un espace complet de bien-être mental : entretiens IA, journal de rêves,
-              coaching et suivi personnalisé tout en un seul endroit sécurisé.
+              {copy.studentDescription}
             </p>
 
             <div className="relative mt-6 flex flex-wrap items-center justify-between gap-3">
               <InfoBadge variant={activeActor === 'student' ? 'white' : 'light'}>
                 <Users className="h-3.5 w-3.5" />
-                12 400+ utilisateurs
+                {copy.users}
               </InfoBadge>
               <InfoBadge variant={activeActor === 'student' ? 'white' : 'light'}>
                 <Activity className="h-3.5 w-3.5" />
-                Actif
+                {copy.active}
               </InfoBadge>
             </div>
           </button>
@@ -317,7 +401,7 @@ export function ActeursFonctionnalites() {
               <span
                 className={getActorPillClass(activeActor === 'coach')}
               >
-                L&apos;ACCOMPAGNATEUR
+                {copy.coachPill}
               </span>
             </div>
 
@@ -325,18 +409,17 @@ export function ActeursFonctionnalites() {
             <p
               className={getActorSubtitleClass(activeActor === 'coach')}
             >
-              Suivi actif et bienveillant
+              {copy.coachSubtitle}
             </p>
 
             <p
               className={getActorDescriptionClass(activeActor === 'coach', 'mt-5')}
             >
-              Suit les étudiants en difficulté, répond à leurs messages et propose des séances
-              d&apos;accompagnement personnalisées.
+              {copy.coachDescription}
             </p>
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <InfoBadge variant={activeActor === 'coach' ? 'white' : 'light'}>Humain ou IA</InfoBadge>
+              <InfoBadge variant={activeActor === 'coach' ? 'white' : 'light'}>{copy.coachBadge}</InfoBadge>
             </div>
           </button>
 
@@ -354,26 +437,25 @@ export function ActeursFonctionnalites() {
               <span
                 className={getActorPillClass(activeActor === 'psychologist')}
               >
-                L&apos;EXPERT CLINIQUE
+                {copy.psychologistPill}
               </span>
             </div>
 
-            <h3 className={getActorTitleClass(activeActor === 'psychologist')}>Psychologue</h3>
+            <h3 className={getActorTitleClass(activeActor === 'psychologist')}>{copy.psychologistTitle}</h3>
             <p
               className={getActorSubtitleClass(activeActor === 'psychologist')}
             >
-              Intervention et suivi clinique
+              {copy.psychologistSubtitle}
             </p>
 
             <p
               className={getActorDescriptionClass(activeActor === 'psychologist', 'mt-5')}
             >
-              Reçoit les étudiants en état critique, gère les rendez-vous et accède aux analyses de
-              personnalité partagées.
+              {copy.psychologistDescription}
             </p>
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <InfoBadge variant={activeActor === 'psychologist' ? 'white' : 'light'}>Certifiés</InfoBadge>
+              <InfoBadge variant={activeActor === 'psychologist' ? 'white' : 'light'}>{copy.psychologistBadge}</InfoBadge>
             </div>
           </button>
         </div>

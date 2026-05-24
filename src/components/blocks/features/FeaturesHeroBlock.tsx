@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import {
   Building2,
   Heart,
@@ -9,7 +9,7 @@ import {
   MessageCircle,
   Mic,
 } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useLocale } from 'next-intl'
 import SplitText from '@/components/blocks/accompagnement/SplitText'
 import {
   appBadgeCtaSecondaryClass,
@@ -18,8 +18,7 @@ import {
 } from '@/components/ui/badge'
 
 export default function FeaturesHeroBlock() {
-  const { lang } = useLanguage()
-  const isFr = lang === 'fr'
+  const isFr = useLocale() !== 'en'
 
   const quickBadges = isFr
     ? [

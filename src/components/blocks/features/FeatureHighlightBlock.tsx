@@ -17,6 +17,7 @@ import {
   UserRoundCheck,
   Video,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 
 type FeatureCard = {
@@ -33,7 +34,7 @@ type FeatureCard = {
   }[]
 }
 
-const features: FeatureCard[] = [
+const featuresFr: FeatureCard[] = [
   {
     number: '01',
     title: 'Entretien Big Five',
@@ -132,6 +133,105 @@ const features: FeatureCard[] = [
   },
 ]
 
+const featuresEn: FeatureCard[] = [
+  {
+    number: '01',
+    title: 'Big Five interview',
+    tagline: 'Know yourself better with AI',
+    icon: <Brain className="h-5 w-5" />,
+    footer: 'AI - PDF',
+    subs: [
+      {
+        icon: <Bot className="h-4 w-4" />,
+        title: 'Adaptive AI interview',
+        description: 'A guided exchange that adjusts questions to your profile.',
+      },
+      {
+        icon: <FileText className="h-4 w-4" />,
+        title: 'Personality report',
+        description: 'A clear summary of your traits and needs.',
+      },
+      {
+        icon: <Download className="h-4 w-4" />,
+        title: 'PDF export',
+        description: 'A clean document ready to review or share.',
+      },
+    ],
+  },
+  {
+    number: '02',
+    title: 'Dream journal',
+    tagline: 'Explore your inner world each night',
+    icon: <Moon className="h-5 w-5" />,
+    footer: 'AI - Video',
+    subs: [
+      {
+        icon: <FileText className="h-4 w-4" />,
+        title: 'Write your dream',
+        description: 'Capture important details as soon as you wake up.',
+      },
+      {
+        icon: <Sparkles className="h-4 w-4" />,
+        title: 'Symbolic analysis',
+        description: 'Identify recurring emotions and symbols.',
+      },
+      {
+        icon: <Video className="h-4 w-4" />,
+        title: 'Illustrated video',
+        description: 'Turn your dream into an AI-generated visual story.',
+      },
+    ],
+  },
+  {
+    number: '03',
+    title: 'Chat with a coach',
+    tagline: 'Human or AI support when you need it',
+    icon: <MessageCircle className="h-5 w-5" />,
+    footer: 'Human - AI',
+    subs: [
+      {
+        icon: <Bot className="h-4 w-4" />,
+        title: 'Smart AI coach',
+        description: 'Quick answers to help you through difficult moments.',
+      },
+      {
+        icon: <UserRoundCheck className="h-4 w-4" />,
+        title: 'Certified human coach',
+        description: 'Kind support when you want to talk.',
+      },
+      {
+        icon: <Lock className="h-4 w-4" />,
+        title: '100% confidential',
+        description: 'Your exchanges remain protected and private.',
+      },
+    ],
+  },
+  {
+    number: '04',
+    title: 'Psychologist appointment',
+    tagline: 'Priority help when the situation becomes critical',
+    icon: <HeartPulse className="h-5 w-5" />,
+    footer: 'Priority',
+    subs: [
+      {
+        icon: <AlertTriangle className="h-4 w-4" />,
+        title: 'Crisis detection',
+        description: 'Warning signs are identified more clearly.',
+      },
+      {
+        icon: <CalendarCheck className="h-4 w-4" />,
+        title: 'Appointment booking',
+        description: 'Slots to get help quickly.',
+      },
+      {
+        icon: <HeartPulse className="h-4 w-4" />,
+        title: 'Post-consultation follow-up',
+        description: 'Continuity after the psychological appointment.',
+      },
+    ],
+  },
+]
+
 function IconBubble({ children, featured = false }: { children: ReactNode; featured?: boolean }) {
   return (
     <span
@@ -145,6 +245,8 @@ function IconBubble({ children, featured = false }: { children: ReactNode; featu
 }
 
 export default function FeatureHighlightBlock() {
+  const isFr = useLocale() !== 'en'
+  const features = isFr ? featuresFr : featuresEn
   const shouldReduceMotion = useReducedMotion()
   const smoothEase = [0.22, 1, 0.36, 1] as const
 
@@ -168,7 +270,7 @@ export default function FeatureHighlightBlock() {
             transition={{ duration: 0.45, ease: smoothEase }}
           >
             <span className={sectionBadgeDotClass} />
-            Espace Étudiant
+            {isFr ? 'Espace etudiant' : 'Student space'}
           </motion.span>
 
           <motion.h2
@@ -178,7 +280,7 @@ export default function FeatureHighlightBlock() {
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.65, delay: shouldReduceMotion ? 0 : 0.08, ease: smoothEase }}
           >
-            4 fonctionnalités pensées pour toi
+            {isFr ? '4 fonctionnalites pensees pour toi' : '4 features designed for you'}
           </motion.h2>
 
           <motion.p
@@ -188,7 +290,9 @@ export default function FeatureHighlightBlock() {
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.16, ease: smoothEase }}
           >
-            De l&apos;analyse de personnalité à la prise en charge urgente, MindBloom couvre chaque étape de ton bien-être.
+            {isFr
+              ? "De l'analyse de personnalite a la prise en charge urgente, MindBloom couvre chaque etape de ton bien-etre."
+              : 'From personality analysis to urgent support, MindBloom covers every step of your well-being.'}
           </motion.p>
         </div>
 

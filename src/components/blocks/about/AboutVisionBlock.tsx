@@ -2,16 +2,15 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { Building2, Target, UserRoundCheck } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { AppBadge, sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { useLanguage } from '@/contexts/LanguageContext'
 
 const descriptionTextClass =
   'text-[15px] font-normal leading-[1.7] tracking-normal text-[var(--mindly-purple-muted)]'
 
 export default function AboutVisionBlock() {
-  const { lang } = useLanguage()
-  const isFr = lang === 'fr'
+  const isFr = useLocale() !== 'en'
   const shouldReduceMotion = useReducedMotion()
   const smoothEase = [0.22, 1, 0.36, 1] as const
   const visionCardInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 28, scale: 0.96 }

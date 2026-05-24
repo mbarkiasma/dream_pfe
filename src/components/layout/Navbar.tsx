@@ -1,21 +1,22 @@
 ﻿'use client'
 
 import { useUser } from '@clerk/nextjs'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { Languages, Menu, Moon, Sun, X } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useLocale, useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 import { appBadgeCtaClass } from '@/components/ui/badge'
+import { Link, usePathname, useRouter, type Locale } from '@/i18n/routing'
 import { useTheme } from '@/providers/Theme'
 
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const locale = useLocale() as Locale
+  const t = useTranslations('navbar')
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [accountHref, setAccountHref] = useState('/auth/redirect')
   const { setTheme, theme } = useTheme()
-  const { lang, t, toggleLang } = useLanguage()
   const { isLoaded, isSignedIn } = useUser()
   const isDark = mounted && theme === 'dark'
 
@@ -56,10 +57,10 @@ export function Navbar() {
   }, [isLoaded, isSignedIn])
 
   const navLinks = [
-    { label: t.navbar.accueil, href: '/home' },
-    { label: t.navbar.fonctionnalites, href: '/fonctionnalites' },
-    { label: t.navbar.aPropos, href: '/a-propos' },
-    { label: t.navbar.contact, href: '/contact' },
+    { label: t('home'), href: '/home' },
+    { label: t('features'), href: '/fonctionnalites' },
+    { label: t('about'), href: '/a-propos' },
+    { label: t('contact'), href: '/contact' },
   ]
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
@@ -68,7 +69,11 @@ export function Navbar() {
     setTheme(isDark ? 'light' : 'dark')
   }
 
-  const accountLabel = isLoaded && isSignedIn ? 'Mon compte' : t.navbar.login
+  const switchLanguage = () => {
+    router.replace(pathname, { locale: locale === 'fr' ? 'en' : 'fr' })
+  }
+
+  const accountLabel = isLoaded && isSignedIn ? t('account') : t('login')
   const accountLink = isLoaded && isSignedIn ? accountHref : '/login'
 
   return (
@@ -79,7 +84,7 @@ export function Navbar() {
             MindBloom
           </span>
           <span className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-[var(--mindly-purple-muted)]">
-            {lang === 'fr' ? 'Bien-etre & IA' : 'Wellness & AI'}
+            {t('tagline')}
           </span>
         </Link>
 
@@ -119,27 +124,19 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={toggleLang}
+              onClick={switchLanguage}
               className="flex h-9 items-center gap-1 rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-3 text-xs font-bold text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
-              aria-label={lang === 'fr' ? 'Changer la langue' : 'Change language'}
-              title={t.navbar.switchLang}
+              aria-label={t('switchLanguage')}
+              title={t('switchLanguage')}
             >
               <Languages className="h-4 w-4" />
-              <span>{lang.toUpperCase()}</span>
+              <span>{locale.toUpperCase()}</span>
             </button>
             <button
               type="button"
               onClick={toggleTheme}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
-              aria-label={
-                lang === 'fr'
-                  ? !isDark
-                    ? 'Activer le mode sombre'
-                    : 'Activer le mode clair'
-                  : !isDark
-                    ? 'Enable dark mode'
-                    : 'Enable light mode'
-              }
+              aria-label={!isDark ? t('darkMode') : t('lightMode')}
             >
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -150,7 +147,7 @@ export function Navbar() {
           type="button"
           className="flex items-center justify-center rounded-xl border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] p-2 text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)] md:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label={lang === 'fr' ? 'Menu' : 'Menu'}
+          aria-label="Menu"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -180,12 +177,12 @@ export function Navbar() {
             <div className="mt-2 grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={toggleLang}
+                onClick={switchLanguage}
                 className="flex items-center justify-center gap-2 rounded-xl border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-4 py-3 text-sm font-bold text-[var(--mindly-primary)]"
-                aria-label={lang === 'fr' ? 'Changer la langue' : 'Change language'}
+                aria-label={t('switchLanguage')}
               >
                 <Languages className="h-4 w-4" />
-                <span>{lang.toUpperCase()}</span>
+                <span>{locale.toUpperCase()}</span>
               </button>
               <button
                 type="button"
@@ -195,12 +192,12 @@ export function Navbar() {
                 {isDark ? (
                   <>
                     <Sun className="h-4 w-4" />
-                    <span>{lang === 'fr' ? 'Clair' : 'Light'}</span>
+                    <span>{t('light')}</span>
                   </>
                 ) : (
                   <>
                     <Moon className="h-4 w-4" />
-                    <span>{lang === 'fr' ? 'Sombre' : 'Dark'}</span>
+                    <span>{t('dark')}</span>
                   </>
                 )}
               </button>

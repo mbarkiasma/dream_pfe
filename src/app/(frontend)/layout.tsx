@@ -5,11 +5,9 @@ import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import React from 'react'
 
-import { FrontendChrome } from '@/components/layout/FrontendChrome'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { draftMode } from 'next/headers'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -17,8 +15,6 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { ClerkProvider } from '@clerk/nextjs'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled } = await draftMode()
-
   return (
     <html
       className={cn(GeistSans.variable, GeistMono.variable)}
@@ -38,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           signUpForceRedirectUrl="/auth/redirect"
         >
           <Providers>
-            <FrontendChrome>{children}</FrontendChrome>
+            {children}
           </Providers>
         </ClerkProvider>
       </body>

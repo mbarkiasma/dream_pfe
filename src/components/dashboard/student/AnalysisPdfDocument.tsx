@@ -275,7 +275,7 @@ export function AnalysisPdfDocument({
           <View style={styles.content}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
-                <Text style={styles.kicker}>Rapport d'analyse</Text>
+                <Text style={styles.kicker}>Rapport d&apos;analyse</Text>
                 <Text style={styles.title}>{analyse.reference}</Text>
                 <Text style={styles.muted}>Généré le {date}</Text>
               </View>
@@ -300,9 +300,9 @@ export function AnalysisPdfDocument({
 
             <View style={styles.twoColumns}>
               <View style={[styles.card, styles.cardTall, styles.column]}>
-                <Text style={styles.sectionTitle}>Vue d'ensemble</Text>
+                <Text style={styles.sectionTitle}>Vue d&apos;ensemble</Text>
                 <Text style={styles.body}>
-                  {analyse.overview || "Aucune vue d'ensemble disponible."}
+                  {analyse.overview || 'Aucune vue d’ensemble disponible.'}
                 </Text>
               </View>
 
@@ -315,12 +315,12 @@ export function AnalysisPdfDocument({
             </View>
 
             <View style={styles.balanceCard} wrap={false}>
-              <Text style={[styles.miniTitle, { color: theme.accent }]}>Indice d'équilibre</Text>
+              <Text style={[styles.miniTitle, { color: theme.accent }]}>Indice d&apos;équilibre</Text>
               <Text style={styles.sectionTitle}>{formatWellbeingLabel(reportWellbeing.label)}</Text>
               <Text style={styles.body}>{formatWellbeingText(reportWellbeing.description)}</Text>
               {reportWellbeing.score !== null ? (
                 <Text style={[styles.strong, { marginTop: 10 }]}>
-                  Score d'équilibre : {reportWellbeing.score.toFixed(1)}/10
+                  Score d&apos;équilibre : {reportWellbeing.score.toFixed(1)}/10
                 </Text>
               ) : null}
             </View>

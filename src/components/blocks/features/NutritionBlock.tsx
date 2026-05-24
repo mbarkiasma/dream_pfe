@@ -9,10 +9,11 @@ import {
   UsersRound,
   Wind,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import RapportFAQFonctionnalites from './RapportFAQFonctionnalites'
 import { sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 
-const cards = [
+const cardsFr = [
   {
     title: 'Respiration guidée',
     description:
@@ -58,8 +59,53 @@ const cards = [
   },
 ]
 
+const cardsEn: typeof cardsFr = [
+  {
+    title: 'Guided breathing',
+    description: 'Start short exercises to calm down before an exam, a class or an appointment.',
+    tag: 'CALMING',
+    Icon: Wind,
+  },
+  {
+    title: 'Time management',
+    description:
+      'Organize your schedule, define priorities and avoid procrastination with intelligent tracking.',
+    tag: 'PRODUCTIVITY',
+    Icon: Clock3,
+  },
+  {
+    title: 'Social relationships',
+    description:
+      'Build healthy connections with classmates and family to strengthen your support network.',
+    tag: 'SOCIAL',
+    Icon: UsersRound,
+  },
+  {
+    title: 'Stress management',
+    description:
+      'Identify your stress sources, track your emotional state and see your progress through clear visualizations.',
+    tag: 'DAILY',
+    Icon: Heart,
+    featured: true,
+  },
+  {
+    title: 'Sleep & recovery',
+    description: 'Analyze your sleep quality and receive guidance to improve physical recovery.',
+    tag: 'AI ANALYSIS',
+    Icon: Moon,
+  },
+  {
+    title: 'Well-being goals',
+    description: 'Set simple, achievable goals and move forward gradually without unnecessary pressure.',
+    tag: 'PROGRESS',
+    Icon: Target,
+  },
+]
+
 export default function NutritionBlock() {
-  const [activeCard, setActiveCard] = useState('Gestion du stress')
+  const isFr = useLocale() !== 'en'
+  const cards = isFr ? cardsFr : cardsEn
+  const [activeCard, setActiveCard] = useState(3)
 
   return (
     <>
@@ -73,31 +119,39 @@ export default function NutritionBlock() {
           <div className="mb-10">
             <span className={sectionBadgeClass}>
               <span className={sectionBadgeDotClass} />
-              Bien-être global
+              {isFr ? 'Bien-etre global' : 'Global well-being'}
             </span>
 
             <h2 className="mt-4 text-[34px] font-bold leading-[1.08] tracking-normal text-[var(--mindly-text-dark)] sm:text-[42px] lg:text-[48px] xl:text-[52px]">
-              Corps et esprit, en équilibre
+              {isFr ? 'Corps et esprit, en equilibre' : 'Body and mind in balance'}
             </h2>
 
             <p className="mt-4 max-w-[720px] font-[family-name:var(--font-zain)] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]">
-              MindBloom prend soin de toutes les dimensions de ton bien-être :{' '}
-              <span className="font-normal text-[var(--mindly-purple-muted)]">gestion du stress</span>, sommeil
-              et objectifs bien-être.
+              {isFr ? (
+                <>
+                  MindBloom prend soin de toutes les dimensions de ton bien-etre :{' '}
+                  <span className="font-normal text-[var(--mindly-purple-muted)]">gestion du stress</span>, sommeil et objectifs bien-etre.
+                </>
+              ) : (
+                <>
+                  MindBloom supports every dimension of your well-being:{' '}
+                  <span className="font-normal text-[var(--mindly-purple-muted)]">stress management</span>, sleep and personal goals.
+                </>
+              )}
             </p>
           </div>
         </div>
 
         <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 lg:px-10 xl:grid-cols-6">
-          {cards.map(({ title, description, tag, Icon }) => {
-            const active = activeCard === title
+          {cards.map(({ title, description, tag, Icon }, index) => {
+            const active = activeCard === index
 
             return (
             <button
               key={title}
               type="button"
               aria-pressed={active}
-              onClick={() => setActiveCard(title)}
+              onClick={() => setActiveCard(index)}
               className={`flex min-h-[240px] flex-col rounded-[20px] p-5 text-left shadow-[0_14px_34px_rgba(137,94,248,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(137,94,248,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--mindly-primary-light)] ${
                 active
                   ? 'border border-transparent bg-[image:var(--mindly-gradient-primary)] text-white'

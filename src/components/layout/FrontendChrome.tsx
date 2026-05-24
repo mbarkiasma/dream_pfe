@@ -1,9 +1,8 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 
-import { LanguageProvider } from '@/contexts/LanguageContext'
+import { usePathname } from '@/i18n/routing'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 
@@ -24,7 +23,7 @@ export function FrontendChrome({ children }: { children: ReactNode }) {
   const showChrome = !chromeExcludedPrefixes.some((prefix) => pathname.startsWith(prefix))
 
   return (
-    <LanguageProvider>
+    <>
       {showChrome ? (
         <div className="mindly-public flex min-h-screen flex-col bg-background text-foreground">
           <Navbar />
@@ -34,6 +33,6 @@ export function FrontendChrome({ children }: { children: ReactNode }) {
       ) : (
         children
       )}
-    </LanguageProvider>
+    </>
   )
 }

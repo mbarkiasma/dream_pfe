@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Bug, CircleHelp, Eye, KeyRound, Lock, Mail, MailCheck, MessageSquare, User, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useLocale } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
 
 interface FormState {
@@ -341,8 +341,7 @@ function SuccessScreen({
 }
 
 export default function ContactFormBlock() {
-  const { t, lang } = useLanguage()
-  const isFr = lang === 'fr'
+  const isFr = useLocale() !== 'en'
   const [form, setForm] = useState<FormState>({ prenom: '', nom: '', email: '', subject: 'general', message: '' })
   const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
@@ -532,7 +531,7 @@ export default function ContactFormBlock() {
         fullWidth
         className={loading ? 'from-[var(--mindly-primary-light)] to-[var(--mindly-primary)] opacity-80' : ''}
       >
-        {loading ? t.contact.submitting : t.contact.submitButton}
+        {loading ? 'Envoi en cours…' : 'Envoyer le message'}
       </Button>
     </Card>
   )

@@ -2,14 +2,13 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { HandHeart, Lock, Scale, ShieldCheck } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useLocale } from 'next-intl'
 
 const descriptionTextClass =
   'text-[15px] font-normal leading-[1.7] tracking-normal text-[var(--mindly-purple-muted)]'
 
 export default function AboutEthicsBlock() {
-  const { lang } = useLanguage()
-  const isFr = lang === 'fr'
+  const isFr = useLocale() !== 'en'
   const shouldReduceMotion = useReducedMotion()
   const smoothEase = [0.22, 1, 0.36, 1] as const
   const sectionInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }

@@ -89,7 +89,7 @@ export default async function StudentAnalysesPage() {
 
                 <div className="report-summary-grid">
                   <div>
-                    <p className="report-mini-label">Vue d'ensemble</p>
+                    <p className="report-mini-label">Vue d&apos;ensemble</p>
                     <p className="report-summary-text">
                       {latestAnalysis.overview ||
                         latestAnalysis.conclusion ||
@@ -98,7 +98,7 @@ export default async function StudentAnalysesPage() {
                   </div>
 
                   <div>
-                    <p className="report-mini-label">Indice d'équilibre</p>
+                    <p className="report-mini-label">Indice d&apos;équilibre</p>
                     <p className="report-summary-text">{reportWellbeing.description}</p>
                   </div>
                 </div>

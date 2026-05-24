@@ -3,9 +3,9 @@
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { AppBadge, sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { useLanguage } from '@/contexts/LanguageContext'
 
 const fondatrices = [
   {
@@ -112,8 +112,12 @@ const leadTextClass =
   'text-[16px] font-normal leading-[1.75] tracking-normal text-[var(--mindly-purple-muted)]'
 
 export default function AboutTeamBlock() {
-  const { t, lang } = useLanguage()
-  const eq = t.equipe
+  const lang = useLocale()
+  const eq = {
+    specialistesBadge: 'NOTRE EQUIPE DE SPECIALISTES',
+    specialistesDesc:
+      'Chaque étudiant peut choisir le spécialiste le plus adapté à ses besoins pour un accompagnement personnalisé, humain et rassurant.',
+  }
   const familyBadgeClass = sectionBadgeClass
   const shouldReduceMotion = useReducedMotion()
 

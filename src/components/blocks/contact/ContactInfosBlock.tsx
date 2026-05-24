@@ -6,7 +6,7 @@ import { TEAM_AVATARS as DEFAULT_TEAM_AVATARS } from './contactData'
 import { AppBadge, appBadgeCtaCompactClass } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useLocale } from 'next-intl'
 
 function EmailCard({
   entry,
@@ -195,8 +195,7 @@ export default function ContactInfosBlock({
   faqItems,
 }: ContactInfosBlockProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const { lang } = useLanguage()
-  const isFr = lang === 'fr'
+  const isFr = useLocale() !== 'en'
   const TEAM_AVATARS = teamAvatars?.length
     ? teamAvatars.map((avatar) => avatar.initials || '').filter(Boolean)
     : DEFAULT_TEAM_AVATARS

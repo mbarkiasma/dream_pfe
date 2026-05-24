@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
-import { EntretienHeader } from '@/app/(frontend)/entretien/EntretienHeader'
-import { InterviewChat } from '@/app/(frontend)/dashboard/student/interview/InterviewChat'
+import { InterviewChat } from '@/app/(frontend)/[locale]/dashboard/student/interview/InterviewChat'
+import { EntretienHeader } from '@/app/(frontend)/[locale]/entretien/EntretienHeader'
 import { getDashboardPath, requiresInitialInterview } from '@/utilities/dashboardAuth'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 

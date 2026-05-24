@@ -1,5 +1,4 @@
 import { NotificationBell } from '@/components/dashboard/NotificationCloche'
-import { LanguageToggle } from '@/components/LanguageToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 type DashboardTopbarProps = {
@@ -23,7 +22,6 @@ export function DashboardTopbar({
         </div>
 
         <div className="mindly-dashboard-actions">
-          <LanguageToggle />
           <ThemeToggle />
           <NotificationBell />
         </div>

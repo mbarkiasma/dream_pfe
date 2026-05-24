@@ -1,0 +1,16 @@
+{
+  "navbar": {
+    "home": "Accueil",
+    "features": "Nos Services",
+    "about": "Qui sommes-nous ?",
+    "contact": "Contactez-nous",
+    "account": "Mon compte",
+    "login": "Se connecter",
+    "tagline": "Bien-etre & IA",
+    "switchLanguage": "Passer en anglais",
+    "darkMode": "Activer le mode sombre",
+    "lightMode": "Activer le mode clair",
+    "dark": "Sombre",
+    "light": "Clair"
+  }
+}

@@ -28,6 +28,7 @@ import { CoachingEvents } from './collections/CoachingEvents'
 import { CoachingRegistrations } from './collections/CoachingRegistrations'
 import { PsyOrientations } from './collections/PsyOrientation'
 import { StudentExercices } from './collections/StudentExercices'
+import localization from './i18n/localization'
 
 
 
@@ -185,6 +186,7 @@ export default buildConfig({
       },
     }),
   ],
+  localization,
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {

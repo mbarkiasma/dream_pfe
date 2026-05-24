@@ -1,0 +1,16 @@
+{
+  "navbar": {
+    "home": "Home",
+    "features": "Our Services",
+    "about": "Who are we?",
+    "contact": "Contact us",
+    "account": "My account",
+    "login": "Sign in",
+    "tagline": "Wellness & AI",
+    "switchLanguage": "Switch to French",
+    "darkMode": "Enable dark mode",
+    "lightMode": "Enable light mode",
+    "dark": "Dark",
+    "light": "Light"
+  }
+}

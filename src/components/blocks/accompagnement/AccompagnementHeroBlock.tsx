@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { BlurFade } from '@/components/ui/blur-fade'
 import { OrbitingCircles } from '@/components/ui/orbiting-circles'
 import {
@@ -10,7 +10,6 @@ import {
   sectionBadgeClass,
   sectionBadgeDotClass,
 } from '@/components/ui/badge'
-import { useLanguage } from '@/contexts/LanguageContext'
 import {
   BrainCircuit,
   Building2,
@@ -22,11 +21,25 @@ import {
   Sparkles,
   ClipboardList,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 const NODE_SIZE = 104
+const heroCopy = {
+  fr: {
+    badge: 'Solution de bien-être étudiant',
+    ctaMain: 'Découvrir mon espace ?',
+    ctaSecondary: 'Voir les fonctionnalités',
+  },
+  en: {
+    badge: 'Student wellness solution',
+    ctaMain: 'Discover my space ?',
+    ctaSecondary: 'View features',
+  },
+}
 
 export default function AccompagnementHeroBlock() {
-  const { lang, t } = useLanguage()
+  const lang = useLocale()
+  const copy = lang === 'en' ? heroCopy.en : heroCopy.fr
 
   const nodes = [
     {
@@ -107,7 +120,7 @@ export default function AccompagnementHeroBlock() {
         <div className="order-1 max-w-[760px]">
           <BlurFade delay={0.15} inView>
             <AppBadge dot dotClassName={sectionBadgeDotClass} className={sectionBadgeClass}>
-              {t.hero.badge}
+              {copy.badge}
             </AppBadge>
           </BlurFade>
 
@@ -199,12 +212,12 @@ export default function AccompagnementHeroBlock() {
             <div className="mt-7">
               <div className="flex flex-wrap gap-4">
                 <Link href="/login" className={`${appBadgeCtaClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
-                  {t.hero.ctaMain}
+                  {copy.ctaMain}
                 </Link>
 
                 <AppBadge asChild size="md" className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
                   <Link href="/fonctionnalites">
-                    {t.hero.ctaSecondary}
+                    {copy.ctaSecondary}
                   </Link>
                 </AppBadge>
               </div>

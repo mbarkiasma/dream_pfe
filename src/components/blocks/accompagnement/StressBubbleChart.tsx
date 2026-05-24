@@ -18,7 +18,7 @@ import {
   PiggyBank,
   Users,
 } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useLocale } from 'next-intl'
 
 const BOTTOM = 170
 
@@ -443,8 +443,7 @@ function StressReportList() {
 }
 
 export function StressAccompagnement() {
-  const { lang } = useLanguage()
-  const isFr = lang === 'fr'
+  const isFr = useLocale() !== 'en'
 
   return (
     <section className="relative overflow-hidden bg-[var(--mindly-bg)] px-5 py-14 sm:px-8 lg:px-10">

@@ -7,7 +7,6 @@ import {
   BrainCircuit,
   CheckCircle2,
   HeartHandshake,
-  Languages,
   Loader2,
   Mail,
   MailCheck,
@@ -16,7 +15,6 @@ import {
   Sparkles,
   Sun,
 } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
 import { useTheme } from '@/providers/Theme'
 import { useEffect, useState } from 'react'
 
@@ -150,8 +148,7 @@ export function LoginClient({
   const { signIn, fetchStatus } = useSignIn()
   const { signUp } = useSignUp()
   const { setTheme, theme } = useTheme()
-  const { lang, toggleLang } = useLanguage()
-  const copy = loginCopy[lang]
+  const copy = loginCopy.fr
   const [email, setEmail] = useState('')
   const [successEmail, setSuccessEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -330,26 +327,9 @@ export function LoginClient({
       <div className="login-theme-switch">
         <button
           type="button"
-          onClick={toggleLang}
-          className="login-action-button"
-          aria-label={lang === 'fr' ? 'Changer la langue' : 'Change language'}
-        >
-          <Languages />
-          <span>{lang.toUpperCase()}</span>
-        </button>
-        <button
-          type="button"
           onClick={toggleTheme}
           className="login-action-button login-action-icon"
-          aria-label={
-            lang === 'fr'
-              ? !isDark
-                ? 'Activer le mode sombre'
-                : 'Activer le mode clair'
-              : !isDark
-                ? 'Enable dark mode'
-                : 'Enable light mode'
-          }
+          aria-label={!isDark ? 'Activer le mode sombre' : 'Activer le mode clair'}
         >
           {isDark ? <Sun /> : <Moon />}
         </button>

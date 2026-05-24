@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { motion } from 'motion/react'
 import { BarChart2, Mail, UserRound } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
-import { AppBadge, appBadgeCtaClass, sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
+import { useLocale } from 'next-intl'
+import { appBadgeCtaClass, sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -21,11 +21,64 @@ const staggerContainer = {
 }
 
 const stepIcons = [UserRound, Mail, BarChart2]
+const processusCopy = {
+  fr: {
+    badge: 'simple & rapide',
+    description: 'Trois étapes suffisent pour accéder à votre espace personnalisé.',
+    cta: 'Commencer maintenant',
+    steps: [
+      {
+        id: '01',
+        title: 'Choisissez votre profil',
+        description:
+          'Etudiant, psychologue ou coach - selectionnez votre role pour acceder a votre espace personnalise.',
+      },
+      {
+        id: '02',
+        title: 'Accedez via magic link',
+        description:
+          'Entrez votre email et recevez un lien securise valable 10 minutes. Aucun mot de passe requis.',
+      },
+      {
+        id: '03',
+        title: 'Suivez votre evolution',
+        description:
+          'Consultez vos progres et recevez des conseils adaptes pour avancer chaque semaine.',
+      },
+    ],
+  },
+  en: {
+    badge: 'simple & fast',
+    description: 'Three steps are enough to access your personalized space.',
+    cta: 'Get started now',
+    steps: [
+      {
+        id: '01',
+        title: 'Choose your profile',
+        description:
+          'Student, psychologist or coach - select your role to access your personalized space.',
+      },
+      {
+        id: '02',
+        title: 'Access via magic link',
+        description:
+          'Enter your email and receive a secure link valid for 10 minutes. No password required.',
+      },
+      {
+        id: '03',
+        title: 'Track your progress',
+        description:
+          'Review your progress and receive tailored advice to move forward each week.',
+      },
+    ],
+  },
+}
 
 export default function AccompagnementProcessBlock() {
-  const { t, lang } = useLanguage()
-  const isFr = lang === 'fr'
-  const steps = t.processus.steps
+  const lang = useLocale()
+  const isFr = lang !== 'en'
+  const copy = isFr ? processusCopy.fr : processusCopy.en
+  const steps = copy.steps
 
   return (
     <section className="relative overflow-hidden bg-transparent px-5 py-14 sm:px-8 lg:px-10">
@@ -41,7 +94,7 @@ export default function AccompagnementProcessBlock() {
             className={`mb-7 ${sectionBadgeClass}`}
           >
             <span className={sectionBadgeDotClass} />
-            {t.processus.badge}
+            {copy.badge}
           </motion.div>
 
           <motion.h2
@@ -64,7 +117,7 @@ export default function AccompagnementProcessBlock() {
           </motion.h2>
 
           <p className="mx-auto mt-4 max-w-[720px] font-[family-name:var(--font-zain)] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]">
-            {t.processus.description}
+            {copy.description}
           </p>
         </div>
 
@@ -119,7 +172,7 @@ export default function AccompagnementProcessBlock() {
 
         <div className="mt-12 text-center">
           <Link href="/login" className={appBadgeCtaClass}>
-            <span className="relative z-10">{t.processus.cta} ?</span>
+            <span className="relative z-10">{copy.cta} ?</span>
           </Link>
 
           <p className="mt-4 text-[14px] font-normal text-[var(--mindly-purple-muted)]">

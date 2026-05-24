@@ -76,33 +76,52 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'N8N_CHAT_URL manquante.' }, { status: 500 })
       }
 
-      const n8nResponse = await fetch(n8nChatUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          assistantName: 'MindBloom',
-          chatInput: userText,
-          sessionId: sessionId || `session-${req.user.id}`,
-          interviewLanguage: interviewLanguage === 'en' ? 'en' : 'fr',
-          interviewerGender: interviewerGender === 'male' ? 'male' : 'female',
-          studentMessageCount:
-            typeof studentMessageCount === 'number' ? studentMessageCount : undefined,
-          conversationHistory: Array.isArray(conversationHistory)
-            ? conversationHistory
-                .map((message: any) => ({
-                  role: message?.role === 'ai' ? 'ai' : 'user',
-                  content: String(message?.content || message?.message || '').trim(),
-                }))
-                .filter((message: { content: string }) => message.content)
-            : [],
-          supportsInteractiveQuestions: supportsInteractiveQuestions === true,
-          interactiveQuestionMode:
-            interactiveQuestionMode === 'occasional' ? 'occasional' : 'text',
-          hasAskedRequiredInteractive: hasAskedRequiredInteractive === true,
-        }),
-      })
+      let n8nResponse: Response
+
+      try {
+        n8nResponse = await fetch(n8nChatUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            assistantName: 'MindBloom',
+            chatInput: userText,
+            sessionId: sessionId || `session-${req.user.id}`,
+            interviewLanguage: interviewLanguage === 'en' ? 'en' : 'fr',
+            interviewerGender: interviewerGender === 'male' ? 'male' : 'female',
+            studentMessageCount:
+              typeof studentMessageCount === 'number' ? studentMessageCount : undefined,
+            conversationHistory: Array.isArray(conversationHistory)
+              ? conversationHistory
+                  .map((message: any) => ({
+                    role: message?.role === 'ai' ? 'ai' : 'user',
+                    content: String(message?.content || message?.message || '').trim(),
+                  }))
+                  .filter((message: { content: string }) => message.content)
+              : [],
+            supportsInteractiveQuestions: supportsInteractiveQuestions === true,
+            interactiveQuestionMode:
+              interactiveQuestionMode === 'occasional' ? 'occasional' : 'text',
+            hasAskedRequiredInteractive: hasAskedRequiredInteractive === true,
+          }),
+        })
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Impossible de contacter le workflow d'entretien."
+
+        console.error('Erreur appel n8n chat:', message)
+
+        return Response.json(
+          {
+            error:
+              "Impossible de contacter le workflow n8n. Vérifiez que n8n est démarré et que N8N_CHAT_URL est correct.",
+          },
+          { status: 502 },
+        )
+      }
 
       if (!n8nResponse.ok) {
         return Response.json({ error: `Erreur n8n (${n8nResponse.status}).` }, { status: 502 })

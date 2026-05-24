@@ -12,9 +12,10 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 
-const reportTraits = [
+const reportTraitsFr = [
   {
     label: 'Ouverture',
     description: 'Curiosite intellectuelle, creativite et gout pour la nouveaute.',
@@ -52,7 +53,45 @@ const reportTraits = [
   },
 ]
 
-const faqItems = [
+const reportTraitsEn: typeof reportTraitsFr = [
+  {
+    label: 'Openness',
+    description: 'Intellectual curiosity, creativity and appetite for novelty.',
+    level: 'Very high',
+    score: 82,
+    Icon: Brain,
+  },
+  {
+    label: 'Conscientiousness',
+    description: 'Organization, discipline and reliability in action.',
+    level: 'High',
+    score: 74,
+    Icon: ClipboardCheck,
+  },
+  {
+    label: 'Extraversion',
+    description: 'Sociability, energy and ease in interactions.',
+    level: 'Moderate',
+    score: 61,
+    Icon: Sparkles,
+  },
+  {
+    label: 'Agreeableness',
+    description: 'Altruism, cooperation and trust toward others.',
+    level: 'High',
+    score: 78,
+    Icon: Heart,
+  },
+  {
+    label: 'Neuroticism',
+    description: 'Tendency to experience negative emotions and stress.',
+    level: 'Stable',
+    score: 43,
+    Icon: Zap,
+  },
+]
+
+const faqItemsFr = [
   {
     question: "Comment se deroule l'entretien intelligent ?",
     answer:
@@ -80,7 +119,38 @@ const faqItems = [
   },
 ]
 
+const faqItemsEn: typeof faqItemsFr = [
+  {
+    question: 'How does the intelligent interview work?',
+    answer:
+      'The student answers guided questions, then MindBloom summarizes useful signals to suggest adapted support.',
+  },
+  {
+    question: 'What is the Big Five analysis for?',
+    answer:
+      'It helps better understand dominant traits, emotional needs and motivation levers for each student.',
+  },
+  {
+    question: 'How does dream analysis work?',
+    answer:
+      'MindBloom turns dream notes into a clear summary, then identifies recurring emotions and themes.',
+  },
+  {
+    question: 'Is the data confidential?',
+    answer:
+      'Yes. Exchanges, reports and personal information remain private and protected by the platform security protocols.',
+  },
+  {
+    question: 'When does a coach or psychologist step in?',
+    answer:
+      'A specialist can take over when the student asks for human support or when a priority need is detected.',
+  },
+]
+
 export default function RapportFAQFonctionnalites() {
+  const isFr = useLocale() !== 'en'
+  const reportTraits = isFr ? reportTraitsFr : reportTraitsEn
+  const faqItems = isFr ? faqItemsFr : faqItemsEn
   const [openIndex, setOpenIndex] = useState(0)
   const shouldReduceMotion = useReducedMotion()
 
@@ -113,11 +183,11 @@ export default function RapportFAQFonctionnalites() {
           <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
             <span className={`${sectionBadgeClass} min-w-0 px-4 py-2 text-[11px]`}>
               <span className={sectionBadgeDotClass} />
-              Exemple de rapport
+              {isFr ? 'Exemple de rapport' : 'Sample report'}
             </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-[var(--mindly-lavender-700)] bg-[var(--mindly-lavender-150)] px-4 py-2 text-[12px] font-bold text-[var(--mindly-primary-muted)]">
               <Brain className="h-3.5 w-3.5" />
-              Profil Big Five
+              {isFr ? 'Profil Big Five' : 'Big Five profile'}
             </span>
           </div>
 
@@ -201,10 +271,12 @@ export default function RapportFAQFonctionnalites() {
             </span>
 
             <h2 className="mt-6 max-w-[360px] text-[34px] font-bold leading-[1.05] tracking-[-0.025em] text-[var(--mindly-text-strong)] sm:text-[40px]">
-              Questions sur les fonctionnalites
+              {isFr ? 'Questions sur les fonctionnalites' : 'Questions about features'}
             </h2>
             <p className="mt-4 text-[15px] font-normal leading-[1.7] text-[var(--mindly-purple-muted)]">
-              Comprendre comment MindBloom accompagne les etudiants.
+              {isFr
+                ? 'Comprendre comment MindBloom accompagne les etudiants.'
+                : 'Understand how MindBloom supports students.'}
             </p>
           </div>
 
@@ -266,8 +338,9 @@ export default function RapportFAQFonctionnalites() {
                 <Lock className="h-4 w-4" />
               </span>
               <p className="text-[14px] font-normal leading-[1.65] text-[var(--mindly-purple-muted)]">
-                Chaque fonctionnalite a ete pensee pour aider l&apos;etudiant a mieux comprendre son etat
-                emotionnel et demander de l&apos;aide au bon moment.
+                {isFr
+                  ? "Chaque fonctionnalite a ete pensee pour aider l'etudiant a mieux comprendre son etat emotionnel et demander de l'aide au bon moment."
+                  : 'Each feature is designed to help students better understand their emotional state and ask for help at the right moment.'}
               </p>
               <ShieldQuestion className="ml-auto hidden h-5 w-5 shrink-0 text-[var(--mindly-primary)] sm:block" />
             </div>
