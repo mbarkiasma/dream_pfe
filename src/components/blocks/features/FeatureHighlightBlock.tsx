@@ -270,7 +270,7 @@ export default function FeatureHighlightBlock() {
             transition={{ duration: 0.45, ease: smoothEase }}
           >
             <span className={sectionBadgeDotClass} />
-            {isFr ? 'Espace etudiant' : 'Student space'}
+            {isFr ? 'Espace étudiant' : 'Student space'}
           </motion.span>
 
           <motion.h2
@@ -280,7 +280,7 @@ export default function FeatureHighlightBlock() {
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.65, delay: shouldReduceMotion ? 0 : 0.08, ease: smoothEase }}
           >
-            {isFr ? '4 fonctionnalites pensees pour toi' : '4 features designed for you'}
+            {isFr ? '4 fonctionnalités pensées pour toi' : '4 features designed for you'}
           </motion.h2>
 
           <motion.p
@@ -291,7 +291,7 @@ export default function FeatureHighlightBlock() {
             transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.16, ease: smoothEase }}
           >
             {isFr
-              ? "De l'analyse de personnalite a la prise en charge urgente, MindBloom couvre chaque etape de ton bien-etre."
+              ? "De l'analyse de personnalité à la prise en charge urgente, MindBloom couvre chaque étape de ton bien-être."
               : 'From personality analysis to urgent support, MindBloom covers every step of your well-being.'}
           </motion.p>
         </div>

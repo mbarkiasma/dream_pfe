@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/routing'
 import { motion } from 'motion/react'
 import { BarChart2, Mail, UserRound } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { appBadgeCtaClass, sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 
 const fadeUp = {
@@ -21,64 +21,18 @@ const staggerContainer = {
 }
 
 const stepIcons = [UserRound, Mail, BarChart2]
-const processusCopy = {
-  fr: {
-    badge: 'simple & rapide',
-    description: 'Trois étapes suffisent pour accéder à votre espace personnalisé.',
-    cta: 'Commencer maintenant',
-    steps: [
-      {
-        id: '01',
-        title: 'Choisissez votre profil',
-        description:
-          'Etudiant, psychologue ou coach - selectionnez votre role pour acceder a votre espace personnalise.',
-      },
-      {
-        id: '02',
-        title: 'Accedez via magic link',
-        description:
-          'Entrez votre email et recevez un lien securise valable 10 minutes. Aucun mot de passe requis.',
-      },
-      {
-        id: '03',
-        title: 'Suivez votre evolution',
-        description:
-          'Consultez vos progres et recevez des conseils adaptes pour avancer chaque semaine.',
-      },
-    ],
-  },
-  en: {
-    badge: 'simple & fast',
-    description: 'Three steps are enough to access your personalized space.',
-    cta: 'Get started now',
-    steps: [
-      {
-        id: '01',
-        title: 'Choose your profile',
-        description:
-          'Student, psychologist or coach - select your role to access your personalized space.',
-      },
-      {
-        id: '02',
-        title: 'Access via magic link',
-        description:
-          'Enter your email and receive a secure link valid for 10 minutes. No password required.',
-      },
-      {
-        id: '03',
-        title: 'Track your progress',
-        description:
-          'Review your progress and receive tailored advice to move forward each week.',
-      },
-    ],
-  },
-}
 
 export default function AccompagnementProcessBlock() {
-  const lang = useLocale()
-  const isFr = lang !== 'en'
-  const copy = isFr ? processusCopy.fr : processusCopy.en
-  const steps = copy.steps
+  const t = useTranslations('homePage.hero')
+  const badge = t('process.badge')
+  const description = t('process.description')
+  const cta = t('process.cta')
+  const title = t('process.title')
+  const stepLabel = t('process.stepLabel')
+  const freeText = t('process.free')
+  const noPassword = t('process.noPassword')
+  const fastText = t('process.fast')
+  const steps = t.raw('process.steps') as Array<{ id: string; title: string; description: string }>
 
   return (
     <section className="relative overflow-hidden bg-transparent px-5 py-14 sm:px-8 lg:px-10">
@@ -94,7 +48,7 @@ export default function AccompagnementProcessBlock() {
             className={`mb-7 ${sectionBadgeClass}`}
           >
             <span className={sectionBadgeDotClass} />
-            {copy.badge}
+            {badge}
           </motion.div>
 
           <motion.h2
@@ -105,19 +59,11 @@ export default function AccompagnementProcessBlock() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             viewport={{ once: true }}
           >
-            {isFr ? (
-              <>
-                Comment ça marche ?
-              </>
-            ) : (
-              <>
-                How does it work ?
-              </>
-            )}
+            {title}
           </motion.h2>
 
           <p className="mx-auto mt-4 max-w-[720px] font-[family-name:var(--font-zain)] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]">
-            {copy.description}
+            {description}
           </p>
         </div>
 
@@ -154,7 +100,7 @@ export default function AccompagnementProcessBlock() {
                   </motion.div>
 
                   <span className="inline-flex rounded-full border border-[var(--mindly-primary)]/45 bg-[var(--mindly-bg-strong)] px-4 py-1.5 text-[12px] font-normal uppercase tracking-[0.12em] text-[var(--mindly-primary)] transition-all duration-300 group-hover:border-transparent group-hover:bg-[linear-gradient(90deg,#895ef8,#a987ff)] group-hover:text-white">
-                    {isFr ? 'Étape' : 'Step'} {step.id}
+                    {stepLabel} {step.id}
                   </span>
 
                   <h3 className="mt-5 text-[17px] font-normal leading-[1.35] text-[var(--mindly-text-strong)]">
@@ -172,20 +118,20 @@ export default function AccompagnementProcessBlock() {
 
         <div className="mt-12 text-center">
           <Link href="/login" className={appBadgeCtaClass}>
-            <span className="relative z-10">{copy.cta} ?</span>
+            <span className="relative z-10">{cta} ?</span>
           </Link>
 
           <p className="mt-4 text-[14px] font-normal text-[var(--mindly-purple-muted)]">
             <span className="bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text font-bold text-transparent">
-              {isFr ? 'Gratuit' : 'Free'}
+              {freeText}
             </span>
             <span className="mx-2 text-[var(--mindly-lavender-800)]">·</span>
             <span className="bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text font-bold text-transparent">
-              {isFr ? 'Sans mot de passe' : 'No password'}
+              {noPassword}
             </span>
             <span className="mx-2 text-[var(--mindly-lavender-800)]">·</span>
             <span className="bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text font-bold text-transparent">
-              {isFr ? "En moins d'une minute" : 'In under a minute'}
+              {fastText}
             </span>
           </p>
         </div>

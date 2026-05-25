@@ -119,18 +119,18 @@ export default function NutritionBlock() {
           <div className="mb-10">
             <span className={sectionBadgeClass}>
               <span className={sectionBadgeDotClass} />
-              {isFr ? 'Bien-etre global' : 'Global well-being'}
+              {isFr ? 'Bien-être global' : 'Global well-being'}
             </span>
 
             <h2 className="mt-4 text-[34px] font-bold leading-[1.08] tracking-normal text-[var(--mindly-text-dark)] sm:text-[42px] lg:text-[48px] xl:text-[52px]">
-              {isFr ? 'Corps et esprit, en equilibre' : 'Body and mind in balance'}
+              {isFr ? 'Corps et esprit, en équilibre' : 'Body and mind in balance'}
             </h2>
 
             <p className="mt-4 max-w-[720px] font-[family-name:var(--font-zain)] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]">
               {isFr ? (
                 <>
-                  MindBloom prend soin de toutes les dimensions de ton bien-etre :{' '}
-                  <span className="font-normal text-[var(--mindly-purple-muted)]">gestion du stress</span>, sommeil et objectifs bien-etre.
+                  MindBloom prend soin de toutes les dimensions de ton bien-être :{' '}
+                  <span className="font-normal text-[var(--mindly-purple-muted)]">gestion du stress</span>, sommeil et objectifs bien-être.
                 </>
               ) : (
                 <>

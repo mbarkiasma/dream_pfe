@@ -9,7 +9,7 @@ import {
   Handshake,
   HeartPulse,
 } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 
 const BOTTOM = 170
@@ -31,7 +31,7 @@ const statsFr = [
     bg: 'bg-[var(--mindly-bg-strong)]',
     text: (
       <>
-        des etudiants ressentent un <strong>stress eleve</strong> pendant les examens
+        des étudiants ressentent un <strong>stress élevé</strong> pendant les examens
       </>
     ),
   },
@@ -42,7 +42,7 @@ const statsFr = [
     bg: 'bg-[var(--mindly-bg-strong)]',
     text: (
       <>
-        presentent des signes d&apos;<strong>anxiete chronique</strong> non pris en charge
+        présentent des signes d'<strong>anxiété chronique</strong> non pris en charge
       </>
     ),
   },
@@ -66,7 +66,7 @@ const statsFr = [
     bg: 'bg-[var(--mindly-bg-pale)]',
     text: (
       <>
-        n&apos;ont <strong>jamais consulte</strong> un psychologue a l&apos;universite
+        n'ont <strong>jamais consulté</strong> un psychologue à l'université
       </>
     ),
   },
@@ -132,57 +132,57 @@ const sourcesFr = [
     short: 'Examens',
     label: 'Examens',
     pct: 95,
-    level: 'Tres eleve',
-    desc: 'Surcharge, deadlines accumulees, manque de sommeil et pression de performance en periode de revisions.',
+    level: 'Très élevé',
+    desc: 'Surcharge, deadlines accumulées, manque de sommeil et pression de performance en période de révisions.',
   },
   {
     short: 'Sommeil',
     label: 'Sommeil',
     pct: 80,
-    level: 'Eleve',
-    desc: 'Insomnies, reves anxieux, recuperation faible et rythme deregle affectant la concentration.',
+    level: 'Élevé',
+    desc: 'Insomnies, rêves anxieux, récupération faible et rythme déréglé affectant la concentration.',
   },
   {
     short: 'Isolement',
     label: 'Isolement',
     pct: 75,
-    level: 'Eleve',
-    desc: "Eloignement familial, solitude dans un nouveau cadre de vie et difficultes d'adaptation.",
+    level: 'Élevé',
+    desc: "Éloignement familial, solitude dans un nouveau cadre de vie et difficultés d'adaptation.",
   },
   {
     short: 'Relations',
     label: 'Relations sociales',
     pct: 75,
-    level: 'Eleve',
-    desc: 'Comparaison, conflits de groupe, pression familiale et attentes sociales difficiles a satisfaire.',
+    level: 'Élevé',
+    desc: 'Comparaison, conflits de groupe, pression familiale et attentes sociales difficiles à satisfaire.',
   },
   {
     short: 'Finances',
     label: 'Finances',
     pct: 70,
-    level: 'Eleve',
-    desc: "Logement, alimentation, frais d'etudes et gestion d'un premier budget autonome.",
+    level: 'Élevé',
+    desc: "Logement, alimentation, frais d'études et gestion d'un premier budget autonome.",
   },
   {
     short: 'Orientation',
     label: 'Orientation',
     pct: 55,
-    level: 'Modere',
-    desc: "Doutes sur le choix de filiere, peur de l'echec et manque de vision sur l'avenir professionnel.",
+    level: 'Modéré',
+    desc: "Doutes sur le choix de filière, peur de l'échec et manque de vision sur l'avenir professionnel.",
   },
   {
     short: 'Avenir pro.',
     label: 'Avenir professionnel',
     pct: 55,
-    level: 'Modere',
-    desc: "Incertitude sur le marche de l'emploi, manque de reseau et peur de ne pas trouver sa place.",
+    level: 'Modéré',
+    desc: "Incertitude sur le marché de l'emploi, manque de réseau et peur de ne pas trouver sa place.",
   },
   {
-    short: 'Sante mentale',
-    label: 'Sante mentale',
+    short: 'Santé mentale',
+    label: 'Santé mentale',
     pct: 35,
-    level: 'Sous-estime',
-    desc: 'Signaux faibles rarement exprimes, souvent reperes trop tard. Le tabou reste un frein majeur.',
+    level: 'Sous-estimé',
+    desc: 'Signaux faibles rarement exprimés, souvent repérés trop tard. Le tabou reste un frein majeur.',
   },
 ]
 
@@ -248,10 +248,10 @@ const sourcesEn: typeof sourcesFr = [
 const gridValues = [100, 75, 50, 25, 0]
 
 const legendItemsFr = [
-  { label: 'Tres eleve (95%)', alpha: 1.0 },
-  { label: 'Eleve (70-80%)', alpha: 0.72 },
-  { label: 'Modere (55%)', alpha: 0.46 },
-  { label: 'Sous-estime (35%)', alpha: 0.26 },
+  { label: 'Très élevé (95%)', alpha: 1.0 },
+  { label: 'Élevé (70-80%)', alpha: 0.72 },
+  { label: 'Modéré (55%)', alpha: 0.46 },
+  { label: 'Sous-estimé (35%)', alpha: 0.26 },
 ]
 
 const legendItemsEn: typeof legendItemsFr = [
@@ -447,12 +447,12 @@ function StatCard({ stat }: { stat: (typeof statsFr)[number] }) {
   )
 }
 
-function Header({ isFr }: { isFr: boolean }) {
+function Header({ label }: { label: string }) {
   return (
     <div className={`mx-auto mb-6 flex ${CHART_FRAME_CLASS} flex-wrap items-center gap-3`}>
       <div className={sectionBadgeClass}>
         <span className={sectionBadgeDotClass} />
-        {isFr ? '8 sources de stress etudiant' : '8 main sources of student stress'}
+        {label}
       </div>
     </div>
   )
@@ -617,13 +617,15 @@ function DetailBox({
 }
 
 function StressBarChart({
-  isFr,
   legendItems,
   sources,
+  sectionBadge,
+  emptyLabel,
 }: {
-  isFr: boolean
   legendItems: typeof legendItemsFr
   sources: StressSource[]
+  sectionBadge: string
+  emptyLabel: string
 }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, amount: 0.3 })
@@ -631,14 +633,10 @@ function StressBarChart({
 
   return (
     <div>
-      <Header isFr={isFr} />
+      <Header label={sectionBadge} />
 
       <DetailBox
-        emptyLabel={
-          isFr
-            ? 'Survolez une barre pour afficher les details de chaque source de stress.'
-            : 'Hover over a bar to display details for each source of stress.'
-        }
+        emptyLabel={emptyLabel}
         source={active !== null ? sources[active] ?? null : null}
       />
 
@@ -659,13 +657,15 @@ function StressBarChart({
 }
 
 function StressReportList({
-  isFr,
   legendItems,
   sources,
+  sectionBadge,
+  emptyLabel,
 }: {
-  isFr: boolean
   legendItems: typeof legendItemsFr
   sources: StressSource[]
+  sectionBadge: string
+  emptyLabel: string
 }) {
   return (
     <motion.div
@@ -676,14 +676,24 @@ function StressReportList({
       className="w-full"
     >
       <div className="mx-auto w-full">
-        <StressBarChart isFr={isFr} legendItems={legendItems} sources={sources} />
+        <StressBarChart
+          legendItems={legendItems}
+          sources={sources}
+          sectionBadge={sectionBadge}
+          emptyLabel={emptyLabel}
+        />
       </div>
     </motion.div>
   )
 }
 
 export default function AccompagnementStressBlock() {
+  const t = useTranslations('homePage.hero')
   const isFr = useLocale() !== 'en'
+  const sectionBadge = t('stress.sectionBadge')
+  const title = t('stress.title')
+  const description = t('stress.description')
+  const emptyLabel = t('stress.emptyLabel')
   const legendItems = isFr ? legendItemsFr : legendItemsEn
   const sources = isFr ? sourcesFr : sourcesEn
   const stats = isFr ? statsFr : statsEn
@@ -703,7 +713,7 @@ export default function AccompagnementStressBlock() {
               className={`mb-7 ${sectionBadgeClass}`}
             >
               <span className={sectionBadgeDotClass} />
-              {isFr ? 'Contexte & enjeux' : 'Context & challenges'}
+              {sectionBadge}
             </motion.div>
 
             <motion.h2
@@ -714,15 +724,7 @@ export default function AccompagnementStressBlock() {
               transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
             >
-              {isFr ? (
-                <>Une generation sous pression</>
-              ) : (
-                <>
-                  University life: a challenge
-                  <br />
-                  for <em>student well-being</em>
-                </>
-              )}
+              {title}
             </motion.h2>
 
             <motion.p
@@ -732,19 +734,7 @@ export default function AccompagnementStressBlock() {
               transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
             >
-              {isFr ? (
-                <>
-                  Les etudiants font face a des <strong>pressions croissantes</strong> qui
-                  impactent leurs resultats. Un accompagnement adapte et une analyse de
-                  personnalite changent tout, pour l&apos;etudiant comme pour l&apos;universite.
-                </>
-              ) : (
-                <>
-                  Students face <strong>increasing pressure</strong> that affects their results.
-                  Tailored support and personality analysis change everything, for students and
-                  universities alike.
-                </>
-              )}
+              {description}
             </motion.p>
           </div>
 
@@ -764,7 +754,12 @@ export default function AccompagnementStressBlock() {
         </motion.div>
 
         <div className="mx-auto w-full">
-          <StressReportList isFr={isFr} legendItems={legendItems} sources={sources} />
+          <StressReportList
+            legendItems={legendItems}
+            sources={sources}
+            sectionBadge={sectionBadge}
+            emptyLabel={emptyLabel}
+          />
         </div>
       </div>
     </section>

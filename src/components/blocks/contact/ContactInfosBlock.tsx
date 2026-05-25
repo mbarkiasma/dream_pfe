@@ -6,7 +6,7 @@ import { TEAM_AVATARS as DEFAULT_TEAM_AVATARS } from './contactData'
 import { AppBadge, appBadgeCtaCompactClass } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 function EmailCard({
   entry,
@@ -184,58 +184,61 @@ type ContactInfosBlockProps = {
 }
 
 export default function ContactInfosBlock({
-  emailsTitleFr = 'Adresses email',
-  emailsTitleEn = 'Email addresses',
+  emailsTitleFr,
+  emailsTitleEn,
   emails,
-  teamTextFr = 'Notre equipe lit chaque message personnellement',
-  teamTextEn = 'Our team reads each message personally',
+  teamTextFr,
+  teamTextEn,
   teamAvatars,
-  faqTitleFr = 'FAQ rapide',
-  faqTitleEn = 'Quick FAQ',
+  faqTitleFr,
+  faqTitleEn,
   faqItems,
 }: ContactInfosBlockProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const isFr = useLocale() !== 'en'
+  const locale = useLocale()
+  const isFr = locale === 'fr'
+  const t = useTranslations('contactPage.infos')
   const TEAM_AVATARS = teamAvatars?.length
     ? teamAvatars.map((avatar) => avatar.initials || '').filter(Boolean)
     : DEFAULT_TEAM_AVATARS
 
-  const EMAILS = isFr
-    ? [
-        { icon: 'mail', tag: 'Email direct', address: 'adminpfe0@gmail.com', desc: 'Reponse sous 24h ouvrables' },
-      ]
-    : [
-        { icon: 'mail', tag: 'Direct email', address: 'adminpfe0@gmail.com', desc: 'Reply within 24 business hours' },
-      ]
+  const defaultEmails = t.raw('emails') as {
+    icon: string
+    tag: string
+    address: string
+    desc: string
+  }[]
 
-  const FAQ_ITEMS = isFr
-    ? [
-        { q: 'Comment puis-je contacter MindBloom ?', a: 'Via le formulaire, par email ou par telephone. Nous repondons rapidement.' },
-        { q: 'Mes donnees sont-elles securisees ?', a: 'Oui, vos donnees sont chiffrees de bout en bout et jamais revendues.' },
-        { q: 'Probleme technique : que faire ?', a: 'Ecrivez a adminpfe0@gmail.com et nous vous repondrons rapidement.' },
-        { q: 'Comment contacter un coach ou psy ?', a: "La plateforme vous oriente automatiquement vers l'accompagnement adapte." },
-        { q: 'Delai de reponse moyen ?', a: 'Nous repondons en general sous 24h ouvrables.' },
-      ]
-    : [
-        { q: 'How can I contact MindBloom?', a: 'Via the form, email, or phone. We reply quickly.' },
-        { q: 'Is my data secure?', a: 'Yes, your data is end-to-end encrypted and never resold.' },
-        { q: 'Technical issue: what should I do?', a: 'Write to adminpfe0@gmail.com and we will reply quickly.' },
-        { q: 'How can I contact a coach or psychologist?', a: 'The platform automatically routes you to the right support.' },
-        { q: 'Average response time?', a: 'We usually reply within 24 business hours.' },
-      ]
+  const EMAILS = emails?.length
+    ? emails.map((email) => ({
+        icon: email.icon || 'mail',
+        tag: locale === 'fr' ? email.tagFr || '' : email.tagEn || '',
+        address: email.address || '',
+        desc: locale === 'fr' ? email.descFr || '' : email.descEn || '',
+      }))
+    : defaultEmails
+
+  const defaultFaqItems = t.raw('faqItems') as { q: string; a: string }[]
+
+  const FAQ_ITEMS = faqItems?.length
+    ? faqItems.map((item) => ({
+        q: locale === 'fr' ? item.qFr || '' : item.qEn || '',
+        a: locale === 'fr' ? item.aFr || '' : item.aEn || '',
+      }))
+    : defaultFaqItems
 
   return (
     <div>
       <Card variant="surface" radius="lg" padding="md" style={{ marginBottom: 16 }}>
         <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--mindly-purple-muted)', marginBottom: 16 }}>
-          {isFr ? emailsTitleFr : emailsTitleEn}
+          {isFr ? emailsTitleFr || t('emailsTitle') : emailsTitleEn || t('emailsTitle')}
         </p>
         {EMAILS.map((e, i) => (
           <EmailCard
             key={i}
             entry={e}
-            copyLabel={isFr ? 'Copier' : 'Copy'}
-            copiedLabel={isFr ? 'Copié !' : 'Copied !'}
+            copyLabel={t('copy')}
+            copiedLabel={t('copied')}
           />
         ))}
       </Card>
@@ -252,7 +255,7 @@ export default function ContactInfosBlock({
         }}
       >
         <p style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.6, marginBottom: 14 }}>
-          {isFr ? teamTextFr : teamTextEn}
+          {isFr ? teamTextFr || t('teamText') : teamTextEn || t('teamText')}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
           {TEAM_AVATARS.map((initials, i) => (
@@ -307,14 +310,14 @@ export default function ContactInfosBlock({
           dot
           dotClassName="bg-[var(--mindly-success)]"
         >
-          {isFr ? 'En ligne maintenant' : 'Online now'}
+          {t('online')}
         </AppBadge>
       </Card>
 
       <Card variant="surface" radius="lg" padding="md">
         <div style={{ marginBottom: 14 }}>
           <AppBadge variant="outline" size="sm" className="border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-soft)] text-[var(--mindly-purple-muted)] tracking-[0.14em]">
-            {isFr ? faqTitleFr : faqTitleEn}
+            {isFr ? faqTitleFr || t('faqTitle') : faqTitleEn || t('faqTitle')}
           </AppBadge>
         </div>
         {FAQ_ITEMS.map((item, i) => (

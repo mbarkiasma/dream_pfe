@@ -11,14 +11,14 @@ export function Footer() {
     ? {
         tagline: 'Bien-etre & IA',
         description:
-          "Plateforme de bien-etre mental propulsee par l'intelligence artificielle. Analyse Big Five, journal de reves, suivi quotidien et accompagnement personnalise.",
+          "Plateforme de bien-être mental propulsée par l'intelligence artificielle. Analyse Big Five, journal de rêves, suivi quotidien et accompagnement personnalisé.",
         privacy: 'Donnees chiffrees - Confidentialite garantie',
         navTitle: 'Navigation',
         resourcesTitle: 'Ressources',
         legalTitle: 'Legal',
         rights: 'Tous droits reserves',
         madeWith: 'Fait avec',
-        madeFor: 'pour le bien-etre mental - Tunis, Tunisie',
+        madeFor: 'pour le bien-être mental - Tunis, Tunisie',
       }
     : {
         tagline: 'Wellness & AI',
@@ -36,7 +36,7 @@ export function Footer() {
   const nav = isFr
     ? [
         { label: 'Accueil', href: '/' },
-        { label: 'Fonctionnalites', href: '/fonctionnalites' },
+        { label: 'Fonctionnalités', href: '/fonctionnalites' },
         { label: 'A propos', href: '/a-propos' },
         { label: 'Contact', href: '/contact' },
       ]
@@ -49,8 +49,8 @@ export function Footer() {
 
   const ressources = isFr
     ? [
-        { label: 'Modele Big Five', href: '/fonctionnalites' },
-        { label: 'Journal de reves', href: '/fonctionnalites' },
+        { label: 'Modèle Big Five', href: '/fonctionnalites' },
+        { label: 'Journal de rêves', href: '/fonctionnalites' },
         { label: 'Suivi quotidien', href: '/fonctionnalites' },
         { label: 'Entretien IA', href: '/login' },
       ]

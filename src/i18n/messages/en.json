@@ -12,5 +12,295 @@
     "lightMode": "Enable light mode",
     "dark": "Dark",
     "light": "Light"
+  },
+  "contactPage": {
+    "hero": {
+      "title": "contact our team",
+      "description": "A question, bug, or partnership request? Our team replies personally within 24h.",
+      "stats": [
+        { "icon": "sparkles", "value": "<24h", "label": "Response time" },
+        { "icon": "shieldCheck", "value": "100%", "label": "End-to-end encryption" },
+        { "icon": "star", "value": "4.9", "label": "Customer satisfaction" },
+        { "icon": "users", "value": "12 400+", "label": "Students helped" }
+      ]
+    },
+    "form": {
+      "progress": "Form progress",
+      "required": "Required field",
+      "invalidEmail": "Invalid email address",
+      "shortMessage": "Message too short (min. 10 characters)",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "yourFirstName": "Your first name",
+      "yourLastName": "Your last name",
+      "emailLabel": "Email",
+      "emailHint": "We will reply to this address",
+      "emailPlaceholder": "your@email.com",
+      "subject": "Subject",
+      "message": "Message",
+      "messagePlaceholder": "Describe your request with as much detail as possible…",
+      "privacy": "Your message is confidential. Your data is only used to reply and is never shared with third parties.",
+      "submitError": "Unable to send the message. Please try again.",
+      "successTitle": "Message sent!",
+      "successLine1": "Thanks! Our team will reply to",
+      "successLine2": "within 24 business hours.",
+      "confirm": "Confirmation",
+      "read": "Read",
+      "reply": "Reply",
+      "confirmDesc": "Confirmation email sent",
+      "readDesc": "Message personally reviewed",
+      "replyDesc": "Within 24 business hours",
+      "newMessage": "New message",
+      "sending": "Sending…",
+      "sendMessage": "Send message",
+      "subjects": [
+        { "val": "general", "icon": "circle-help", "name": "General question", "desc": "Information, features" },
+        { "val": "bug", "icon": "bug", "name": "Technical bug", "desc": "Error, malfunction" },
+        { "val": "partner", "icon": "building-2", "name": "Partnership", "desc": "University, institution" },
+        { "val": "access", "icon": "key-round", "name": "Access issue", "desc": "Login, locked account" }
+      ]
+    },
+    "infos": {
+      "emailsTitle": "Email addresses",
+      "teamText": "Our team reads each message personally",
+      "faqTitle": "Quick FAQ",
+      "copy": "Copy",
+      "copied": "Copied !",
+      "online": "Online now",
+      "emails": [
+        { "icon": "mail", "tag": "Direct email", "address": "adminpfe0@gmail.com", "desc": "Reply within 24 business hours" }
+      ],
+      "faqItems": [
+        { "q": "How can I contact MindBloom?", "a": "Via the form, email, or phone. We reply quickly." },
+        { "q": "Is my data secure?", "a": "Yes, your data is end-to-end encrypted and never resold." },
+        { "q": "Technical issue: what should I do?", "a": "Write to adminpfe0@gmail.com and we will reply quickly." },
+        { "q": "How can I contact a coach or psychologist?", "a": "The platform automatically routes you to the right support." },
+        { "q": "Average response time?", "a": "We usually reply within 24 business hours." }
+      ]
+    }
+  },
+  "homePage": {
+    "hero": {
+      "badge": "Student well-being solution",
+      "ctaMain": "Discover my space?",
+      "ctaSecondary": "See features",
+      "titlePrefixLine1": ", a listening space",
+      "titlePrefixLine2": "for students",
+      "subtitle": "Intelligent support with AI.",
+      "intro": "An innovative platform dedicated to student well-being, connecting students with certified professionals while leveraging AI to provide personalized support.",
+      "quickBadges": [
+        { "icon": "building2", "label": "ESSTHS · Sousse" },
+        { "icon": "heart", "label": "100% free" },
+        { "icon": "sparkles", "label": "AI integrated" }
+      ],
+      "nodes": [
+        { "icon": "mic", "title": "Consultation", "subtitle": "Voice analysis", "badge": "Active" },
+        { "icon": "clipboard", "title": "Personality analysis", "subtitle": "Psych profile" },
+        { "icon": "heart", "title": "Global well-being", "subtitle": "This week", "badge": "87%" },
+        { "icon": "play", "title": "Dream video", "subtitle": "AI summary", "badge": "NEW" },
+        { "icon": "handshake", "title": "Coaching", "subtitle": "real-smart" },
+        { "icon": "moon", "title": "Dream analysis", "subtitle": "4 tries" }
+      ],
+      "process": {
+        "badge": "simple & fast",
+        "title": "How does it work?",
+        "description": "Three steps are enough to access your personalized space.",
+        "cta": "Get started now",
+        "stepLabel": "Step",
+        "free": "Free",
+        "noPassword": "No password",
+        "fast": "In under a minute",
+        "steps": [
+          {
+            "id": "01",
+            "title": "Choose your profile",
+            "description": "Student, psychologist or coach - select your role to access your personalized space."
+          },
+          {
+            "id": "02",
+            "title": "Access via magic link",
+            "description": "Enter your email and receive a secure link valid for 10 minutes. No password required."
+          },
+          {
+            "id": "03",
+            "title": "Track your progress",
+            "description": "Review your progress and receive tailored advice to move forward each week."
+          }
+        ]
+      },
+      "stress": {
+        "sectionBadge": "8 main sources of student stress",
+        "title": "University life: a challenge for student well-being",
+        "description": "Students face increasing pressure that affects their results. Tailored support and personality analysis change everything, for students and universities alike.",
+        "emptyLabel": "Hover over a bar to display details for each source of stress."
+      }
+    }
+  },
+  "featuresPage": {
+    "hero": {
+      "sectionBadge": "Student well-being solution",
+      "titleLine1A": "MindBloom",
+      "titleLine1B": ", the platform that",
+      "titleLine2": "turns listening",
+      "titleLine3": "into support",
+      "subtitle": "A support platform built for students",
+      "paragraph": "Because success starts with feeling well. Our platform supports you every day: a safe space to speak freely, understand your emotions, and move forward with the human and AI support you need.",
+      "contactButton": "Contact us",
+      "aboutButton": "About us",
+      "videoAria": "Illustrated video of the April 28 dream",
+      "dreamLabel": "Dream Apr 28",
+      "journalTitle": "Dream journal",
+      "journalDesc": "AI-generated illustrated video · Summary of your night",
+      "videoBadge": "AI video",
+      "quickBadges": [
+        { "icon": "building2", "label": "ESSTHS · Sousse" },
+        { "icon": "heart", "label": "100% free" },
+        { "icon": "sparkles", "label": "AI integrated" }
+      ],
+      "cards": [
+        { "title": "ESSTHS · Sousse", "desc": "100% encrypted, never shared. Your privacy first.", "badge": "Private" },
+        { "title": "100% free", "desc": "Human or AI, always available.", "badge": "For students" },
+        { "title": "AI integrated", "desc": "A guided conversation to better understand your emotional state.", "badge": "Voice analysis" }
+      ]
+    }
+  },
+  "aboutPage": {
+    "hero": {
+      "cards": [
+        {
+          "href": "#fondatrices-encadrante",
+          "title": "Founders & supervisor",
+          "description": "Meet the project founders and our academic supervisor."
+        },
+        {
+          "href": "#equipe-specialistes",
+          "title": "Our specialist team",
+          "description": "Meet our experts dedicated to student well-being."
+        },
+        {
+          "href": "#valeurs",
+          "title": "A strong ethics at MindBloom's core",
+          "description": "Our principles, commitments, and responsibility."
+        },
+        {
+          "href": "#vision-2028",
+          "title": "Vision 2028",
+          "description": "Our roadmap for lasting, measurable impact."
+        }
+      ],
+      "goToSection": "Go to section"
+    },
+    "ethics": {
+      "title": "A strong ethics at the core of",
+      "values": [
+        { "icon": "lock", "title": "Privacy", "description": "All your personal data, conversations and reports stay strictly private. No sharing with third parties, ever.", "quote": "\"Your privacy is a fundamental right.\"" },
+        { "icon": "shieldCheck", "title": "Security", "description": "The platform is protected by advanced protocols: magic link, encryption and secure authentication.", "quote": "\"Your security is our top priority.\"" },
+        { "icon": "handHeart", "title": "Kindness", "description": "Every feature is designed with empathy and respect for students, in a friendly, judgment-free space.", "quote": "\"People first, always.\"" },
+        { "icon": "scale", "title": "Responsibility", "description": "We deliver reliable information validated by certified professionals, in a serious framework.", "quote": "\"Serious care, real results.\"" }
+      ]
+    },
+    "vision": {
+      "title": "Our vision for 2028",
+      "description": "A roadmap for lasting impact and stronger support for students across Tunisia.",
+      "steps": [
+        {
+          "annee": "2024",
+          "titre": "Pilot launch",
+          "description": "Initial deployment with pilot students and quantitative feedback."
+        },
+        {
+          "annee": "2026",
+          "titre": "Scaling up",
+          "description": "Expand the service to multiple campuses and improve support pathways."
+        },
+        {
+          "annee": "2028",
+          "titre": "Sustainable support",
+          "description": "A stable ecosystem to support students over the long term."
+        }
+      ],
+      "objectives": [
+        {
+          "icon": "building2",
+          "titre": "Stronger team",
+          "description": "Recruit experts in coaching, psychology and technology for full support."
+        },
+        {
+          "icon": "target",
+          "titre": "Measurable impact",
+          "description": "Track student well-being with concrete metrics and continuous improvement."
+        },
+        {
+          "icon": "userRoundCheck",
+          "titre": "Accessible support",
+          "description": "Provide simple, safe and tailored support for every student, wherever they are."
+        }
+      ]
+    },
+    "team": {
+      "teamBadge": "OUR SPECIALIST TEAM",
+      "foundersTitlePrimary": "Project",
+      "foundersTitleHighlight": "founders",
+      "founderLabel": "Founder",
+      "specialtyLabel": "Specialty",
+      "supervisorBadge": "ACADEMIC SUPERVISION",
+      "supervisorRoleLabel": "Supervisor",
+      "supervisorTitle": "Associate professor",
+      "supervisorDescription": "MindBloom project supervisor - methodological guidance and scientific validation of the solution.",
+      "specialistSectionBadge": "OUR SPECIALIST TEAM",
+      "specialistsTitlePrimary": "Our team",
+      "specialistsTitleHighlight": "of specialists",
+      "specialistsDescription": "Each student can choose the specialist best suited to their needs for personalized, human, reassuring support.",
+      "founders": [
+        {
+          "role": "Computer science student",
+          "description": "Co-developer of the solution and co-creator of the MindBloom concept.",
+          "specialty": "AI and web development"
+        },
+        {
+          "role": "Computer science student",
+          "description": "Co-developer of the solution and co-creator of the MindBloom concept.",
+          "specialty": "AI and web development"
+        }
+      ],
+      "specialists": [
+        {
+          "title": "Educational support coach",
+          "description": "Supports students in organizing their studies, managing stress, and improving their academic journey.",
+          "specialties": ["Organization", "Stress", "Academic path"],
+          "note": "4.9"
+        },
+        {
+          "title": "Personal development coach",
+          "description": "Supports students with motivation, self-confidence, and orientation choices.",
+          "specialties": ["Motivation", "Confidence", "Orientation"],
+          "note": "4.8"
+        },
+        {
+          "title": "Academic success coach",
+          "description": "Helps improve productivity, time management, and learning methods.",
+          "specialties": ["Productivity", "Methods", "Time management"],
+          "note": "5"
+        },
+        {
+          "title": "Emotional regulation coach",
+          "description": "Supports students in emotional regulation, interpersonal communication, and preventing emotional overload.",
+          "specialties": ["Emotions", "Communication", "Overload"],
+          "note": "4.9"
+        },
+        {
+          "title": "Compassionate communication coach",
+          "description": "Guides students in public speaking, non-violent communication, and conflict management in university settings.",
+          "specialties": ["NVC", "Public speaking", "Conflicts"],
+          "note": "4.7"
+        },
+        {
+          "title": "University clinical psychologist",
+          "description": "Provides professional psychological support for anxiety disorders, student distress, and vulnerability situations.",
+          "specialties": ["Anxiety", "Psychology", "Well-being"],
+          "note": "5"
+        }
+      ]
+    }
   }
 }

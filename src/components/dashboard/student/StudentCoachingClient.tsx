@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bot,
+  CalendarDays,
   Check,
   MessageCircle,
   Mic,
   Pencil,
   Plus,
   Send,
+  Sparkles,
   Square,
   Trash2,
   UserRound,
@@ -74,6 +76,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   const [selectedChoicesByMessage, setSelectedChoicesByMessage] = useState<
     Record<string, string[]>
   >({})
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -82,8 +85,26 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     () => sessions.find((session) => String(session.id) === String(selectedSessionId)) ?? null,
     [selectedSessionId, sessions],
   )
+
   const selectedCoachName = getCoachName(selectedSession)
   const messageCount = messages.length
+
+  const startButtonLabel =
+    mode === 'smart' ? 'Démarrer avec le Smart coach IA' : 'Planifier avec un coach humain'
+
+  const emptyChatTitle = selectedSessionId
+    ? 'Commencez votre échange'
+    : 'Choisissez un accompagnement'
+
+  const emptyChatDescription = selectedSessionId
+    ? 'Écrivez votre besoin actuel ou sélectionnez une suggestion pour lancer la discussion.'
+    : 'Sélectionnez un type d’accompagnement à gauche, puis démarrez une session.'
+
+  const suggestedPrompts = [
+    'Je me sens stressé avant mes examens.',
+    'Aide-moi à organiser ma semaine.',
+    'Je manque de motivation ces derniers jours.',
+  ]
 
   useEffect(() => {
     if (!selectedSessionId) {
@@ -191,13 +212,13 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           setSelectedCoachId(null)
         }
 
-        throw new Error(data.error || 'Impossible de creer la session.')
+        throw new Error(data.error || 'Impossible de créer la session.')
       }
 
       setSessions((current) => [data.session, ...current])
       setSelectedSessionId(data.session.id)
       setMessages([])
-      setStatusMessage('Session creee avec succes.')
+      setStatusMessage('Session créée avec succès.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
     } finally {
@@ -228,7 +249,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Message non envoye.')
+        throw new Error(data.error || 'Message non envoyé.')
       }
 
       setMessages((current) => [
@@ -298,7 +319,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       )
       setEditingSessionId(null)
       setEditingTitle('')
-      setStatusMessage('Session renommee.')
+      setStatusMessage('Session renommée.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
     } finally {
@@ -332,7 +353,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         setMessages([])
       }
 
-      setStatusMessage('Session supprimee.')
+      setStatusMessage('Session supprimée.')
       setSessionToDelete(null)
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
@@ -368,7 +389,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       setMessages(data.messages ?? [])
       setEditingMessageId(null)
       setEditingMessageContent('')
-      setStatusMessage('Message modifie et reponse regeneree.')
+      setStatusMessage('Message modifié et réponse régénérée.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
     } finally {
@@ -422,7 +443,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           }
 
           setMessage((current) => `${current}${current ? ' ' : ''}${data.text || ''}`.trim())
-          setStatusMessage(data.text ? 'Texte transcrit.' : 'Aucun texte detecte.')
+          setStatusMessage(data.text ? 'Texte transcrit.' : 'Aucun texte détecté.')
         } catch (error) {
           setStatusMessage(error instanceof Error ? error.message : 'Erreur micro.')
         } finally {
@@ -435,7 +456,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       setIsRecording(true)
       setStatusMessage('Enregistrement en cours...')
     } catch {
-      setStatusMessage("Impossible d'acceder au microphone.")
+      setStatusMessage("Impossible d'accéder au microphone.")
     }
   }
 
@@ -465,29 +486,25 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     }
   }
 
-  const suggestedPrompts = [
-    'Je me sens stresse avant mes examens.',
-    'Aide-moi a organiser ma semaine.',
-    'Je manque de motivation ces derniers jours.',
-  ]
-
   return (
     <div className="student-coaching-layout">
       <section className="student-coaching-sidebar">
-        <div className="student-coaching-panel">
+        <div className="student-coaching-panel student-coaching-start-panel">
           <div className="student-coaching-header-row">
             <div className="student-coaching-icon">
-              <Plus />
+              <Sparkles />
             </div>
+
             <div className="student-flex-content">
               <div className="student-coaching-title-row">
-                <h2 className="student-section-title">Nouvel accompagnement</h2>
+                <h2 className="student-section-title">Démarrer</h2>
                 <span className="mindly-ui-badge">
-                  {mode === 'smart' ? 'Instantane' : 'Humain'}
+                  {mode === 'smart' ? 'Instantané' : 'Humain'}
                 </span>
               </div>
+
               <p className="student-coaching-copy">
-                Lancez une session adaptee a votre besoin du moment.
+                Choisissez le type d’accompagnement adapté à votre besoin.
               </p>
             </div>
           </div>
@@ -496,7 +513,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             <button
               type="button"
               onClick={() => setMode('smart')}
-              className={`student-choice-card ${
+              className={`student-choice-card student-mode-card ${
                 mode === 'smart' ? 'student-choice-card-active' : ''
               }`}
             >
@@ -508,15 +525,19 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 >
                   <Bot />
                 </div>
+
                 <span className="student-flex-content">
-                  <span className="block text-sm font-semibold">Smart coach IA</span>
+                  <span className="student-choice-title">Smart coach IA</span>
                   <span className="student-choice-description">
-                    Disponible maintenant, avec voix et reponses courtes.
+                    Disponible maintenant, avec voix et réponses courtes.
                   </span>
-                  <span className="mindly-ui-badge mt-2">
-                    Stress, motivation, organisation
+                  <span className="student-choice-tags">
+                    <span>Stress</span>
+                    <span>Motivation</span>
+                    <span>Organisation</span>
                   </span>
                 </span>
+
                 {mode === 'smart' ? <span className="mindly-ui-badge">Choisi</span> : null}
               </div>
             </button>
@@ -524,7 +545,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             <button
               type="button"
               onClick={() => setMode('classic')}
-              className={`student-choice-card ${
+              className={`student-choice-card student-mode-card ${
                 mode === 'classic' ? 'student-choice-card-active' : ''
               }`}
             >
@@ -536,13 +557,18 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 >
                   <UserRound />
                 </div>
+
                 <span className="student-flex-content">
-                  <span className="block text-sm font-semibold">Coaching classique</span>
+                  <span className="student-choice-title">Coaching classique</span>
                   <span className="student-choice-description">
                     Une session suivie par un coach humain.
                   </span>
-                  <span className="mindly-ui-badge mt-2">Suivi personnalise</span>
+                  <span className="student-choice-tags">
+                    <span>Suivi personnalisé</span>
+                    <span>Échange humain</span>
+                  </span>
                 </span>
+
                 {mode === 'classic' ? <span className="mindly-ui-badge">Choisi</span> : null}
               </div>
             </button>
@@ -554,9 +580,10 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 <div>
                   <h3 className="student-subsection-title">Coachs disponibles</h3>
                   <p className="student-choice-description">
-                    Choisissez un coach humain disponible pour commencer la session.
+                    Choisissez un coach humain pour commencer la session.
                   </p>
                 </div>
+
                 {isLoadingCoaches ? <span className="mindly-ui-badge">Chargement</span> : null}
               </div>
 
@@ -567,8 +594,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
                 {!isLoadingCoaches && availableCoaches.length === 0 ? (
                   <div className="mindly-empty">
-                    Aucun coach n&apos;est disponible actuellement. Le Smart coach IA reste disponible
-                    pour continuer l&apos;accompagnement sans attente.
+                    Aucun coach n&apos;est disponible actuellement. Le Smart coach IA reste
+                    disponible pour continuer l&apos;accompagnement sans attente.
+
                     <button
                       type="button"
                       onClick={() => {
@@ -597,9 +625,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       <span className="student-choice-icon">
                         <UserRound />
                       </span>
+
                       <span className="student-flex-content">
                         <span className="block truncate text-sm font-semibold">{coach.name}</span>
                         <span className="mindly-ui-badge mt-1">{coach.specialty}</span>
+
                         {coach.bio ? (
                           <span className="student-choice-description-clamped">{coach.bio}</span>
                         ) : null}
@@ -620,29 +650,35 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             className="mindly-btn mindly-btn-primary student-primary-action"
           >
             <Plus className="h-4 w-4" />
-            Demarrer
+            {startButtonLabel}
           </Button>
         </div>
 
         <div className="student-coaching-panel-compact">
           <div className="student-between-row-inset">
-            <h2 className="student-section-title">Mes sessions</h2>
+            <div>
+              <h2 className="student-section-title">Mes sessions</h2>
+              <p className="student-coaching-copy">Retrouvez vos accompagnements récents.</p>
+            </div>
+
             <span className="mindly-ui-badge">{sessions.length}</span>
           </div>
+
           <div className="student-list-stack">
             {sessions.length === 0 ? (
-              <div className="mindly-empty">
+              <div className="mindly-empty student-session-empty">
+                <CalendarDays />
                 <p className="font-semibold text-[var(--mindly-text-strong)]">
                   Aucune session pour le moment.
                 </p>
-                <p className="mt-1">Demarrez un accompagnement pour retrouver vos échanges ici.</p>
+                <p className="mt-1">Démarrez un accompagnement pour retrouver vos échanges ici.</p>
               </div>
             ) : null}
 
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className={`student-choice-card ${
+                className={`student-choice-card student-session-card ${
                   String(selectedSessionId) === String(session.id)
                     ? 'student-choice-card-active'
                     : ''
@@ -656,6 +692,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       className="student-edit-input"
                       maxLength={120}
                     />
+
                     <div className="student-icon-action-row">
                       <button
                         type="button"
@@ -665,6 +702,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       >
                         <Check />
                       </button>
+
                       <button
                         type="button"
                         onClick={() => {
@@ -687,8 +725,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     >
                       <span className="block truncate text-sm font-semibold">{session.title}</span>
                       <span className="mt-1 block text-xs opacity-75">
-                        {session.mode === 'smart' ? 'Smart coach IA' : 'Coach humain'} -{' '}
-                        {session.status}
+                        {session.mode === 'smart' ? 'Smart coach IA' : 'Coach humain'} ·{' '}
+                        {session.status === 'open' ? 'Ouverte' : 'Fermée'}
                       </span>
                     </button>
 
@@ -704,6 +742,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       >
                         <Pencil />
                       </button>
+
                       {session.mode === 'smart' ? (
                         <button
                           type="button"
@@ -728,8 +767,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           <div className="student-chat-header-inner">
             <div>
               <h2 className="student-chat-title">
-                {selectedSession?.title ?? 'Aucune session selectionnee'}
+                {selectedSession?.title ?? 'Aucune session sélectionnée'}
               </h2>
+
               <div className="student-chat-badges">
                 <span className="mindly-ui-badge">
                   {selectedSession?.mode === 'smart'
@@ -738,15 +778,19 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       ? selectedCoachName
                       : 'Aucune session'}
                 </span>
+
                 <span className="mindly-ui-badge">
                   {messageCount} message{messageCount > 1 ? 's' : ''}
                 </span>
-                {isLoading ? <span className="mindly-ui-badge">Reponse en cours</span> : null}
+
+                {isLoading ? <span className="mindly-ui-badge">Réponse en cours</span> : null}
+
                 {selectedSession?.status === 'closed' ? (
-                  <span className="mindly-ui-badge mindly-ui-badge-muted">Fermee</span>
+                  <span className="mindly-ui-badge mindly-ui-badge-muted">Fermée</span>
                 ) : null}
               </div>
             </div>
+
             <div className="student-chat-icon">
               <MessageCircle />
             </div>
@@ -755,24 +799,35 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
         <div className="student-chat-scroll">
           {messages.length === 0 ? (
-            <div className="student-chat-empty">
-              <p className="font-semibold text-[var(--mindly-text-strong)]">Commencez simplement.</p>
-              <p className="mt-1">
-                Ecrivez votre besoin actuel ou choisissez une suggestion pour lancer la discussion.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
+            <div className="student-chat-empty student-chat-empty-redesign">
+              <div className="student-empty-hero-icon">
+                <MessageCircle />
+              </div>
+
+              <p className="student-empty-title">{emptyChatTitle}</p>
+
+              <p className="student-empty-description">{emptyChatDescription}</p>
+
+              <div className="student-prompt-grid">
                 {suggestedPrompts.map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
                     onClick={() => setMessage(prompt)}
                     disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-                    className="mindly-ui-badge"
+                    className="student-prompt-chip"
                   >
                     {prompt}
                   </button>
                 ))}
               </div>
+
+              {!selectedSessionId ? (
+                <p className="student-empty-helper">
+                  Astuce : commencez rapidement avec le Smart coach IA pour un accompagnement
+                  immédiat.
+                </p>
+              ) : null}
             </div>
           ) : null}
 
@@ -808,6 +863,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         rows={4}
                         className="student-message-edit-textarea"
                       />
+
                       <div className="student-icon-action-row-end">
                         <button
                           type="button"
@@ -817,6 +873,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         >
                           <Check />
                         </button>
+
                         <button
                           type="button"
                           onClick={() => {
@@ -861,6 +918,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                                   }}
                                   className="student-choice-checkbox"
                                 />
+
                                 <span>
                                   <span className="font-semibold">{choice.label}.</span>{' '}
                                   {choice.text}
@@ -905,13 +963,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       className="student-message-action"
                     >
                       <Volume2 />
-                      Ecouter
+                      Écouter
                     </button>
                   ) : null}
                 </div>
               </div>
             )
           })}
+
           <div ref={messagesEndRef} />
         </div>
 
@@ -926,7 +985,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               className={`student-recorder-button ${
                 isRecording ? 'student-recorder-button-recording' : 'student-recorder-button-idle'
               }`}
-              title={isRecording ? 'Arreter' : 'Dicter'}
+              title={isRecording ? 'Arrêter' : 'Dicter'}
             >
               {isRecording ? <Square /> : <Mic />}
             </button>
@@ -944,8 +1003,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               rows={3}
               placeholder={
                 selectedSessionId
-                  ? 'Ecrivez votre message...'
-                  : 'Demarrez ou selectionnez une session pour ecrire.'
+                  ? 'Écrivez votre besoin actuel...'
+                  : 'Démarrez ou sélectionnez une session pour écrire.'
               }
               className="student-composer-textarea"
             />
@@ -962,8 +1021,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           </div>
 
           <div className="student-composer-footer">
-            <span>Entree pour envoyer, Shift+Entree pour une nouvelle ligne.</span>
-            <span>{message.trim().length} caracteres</span>
+            <span>Entrée pour envoyer, Shift + Entrée pour une nouvelle ligne.</span>
+            <span>{message.trim().length} caractères</span>
           </div>
         </div>
       </section>
@@ -978,10 +1037,12 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
               <div className="student-flex-content">
                 <h3 className="student-section-title">Supprimer la session ?</h3>
+
                 <p className="student-delete-modal-text">
                   Cette action supprimera aussi les messages de cette session. Elle ne pourra pas
-                  etre annulee.
+                  être annulée.
                 </p>
+
                 <p className="student-delete-modal-preview">{sessionToDelete.title}</p>
               </div>
             </div>
@@ -994,6 +1055,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               >
                 Annuler
               </button>
+
               <button
                 type="button"
                 onClick={() => void deleteSession(sessionToDelete.id)}

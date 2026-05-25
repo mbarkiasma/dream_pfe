@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { Building2, Target, UserRoundCheck } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { AppBadge, sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -10,7 +10,7 @@ const descriptionTextClass =
   'text-[15px] font-normal leading-[1.7] tracking-normal text-[var(--mindly-purple-muted)]'
 
 export default function AboutVisionBlock() {
-  const isFr = useLocale() !== 'en'
+  const t = useTranslations('aboutPage.vision')
   const shouldReduceMotion = useReducedMotion()
   const smoothEase = [0.22, 1, 0.36, 1] as const
   const visionCardInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 28, scale: 0.96 }
@@ -80,61 +80,32 @@ export default function AboutVisionBlock() {
     },
   }
 
-  const etapes = isFr
-    ? [
-        {
-          annee: '2026',
-          titre: 'Lancement',
-          description: 'Integration de MindBloom dans notre etablissement avec les premiers etudiants, psychologues et coachs.',
-        },
-        {
-          annee: '2027',
-          titre: 'Expansion regionale',
-          description: 'Deploiement dans 5 universites tunisiennes partenaires et lancement du module nutrition et bien-etre.',
-        },
-        {
-          annee: '2028',
-          titre: 'Solution nationale',
-          description: 'MindBloom integre comme solution officielle de bien-etre dans toutes les universites tunisiennes.',
-        },
-      ]
-    : [
-        {
-          annee: '2026',
-          titre: 'Launch',
-          description: 'MindBloom integration in our institution with first students, psychologists, and coaches.',
-        },
-        {
-          annee: '2027',
-          titre: 'Regional expansion',
-          description: 'Deployment to 5 partner Tunisian universities and launch of nutrition and wellness module.',
-        },
-        {
-          annee: '2028',
-          titre: 'National solution',
-          description: 'MindBloom integrated as an official student wellness solution across Tunisian universities.',
-        },
-      ]
+  const etapes = t.raw('steps') as Array<{
+    annee: string
+    titre: string
+    description: string
+  }>
 
-  const objectifs = isFr
-    ? [
-        { Icon: Target, titre: '9000 etudiants accompagnes', description: "d'ici 2028" },
-        { Icon: Building2, titre: 'Toutes les universites tunisiennes couvertes', description: 'Un deploiement progressif dans chaque campus partenaire.' },
-        { Icon: UserRoundCheck, titre: '20 specialistes partenaires', description: 'Coachs, psychologues et nutritionnistes engages pour accompagner les etudiants.' },
-      ]
-    : [
-        { Icon: Target, titre: '9000 supported students', description: 'by 2028' },
-        { Icon: Building2, titre: 'All Tunisian universities covered', description: 'A gradual deployment in each partner campus.' },
-        { Icon: UserRoundCheck, titre: '20 partner specialists', description: 'Coaches, psychologists, and nutritionists committed to student support.' },
-      ]
+  const objectifsRaw = t.raw('objectives') as Array<{
+    icon: 'building2' | 'target' | 'userRoundCheck'
+    titre: string
+    description: string
+  }>
 
-  const visionTitle = isFr
-    ? 'Nos objectifs pour les universites tunisiennes'
-    : 'Our goals for Tunisian universities'
-  const visionDescription = isFr
-    ? "MindBloom ambitionne de devenir la solution de reference pour le bien-etre etudiant dans toutes les universites tunisiennes d'ici 2028, avec un focus sur la nutrition."
-    : 'MindBloom aims to become the reference student wellness solution across Tunisian universities by 2028, with a strong focus on nutrition.'
+  const visionTitle = t('title')
+  const visionDescription = t('description')
   const visionTitleWords = visionTitle.split(' ')
+
+  const iconMap = {
+    building2: Building2,
+    target: Target,
+    userRoundCheck: UserRoundCheck,
+  } as const
+
+  const objectifs = objectifsRaw.map((objectif) => ({
+    Icon: iconMap[objectif.icon],
+    ...objectif,
+  }))
 
   return (
     <section id="vision-2028" className="mx-auto max-w-[1200px] scroll-mt-28 px-5 pb-10 font-[family-name:var(--font-zain)] sm:px-8">
@@ -182,7 +153,7 @@ export default function AboutVisionBlock() {
               variant="outline"
               className={sectionBadgeClass}
             >
-              {isFr ? 'Vision 2028' : 'Vision 2028'}
+              Vision 2028
             </AppBadge>
           </motion.div>
           <motion.h2

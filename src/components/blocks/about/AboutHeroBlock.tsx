@@ -3,13 +3,11 @@
 import { Link } from '@/i18n/routing'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Rocket, ShieldCheck, Sparkles, UsersRound } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 
-const cardsFr = [
+const cardLayouts = [
   {
     href: '#fondatrices-encadrante',
-    title: "Les fondatrices & l'encadrante",
-    description: 'Decouvrez les fondatrices du projet et notre encadrante academique.',
     Icon: UsersRound,
     className: 'lg:left-[calc(50%-125px)] lg:top-[42px] xl:left-[calc(50%-140px)]',
     floatDuration: 6.2,
@@ -17,8 +15,6 @@ const cardsFr = [
   },
   {
     href: '#equipe-specialistes',
-    title: 'Notre equipe de specialistes',
-    description: 'Rencontrez nos expertes dediees au bien-etre etudiant.',
     Icon: UsersRound,
     className: 'lg:left-0 lg:top-[150px]',
     floatDuration: 7,
@@ -26,8 +22,6 @@ const cardsFr = [
   },
   {
     href: '#valeurs',
-    title: 'Une ethique forte au coeur de MindBloom',
-    description: 'Nos principes, nos engagements et notre responsabilite.',
     Icon: ShieldCheck,
     className: 'lg:right-0 lg:top-[150px]',
     floatDuration: 5.8,
@@ -35,47 +29,6 @@ const cardsFr = [
   },
   {
     href: '#vision-2028',
-    title: 'Vision 2028',
-    description: 'Notre feuille de route pour un impact durable et mesurable.',
-    Icon: Rocket,
-    className: 'lg:left-[calc(50%-125px)] lg:top-[290px] xl:left-[calc(50%-140px)]',
-    floatDuration: 6.8,
-    floatDelay: 0.5,
-  },
-]
-
-const cardsEn: typeof cardsFr = [
-  {
-    href: '#fondatrices-encadrante',
-    title: 'Founders & supervisor',
-    description: 'Discover the project founders and our academic supervisor.',
-    Icon: UsersRound,
-    className: 'lg:left-[calc(50%-125px)] lg:top-[42px] xl:left-[calc(50%-140px)]',
-    floatDuration: 6.2,
-    floatDelay: 0,
-  },
-  {
-    href: '#equipe-specialistes',
-    title: 'Our specialist team',
-    description: 'Meet our experts dedicated to student well-being.',
-    Icon: UsersRound,
-    className: 'lg:left-0 lg:top-[150px]',
-    floatDuration: 7,
-    floatDelay: 0.35,
-  },
-  {
-    href: '#valeurs',
-    title: 'Strong ethics at MindBloom core',
-    description: 'Our principles, commitments and responsibility.',
-    Icon: ShieldCheck,
-    className: 'lg:right-0 lg:top-[150px]',
-    floatDuration: 5.8,
-    floatDelay: 0.18,
-  },
-  {
-    href: '#vision-2028',
-    title: 'Vision 2028',
-    description: 'Our roadmap for lasting and measurable impact.',
     Icon: Rocket,
     className: 'lg:left-[calc(50%-125px)] lg:top-[290px] xl:left-[calc(50%-140px)]',
     floatDuration: 6.8,
@@ -84,8 +37,9 @@ const cardsEn: typeof cardsFr = [
 ]
 
 export default function AboutHeroBlock() {
-  const isFr = useLocale() !== 'en'
-  const cards = isFr ? cardsFr : cardsEn
+  const t = useTranslations('aboutPage.hero')
+  const cardsFromLocale = t.raw('cards') as Array<{ href: string; title: string; description: string }>
+  const cards = cardsFromLocale.map((card, index) => ({ ...card, ...cardLayouts[index] }))
   const shouldReduceMotion = useReducedMotion()
   const smoothEase = [0.22, 1, 0.36, 1] as const
   const cardInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 22, scale: 0.98 }
@@ -168,7 +122,7 @@ export default function AboutHeroBlock() {
                       {description}
                     </span>
                     <span className="mt-1.5 inline-flex items-center gap-1.5 text-[13.5px] font-bold tracking-normal text-[var(--mindly-primary)] transition-all duration-300 group-hover:gap-2.5">
-                      {isFr ? 'Aller a la section' : 'Go to section'}
+                      {t('goToSection')}
                       <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-[5px]" />
                     </span>
                   </span>

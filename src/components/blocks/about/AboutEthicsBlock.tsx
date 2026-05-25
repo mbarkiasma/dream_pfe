@@ -2,53 +2,37 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { HandHeart, Lock, Scale, ShieldCheck } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 
 const descriptionTextClass =
   'text-[15px] font-normal leading-[1.7] tracking-normal text-[var(--mindly-purple-muted)]'
 
+const iconMap = {
+  lock: Lock,
+  shieldCheck: ShieldCheck,
+  handHeart: HandHeart,
+  scale: Scale,
+} as const
+
 export default function AboutEthicsBlock() {
-  const isFr = useLocale() !== 'en'
+  const t = useTranslations('aboutPage.ethics')
   const shouldReduceMotion = useReducedMotion()
   const smoothEase = [0.22, 1, 0.36, 1] as const
   const sectionInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }
   const cardInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 34, scale: 0.96 }
   const itemInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
 
-  const valeurs = [
-    {
-      Icon: Lock,
-      titre: isFr ? 'Confidentialite' : 'Confidentiality',
-      description: isFr
-        ? 'Toutes vos donnees personnelles, echanges et rapports restent strictement prives. Aucun partage avec des tiers, jamais.'
-        : 'All your personal data, conversations, and reports remain strictly private. No third-party sharing, ever.',
-      citation: isFr ? '"Votre vie privee est un droit fondamental."' : '"Your privacy is a fundamental right."',
-    },
-    {
-      Icon: ShieldCheck,
-      titre: isFr ? 'Securite' : 'Security',
-      description: isFr
-        ? 'La plateforme est protegee par des protocoles avances : magic link, chiffrement et authentification securisee.'
-        : 'The platform is protected by advanced protocols: magic link, end-to-end encryption, and secure authentication.',
-      citation: isFr ? '"Votre securite, notre priorite absolue."' : '"Your security, our absolute priority."',
-    },
-    {
-      Icon: HandHeart,
-      titre: isFr ? 'Bienveillance' : 'Care',
-      description: isFr
-        ? "Chaque fonctionnalite est pensee avec empathie et respect de l'etudiant, dans un cadre ouvert et sans jugement."
-        : 'Every feature is designed with empathy and respect for students, in an open and non-judgmental space.',
-      citation: isFr ? '"Lhumain avant tout, toujours."' : '"People first, always."',
-    },
-    {
-      Icon: Scale,
-      titre: isFr ? 'Responsabilite' : 'Responsibility',
-      description: isFr
-        ? "Nous fournissons des informations fiables, validees par des professionnels certifies, dans un cadre serieux."
-        : 'We provide reliable information validated by certified professionals within a rigorous support framework.',
-      citation: isFr ? '"Un accompagnement serieux, des resultats concrets."' : '"Serious support, concrete outcomes."',
-    },
-  ]
+  const valeursFromLocale = t.raw('values') as Array<{
+    icon: keyof typeof iconMap
+    title: string
+    description: string
+    quote: string
+  }>
+
+  const valeurs = valeursFromLocale.map((valeur) => ({
+    Icon: iconMap[valeur.icon],
+    ...valeur,
+  }))
 
   return (
     <motion.section
@@ -67,7 +51,7 @@ export default function AboutEthicsBlock() {
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.65, delay: 0.08, ease: smoothEase }}
         >
-          {isFr ? 'Une ethique forte au coeur de' : 'A strong ethic at the heart of'}{' '}
+          {t('title')}{' '}
           <span className="bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
             MindBloom
           </span>
@@ -77,7 +61,7 @@ export default function AboutEthicsBlock() {
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {valeurs.map((valeur, index) => (
           <motion.article
-            key={valeur.titre}
+            key={`${valeur.title}-${index}`}
             className="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-[var(--mindly-primary-soft)]/70 bg-[var(--mindly-surface)] p-5 text-[var(--mindly-text-dark)] shadow-[0_16px_40px_rgba(74,35,176,0.10)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--mindly-primary)] hover:shadow-[0_22px_54px_rgba(74,35,176,0.22)]"
             style={{ animationDelay: `${index * 80}ms` }}
             initial={cardInitial}
@@ -113,7 +97,7 @@ export default function AboutEthicsBlock() {
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.35, delay: 0.28 + index * 0.1, ease: smoothEase }}
             >
-              {valeur.titre}
+              {valeur.title}
             </motion.h3>
 
             <motion.p
@@ -133,7 +117,7 @@ export default function AboutEthicsBlock() {
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.35, delay: 0.36 + index * 0.1, ease: smoothEase }}
             >
-              {valeur.citation}
+              {valeur.quote}
             </motion.p>
           </motion.article>
         ))}

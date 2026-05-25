@@ -76,7 +76,7 @@ const actorFeatures: Record<
         number: 1,
         content: (
           <>
-            Passer l&apos;entretien <Highlight>Big Five</Highlight>
+            Passer l'entretien <Highlight>Big Five</Highlight>
           </>
         ),
       },
@@ -277,19 +277,19 @@ export function ActeursFonctionnalites() {
         studentTitle: 'Etudiant',
         studentSubtitle: 'Utilisateur central de la plateforme',
         studentDescription:
-          "Accede a un espace complet de bien-etre mental : entretiens IA, journal de reves, coaching et suivi personnalise tout en un seul endroit securise.",
+          "Accède à un espace complet de bien-être mental : entretiens IA, journal de rêves, coaching et suivi personnalisé tout en un seul endroit sécurisé.",
         users: '12 400+ utilisateurs',
         active: 'Actif',
         coachPill: "L'ACCOMPAGNATEUR",
         coachSubtitle: 'Suivi actif et bienveillant',
         coachDescription:
-          "Suit les etudiants en difficulte, repond a leurs messages et propose des seances d'accompagnement personnalisees.",
+          "Suit les étudiants en difficulté, répond à leurs messages et propose des séances d'accompagnement personnalisées.",
         coachBadge: 'Humain ou IA',
         psychologistPill: "L'EXPERT CLINIQUE",
         psychologistTitle: 'Psychologue',
         psychologistSubtitle: 'Intervention et suivi clinique',
         psychologistDescription:
-          'Recoit les etudiants en etat critique, gere les rendez-vous et accede aux analyses de personnalite partagees.',
+          'Reçoit les étudiants en état critique, gère les rendez-vous et accède aux analyses de personnalité partagées.',
         psychologistBadge: 'Certifies',
       }
     : {

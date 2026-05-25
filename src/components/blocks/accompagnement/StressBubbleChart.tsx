@@ -50,7 +50,7 @@ const stats = [
     bg: 'bg-[var(--mindly-bg-strong)]',
     text: (
       <>
-        présentent des signes d&apos;<strong>anxiété chronique</strong> non pris en charge
+        présentent des signes d'<strong>anxiété chronique</strong> non pris en charge
       </>
     ),
   },
@@ -74,7 +74,7 @@ const stats = [
     bg: 'bg-[var(--mindly-bg-pale)]',
     text: (
       <>
-        n&apos;ont <strong>jamais consulté</strong> un psychologue à l&apos;université
+        n'ont <strong>jamais consulté</strong> un psychologue à l'université
       </>
     ),
   },
@@ -493,7 +493,7 @@ export function StressAccompagnement() {
                 <>
                   Les étudiants font face à des <strong>pressions croissantes</strong> qui
                   impactent leurs résultats. Un accompagnement adapté et une analyse de
-                  personnalité changent tout, pour l&apos;étudiant comme pour l&apos;université.
+                  personnalité changent tout, pour l'étudiant comme pour l'université.
                 </>
               ) : (
                 <>

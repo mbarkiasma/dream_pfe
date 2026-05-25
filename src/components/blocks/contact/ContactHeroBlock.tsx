@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import { ShieldCheck, Sparkles, Star, Users } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { AppBadge } from '@/components/ui/badge'
 import { TextAnimate } from '@/components/ui/text-animate'
 
@@ -19,15 +19,25 @@ type ContactHeroBlockProps = {
   }[]
 }
 
+type MessageStat = {
+  icon?: string | null
+  value?: string | null
+  label?: string | null
+}
+
+type CmsStat = NonNullable<ContactHeroBlockProps['stats']>[number]
+
 export default function ContactHeroBlock({
   brand = 'MindBloom',
-  titleFr = 'contactez notre equipe',
-  titleEn = 'contact our team',
-  descriptionFr = 'Une question, un bug, un partenariat ? Notre equipe vous repond personnellement sous 24h.',
-  descriptionEn = 'A question, bug, or partnership request? Our team replies personally within 24h.',
+  titleFr,
+  titleEn,
+  descriptionFr,
+  descriptionEn,
   stats,
 }: ContactHeroBlockProps) {
-  const isFr = useLocale() !== 'en'
+  const locale = useLocale()
+  const isFr = locale === 'fr'
+  const t = useTranslations('contactPage.hero')
 
   const iconMap = {
     sparkles: Sparkles,
@@ -36,19 +46,26 @@ export default function ContactHeroBlock({
     users: Users,
   }
 
+  const defaultStats = t.raw('stats') as MessageStat[]
+  const isMessageStat = (stat: CmsStat | MessageStat): stat is MessageStat =>
+    'label' in stat
+
+  const getStatLabel = (stat: CmsStat | MessageStat) => {
+    if (isMessageStat(stat)) return stat.label || ''
+    return locale === 'fr' ? stat.labelFr || '' : stat.labelEn || ''
+  }
+
+  const title = locale === 'fr' ? titleFr || t('title') : titleEn || t('title')
+  const description = locale === 'fr' ? descriptionFr || t('description') : descriptionEn || t('description')
+
   const STATS = (
     stats?.length
       ? stats
-      : [
-          { icon: 'sparkles', value: '<24h', labelFr: 'Temps de reponse', labelEn: 'Response time' },
-          { icon: 'shieldCheck', value: '100%', labelFr: 'Chiffrement total', labelEn: 'End-to-end encryption' },
-          { icon: 'star', value: '4.9', labelFr: 'Satisfaction client', labelEn: 'Customer satisfaction' },
-          { icon: 'users', value: '12 400+', labelFr: 'Etudiants aides', labelEn: 'Students helped' },
-        ]
+      : defaultStats
   ).map((stat) => ({
     Icon: iconMap[(stat.icon || 'sparkles') as keyof typeof iconMap] ?? Sparkles,
     value: stat.value || '',
-    label: isFr ? stat.labelFr || '' : stat.labelEn || '',
+    label: getStatLabel(stat),
   }))
 
   return (
@@ -63,7 +80,7 @@ export default function ContactHeroBlock({
           {brand}
         </TextAnimate>{' '}
         <TextAnimate as="span" animation="slideUp" by="word" className="inline">
-          {isFr ? titleFr : titleEn}
+          {isFr ? titleFr || t('title') : titleEn || t('title')}
         </TextAnimate>
       </h1>
 
@@ -76,7 +93,7 @@ export default function ContactHeroBlock({
           lineHeight: 1.75,
         }}
       >
-        {isFr ? descriptionFr : descriptionEn}
+        {isFr ? descriptionFr || t('description') : descriptionEn || t('description')}
       </p>
 
       <div

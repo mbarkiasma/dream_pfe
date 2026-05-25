@@ -1,9 +1,9 @@
-﻿'use client'
+'use client'
 import { useState } from 'react'
 import { Bug, CircleHelp, Eye, KeyRound, Lock, Mail, MailCheck, MessageSquare, User, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
 
 interface FormState {
@@ -197,7 +197,7 @@ function SubjectSelector({
                     flexShrink: 0,
                   }}
                 >
-                  ✓
+                  &#10003;
                 </div>
               )}
             </button>
@@ -289,6 +289,8 @@ function SuccessScreen({
     readDesc: string
     replyDesc: string
     newMessage: string
+    sending: string
+    sendMessage: string
   }
 }) {
   return (
@@ -334,90 +336,52 @@ function SuccessScreen({
           fontFamily: 'inherit',
         }}
       >
-        ← {copy.newMessage}
+        &larr; {copy.newMessage}
       </Button>
     </div>
   )
 }
 
 export default function ContactFormBlock() {
-  const isFr = useLocale() !== 'en'
+  const t = useTranslations('contactPage.form')
   const [form, setForm] = useState<FormState>({ prenom: '', nom: '', email: '', subject: 'general', message: '' })
   const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const copy = isFr
-    ? {
-        progress: 'Progression du formulaire',
-        required: 'Champ requis',
-        invalidEmail: 'Adresse email invalide',
-        shortMessage: 'Message trop court (min. 10 caracteres)',
-        firstName: 'Prenom',
-        lastName: 'Nom',
-        yourFirstName: 'Votre prenom',
-        yourLastName: 'Votre nom',
-        emailLabel: 'Email',
-        emailHint: 'Nous vous repondrons a cette adresse',
-        subject: 'Sujet',
-        message: 'Message',
-        messagePlaceholder: 'Decrivez votre demande avec le plus de details possible…',
-        privacy: 'Votre message est confidentiel. Vos donnees ne sont utilisees que pour vous repondre et ne sont jamais partagees avec des tiers.',
-        submitError: "Impossible d'envoyer le message. Veuillez reessayer.",
-        successTitle: 'Message envoye !',
-        successLine1: 'Merci ! Notre equipe vous repondra a',
-        successLine2: 'sous 24 heures ouvrables.',
-        confirm: 'Confirmation',
-        read: 'Lecture',
-        reply: 'Reponse',
-        confirmDesc: 'Email de confirmation envoye',
-        readDesc: 'Message lu personnellement',
-        replyDesc: 'Sous 24h ouvrables',
-        newMessage: 'Nouveau message',
-      }
-    : {
-        progress: 'Form progress',
-        required: 'Required field',
-        invalidEmail: 'Invalid email address',
-        shortMessage: 'Message too short (min. 10 characters)',
-        firstName: 'First name',
-        lastName: 'Last name',
-        yourFirstName: 'Your first name',
-        yourLastName: 'Your last name',
-        emailLabel: 'Email',
-        emailHint: 'We will reply to this address',
-        subject: 'Subject',
-        message: 'Message',
-        messagePlaceholder: 'Describe your request with as much detail as possible…',
-        privacy: 'Your message is confidential. Your data is only used to reply and is never shared with third parties.',
-        submitError: 'Unable to send the message. Please try again.',
-        successTitle: 'Message sent!',
-        successLine1: 'Thanks! Our team will reply to',
-        successLine2: 'within 24 business hours.',
-        confirm: 'Confirmation',
-        read: 'Read',
-        reply: 'Reply',
-        confirmDesc: 'Confirmation email sent',
-        readDesc: 'Message personally reviewed',
-        replyDesc: 'Within 24 business hours',
-        newMessage: 'New message',
-      }
+  const copy = {
+    progress: t('progress'),
+    required: t('required'),
+    invalidEmail: t('invalidEmail'),
+    shortMessage: t('shortMessage'),
+    firstName: t('firstName'),
+    lastName: t('lastName'),
+    yourFirstName: t('yourFirstName'),
+    yourLastName: t('yourLastName'),
+    emailLabel: t('emailLabel'),
+    emailHint: t('emailHint'),
+    emailPlaceholder: t('emailPlaceholder'),
+    subject: t('subject'),
+    message: t('message'),
+    messagePlaceholder: t('messagePlaceholder'),
+    privacy: t('privacy'),
+    submitError: t('submitError'),
+    successTitle: t('successTitle'),
+    successLine1: t('successLine1'),
+    successLine2: t('successLine2'),
+    confirm: t('confirm'),
+    read: t('read'),
+    reply: t('reply'),
+    confirmDesc: t('confirmDesc'),
+    readDesc: t('readDesc'),
+    replyDesc: t('replyDesc'),
+    newMessage: t('newMessage'),
+    sending: t('sending'),
+    sendMessage: t('sendMessage'),
+  }
 
-  const subjects = isFr
-    ? [
-        { val: 'general', icon: 'circle-help', name: 'Question generale', desc: 'Informations, fonctionnalites' },
-        { val: 'bug', icon: 'bug', name: 'Bug technique', desc: 'Erreur, dysfonctionnement' },
-        { val: 'partner', icon: 'building-2', name: 'Partenariat', desc: 'Universite, institution' },
-        { val: 'access', icon: 'key-round', name: "Probleme d'acces", desc: 'Connexion, compte bloque' },
-      ]
-    : [
-        { val: 'general', icon: 'circle-help', name: 'General question', desc: 'Information, features' },
-        { val: 'bug', icon: 'bug', name: 'Technical bug', desc: 'Error, malfunction' },
-        { val: 'partner', icon: 'building-2', name: 'Partnership', desc: 'University, institution' },
-        { val: 'access', icon: 'key-round', name: 'Access issue', desc: 'Login, locked account' },
-      ]
-
+  const subjects = t.raw('subjects') as { val: string; icon: string; name: string; desc: string }[]
   const set = (key: keyof FormState) => (val: string) => {
     setForm(prev => ({ ...prev, [key]: val }))
     setErrors(prev => ({ ...prev, [key]: undefined }))
@@ -489,7 +453,7 @@ export default function ContactFormBlock() {
         id='email'
         icon={<Mail className="h-4 w-4 text-[var(--mindly-purple-icon)]" />}
         type='email'
-        placeholder='your@email.com'
+        placeholder={copy.emailPlaceholder}
         value={form.email}
         error={errors.email}
         hint={copy.emailHint}
@@ -531,7 +495,7 @@ export default function ContactFormBlock() {
         fullWidth
         className={loading ? 'from-[var(--mindly-primary-light)] to-[var(--mindly-primary)] opacity-80' : ''}
       >
-        {loading ? 'Envoi en cours…' : 'Envoyer le message'}
+        {loading ? copy.sending : copy.sendMessage}
       </Button>
     </Card>
   )

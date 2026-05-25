@@ -18,35 +18,35 @@ import { sectionBadgeClass, sectionBadgeDotClass } from '@/components/ui/badge'
 const reportTraitsFr = [
   {
     label: 'Ouverture',
-    description: 'Curiosite intellectuelle, creativite et gout pour la nouveaute.',
-    level: 'Tres eleve',
+    description: 'Curiosité intellectuelle, créativité et goût pour la nouveauté.',
+    level: 'Très élevé',
     score: 82,
     Icon: Brain,
   },
   {
     label: 'Conscience',
-    description: "Organisation, discipline et fiabilite dans l'action.",
-    level: 'Eleve',
+    description: "Organisation, discipline et fiabilité dans l'action.",
+    level: 'Élevé',
     score: 74,
     Icon: ClipboardCheck,
   },
   {
     label: 'Extraversion',
-    description: 'Sociabilite, energie et aisance dans les interactions.',
-    level: 'Modere',
+    description: 'Sociabilité, énergie et aisance dans les interactions.',
+    level: 'Modéré',
     score: 61,
     Icon: Sparkles,
   },
   {
-    label: 'Agreabilite',
-    description: 'Altruisme, cooperation et confiance envers autrui.',
-    level: 'Eleve',
+    label: 'Agréabilité',
+    description: 'Altruisme, coopération et confiance envers autrui.',
+    level: 'Élevé',
     score: 78,
     Icon: Heart,
   },
   {
     label: 'Neurotisme',
-    description: 'Tendance a ressentir des emotions negatives et du stress.',
+    description: 'Tendance à ressentir des émotions négatives et du stress.',
     level: 'Stable',
     score: 43,
     Icon: Zap,
@@ -93,29 +93,29 @@ const reportTraitsEn: typeof reportTraitsFr = [
 
 const faqItemsFr = [
   {
-    question: "Comment se deroule l'entretien intelligent ?",
+    question: "Comment se déroule l'entretien intelligent ?",
     answer:
-      "L'etudiant repond a des questions guidees, puis MindBloom synthetise les signaux utiles pour proposer un accompagnement adapte.",
+      "L'étudiant répond à des questions guidées, puis MindBloom synthétise les signaux utiles pour proposer un accompagnement adapté.",
   },
   {
-    question: "A quoi sert l'analyse Big Five ?",
+    question: "À quoi sert l'analyse Big Five ?",
     answer:
-      'Elle aide a mieux comprendre les traits dominants, les besoins emotionnels et les leviers de motivation de chaque etudiant.',
+      'Elle aide à mieux comprendre les traits dominants, les besoins émotionnels et les leviers de motivation de chaque étudiant.',
   },
   {
-    question: "Comment fonctionne l'analyse des reves ?",
+    question: "Comment fonctionne l'analyse des rêves ?",
     answer:
-      'MindBloom transforme les notes de reve en resume clair, puis identifie les emotions et themes recurrents.',
+      'MindBloom transforme les notes de rêve en résumé clair, puis identifie les émotions et thèmes récurrents.',
   },
   {
-    question: 'Est-ce que les donnees sont confidentielles ?',
+    question: 'Est-ce que les données sont confidentielles ?',
     answer:
-      'Oui. Les echanges, rapports et informations personnelles restent prives et proteges par les protocoles de securite de la plateforme.',
+      'Oui. Les échanges, rapports et informations personnelles restent privés et protégés par les protocoles de sécurité de la plateforme.',
   },
   {
     question: 'Quand intervient un coach ou un psychologue ?',
     answer:
-      "Un specialiste peut prendre le relais quand l'etudiant demande un soutien humain ou lorsqu'un besoin prioritaire est detecte.",
+      "Un spécialiste peut prendre le relais quand l'étudiant demande un soutien humain ou lorsqu'un besoin prioritaire est détecté.",
   },
 ]
 
@@ -271,11 +271,11 @@ export default function RapportFAQFonctionnalites() {
             </span>
 
             <h2 className="mt-6 max-w-[360px] text-[34px] font-bold leading-[1.05] tracking-[-0.025em] text-[var(--mindly-text-strong)] sm:text-[40px]">
-              {isFr ? 'Questions sur les fonctionnalites' : 'Questions about features'}
+              {isFr ? 'Questions sur les fonctionnalités' : 'Questions about features'}
             </h2>
             <p className="mt-4 text-[15px] font-normal leading-[1.7] text-[var(--mindly-purple-muted)]">
               {isFr
-                ? 'Comprendre comment MindBloom accompagne les etudiants.'
+                ? 'Comprendre comment MindBloom accompagne les étudiants.'
                 : 'Understand how MindBloom supports students.'}
             </p>
           </div>
@@ -339,7 +339,7 @@ export default function RapportFAQFonctionnalites() {
               </span>
               <p className="text-[14px] font-normal leading-[1.65] text-[var(--mindly-purple-muted)]">
                 {isFr
-                  ? "Chaque fonctionnalite a ete pensee pour aider l'etudiant a mieux comprendre son etat emotionnel et demander de l'aide au bon moment."
+                  ? "Chaque fonctionnalité a été pensée pour aider l'étudiant à mieux comprendre son état émotionnel et demander de l'aide au bon moment."
                   : 'Each feature is designed to help students better understand their emotional state and ask for help at the right moment.'}
               </p>
               <ShieldQuestion className="ml-auto hidden h-5 w-5 shrink-0 text-[var(--mindly-primary)] sm:block" />

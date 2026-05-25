@@ -73,7 +73,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
         <div className="hidden">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
-            Rapport d&apos;analyse de personnalite
+            Rapport d&apos;analyse de personnalité
           </p>
           <h1 className="mt-2 text-3xl font-semibold">{analyse.reference}</h1>
           <p className="mt-2 text-sm text-slate-600">Date : {date}</p>
@@ -101,7 +101,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
         <section className="report-balance-panel mt-6 rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] p-5 print:border-slate-200 print:bg-white">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
-            Indice d&apos;equilibre
+            Indice d&apos;équilibre
           </p>
           <h2 className="mt-2 text-xl font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
             {reportWellbeing.label}
@@ -111,7 +111,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
           </p>
           {reportWellbeing.score !== null ? (
             <p className="mt-3 text-sm font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Score d&apos;equilibre : {reportWellbeing.score.toFixed(1)}/10
+              Score d&apos;équilibre : {reportWellbeing.score.toFixed(1)}/10
             </p>
           ) : null}
         </section>
@@ -122,7 +122,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
               Forces dominantes
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.forcesDominantes || 'Non renseigne.'}
+              {analyse.forcesDominantes || 'Non renseigné.'}
             </p>
           </article>
 
@@ -131,7 +131,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
               Points de vigilance
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.pointsVigilance || 'Non renseigne.'}
+              {analyse.pointsVigilance || 'Non renseigné.'}
             </p>
           </article>
 
@@ -140,7 +140,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
               Style relationnel
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.styleRelationnel || 'Non renseigne.'}
+              {analyse.styleRelationnel || 'Non renseigné.'}
             </p>
           </article>
         </section>
@@ -173,7 +173,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
                 {trait.observedIndicators && trait.observedIndicators.length > 0 ? (
                   <div className="mt-4">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-400">
-                      Indicateurs observes
+                      Indicateurs observés
                     </p>
                     <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
                       {trait.observedIndicators.map((item, indicatorIndex) => (
@@ -190,16 +190,16 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
         <section className="mt-8 grid gap-4 md:grid-cols-2">
           <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Profil emotionnel
+              Profil émotionnel
             </h2>
             <p className="mt-3 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
-              Emotion dominante : {analyse.profilEmotionnel?.dominantEmotion || 'Non renseigne'}
+              Émotion dominante : {analyse.profilEmotionnel?.dominantEmotion || 'Non renseigné'}
             </p>
             <p className="mt-2 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
-              Stabilite emotionnelle : {analyse.profilEmotionnel?.emotionalStability || '--'}/10
+              Stabilité émotionnelle : {analyse.profilEmotionnel?.emotionalStability || '--'}/10
             </p>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.profilEmotionnel?.emotionalSummary || 'Aucun resume emotionnel disponible.'}
+              {analyse.profilEmotionnel?.emotionalSummary || 'Aucun résumé émotionnel disponible.'}
             </p>
           </article>
 

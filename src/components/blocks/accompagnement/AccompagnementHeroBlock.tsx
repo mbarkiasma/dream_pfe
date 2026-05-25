@@ -21,61 +21,20 @@ import {
   Sparkles,
   ClipboardList,
 } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 
 const NODE_SIZE = 104
-const heroCopy = {
-  fr: {
-    badge: 'Solution de bien-être étudiant',
-    ctaMain: 'Découvrir mon espace ?',
-    ctaSecondary: 'Voir les fonctionnalités',
-  },
-  en: {
-    badge: 'Student wellness solution',
-    ctaMain: 'Discover my space ?',
-    ctaSecondary: 'View features',
-  },
-}
 
 export default function AccompagnementHeroBlock() {
-  const lang = useLocale()
-  const copy = lang === 'en' ? heroCopy.en : heroCopy.fr
+  const t = useTranslations('homePage.hero')
 
-  const nodes = [
-    {
-      icon: 'mic',
-      title: lang === 'fr' ? 'Entretien' : 'Interview',
-      subtitle: lang === 'fr' ? 'Analyse vocale' : 'Voice analysis',
-      badge: lang === 'fr' ? 'Actif' : 'Active',
-    },
-    {
-      icon: 'clipboard',
-      title: lang === 'fr' ? 'Analyse personnalité' : 'Personality analysis',
-      subtitle: lang === 'fr' ? 'Profil psycho' : 'Psy profile',
-    },
-    {
-      icon: 'heart',
-      title: lang === 'fr' ? 'Bien-être global' : 'Global wellness',
-      subtitle: lang === 'fr' ? 'Cette semaine' : 'This week',
-      badge: '87%',
-    },
-    {
-      icon: 'play',
-      title: lang === 'fr' ? 'Vidéo de rêve' : 'Dream video',
-      subtitle: lang === 'fr' ? 'Résumé IA' : 'AI summary',
-      badge: 'NEW',
-    },
-    {
-      icon: 'handshake',
-      title: 'Coaching',
-      subtitle: lang === 'fr' ? 'réel-smart' : 'real-smart',
-    },
-    {
-      icon: 'moon',
-      title: lang === 'fr' ? 'Analyse de rêve' : 'Dream analysis',
-      subtitle: lang === 'fr' ? '4 essais' : '4 trials',
-    },
-  ]
+  const quickBadges = t.raw('quickBadges') as Array<{ icon: string; label: string }>
+  const nodes = t.raw('nodes') as Array<{
+    icon: string
+    title: string
+    subtitle: string
+    badge?: string
+  }>
 
   const renderNodeIcon = (icon: string) => (
     <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(90deg,#895ef8,#a987ff)] shadow-[0_10px_22px_rgba(137,94,248,0.24)]">
@@ -120,91 +79,50 @@ export default function AccompagnementHeroBlock() {
         <div className="order-1 max-w-[760px]">
           <BlurFade delay={0.15} inView>
             <AppBadge dot dotClassName={sectionBadgeDotClass} className={sectionBadgeClass}>
-              {copy.badge}
+              {t('badge')}
             </AppBadge>
           </BlurFade>
 
           <BlurFade delay={0.25} inView>
             <h1 className="mt-6 max-w-[760px] font-[family-name:var(--font-zain)] text-[38px] font-bold leading-[1.08] tracking-normal text-[var(--mindly-text)] sm:text-[46px] lg:text-[50px] xl:text-[54px]">
-              {lang === 'fr' ? (
-                <>
-                  <span className="block whitespace-nowrap">
-                    <span className="inline-block pb-[0.08em] bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
-                      MindBloom
-                    </span>
-                    , une cellule d&apos;écoute
-                  </span>
+              <span className="block whitespace-nowrap">
+                <span className="inline-block pb-[0.08em] bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
+                  MindBloom
+                </span>
+                {t('titlePrefixLine1')}
+              </span>
 
-                  <span className="block">pour les étudiants</span>
-                </>
-              ) : (
-                <>
-                  <span className="block whitespace-nowrap">
-                    <span className="inline-block pb-[0.08em] bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
-                      MindBloom
-                    </span>
-                    , a listening space
-                  </span>
-
-                  <span className="block">for students</span>
-                </>
-              )}
+              <span className="block">{t('titlePrefixLine2')}</span>
             </h1>
           </BlurFade>
 
           <BlurFade delay={0.3} inView>
             <p className="mt-4 font-[family-name:var(--font-zain)] text-[18px] font-bold tracking-normal text-[var(--mindly-purple-muted)] sm:text-[20px]">
-              {lang === 'fr'
-                ? "Accompagnement intelligent avec l’IA."
-                : 'Intelligent support powered by AI.'}
+              {t('subtitle')}
             </p>
           </BlurFade>
 
           <BlurFade delay={0.35} inView>
             <div className="mt-5 overflow-x-auto pb-1">
               <div className="flex min-w-max flex-nowrap gap-3">
-                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-[var(--mindly-border)] bg-white px-4 py-2.5 font-[family-name:var(--font-zain)] text-[14px] font-normal tracking-normal text-[var(--mindly-primary)] shadow-[0_8px_20px_rgba(137,94,248,0.07)]">
-                  <Building2 className="h-4 w-4 text-[var(--mindly-primary)]" />
-                  <span>ESSTHS · Sousse</span>
-                </div>
-
-                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-[var(--mindly-border)] bg-white px-4 py-2.5 font-[family-name:var(--font-zain)] text-[14px] font-normal tracking-normal text-[var(--mindly-primary)] shadow-[0_8px_20px_rgba(137,94,248,0.07)]">
-                  <Heart className="h-4 w-4 text-[var(--mindly-primary)]" />
-                  <span>{lang === 'fr' ? '100% gratuit' : '100% free'}</span>
-                </div>
-
-                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-[var(--mindly-border)] bg-white px-4 py-2.5 font-[family-name:var(--font-zain)] text-[14px] font-normal tracking-normal text-[var(--mindly-primary)] shadow-[0_8px_20px_rgba(137,94,248,0.07)]">
-                  <Sparkles className="h-4 w-4 text-[var(--mindly-primary)]" />
-                  <span>{lang === 'fr' ? 'IA intégrée' : 'Integrated AI'}</span>
-                </div>
+                {quickBadges.map(({ icon, label }) => (
+                  <div
+                    key={label}
+                    className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-[var(--mindly-border)] bg-white px-4 py-2.5 font-[family-name:var(--font-zain)] text-[14px] font-normal tracking-normal text-[var(--mindly-primary)] shadow-[0_8px_20px_rgba(137,94,248,0.07)]"
+                  >
+                    {icon === 'building2' && <Building2 className="h-4 w-4 text-[var(--mindly-primary)]" />}
+                    {icon === 'heart' && <Heart className="h-4 w-4 text-[var(--mindly-primary)]" />}
+                    {icon === 'sparkles' && <Sparkles className="h-4 w-4 text-[var(--mindly-primary)]" />}
+                    <span>{label}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </BlurFade>
 
           <BlurFade delay={0.45} inView>
             <p className="mt-6 max-w-[700px] font-[family-name:var(--font-zain)] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]">
-              {lang === 'fr' ? (
-                <>
-                  Une plateforme innovante dédiée au{' '}
-                  <strong className="font-normal text-[var(--mindly-purple-muted)]">bien-être étudiant</strong>,
-                  reliant les étudiants à des{' '}
-                  <strong className="font-normal text-[var(--mindly-purple-muted)]">
-                    professionnels certifiés
-                  </strong>{' '}
-                  tout en s&apos;appuyant sur l&apos;intelligence artificielle pour offrir un
-                  accompagnement personnalisé.
-                </>
-              ) : (
-                <>
-                  An innovative platform dedicated to{' '}
-                  <strong className="font-normal text-[var(--mindly-purple-muted)]">student wellness</strong>,
-                  connecting students with{' '}
-                  <strong className="font-normal text-[var(--mindly-purple-muted)]">
-                    certified professionals
-                  </strong>{' '}
-                  while using artificial intelligence to provide personalized support.
-                </>
-              )}
+              {t('intro')}
             </p>
           </BlurFade>
 
@@ -212,12 +130,12 @@ export default function AccompagnementHeroBlock() {
             <div className="mt-7">
               <div className="flex flex-wrap gap-4">
                 <Link href="/login" className={`${appBadgeCtaClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
-                  {copy.ctaMain}
+                  {t('ctaMain')}
                 </Link>
 
                 <AppBadge asChild size="md" className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
                   <Link href="/fonctionnalites">
-                    {copy.ctaSecondary}
+                    {t('ctaSecondary')}
                   </Link>
                 </AppBadge>
               </div>
