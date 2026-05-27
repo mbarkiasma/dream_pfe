@@ -1,5 +1,8 @@
+'use client'
+
 import { BarChart3, CalendarDays, MoonStar } from 'lucide-react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/routing'
 
 type StudentStatsCardsProps = {
   analysesCount: number
@@ -12,27 +15,29 @@ export function StudentStatsCards({
   appointmentsCount = 0,
   dreamsCount,
 }: StudentStatsCardsProps) {
+  const t = useTranslations('dashboard.student.stats')
+
   const stats = [
     {
       href: '/dashboard/student/dreams',
       icon: MoonStar,
-      label: 'Mes reves',
+      label: t('dreams'),
       value: String(dreamsCount),
-      hint: 'Journal personnel',
+      hint: t('dreamsHint'),
     },
     {
       href: '/dashboard/student/analyses',
       icon: BarChart3,
-      label: 'Mes analyses',
+      label: t('analyses'),
       value: String(analysesCount),
-      hint: 'Suivi IA',
+      hint: t('analysesHint'),
     },
     {
       href: '/dashboard/student/rendez_vous',
       icon: CalendarDays,
-      label: 'Rendez-vous',
+      label: t('appointments'),
       value: String(appointmentsCount),
-      hint: 'Planifies',
+      hint: t('appointmentsHint'),
     },
   ]
 

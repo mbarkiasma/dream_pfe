@@ -1,7 +1,10 @@
 'use client'
 
-import Link from 'next/link'
+'use client'
+
+import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
+import { Link } from '@/i18n/routing'
 import {
   CalendarDays,
   Bell,
@@ -20,17 +23,19 @@ import { useState } from 'react'
 import { LogoutButton } from '@/components/dashboard/student/Logout'
 
 const navItems = [
-  { title: 'Dashboard', href: '/dashboard/student', icon: LayoutDashboard },
-  { title: 'Mes reves', href: '/dashboard/student/dreams', icon: MoonStar },
-  { title: 'Mon rapport', href: '/dashboard/student/analyses', icon: FileSearch },
-  { title: 'Smart coaching', href: '/dashboard/student/coaching', icon: LifeBuoy },
-  { title: 'Ma progression', href: '/dashboard/student/checkin', icon: NotebookPen },
-  { title: 'Seances coach', href: '/dashboard/student/seances', icon: CalendarDays },
-  { title: 'Annonces de motivation', href: '/dashboard/student/motivation', icon: Megaphone },
-  { title: 'Rendez-vous', href: '/dashboard/student/rendez_vous', icon: CalendarDays },
-  { title: 'Notifications', href: '/dashboard/student/notifications', icon: Bell },
-  { title: 'Mon profil', href: '/dashboard/student/profile', icon: UserRound },
-]
+  { key: 'dashboard', href: '/dashboard/student', icon: LayoutDashboard },
+  { key: 'dreams', href: '/dashboard/student/dreams', icon: MoonStar },
+  { key: 'analyses', href: '/dashboard/student/analyses', icon: FileSearch },
+  { key: 'coaching', href: '/dashboard/student/coaching', icon: LifeBuoy },
+  { key: 'checkin', href: '/dashboard/student/checkin', icon: NotebookPen },
+  { key: 'seances', href: '/dashboard/student/seances', icon: CalendarDays },
+  { key: 'motivation', href: '/dashboard/student/motivation', icon: Megaphone },
+  { key: 'appointments', href: '/dashboard/student/rendez_vous', icon: CalendarDays },
+  { key: 'notifications', href: '/dashboard/student/notifications', icon: Bell },
+  { key: 'profile', href: '/dashboard/student/profile', icon: UserRound },
+] as const
+
+type SidebarNavItem = (typeof navItems)[number]
 
 function isActivePath(pathname: string, href: string) {
   if (href === '/dashboard/student') {
@@ -41,6 +46,7 @@ function isActivePath(pathname: string, href: string) {
 }
 
 export function StudentSidebar() {
+  const t = useTranslations('dashboard.student.sidebar')
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -52,7 +58,7 @@ export function StudentSidebar() {
             <MoonStar />
           </div>
           <div className="min-w-0">
-            <p className="mindly-sidebar-title">Espace étudiant</p>
+            <p className="mindly-sidebar-title">{t('title')}</p>
           </div>
         </div>
 
@@ -60,11 +66,11 @@ export function StudentSidebar() {
           type="button"
           className="mindly-sidebar-mobile-toggle"
           aria-expanded={menuOpen}
-          aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-label={menuOpen ? t('closeMenu') : t('openMenu')}
           onClick={() => setMenuOpen((open) => !open)}
         >
           {menuOpen ? <X /> : <Menu />}
-          <span>Menu</span>
+          <span>{t('menu')}</span>
         </button>
       </div>
 
@@ -77,14 +83,14 @@ export function StudentSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              title={item.title}
+              title={t(item.key)}
               className={active ? 'mindly-sidebar-link-active' : 'mindly-sidebar-link'}
               onClick={() => setMenuOpen(false)}
             >
               <span className="mindly-sidebar-icon">
                 <Icon />
               </span>
-              <span className="truncate">{item.title}</span>
+              <span className="truncate">{t(item.key)}</span>
             </Link>
           )
         })}

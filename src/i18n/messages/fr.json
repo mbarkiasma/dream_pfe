@@ -13,6 +13,66 @@
     "dark": "Sombre",
     "light": "Clair"
   },
+  "dashboard": {
+    "student": {
+      "topbar": {
+        "title": "Espace étudiant",
+        "description": "Suivez vos reves, vos analyses, vos rendez-vous et votre accompagnement dans un espace unifie."
+      },
+      "home": {
+        "latestDream": {
+          "title": "Mon dernier reve",
+          "empty": "Aucun reve enregistre pour le moment.",
+          "videoLabel": "Video : {status}"
+        },
+        "latestDreamStatusPending": "En attente",
+        "latestDreamStatusWaitingValidation": "En attente de validation",
+        "latestDreamStatusGenerating": "Génération en cours",
+        "latestDreamStatusReady": "Prêt",
+        "latestDreamStatusFailed": "Échoué",
+        "latestDreamStatusUnknown": "Inconnu",
+        "analysis": {
+          "title": "Analyse IA",
+          "empty": "Aucune analyse generee pour le moment.",
+          "overview": "Analyse disponible dans votre espace analyses.",
+          "confidence": "Confiance : {value}"
+        },
+        "analysisConfidenceHigh": "Élevée",
+        "analysisConfidenceMedium": "Moyenne",
+        "analysisConfidenceLow": "Faible",
+        "analysisConfidenceUnknown": "Inconnu",
+        "appointment": {
+          "title": "Prochain rendez-vous",
+          "empty": "Aucun rendez-vous planifie pour le moment."
+        },
+        "see": "Voir"
+      },
+      "stats": {
+        "dreams": "Mes reves",
+        "dreamsHint": "Journal personnel",
+        "analyses": "Mes analyses",
+        "analysesHint": "Suivi IA",
+        "appointments": "Rendez-vous",
+        "appointmentsHint": "Planifies"
+      },
+      "sidebar": {
+        "title": "Espace étudiant",
+        "menu": "Menu",
+        "openMenu": "Ouvrir le menu",
+        "closeMenu": "Fermer le menu",
+        "dashboard": "Dashboard",
+        "dreams": "Mes reves",
+        "analyses": "Mon rapport",
+        "coaching": "Smart coaching",
+        "checkin": "Ma progression",
+        "seances": "Seances coach",
+        "motivation": "Annonces de motivation",
+        "appointments": "Rendez-vous",
+        "notifications": "Notifications",
+        "profile": "Mon profil"
+      }
+    }
+  },
   "contactPage": {
     "hero": {
       "title": "contactez notre équipe",

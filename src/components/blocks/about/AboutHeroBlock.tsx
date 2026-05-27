@@ -9,7 +9,7 @@ const cardLayouts = [
   {
     href: '#fondatrices-encadrante',
     Icon: UsersRound,
-    className: 'lg:left-[calc(50%-125px)] lg:top-[42px] xl:left-[calc(50%-140px)]',
+    className: 'lg:left-[calc(50%-125px)] lg:top-[6px] xl:left-[calc(50%-140px)]',
     floatDuration: 6.2,
     floatDelay: 0,
   },
@@ -61,16 +61,16 @@ export default function AboutHeroBlock() {
         viewBox="0 0 1120 410"
         fill="none"
       >
-        <motion.path d="M560 96 C560 132 560 158 560 184" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
+        <motion.path d="M560 58 C560 98 560 148 560 184" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
         <motion.path d="M560 250 C560 292 560 322 560 352" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
         <motion.path d="M626 217 H806" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
         <motion.path d="M494 217 H314" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
-        <motion.path d="M395 96 C278 104 236 138 214 198" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
-        <motion.path d="M725 96 C842 104 884 138 906 198" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
+        <motion.path d="M395 58 C278 70 236 120 214 198" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
+        <motion.path d="M725 58 C842 70 884 120 906 198" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
         <motion.path d="M214 236 C236 306 280 342 395 352" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
         <motion.path d="M906 236 C884 306 840 342 725 352" stroke="var(--mindly-primary-light)" strokeWidth="1.8" strokeDasharray="6 10" opacity="0.9" {...connectorProps} />
-        <motion.path d="M395 96 C442 136 474 164 510 190" stroke="var(--mindly-primary)" strokeWidth="1.3" strokeDasharray="6 10" opacity="0.62" {...connectorProps} />
-        <motion.path d="M725 96 C678 136 646 164 610 190" stroke="var(--mindly-primary)" strokeWidth="1.3" strokeDasharray="6 10" opacity="0.62" {...connectorProps} />
+        <motion.path d="M395 58 C442 105 474 152 510 190" stroke="var(--mindly-primary)" strokeWidth="1.3" strokeDasharray="6 10" opacity="0.62" {...connectorProps} />
+        <motion.path d="M725 58 C678 105 646 152 610 190" stroke="var(--mindly-primary)" strokeWidth="1.3" strokeDasharray="6 10" opacity="0.62" {...connectorProps} />
         <motion.path d="M395 352 C442 316 474 286 510 244" stroke="var(--mindly-primary)" strokeWidth="1.3" strokeDasharray="6 10" opacity="0.62" {...connectorProps} />
         <motion.path d="M725 352 C678 316 646 286 610 244" stroke="var(--mindly-primary)" strokeWidth="1.3" strokeDasharray="6 10" opacity="0.62" {...connectorProps} />
       </svg>

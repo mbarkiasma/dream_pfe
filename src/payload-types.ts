@@ -130,10 +130,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'account-retention-settings': AccountRetentionSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'account-retention-settings': AccountRetentionSettingsSelect<false> | AccountRetentionSettingsSelect<true>;
   };
   locale: 'fr' | 'en';
   widgets: {
@@ -772,6 +774,11 @@ export interface User {
   clerkUserId?: string | null;
   magic_login_token?: string | null;
   magic_login_expires_at?: string | null;
+  /**
+   * Un compte désactivé ne peut plus se connecter.
+   */
+  isActive?: boolean | null;
+  deactivatedAt?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   studentBranch?: ('LI' | 'LEA' | 'LPE' | 'PC' | 'MP' | 'LM' | 'LSE' | 'master') | null;
@@ -802,6 +809,10 @@ export interface User {
         | 'MR1MATH'
       )
     | null;
+  /**
+   * Exemple : licence, prépa, master.
+   */
+  studentSpecialty?: string | null;
   onboardingStep: 'profile' | 'interview' | 'completed';
   role: 'admin' | 'etudiant' | 'coach' | 'psy';
   /**
@@ -1816,10 +1827,13 @@ export interface UsersSelect<T extends boolean = true> {
   clerkUserId?: T;
   magic_login_token?: T;
   magic_login_expires_at?: T;
+  isActive?: T;
+  deactivatedAt?: T;
   firstName?: T;
   lastName?: T;
   studentBranch?: T;
   studentLevel?: T;
+  studentSpecialty?: T;
   onboardingStep?: T;
   role?: T;
   isAvailableForCoaching?: T;
@@ -2451,6 +2465,20 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * Paramètres de rétention des comptes. Le cron lit ces paramètres pour désactiver ou supprimer les comptes expirés.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "account-retention-settings".
+ */
+export interface AccountRetentionSetting {
+  id: number;
+  enabled?: boolean | null;
+  action: 'deactivate' | 'delete';
+  targetRoles: ('etudiant' | 'coach' | 'psy' | 'admin')[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -2492,6 +2520,18 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "account-retention-settings_select".
+ */
+export interface AccountRetentionSettingsSelect<T extends boolean = true> {
+  enabled?: T;
+  action?: T;
+  targetRoles?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

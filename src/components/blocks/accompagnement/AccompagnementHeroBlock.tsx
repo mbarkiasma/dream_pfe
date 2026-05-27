@@ -48,25 +48,24 @@ export default function AccompagnementHeroBlock() {
   )
 
   const renderNode = (node: (typeof nodes)[number], index: number) => (
-    <div
-      key={index}
-      className="relative flex h-full w-full flex-col items-center justify-center rounded-full border border-[var(--mindly-primary-soft)] bg-[var(--mindly-primary-soft-3)] text-center shadow-[0_14px_35px_rgba(137,94,248,0.14)]"
-    >
+    <div key={index} className="relative h-full w-full">
       {node.badge && (
-        <div className="absolute -right-2 -top-2 rounded-full bg-[var(--mindly-primary)] px-2.5 py-1 text-[10px] font-bold text-white shadow-[0_8px_18px_rgba(137,94,248,0.25)]">
+        <div className="absolute -right-2 -top-2 z-10 rounded-full bg-[var(--mindly-primary)] px-2.5 py-1 text-[10px] font-bold text-white shadow-[0_8px_18px_rgba(137,94,248,0.25)]">
           {node.badge}
         </div>
       )}
 
-      {renderNodeIcon(node.icon)}
+      <div className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-full border border-[var(--mindly-primary-soft)] bg-[var(--mindly-primary-soft-3)] px-2 text-center shadow-[0_14px_35px_rgba(137,94,248,0.14)]">
+        {renderNodeIcon(node.icon)}
 
-      <p className="max-w-[108px] px-1 font-[family-name:var(--font-zain)] text-[13px] font-normal leading-[1.15] text-[var(--mindly-text-strong)]">
-        {node.title}
-      </p>
+        <p className="w-full max-w-[82px] font-[family-name:var(--font-zain)] text-[11.5px] font-semibold leading-[1.2] text-[var(--mindly-text-strong)]">
+          {node.title}
+        </p>
 
-      <p className="mt-1 max-w-[108px] px-1 font-[family-name:var(--font-zain)] text-[11px] font-normal leading-tight text-[var(--mindly-purple-muted)]">
-        {node.subtitle}
-      </p>
+        <p className="mt-1 w-full max-w-[82px] font-[family-name:var(--font-zain)] text-[10px] font-normal leading-tight text-[var(--mindly-purple-muted)]">
+          {node.subtitle}
+        </p>
+      </div>
     </div>
   )
 

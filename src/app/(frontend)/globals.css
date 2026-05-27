@@ -4664,19 +4664,100 @@
     border-color: rgb(255 255 255 / 0.1);
     background: rgb(255 255 255 / 0.04);
   }
+  /* ============================= */
+/* STUDENT COACHING LAYOUT FIX */
+/* ============================= */
+
+.student-coaching-layout {
+  display: flex;
+  gap: 1.25rem;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 1rem;
+  background: var(--mindly-page-gradient);
+}
+
+/* LEFT SIDEBAR */
+.student-coaching-sidebar {
+  width: 300px;
+  min-width: 300px;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.35rem;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--mindly-primary-soft) transparent;
+}
+
+.student-coaching-sidebar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.student-coaching-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.student-coaching-sidebar::-webkit-scrollbar-thumb {
+  background: var(--mindly-primary-soft);
+  border-radius: 999px;
+}
+
+/* RIGHT CHAT PANEL */
+.student-coaching-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* CHAT CONTENT */
+.student-chat-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* IMPORTANT FOR FLEX CHILDREN */
+.student-coaching-panel,
+.student-coaching-panel-compact,
+.student-choice-grid,
+.student-list-stack {
+  min-height: 0;
+}
+
+/* MOBILE */
+@media (width < 1024px) {
   .student-coaching-layout {
-    display: grid;
-    gap: 1.5rem;
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
   }
 
-  @media (width >= 80rem) {
-    .student-coaching-layout {
-      height: calc(100vh - 11rem);
-      min-height: 640px;
-      grid-template-columns: 340px minmax(0, 1fr);
-      overflow: hidden;
-    }
+  .student-coaching-sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
+
+  .student-coaching-main {
+    height: auto;
+    overflow: visible;
+  }
+
+  .student-chat-content {
+    overflow: visible;
+  }
+}
 
   .student-coaching-sidebar {
     min-height: 0;
@@ -5024,7 +5105,7 @@
     flex-shrink: 0;
     border-bottom: 1px solid var(--mindly-border);
     background: rgb(255 255 255 / 0.72);
-    padding: 1.25rem;
+    padding: 0.55rem 1rem;
   }
 
   .student-chat-badges {
@@ -10875,7 +10956,7 @@ html[data-static='true'] {
 
 .student-coaching-layout {
   display: grid;
-  grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 300px) minmax(0, 1fr);
   gap: 1.75rem;
   height: calc(100vh - 190px);
   min-height: 620px;
@@ -10887,7 +10968,7 @@ html[data-static='true'] {
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.65rem;
   overflow: hidden;
 }
 
@@ -10905,7 +10986,7 @@ html[data-static='true'] {
 .student-coaching-panel {
   flex: 0 0 auto;
   border-radius: 2rem;
-  padding: 1.35rem;
+  padding: 0.85rem;
 }
 
 .student-coaching-start-panel {
@@ -10929,7 +11010,7 @@ html[data-static='true'] {
   min-height: 0;
   overflow-y: auto;
   border-radius: 2rem;
-  padding: 1.1rem;
+  padding: 0.75rem;
 }
 
 .student-coaching-header-row,
@@ -10953,6 +11034,10 @@ html[data-static='true'] {
 .student-between-row,
 .student-chat-header-inner {
   justify-content: space-between;
+}
+
+.student-choice-content {
+  gap: 0.6rem;
 }
 
 .student-between-row-inset {
@@ -10982,11 +11067,11 @@ html[data-static='true'] {
 }
 
 .student-section-title {
-  font-size: 1.35rem;
+  font-size: 1.05rem;
 }
 
 .student-subsection-title {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
 }
 
 .student-chat-title {
@@ -11007,16 +11092,16 @@ html[data-static='true'] {
 }
 
 .student-coaching-copy {
-  margin-top: 0.35rem;
-  font-size: 0.9rem;
-  line-height: 1.55rem;
+  margin-top: 0.15rem;
+  font-size: 0.77rem;
+  line-height: 1.4rem;
 }
 
 .student-choice-description {
-  margin-top: 0.25rem;
+  margin-top: 0.1rem;
   display: block;
-  font-size: 0.82rem;
-  line-height: 1.35rem;
+  font-size: 0.76rem;
+  line-height: 1.25rem;
 }
 
 .student-choice-description-clamped {
@@ -11043,18 +11128,18 @@ html[data-static='true'] {
 }
 
 .student-coaching-icon {
-  width: 3.7rem;
-  height: 3.7rem;
-  border-radius: 1.4rem;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 1.1rem;
   background: linear-gradient(145deg, var(--mindly-primary), var(--mindly-primary-light));
   color: var(--mindly-white);
-  box-shadow: 0 18px 36px rgb(137 94 248 / 0.24);
+  box-shadow: 0 14px 28px rgb(137 94 248 / 0.22);
 }
 
 .student-choice-icon {
-  width: 3.25rem;
-  height: 3.25rem;
-  border-radius: 1.15rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.95rem;
   background: var(--mindly-primary-soft-3);
   color: var(--mindly-primary);
 }
@@ -11086,8 +11171,8 @@ html[data-static='true'] {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 0.85rem;
-  margin-top: 1.25rem;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
 }
 
 .student-choice-card {
@@ -11095,9 +11180,9 @@ html[data-static='true'] {
   width: 100%;
   overflow: hidden;
   border: 1px solid var(--mindly-border);
-  border-radius: 1.45rem;
+  border-radius: 1.2rem;
   background: rgb(255 255 255 / 0.74);
-  padding: 1rem;
+  padding: 0.65rem 0.75rem;
   text-align: left;
   color: var(--mindly-text-strong);
   box-shadow: 0 10px 24px rgb(111 77 215 / 0.07);
@@ -11126,7 +11211,7 @@ html[data-static='true'] {
 }
 
 .student-mode-card {
-  min-height: 8.5rem;
+  min-height: auto;
 }
 
 .student-choice-title {
@@ -11137,10 +11222,10 @@ html[data-static='true'] {
 }
 
 .student-choice-tags {
-  margin-top: 0.75rem;
+  margin-top: 0.4rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.3rem;
 }
 
 .student-choice-tags span,
@@ -11153,19 +11238,19 @@ html[data-static='true'] {
   border-radius: var(--mindly-radius-pill);
   background: rgb(255 255 255 / 0.76);
   color: var(--mindly-primary-muted);
-  font-size: 0.76rem;
+  font-size: 0.67rem;
   font-weight: 850;
   line-height: 1;
 }
 
 .student-choice-tags span {
-  padding: 0.42rem 0.62rem;
+  padding: 0.24rem 0.42rem;
 }
 
 .mindly-ui-badge {
-  gap: 0.35rem;
-  min-height: 1.75rem;
-  padding: 0.42rem 0.72rem;
+  gap: 0.3rem;
+  min-height: 1.4rem;
+  padding: 0.28rem 0.58rem;
 }
 
 .mindly-ui-badge-muted {
@@ -11189,6 +11274,13 @@ html[data-static='true'] {
 .student-coach-panel .student-list-stack {
   margin-top: 0.85rem;
   max-height: 15rem;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+.student-coaching-panel-compact .student-list-stack {
+  margin-top: 0.85rem;
+  max-height: 22rem;
   overflow-y: auto;
   padding-right: 0.15rem;
 }
@@ -11323,7 +11415,7 @@ html[data-static='true'] {
 
 .student-chat-header-inner {
   align-items: center;
-  padding: 1.35rem 1.6rem;
+  padding: 0.55rem 1.4rem;
 }
 
 .student-chat-badges {
@@ -11341,6 +11433,22 @@ html[data-static='true'] {
   background:
     radial-gradient(circle at top left, rgb(137 94 248 / 0.08), transparent 30%),
     linear-gradient(180deg, rgb(255 255 255 / 0.72), rgb(248 245 255 / 0.72));
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--mindly-primary-soft) transparent;
+}
+
+.student-chat-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+
+.student-chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.student-chat-scroll::-webkit-scrollbar-thumb {
+  background: var(--mindly-primary-soft);
+  border-radius: 999px;
 }
 
 .student-chat-empty-redesign {
@@ -11375,7 +11483,7 @@ html[data-static='true'] {
 
 .student-empty-title {
   color: var(--mindly-text-strong);
-  font-size: 1.45rem;
+  font-size: 1.25rem;
   font-weight: 900;
   line-height: 1.2;
 }
@@ -11384,7 +11492,7 @@ html[data-static='true'] {
   max-width: 34rem;
   margin-top: 0.65rem;
   color: var(--mindly-text-soft);
-  font-size: 0.98rem;
+  font-size: 0.88rem;
   line-height: 1.75;
 }
 
@@ -11400,9 +11508,9 @@ html[data-static='true'] {
   border: 1px solid rgb(137 94 248 / 0.28);
   border-radius: 999px;
   background: rgb(255 255 255 / 0.82);
-  padding: 0.72rem 1rem;
+  padding: 0.55rem 0.85rem;
   color: var(--mindly-primary-muted);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 850;
   box-shadow: 0 10px 22px rgb(111 77 215 / 0.07);
 }
@@ -11424,9 +11532,159 @@ html[data-static='true'] {
   font-size: 0.86rem;
 }
 
+/* ── Sidebar tab segment control ── */
+.student-sidebar-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--mindly-bg-lavender);
+  border-radius: 1rem;
+  border: 1px solid var(--mindly-border);
+  flex-shrink: 0;
+}
+
+.student-sidebar-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 750;
+  color: var(--mindly-purple-muted);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.student-sidebar-tab-active {
+  background: white;
+  color: var(--mindly-primary);
+  box-shadow: 0 2px 8px rgba(137, 94, 248, 0.12);
+}
+
+.student-sidebar-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.28rem;
+  border-radius: 999px;
+  background: var(--mindly-primary);
+  color: white;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+/* ── Sidebar tab content area ── */
+.student-sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ── Mode selector (IA / Human) ── */
+.student-mode-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-mode-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem;
+  border-radius: 1rem;
+  border: 1.5px solid var(--mindly-border);
+  background: var(--mindly-surface);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.student-mode-option:hover {
+  border-color: rgba(137, 94, 248, 0.3);
+  background: var(--mindly-primary-soft-3);
+}
+
+.student-mode-option-active {
+  border-color: var(--mindly-primary);
+  background: var(--mindly-primary-soft-3);
+}
+
+.student-mode-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.75rem;
+  background: var(--mindly-bg-lavender);
+  color: var(--mindly-primary);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.student-mode-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.student-mode-icon-active {
+  background: var(--mindly-primary);
+  color: white;
+  box-shadow: 0 8px 18px rgba(137, 94, 248, 0.28);
+}
+
+.student-mode-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 750;
+  color: var(--mindly-text-strong);
+  line-height: 1.2;
+}
+
+.student-mode-sub {
+  display: block;
+  font-size: 0.71rem;
+  color: var(--mindly-purple-muted);
+  margin-top: 0.12rem;
+  line-height: 1.3;
+}
+
+.student-mode-check {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: var(--mindly-primary);
+  color: white;
+  flex-shrink: 0;
+}
+
+.student-mode-check svg {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
 .student-message-row-mine,
 .student-message-row-assistant {
   display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
   margin-bottom: 1rem;
 }
 
@@ -11444,6 +11702,7 @@ html[data-static='true'] {
   border-radius: 1.45rem;
   padding: 1rem;
   box-shadow: 0 12px 28px rgb(111 77 215 / 0.08);
+  animation: messageIn 0.22s ease-out;
 }
 
 .student-message-bubble-mine {
@@ -11460,12 +11719,12 @@ html[data-static='true'] {
 }
 
 .student-message-meta {
-  margin-bottom: 0.35rem;
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.72;
+  margin-bottom: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  opacity: 0.6;
 }
 
 .student-message-content {
@@ -11539,7 +11798,7 @@ html[data-static='true'] {
   flex: 0 0 auto;
   border-top: 1px solid rgb(137 94 248 / 0.14);
   background: rgb(255 255 255 / 0.82);
-  padding: 1.2rem;
+  padding: 0.5rem 0.9rem;
   backdrop-filter: blur(16px);
 }
 
@@ -11556,9 +11815,9 @@ html[data-static='true'] {
 
 .student-composer-row {
   display: grid;
-  grid-template-columns: 3.7rem minmax(0, 1fr) 4.9rem;
-  align-items: stretch;
-  gap: 0.9rem;
+  grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .student-recorder-button,
@@ -11591,22 +11850,30 @@ html[data-static='true'] {
   opacity: 0.48;
 }
 
+.student-recorder-button,
+.student-send-button {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
 .student-recorder-button svg,
 .student-send-button svg {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1rem;
+  height: 1rem;
 }
 
 .student-composer-textarea {
-  min-height: 4.7rem;
-  max-height: 10rem;
+  min-height: 2.4rem;
+  max-height: 8rem;
   width: 100%;
-  resize: vertical;
+  resize: none;
   border: 1px solid var(--mindly-border-violet);
-  border-radius: 1.45rem;
+  border-radius: 1.2rem;
   background: rgb(255 255 255 / 0.96);
-  padding: 1rem 1.15rem;
+  padding: 0.55rem 0.9rem;
   color: var(--mindly-text-strong);
+  font-size: 0.875rem;
+  line-height: 1.4;
   outline: none;
   box-shadow: inset 0 2px 8px rgb(111 77 215 / 0.06);
 }
@@ -11762,6 +12029,106 @@ html[data-static='true'] {
   opacity: 0.6;
 }
 
+/* Message avatars */
+.student-message-avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+}
+
+.student-message-avatar svg {
+  width: 0.88rem;
+  height: 0.88rem;
+}
+
+.student-message-avatar-ai {
+  background: linear-gradient(135deg, var(--mindly-primary), var(--mindly-primary-light));
+  color: var(--mindly-white);
+  box-shadow: 0 4px 12px rgb(137 94 248 / 0.22);
+}
+
+.student-message-avatar-coach {
+  background: var(--mindly-surface);
+  border: 1.5px solid var(--mindly-border-violet);
+  color: var(--mindly-primary);
+}
+
+.student-message-avatar-mine {
+  background: var(--mindly-primary-soft-3);
+  border: 1.5px solid rgba(137, 94, 248, 0.2);
+  color: var(--mindly-primary);
+}
+
+/* Session mode label */
+.student-session-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--mindly-text-soft);
+}
+
+.student-session-meta-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* Typing indicator */
+.student-typing-bubble {
+  padding: 0.9rem 1.1rem;
+}
+
+.student-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.student-typing-indicator span {
+  display: block;
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 999px;
+  background: var(--mindly-primary);
+  animation: typingDot 1.3s ease-in-out infinite;
+}
+
+.student-typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.student-typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingDot {
+  0%, 80%, 100% {
+    transform: scale(0.75);
+    opacity: 0.45;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Dark mode */
 [data-theme='dark'] .student-coaching-panel,
 [data-theme='dark'] .student-coaching-panel-compact,
@@ -11809,6 +12176,15 @@ html[data-static='true'] {
 
 [data-theme='dark'] .student-composer-textarea::placeholder {
   color: rgb(255 255 255 / 0.46);
+}
+
+[data-theme='dark'] .student-message-avatar-mine {
+  background: rgb(137 94 248 / 0.18);
+  color: var(--mindly-primary-light);
+}
+
+[data-theme='dark'] .student-typing-indicator span {
+  background: var(--mindly-primary-light);
 }
 
 /* Responsive */
@@ -12105,4 +12481,81 @@ html[data-static='true'] {
     margin-top: 0 !important;
   }
 }
+/* ===================================================== */
+/* STUDENT COACHING SCROLL FIX */
+/* ===================================================== */
 
+.student-coaching-layout {
+  display: flex;
+  gap: 1rem;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.student-coaching-sidebar {
+  width: 300px;
+  min-width: 300px;
+  height: 100vh;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-right: 6px;
+
+  scrollbar-width: thin;
+}
+
+.student-coaching-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+.student-chat-content {
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* IMPORTANT FLEX FIX */
+.student-coaching-panel,
+.student-coaching-panel-compact,
+.student-choice-grid,
+.student-list-stack {
+  min-height: 0;
+}
+
+/* MOBILE */
+@media (max-width: 1024px) {
+  .student-coaching-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .student-coaching-sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .student-coaching-main {
+    height: auto;
+    overflow: visible;
+  }
+
+  .student-chat-content {
+    overflow: visible;
+  }
+}

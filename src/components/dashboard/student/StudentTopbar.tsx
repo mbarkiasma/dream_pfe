@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar'
 
 type StudentTopbarProps = {
@@ -5,9 +8,13 @@ type StudentTopbarProps = {
   description?: string
 }
 
-export function StudentTopbar({
-  title = 'Espace étudiant',
-  description = 'Suivez vos reves, vos analyses, vos rendez-vous et votre accompagnement dans un espace unifie.',
-}: StudentTopbarProps) {
-  return <DashboardTopbar title={title} description={description} />
+export function StudentTopbar({ title, description }: StudentTopbarProps) {
+  const t = useTranslations('dashboard.student.topbar')
+
+  return (
+    <DashboardTopbar
+      title={title ?? t('title')}
+      description={description ?? t('description')}
+    />
+  )
 }

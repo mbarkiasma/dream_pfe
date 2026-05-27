@@ -33,7 +33,7 @@ export function Navbar() {
 
     async function resolveAccountHref() {
       try {
-        const response = await fetch('/api/auth/dashboard-redirect', {
+        const response = await fetch(`/api/auth/dashboard-redirect?locale=${locale}`, {
           cache: 'no-store',
           credentials: 'include',
         })

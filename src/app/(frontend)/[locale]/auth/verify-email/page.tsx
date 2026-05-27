@@ -3,13 +3,19 @@
 import { useClerk } from '@clerk/nextjs'
 import { AlertCircle, Loader2, MailPlus } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 type VerificationStatus = 'checking' | 'expired'
 
 export default function VerifyEmailPage() {
+  const locale = useLocale() as 'fr' | 'en'
   const clerk = useClerk()
   const [status, setStatus] = useState<VerificationStatus>('checking')
+  const redirectPath = `/${locale}/auth/redirect`
+  const loginPath = `/${locale}/login?message=verified-other-device`
+  const magicLinkPath = `/${locale}/login?message=magic-link-expired`
+  const isEnglish = locale === 'en'
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -22,10 +28,10 @@ export default function VerifyEmailPage() {
     void clerk
       .handleEmailLinkVerification(
         {
-          redirectUrl: '/auth/redirect',
-          redirectUrlComplete: '/auth/redirect',
+          redirectUrl: redirectPath,
+          redirectUrlComplete: redirectPath,
           onVerifiedOnOtherDevice: () => {
-            window.location.assign('/login?message=verified-other-device')
+            window.location.assign(loginPath)
           },
         },
         async (to) => {
@@ -36,21 +42,24 @@ export default function VerifyEmailPage() {
         console.error('Clerk email link verification error:', error)
         setStatus('expired')
       })
-  }, [clerk])
+  }, [clerk, loginPath, redirectPath])
 
   if (status === 'expired') {
     return (
       <main className="auth-status-page">
         <div className="auth-status-card">
           <AlertCircle className="auth-status-icon auth-status-icon-error" />
-          <h1 className="auth-status-title">Votre lien magique a expire</h1>
+          <h1 className="auth-status-title">
+            {isEnglish ? 'Your magic link expired' : 'Votre lien magique a expire'}
+          </h1>
           <p className="auth-status-text">
-            Le delai de connexion est ecoule. Pour proteger votre compte, demandez un nouveau lien
-            magique et ouvrez le dernier email recu.
+            {isEnglish
+              ? 'The login window has expired. Request a new magic link and open your latest email.'
+              : 'Le delai de connexion est ecoule. Pour proteger votre compte, demandez un nouveau lien magique et ouvrez le dernier email recu.'}
           </p>
-          <Link className="auth-status-button" href="/login?message=magic-link-expired">
+          <Link className="auth-status-button" href={magicLinkPath}>
             <MailPlus />
-            Generer un nouveau lien magique
+            {isEnglish ? 'Generate a new magic link' : 'Generer un nouveau lien magique'}
           </Link>
         </div>
       </main>
@@ -61,9 +70,13 @@ export default function VerifyEmailPage() {
     <main className="auth-status-page">
       <div className="auth-status-card">
         <Loader2 className="auth-status-icon auth-status-icon-spin" />
-        <h1 className="auth-status-title">Verification en cours</h1>
+        <h1 className="auth-status-title">
+          {isEnglish ? 'Verification in progress' : 'Verification en cours'}
+        </h1>
         <p className="auth-status-text">
-          Nous validons votre lien magique avant de vous rediriger.
+          {isEnglish
+            ? 'We are validating your magic link before redirecting you.'
+            : 'Nous validons votre lien magique avant de vous rediriger.'}
         </p>
       </div>
     </main>

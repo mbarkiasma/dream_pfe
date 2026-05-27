@@ -13,6 +13,66 @@
     "dark": "Dark",
     "light": "Light"
   },
+  "dashboard": {
+    "student": {
+      "topbar": {
+        "title": "Student space",
+        "description": "A unified student space to track dreams, analyses and appointments."
+      },
+      "home": {
+        "latestDream": {
+          "title": "My latest dream",
+          "empty": "No dream recorded yet.",
+          "videoLabel": "Video: {status}"
+        },
+        "latestDreamStatusPending": "Pending",
+        "latestDreamStatusWaitingValidation": "Waiting validation",
+        "latestDreamStatusGenerating": "Generating",
+        "latestDreamStatusReady": "Ready",
+        "latestDreamStatusFailed": "Failed",
+        "latestDreamStatusUnknown": "Unknown",
+        "analysis": {
+          "title": "AI analysis",
+          "empty": "No analysis generated yet.",
+          "overview": "Analysis available in your analyses section.",
+          "confidence": "Confidence: {value}"
+        },
+        "analysisConfidenceHigh": "High",
+        "analysisConfidenceMedium": "Medium",
+        "analysisConfidenceLow": "Low",
+        "analysisConfidenceUnknown": "Unknown",
+        "appointment": {
+          "title": "Next appointment",
+          "empty": "No appointment scheduled yet."
+        },
+        "see": "See"
+      },
+      "stats": {
+        "dreams": "My dreams",
+        "dreamsHint": "Personal journal",
+        "analyses": "My analyses",
+        "analysesHint": "AI tracking",
+        "appointments": "Appointments",
+        "appointmentsHint": "Scheduled"
+      },
+      "sidebar": {
+        "title": "Student space",
+        "menu": "Menu",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu",
+        "dashboard": "Dashboard",
+        "dreams": "My dreams",
+        "analyses": "My report",
+        "coaching": "Smart coaching",
+        "checkin": "My progress",
+        "seances": "Coach sessions",
+        "motivation": "Motivation posts",
+        "appointments": "Appointments",
+        "notifications": "Notifications",
+        "profile": "My profile"
+      }
+    }
+  },
   "contactPage": {
     "hero": {
       "title": "contact our team",

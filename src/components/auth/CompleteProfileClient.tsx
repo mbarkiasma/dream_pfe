@@ -2,8 +2,9 @@
 
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { AlertCircle, ArrowRight, Loader2, UserRound } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { AlertCircle, ArrowRight, Languages, Loader2, UserRound } from 'lucide-react'
+import { useLocale } from 'next-intl'
+import { useRouter, usePathname } from '@/i18n/routing'
 import { useState } from 'react'
 
 type CompleteProfileClientProps = {
@@ -27,12 +28,70 @@ const branchLevels = {
 type StudentBranch = keyof typeof branchLevels
 const branchOptions = Object.keys(branchLevels) as StudentBranch[]
 
+type ProfileCopy = {
+  themeLabel: string
+  profileEyebrow: string
+  profileTitle: string
+  profileDescription: string
+  firstNameLabel: string
+  lastNameLabel: string
+  firstNamePlaceholder: string
+  lastNamePlaceholder: string
+  branchLabel: string
+  branchPlaceholder: string
+  missingNames: string
+  missingBranch: string
+  submit: string
+  submitError: string
+  genericError: string
+  switchLanguage: string
+}
+
 function getBranchForLevel(level: string): StudentBranch | '' {
   return (
     branchOptions.find((branch) => (branchLevels[branch] as readonly string[]).includes(level)) ??
     ''
   )
 }
+
+const profileCopy: Record<'fr' | 'en', ProfileCopy> = {
+  fr: {
+    themeLabel: 'Theme',
+    profileEyebrow: 'Profil etudiant',
+    profileTitle: 'Completez votre profil',
+    profileDescription: 'Ces informations seront utilisees dans votre dashboard, vos rapports et votre suivi.',
+    firstNameLabel: 'Prenom',
+    lastNameLabel: 'Nom',
+    firstNamePlaceholder: 'Votre prenom',
+    lastNamePlaceholder: 'Votre nom',
+    branchLabel: 'Branche et niveau',
+    branchPlaceholder: 'Choisir votre branche et votre niveau',
+    missingNames: 'Veuillez renseigner votre prenom et votre nom.',
+    missingBranch: 'Veuillez selectionner votre branche et votre niveau.',
+    submit: 'Continuer vers mon dashboard',
+    submitError: 'Profil impossible a mettre a jour.',
+    genericError: 'Une erreur est survenue.',
+    switchLanguage: 'Changer de langue',
+  },
+  en: {
+    themeLabel: 'Theme',
+    profileEyebrow: 'Student profile',
+    profileTitle: 'Complete your profile',
+    profileDescription: 'This information will be used in your dashboard, reports and follow-up.',
+    firstNameLabel: 'First name',
+    lastNameLabel: 'Last name',
+    firstNamePlaceholder: 'Your first name',
+    lastNamePlaceholder: 'Your last name',
+    branchLabel: 'Branch and level',
+    branchPlaceholder: 'Choose your branch and your level',
+    missingNames: 'Please enter your first and last name.',
+    missingBranch: 'Please select your branch and your level.',
+    submit: 'Continue to my dashboard',
+    submitError: 'Unable to update profile.',
+    genericError: 'Something went wrong.',
+    switchLanguage: 'Switch language',
+  },
+} as const
 
 export function CompleteProfileClient({
   defaultFirstName = '',
@@ -41,12 +100,19 @@ export function CompleteProfileClient({
   defaultStudentLevel = '',
 }: CompleteProfileClientProps) {
   const router = useRouter()
+  const locale = useLocale() as 'fr' | 'en'
+  const pathname = usePathname()
+  const copy = profileCopy[locale] ?? profileCopy.fr
   const [firstName, setFirstName] = useState(defaultFirstName)
   const [lastName, setLastName] = useState(defaultLastName)
   const [studentBranch, setStudentBranch] = useState(defaultStudentBranch)
   const [studentLevel, setStudentLevel] = useState(defaultStudentLevel)
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const switchLanguage = () => {
+    router.replace(pathname, { locale: locale === 'fr' ? 'en' : 'fr' })
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -59,12 +125,12 @@ export function CompleteProfileClient({
     setErrorMessage('')
 
     if (!cleanFirstName || !cleanLastName) {
-      setErrorMessage('Veuillez renseigner votre prenom et votre nom.')
+      setErrorMessage(copy.missingNames)
       return
     }
 
     if (!cleanStudentBranch || !cleanStudentLevel) {
-      setErrorMessage('Veuillez selectionner votre branche et votre niveau.')
+      setErrorMessage(copy.missingBranch)
       return
     }
 
@@ -87,13 +153,13 @@ export function CompleteProfileClient({
       const data = (await response.json().catch(() => ({}))) as { error?: string }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Profil impossible a mettre a jour.')
+        throw new Error(data.error || copy.submitError)
       }
 
       router.replace('/entretien')
       router.refresh()
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Une erreur est survenue.')
+      setErrorMessage(error instanceof Error ? error.message : copy.genericError)
     } finally {
       setIsSubmitting(false)
     }
@@ -101,8 +167,18 @@ export function CompleteProfileClient({
 
   return (
     <main className="complete-profile-page">
-      <div className="login-theme-switch">
-        <span className="login-theme-label">Theme</span>
+      <div className="login-theme-switch flex gap-2">
+        <button
+          type="button"
+          onClick={switchLanguage}
+          className="flex h-9 items-center gap-1 rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-3 text-xs font-bold text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
+          aria-label={copy.switchLanguage}
+          title={copy.switchLanguage}
+        >
+          <Languages className="h-4 w-4" />
+          <span>{locale.toUpperCase()}</span>
+        </button>
+
         <ThemeToggle className="login-theme-toggle" />
       </div>
 
@@ -113,20 +189,18 @@ export function CompleteProfileClient({
               <UserRound />
             </div>
 
-            <p className="complete-profile-eyebrow">Profil etudiant</p>
+            <p className="complete-profile-eyebrow">{copy.profileEyebrow}</p>
 
-            <h1 className="complete-profile-title">Completez votre profil</h1>
+            <h1 className="complete-profile-title">{copy.profileTitle}</h1>
 
-            <p className="complete-profile-description">
-              Ces informations seront utilisees dans votre dashboard, vos rapports et votre suivi.
-            </p>
+            <p className="complete-profile-description">{copy.profileDescription}</p>
           </div>
 
           <form className="complete-profile-form" onSubmit={handleSubmit}>
             <div className="complete-profile-grid">
               <div className="complete-profile-field">
                 <label className="complete-profile-label" htmlFor="firstName">
-                  Prenom
+                  {copy.firstNameLabel}
                 </label>
 
                 <input
@@ -134,7 +208,7 @@ export function CompleteProfileClient({
                   disabled={isSubmitting}
                   id="firstName"
                   onChange={(event) => setFirstName(event.target.value)}
-                  placeholder="Votre prenom"
+                  placeholder={copy.firstNamePlaceholder}
                   type="text"
                   value={firstName}
                 />
@@ -142,7 +216,7 @@ export function CompleteProfileClient({
 
               <div className="complete-profile-field">
                 <label className="complete-profile-label" htmlFor="lastName">
-                  Nom
+                  {copy.lastNameLabel}
                 </label>
 
                 <input
@@ -150,7 +224,7 @@ export function CompleteProfileClient({
                   disabled={isSubmitting}
                   id="lastName"
                   onChange={(event) => setLastName(event.target.value)}
-                  placeholder="Votre nom"
+                  placeholder={copy.lastNamePlaceholder}
                   type="text"
                   value={lastName}
                 />
@@ -158,7 +232,7 @@ export function CompleteProfileClient({
 
               <div className="complete-profile-field complete-profile-field-wide">
                 <label className="complete-profile-label" htmlFor="studentLevel">
-                  Branche et niveau
+                  {copy.branchLabel}
                 </label>
 
                 <select
@@ -173,7 +247,7 @@ export function CompleteProfileClient({
                   }}
                   value={studentLevel}
                 >
-                  <option value="">Choisir votre branche et votre niveau</option>
+                  <option value="">{copy.branchPlaceholder}</option>
                   {branchOptions.map((branch) => (
                     <optgroup key={branch} label={branch === 'master' ? 'Master' : branch}>
                       {branchLevels[branch].map((level) => (
@@ -202,7 +276,7 @@ export function CompleteProfileClient({
               className="complete-profile-submit"
             >
               {isSubmitting ? <Loader2 className="animate-spin" /> : <ArrowRight />}
-              Continuer vers mon dashboard
+              {copy.submit}
             </Button>
           </form>
         </section>

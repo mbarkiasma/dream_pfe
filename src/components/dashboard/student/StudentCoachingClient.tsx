@@ -63,6 +63,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   const [message, setMessage] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isAiTyping, setIsAiTyping] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [editingSessionId, setEditingSessionId] = useState<string | number | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
@@ -76,6 +77,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   const [selectedChoicesByMessage, setSelectedChoicesByMessage] = useState<
     Record<string, string[]>
   >({})
+  const [sidebarTab, setSidebarTab] = useState<'sessions' | 'new'>(
+    initialSessions.length > 0 ? 'sessions' : 'new',
+  )
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
@@ -98,7 +102,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
   const emptyChatDescription = selectedSessionId
     ? 'Écrivez votre besoin actuel ou sélectionnez une suggestion pour lancer la discussion.'
-    : 'Sélectionnez un type d’accompagnement à gauche, puis démarrez une session.'
+    : "Sélectionnez un type d'accompagnement à gauche, puis démarrez une session."
 
   const suggestedPrompts = [
     'Je me sens stressé avant mes examens.',
@@ -132,7 +136,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages, isLoading, editingMessageId])
+  }, [messages, isLoading, isAiTyping, editingMessageId])
 
   useEffect(() => {
     if (mode !== 'classic') return
@@ -232,7 +236,17 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     if (!selectedSessionId || !cleanMessage || isLoading) return
 
     setIsLoading(true)
+    setIsAiTyping(true)
     setStatusMessage('')
+
+    const optimisticMessage: CoachingMessage = {
+      id: `optimistic-${Date.now()}`,
+      content: cleanMessage,
+      senderRole: 'student',
+    }
+
+    setMessages((current) => [...current, optimisticMessage])
+    setMessage('')
 
     try {
       const response = await fetch('/api/coaching/messages', {
@@ -253,19 +267,23 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       }
 
       setMessages((current) => [
-        ...current,
+        ...current.filter((m) => String(m.id) !== String(optimisticMessage.id)),
         data.message,
         ...(data.aiMessage ? [data.aiMessage] : []),
       ])
-      setMessage('')
 
       if (data.aiMessage?.content) {
         void playText(data.aiMessage.content)
       }
     } catch (error) {
+      setMessages((current) =>
+        current.filter((m) => String(m.id) !== String(optimisticMessage.id)),
+      )
+      setMessage(cleanMessage)
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
     } finally {
       setIsLoading(false)
+      setIsAiTyping(false)
     }
   }
 
@@ -489,182 +507,164 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   return (
     <div className="student-coaching-layout">
       <section className="student-coaching-sidebar">
-        <div className="student-coaching-panel student-coaching-start-panel">
-          <div className="student-coaching-header-row">
-            <div className="student-coaching-icon">
-              <Sparkles />
-            </div>
+        {/* Segment control */}
+        <div className="student-sidebar-tabs">
+          <button
+            type="button"
+            onClick={() => setSidebarTab('sessions')}
+            className={`student-sidebar-tab ${sidebarTab === 'sessions' ? 'student-sidebar-tab-active' : ''}`}
+          >
+            <CalendarDays className="h-4 w-4" />
+            Mes sessions
+            {sessions.length > 0 && (
+              <span className="student-sidebar-tab-badge">{sessions.length}</span>
+            )}
+          </button>
 
-            <div className="student-flex-content">
-              <div className="student-coaching-title-row">
-                <h2 className="student-section-title">Démarrer</h2>
-                <span className="mindly-ui-badge">
-                  {mode === 'smart' ? 'Instantané' : 'Humain'}
-                </span>
-              </div>
+          <button
+            type="button"
+            onClick={() => setSidebarTab('new')}
+            className={`student-sidebar-tab ${sidebarTab === 'new' ? 'student-sidebar-tab-active' : ''}`}
+          >
+            <Plus className="h-4 w-4" />
+            Nouveau
+          </button>
+        </div>
 
-              <p className="student-coaching-copy">
-                Choisissez le type d’accompagnement adapté à votre besoin.
-              </p>
-            </div>
-          </div>
+        {sidebarTab === 'new' ? (
+          <div className="student-sidebar-content">
+            <p className="student-coaching-copy">
+              Choisissez le type d&apos;accompagnement pour démarrer votre session.
+            </p>
 
-          <div className="student-choice-grid">
-            <button
-              type="button"
-              onClick={() => setMode('smart')}
-              className={`student-choice-card student-mode-card ${
-                mode === 'smart' ? 'student-choice-card-active' : ''
-              }`}
-            >
-              <div className="student-choice-content">
-                <div
-                  className={`student-choice-icon ${
-                    mode === 'smart' ? 'student-choice-icon-active' : ''
-                  }`}
-                >
+            <div className="student-mode-selector">
+              <button
+                type="button"
+                onClick={() => setMode('smart')}
+                className={`student-mode-option ${mode === 'smart' ? 'student-mode-option-active' : ''}`}
+              >
+                <div className={`student-mode-icon ${mode === 'smart' ? 'student-mode-icon-active' : ''}`}>
                   <Bot />
                 </div>
 
                 <span className="student-flex-content">
-                  <span className="student-choice-title">Smart coach IA</span>
-                  <span className="student-choice-description">
-                    Disponible maintenant, avec voix et réponses courtes.
-                  </span>
-                  <span className="student-choice-tags">
-                    <span>Stress</span>
-                    <span>Motivation</span>
-                    <span>Organisation</span>
-                  </span>
+                  <span className="student-mode-label">Smart coach IA</span>
+                  <span className="student-mode-sub">Instantané · Voix · IA</span>
                 </span>
 
-                {mode === 'smart' ? <span className="mindly-ui-badge">Choisi</span> : null}
-              </div>
-            </button>
+                {mode === 'smart' && (
+                  <div className="student-mode-check">
+                    <Check />
+                  </div>
+                )}
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setMode('classic')}
-              className={`student-choice-card student-mode-card ${
-                mode === 'classic' ? 'student-choice-card-active' : ''
-              }`}
-            >
-              <div className="student-choice-content">
-                <div
-                  className={`student-choice-icon ${
-                    mode === 'classic' ? 'student-choice-icon-active' : ''
-                  }`}
-                >
+              <button
+                type="button"
+                onClick={() => setMode('classic')}
+                className={`student-mode-option ${mode === 'classic' ? 'student-mode-option-active' : ''}`}
+              >
+                <div className={`student-mode-icon ${mode === 'classic' ? 'student-mode-icon-active' : ''}`}>
                   <UserRound />
                 </div>
 
                 <span className="student-flex-content">
-                  <span className="student-choice-title">Coaching classique</span>
-                  <span className="student-choice-description">
-                    Une session suivie par un coach humain.
-                  </span>
-                  <span className="student-choice-tags">
-                    <span>Suivi personnalisé</span>
-                    <span>Échange humain</span>
-                  </span>
+                  <span className="student-mode-label">Coach humain</span>
+                  <span className="student-mode-sub">Suivi personnalisé · Humain</span>
                 </span>
 
-                {mode === 'classic' ? <span className="mindly-ui-badge">Choisi</span> : null}
-              </div>
-            </button>
-          </div>
+                {mode === 'classic' && (
+                  <div className="student-mode-check">
+                    <Check />
+                  </div>
+                )}
+              </button>
+            </div>
 
-          {mode === 'classic' ? (
-            <div className="student-coach-panel">
-              <div className="student-between-row">
-                <div>
-                  <h3 className="student-subsection-title">Coachs disponibles</h3>
-                  <p className="student-choice-description">
-                    Choisissez un coach humain pour commencer la session.
-                  </p>
+            {mode === 'classic' ? (
+              <div className="student-coach-panel">
+                <div className="student-between-row">
+                  <div>
+                    <h3 className="student-subsection-title">Coachs disponibles</h3>
+                    <p className="student-choice-description">
+                      Choisissez un coach pour commencer.
+                    </p>
+                  </div>
+
+                  {isLoadingCoaches ? <span className="mindly-ui-badge">Chargement</span> : null}
                 </div>
 
-                {isLoadingCoaches ? <span className="mindly-ui-badge">Chargement</span> : null}
-              </div>
+                <div className="student-list-stack">
+                  {coachesError ? (
+                    <div className="mindly-alert mindly-alert-danger">{coachesError}</div>
+                  ) : null}
 
-              <div className="student-list-stack">
-                {coachesError ? (
-                  <div className="mindly-alert mindly-alert-danger">{coachesError}</div>
-                ) : null}
+                  {!isLoadingCoaches && availableCoaches.length === 0 ? (
+                    <div className="mindly-empty">
+                      Aucun coach n&apos;est disponible actuellement. Le Smart coach IA reste
+                      disponible pour continuer l&apos;accompagnement sans attente.
 
-                {!isLoadingCoaches && availableCoaches.length === 0 ? (
-                  <div className="mindly-empty">
-                    Aucun coach n&apos;est disponible actuellement. Le Smart coach IA reste
-                    disponible pour continuer l&apos;accompagnement sans attente.
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMode('smart')
+                          setSelectedCoachId(null)
+                        }}
+                        className="mindly-btn mindly-btn-primary mt-3 w-full"
+                      >
+                        Utiliser le Smart coach IA
+                      </button>
+                    </div>
+                  ) : null}
 
+                  {availableCoaches.map((coach) => (
                     <button
+                      key={coach.id}
                       type="button"
-                      onClick={() => {
-                        setMode('smart')
-                        setSelectedCoachId(null)
-                      }}
-                      className="mindly-btn mindly-btn-primary mt-3 w-full"
+                      onClick={() => setSelectedCoachId(coach.id)}
+                      className={`student-choice-card ${
+                        String(selectedCoachId) === String(coach.id)
+                          ? 'student-choice-card-active'
+                          : ''
+                      }`}
                     >
-                      Utiliser le Smart coach IA
+                      <span className="student-media-row">
+                        <span className="student-choice-icon">
+                          <UserRound />
+                        </span>
+
+                        <span className="student-flex-content">
+                          <span className="block truncate text-sm font-semibold">{coach.name}</span>
+                          <span className="mindly-ui-badge mt-1">{coach.specialty}</span>
+
+                          {coach.bio ? (
+                            <span className="student-choice-description-clamped">{coach.bio}</span>
+                          ) : null}
+                        </span>
+                      </span>
                     </button>
-                  </div>
-                ) : null}
-
-                {availableCoaches.map((coach) => (
-                  <button
-                    key={coach.id}
-                    type="button"
-                    onClick={() => setSelectedCoachId(coach.id)}
-                    className={`student-choice-card ${
-                      String(selectedCoachId) === String(coach.id)
-                        ? 'student-choice-card-active'
-                        : ''
-                    }`}
-                  >
-                    <span className="student-media-row">
-                      <span className="student-choice-icon">
-                        <UserRound />
-                      </span>
-
-                      <span className="student-flex-content">
-                        <span className="block truncate text-sm font-semibold">{coach.name}</span>
-                        <span className="mindly-ui-badge mt-1">{coach.specialty}</span>
-
-                        {coach.bio ? (
-                          <span className="student-choice-description-clamped">{coach.bio}</span>
-                        ) : null}
-                      </span>
-                    </span>
-                  </button>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
 
-          <Button
-            type="button"
-            variant="dream"
-            size="pillLg"
-            onClick={() => void startSession()}
-            disabled={isLoading || isLoadingCoaches || (mode === 'classic' && !selectedCoachId)}
-            className="mindly-btn mindly-btn-primary student-primary-action"
-          >
-            <Plus className="h-4 w-4" />
-            {startButtonLabel}
-          </Button>
-        </div>
-
-        <div className="student-coaching-panel-compact">
-          <div className="student-between-row-inset">
-            <div>
-              <h2 className="student-section-title">Mes sessions</h2>
-              <p className="student-coaching-copy">Retrouvez vos accompagnements récents.</p>
-            </div>
-
-            <span className="mindly-ui-badge">{sessions.length}</span>
+            <Button
+              type="button"
+              variant="dream"
+              size="pillLg"
+              onClick={() => {
+                void startSession()
+                setSidebarTab('sessions')
+              }}
+              disabled={isLoading || isLoadingCoaches || (mode === 'classic' && !selectedCoachId)}
+              className="mindly-btn mindly-btn-primary student-primary-action"
+            >
+              <Sparkles className="h-4 w-4" />
+              {startButtonLabel}
+            </Button>
           </div>
-
-          <div className="student-list-stack">
+        ) : (
+          <div className="student-sidebar-content">
             {sessions.length === 0 ? (
               <div className="mindly-empty student-session-empty">
                 <CalendarDays />
@@ -672,94 +672,109 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   Aucune session pour le moment.
                 </p>
                 <p className="mt-1">Démarrez un accompagnement pour retrouver vos échanges ici.</p>
+
+                <button
+                  type="button"
+                  onClick={() => setSidebarTab('new')}
+                  className="mindly-btn mindly-btn-primary mt-3 w-full"
+                >
+                  Commencer maintenant
+                </button>
               </div>
             ) : null}
 
-            {sessions.map((session) => (
-              <div
-                key={session.id}
-                className={`student-choice-card student-session-card ${
-                  String(selectedSessionId) === String(session.id)
-                    ? 'student-choice-card-active'
-                    : ''
-                }`}
-              >
-                {String(editingSessionId) === String(session.id) ? (
-                  <div className="student-edit-stack">
-                    <input
-                      value={editingTitle}
-                      onChange={(event) => setEditingTitle(event.target.value)}
-                      className="student-edit-input"
-                      maxLength={120}
-                    />
+            <div className="student-list-stack">
+              {sessions.map((session) => (
+                <div
+                  key={session.id}
+                  className={`student-choice-card student-session-card ${
+                    String(selectedSessionId) === String(session.id)
+                      ? 'student-choice-card-active'
+                      : ''
+                  }`}
+                >
+                  {String(editingSessionId) === String(session.id) ? (
+                    <div className="student-edit-stack">
+                      <input
+                        value={editingTitle}
+                        onChange={(event) => setEditingTitle(event.target.value)}
+                        className="student-edit-input"
+                        maxLength={120}
+                      />
 
-                    <div className="student-icon-action-row">
-                      <button
-                        type="button"
-                        onClick={() => void renameSession(session.id)}
-                        className="student-icon-action student-icon-action-md student-icon-action-primary"
-                        title="Enregistrer"
-                      >
-                        <Check />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingSessionId(null)
-                          setEditingTitle('')
-                        }}
-                        className="student-icon-action student-icon-action-md student-icon-action-muted"
-                        title="Annuler"
-                      >
-                        <X />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="student-session-row">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSessionId(session.id)}
-                      className="student-flex-button-content"
-                    >
-                      <span className="block truncate text-sm font-semibold">{session.title}</span>
-                      <span className="mt-1 block text-xs opacity-75">
-                        {session.mode === 'smart' ? 'Smart coach IA' : 'Coach humain'} ·{' '}
-                        {session.status === 'open' ? 'Ouverte' : 'Fermée'}
-                      </span>
-                    </button>
-
-                    <div className="student-session-actions">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingSessionId(session.id)
-                          setEditingTitle(session.title)
-                        }}
-                        className="student-icon-action student-icon-action-sm"
-                        title="Renommer"
-                      >
-                        <Pencil />
-                      </button>
-
-                      {session.mode === 'smart' ? (
+                      <div className="student-icon-action-row">
                         <button
                           type="button"
-                          onClick={() => setSessionToDelete(session)}
-                          className="student-icon-action student-icon-action-sm student-icon-action-danger"
-                          title="Supprimer"
+                          onClick={() => void renameSession(session.id)}
+                          className="student-icon-action student-icon-action-md student-icon-action-primary"
+                          title="Enregistrer"
                         >
-                          <Trash2 />
+                          <Check />
                         </button>
-                      ) : null}
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingSessionId(null)
+                            setEditingTitle('')
+                          }}
+                          className="student-icon-action student-icon-action-md student-icon-action-muted"
+                          title="Annuler"
+                        >
+                          <X />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  ) : (
+                    <div className="student-session-row">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSessionId(session.id)}
+                        className="student-flex-button-content"
+                      >
+                        <span className="block truncate text-sm font-semibold">{session.title}</span>
+                        <span className="student-session-meta">
+                          {session.mode === 'smart' ? (
+                            <Bot className="student-session-meta-icon" />
+                          ) : (
+                            <UserRound className="student-session-meta-icon" />
+                          )}
+                          {session.mode === 'smart' ? 'Smart coach IA' : getCoachName(session)} ·{' '}
+                          {session.status === 'open' ? 'Ouverte' : 'Fermée'}
+                        </span>
+                      </button>
+
+                      <div className="student-session-actions">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingSessionId(session.id)
+                            setEditingTitle(session.title)
+                          }}
+                          className="student-icon-action student-icon-action-sm"
+                          title="Renommer"
+                        >
+                          <Pencil />
+                        </button>
+
+                        {session.mode === 'smart' ? (
+                          <button
+                            type="button"
+                            onClick={() => setSessionToDelete(session)}
+                            className="student-icon-action student-icon-action-sm student-icon-action-danger"
+                            title="Supprimer"
+                          >
+                            <Trash2 />
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       <section className="student-chat-shell">
@@ -769,26 +784,6 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               <h2 className="student-chat-title">
                 {selectedSession?.title ?? 'Aucune session sélectionnée'}
               </h2>
-
-              <div className="student-chat-badges">
-                <span className="mindly-ui-badge">
-                  {selectedSession?.mode === 'smart'
-                    ? 'Smart coach IA'
-                    : selectedSession
-                      ? selectedCoachName
-                      : 'Aucune session'}
-                </span>
-
-                <span className="mindly-ui-badge">
-                  {messageCount} message{messageCount > 1 ? 's' : ''}
-                </span>
-
-                {isLoading ? <span className="mindly-ui-badge">Réponse en cours</span> : null}
-
-                {selectedSession?.status === 'closed' ? (
-                  <span className="mindly-ui-badge mindly-ui-badge-muted">Fermée</span>
-                ) : null}
-              </div>
             </div>
 
             <div className="student-chat-icon">
@@ -842,6 +837,18 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 key={item.id}
                 className={isMine ? 'student-message-row-mine' : 'student-message-row-assistant'}
               >
+                {!isMine && (
+                  <div
+                    className={`student-message-avatar ${
+                      item.senderRole === 'ai'
+                        ? 'student-message-avatar-ai'
+                        : 'student-message-avatar-coach'
+                    }`}
+                  >
+                    {item.senderRole === 'ai' ? <Bot /> : <UserRound />}
+                  </div>
+                )}
+
                 <div
                   className={`student-message-bubble ${
                     isMine ? 'student-message-bubble-mine' : 'student-message-bubble-assistant'
@@ -849,9 +856,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 >
                   <p className="student-message-meta">
                     {item.senderRole === 'ai'
-                      ? 'Smart coach'
+                      ? 'Smart coach IA'
                       : item.senderRole === 'coach'
-                        ? 'Coach'
+                        ? (selectedCoachName || 'Coach')
                         : 'Vous'}
                   </p>
 
@@ -967,9 +974,31 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     </button>
                   ) : null}
                 </div>
+
+                {isMine && (
+                  <div className="student-message-avatar student-message-avatar-mine">
+                    <UserRound />
+                  </div>
+                )}
               </div>
             )
           })}
+
+          {isAiTyping && (
+            <div className="student-message-row-assistant">
+              <div className="student-message-avatar student-message-avatar-assistant">
+                <Bot />
+              </div>
+
+              <div className="student-message-bubble student-message-bubble-assistant student-typing-bubble">
+                <div className="student-typing-indicator">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div ref={messagesEndRef} />
         </div>
@@ -1000,7 +1029,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 }
               }}
               disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-              rows={3}
+              rows={1}
               placeholder={
                 selectedSessionId
                   ? 'Écrivez votre besoin actuel...'
@@ -1020,10 +1049,6 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             </button>
           </div>
 
-          <div className="student-composer-footer">
-            <span>Entrée pour envoyer, Shift + Entrée pour une nouvelle ligne.</span>
-            <span>{message.trim().length} caractères</span>
-          </div>
         </div>
       </section>
 

@@ -7,6 +7,7 @@ import { gcsStorage } from '@payloadcms/storage-gcs'
 import { fileURLToPath } from 'url'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
+import { AccountRetentionSettings } from './globals/AccountRetentionSettings/config'
 import { Pages } from './collections/Pages'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -163,7 +164,7 @@ export default buildConfig({
     PsyOrientations,
     StudentExercices,
   ].map(hideNonAdminManagedCollection),
-  globals: [Header, Footer].map(hideGlobalInAdmin),
+  globals: [Header, Footer].map(hideGlobalInAdmin).concat([AccountRetentionSettings]),
   cors: [getServerSideURL()].filter(Boolean),
   plugins: [
     ...plugins,

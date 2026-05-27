@@ -21,8 +21,7 @@ export async function GET() {
 
   const coaches = await payload.find({
     collection: 'users',
-    user,
-    overrideAccess: false,
+    overrideAccess: true,
     where: {
       role: {
         equals: 'coach',

@@ -7,6 +7,7 @@ import {
   BrainCircuit,
   CheckCircle2,
   HeartHandshake,
+  Languages,
   Loader2,
   Mail,
   MailCheck,
@@ -16,6 +17,8 @@ import {
   Sun,
 } from 'lucide-react'
 import { useTheme } from '@/providers/Theme'
+import { usePathname, useRouter } from '@/i18n/routing'
+import { useLocale } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 type ClerkFlowError = {
@@ -38,18 +41,18 @@ function getFirstClerkError(error: unknown): ClerkFlowError | null {
   return error as ClerkFlowError
 }
 
-function getErrorMessage(error: unknown) {
+function getErrorMessage(error: unknown, fallbackMessage: string) {
   const clerkError = getFirstClerkError(error)
 
   if (clerkError) {
-    return clerkError.longMessage || clerkError.message || 'Une erreur est survenue.'
+    return clerkError.longMessage || clerkError.message || fallbackMessage
   }
 
   if (error instanceof Error) {
     return error.message
   }
 
-  return 'Une erreur est survenue.'
+  return fallbackMessage
 }
 
 function isAccountNotFoundError(error: unknown) {
@@ -110,6 +113,9 @@ const loginCopy = {
     magicError: "Impossible d'envoyer le lien magique.",
     successPrefix: 'Lien envoye a',
     successSuffix: 'Ouvrez votre boite mail pour terminer la connexion.',
+    themeDarkAria: 'Activer le mode sombre',
+    themeLightAria: 'Activer le mode clair',
+    switchLanguage: 'Changer de langue',
   },
   en: {
     visualEyebrow: 'Wellness and AI',
@@ -136,6 +142,9 @@ const loginCopy = {
     magicError: 'Unable to send the magic link.',
     successPrefix: 'Link sent to',
     successSuffix: 'Open your inbox to finish signing in.',
+    themeDarkAria: 'Enable dark mode',
+    themeLightAria: 'Enable light mode',
+    switchLanguage: 'Switch language',
   },
 } as const
 
@@ -148,7 +157,15 @@ export function LoginClient({
   const { signIn, fetchStatus } = useSignIn()
   const { signUp } = useSignUp()
   const { setTheme, theme } = useTheme()
-  const copy = loginCopy.fr
+  const locale = useLocale() as 'fr' | 'en'
+  const router = useRouter()
+  const pathname = usePathname()
+  const redirectPath = `/${locale}/auth/redirect`
+  const loginPath = `/${locale}/login?switchAccount=1`
+  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  const verifyEmailUrl = `${origin}/${locale}/auth/verify-email`
+  const ssoCallbackPath = `/${locale}/sso-callback`
+  const copy = loginCopy[locale] ?? loginCopy.fr
   const [email, setEmail] = useState('')
   const [successEmail, setSuccessEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -158,15 +175,27 @@ export function LoginClient({
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+     
+    const suppressClerkChannelNoise = (event: PromiseRejectionEvent) => {
+      const msg = String(event.reason?.message ?? event.reason ?? '')
+      if (msg.includes('message channel closed') || msg.includes('listener indicated')) {
+        event.preventDefault()
+      }
+    }
+    window.addEventListener('unhandledrejection', suppressClerkChannelNoise)
+    return () => window.removeEventListener('unhandledrejection', suppressClerkChannelNoise)
+  }, [])
+
+  useEffect(() => {
     setMounted(true)
 
     if (isLoaded && isSignedIn && shouldSwitchAccount) {
-      void signOut({ redirectUrl: '/login?switchAccount=1' })
+      void signOut({ redirectUrl: loginPath })
       return
     }
 
     if (isLoaded && isSignedIn) {
-      window.location.assign('/auth/redirect')
+      window.location.assign(redirectPath)
     }
   }, [isLoaded, isSignedIn, shouldSwitchAccount, signOut])
 
@@ -181,15 +210,28 @@ export function LoginClient({
       return
     }
 
+    // Reset loading when user comes back to the tab (popup cancelled or blocker)
+    const resetOnFocus = () => setGoogleLoading(false)
+    window.addEventListener('focus', resetOnFocus, { once: true })
+
     try {
-      await signIn.sso({
+      const { error } = await signIn.sso({
         strategy: 'oauth_google',
         oidcPrompt: 'select_account consent',
-        redirectUrl: '/auth/redirect',
-        redirectCallbackUrl: '/sso-callback',
+        redirectCallbackUrl: ssoCallbackPath, 
+        redirectUrl: redirectPath,            
       })
+      if (error) {
+        window.removeEventListener('focus', resetOnFocus)
+        setErrorMessage(getErrorMessage(error, copy.googleError))
+        setGoogleLoading(false)
+        return
+      }
+      window.removeEventListener('focus', resetOnFocus)
+      setGoogleLoading(false)
     } catch (error) {
-      setErrorMessage(getErrorMessage(error) || copy.googleError)
+      window.removeEventListener('focus', resetOnFocus)
+      setErrorMessage(getErrorMessage(error, copy.googleError))
       setGoogleLoading(false)
     }
   }
@@ -232,7 +274,7 @@ export function LoginClient({
         }
 
         const { error: signUpLinkError } = await signUp.verifications.sendEmailLink({
-          verificationUrl: `${window.location.origin}/auth/verify-email`,
+          verificationUrl: verifyEmailUrl,
         })
 
         if (signUpLinkError) {
@@ -253,7 +295,7 @@ export function LoginClient({
           const { error: finalizeError } = await signUp.finalize()
 
           if (!finalizeError) {
-            window.location.assign('/auth/redirect')
+            window.location.assign(redirectPath)
           }
         })
       }
@@ -278,7 +320,7 @@ export function LoginClient({
 
       let { error: linkError } = await signIn.emailLink.sendLink({
         emailAddress: cleanEmail,
-        verificationUrl: `${window.location.origin}/auth/verify-email`,
+        verificationUrl: verifyEmailUrl,
       })
 
       if (linkError && isMissingActiveSessionError(linkError)) {
@@ -286,7 +328,7 @@ export function LoginClient({
 
         const retry = await signIn.emailLink.sendLink({
           emailAddress: cleanEmail,
-          verificationUrl: `${window.location.origin}/auth/verify-email`,
+          verificationUrl: verifyEmailUrl,
         })
 
         linkError = retry.error
@@ -307,7 +349,7 @@ export function LoginClient({
       setSuccessEmail(cleanEmail)
       setEmail('')
     } catch (error) {
-      setErrorMessage(getErrorMessage(error))
+      setErrorMessage(getErrorMessage(error, copy.genericError))
     } finally {
       setEmailLoading(false)
     }
@@ -315,21 +357,36 @@ export function LoginClient({
 
   const isClerkBusy = fetchStatus === 'fetching'
   const isSubmitting = googleLoading || emailLoading || isClerkBusy
-  const isGoogleDisabled = googleLoading || emailLoading || !signIn
+  const isGoogleDisabled = googleLoading || emailLoading || !isLoaded
   const isDark = mounted && theme === 'dark'
 
   const toggleTheme = () => {
     setTheme(isDark ? 'light' : 'dark')
   }
 
+  const switchLanguage = () => {
+    router.replace(pathname, { locale: locale === 'fr' ? 'en' : 'fr' })
+  }
+
   return (
     <main className="login-page">
-      <div className="login-theme-switch">
+      <div className="login-theme-switch flex gap-2">
+        <button
+          type="button"
+          onClick={switchLanguage}
+          className="flex h-9 items-center gap-1 rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-3 text-xs font-bold text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
+          aria-label={copy.switchLanguage}
+          title={copy.switchLanguage}
+        >
+          <Languages className="h-4 w-4" />
+          <span>{locale.toUpperCase()}</span>
+        </button>
+
         <button
           type="button"
           onClick={toggleTheme}
-          className="login-action-button login-action-icon"
-          aria-label={!isDark ? 'Activer le mode sombre' : 'Activer le mode clair'}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
+          aria-label={!isDark ? copy.themeDarkAria : copy.themeLightAria}
         >
           {isDark ? <Sun /> : <Moon />}
         </button>
@@ -419,7 +476,7 @@ export function LoginClient({
 
               <input
                 className="login-input"
-                disabled={isSubmitting || !signIn || !signUp}
+                disabled={isSubmitting || !isLoaded}
                 id="login-email"
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder={copy.emailPlaceholder}
@@ -430,7 +487,7 @@ export function LoginClient({
 
             <div
               className="login-captcha"
-              data-cl-language="fr-FR"
+              data-cl-language={locale === 'fr' ? 'fr-FR' : 'en-US'}
               data-cl-size="flexible"
               data-cl-theme={theme === 'dark' ? 'dark' : 'light'}
               id="clerk-captcha"
@@ -460,7 +517,7 @@ export function LoginClient({
             <Button
               variant="dream"
               size="lg"
-              disabled={isSubmitting || !signIn || !signUp}
+              disabled={isSubmitting || !isLoaded}
               type="submit"
               className="login-submit-button"
             >

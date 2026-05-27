@@ -89,7 +89,7 @@ export const Users: CollectionConfig = {
 
       return null
     },
-    defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isAvailableForCoaching'],
+    defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isActive', 'isAvailableForCoaching'],
     useAsTitle: 'email',
   },
   auth: {
@@ -427,6 +427,29 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      name: 'isActive',
+      type: 'checkbox',
+      label: 'Compte actif',
+      defaultValue: true,
+      admin: {
+        description: 'Un compte désactivé ne peut plus se connecter.',
+      },
+      access: {
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
+      name: 'deactivatedAt',
+      type: 'date',
+      label: 'Date de désactivation',
+      admin: {
+        readOnly: true,
+      },
+      access: {
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
       name: 'firstName',
       type: 'text',
     },
@@ -483,6 +506,15 @@ export const Users: CollectionConfig = {
       ],
       admin: {
         condition: (_, siblingData) => siblingData?.role === 'etudiant',
+      },
+    },
+    {
+      name: 'studentSpecialty',
+      type: 'text',
+      label: 'Spécialité',
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'etudiant',
+        description: 'Exemple : licence, prépa, master.',
       },
     },
     {

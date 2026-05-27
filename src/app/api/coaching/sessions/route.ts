@@ -31,15 +31,21 @@ export async function POST(request: Request) {
 
   if (mode === 'classic') {
     if (body.coachId) {
-      const coach = await payload.findByID({
-        collection: 'users',
-        id: body.coachId,
-        user,
-        overrideAccess: false,
-        depth: 0,
-      })
+      let coach: Awaited<ReturnType<typeof payload.findByID<'users'>>> | null = null
 
-      if (coach.role !== 'coach' || coach.isAvailableForCoaching !== true) {
+      try {
+        coach = await payload.findByID({
+          collection: 'users',
+          id: body.coachId,
+          user,
+          overrideAccess: false,
+          depth: 0,
+        })
+      } catch {
+        return Response.json({ error: 'Coach introuvable.' }, { status: 409 })
+      }
+
+      if (!coach || coach.role !== 'coach' || coach.isAvailableForCoaching !== true) {
         return Response.json({ error: 'Coach indisponible pour le moment.' }, { status: 409 })
       }
 

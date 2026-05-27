@@ -44,7 +44,7 @@ const cardsFr = [
     featured: true,
   },
   {
-    title: 'Sommeil & récupération',
+    title: 'Sommeil et récupération',
     description:
       'Analyse la qualité de ton sommeil et reçois des conseils pour améliorer ta récupération physique.',
     tag: 'ANALYSE IA',
@@ -123,7 +123,7 @@ export default function NutritionBlock() {
             </span>
 
             <h2 className="mt-4 text-[34px] font-bold leading-[1.08] tracking-normal text-[var(--mindly-text-dark)] sm:text-[42px] lg:text-[48px] xl:text-[52px]">
-              {isFr ? 'Corps et esprit, en équilibre' : 'Body and mind in balance'}
+              {isFr ? 'Corps et esprit , en équilibre' : 'Body and mind in balance'}
             </h2>
 
             <p className="mt-4 max-w-[720px] font-[family-name:var(--font-zain)] text-[15px] font-normal leading-[1.65] tracking-normal text-[var(--mindly-purple-muted)]">

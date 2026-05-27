@@ -159,9 +159,9 @@ export default function FeaturesHeroBlock() {
               {cards.map(({ title, desc, badge }) => (
                 <article
                   key={title}
-                  className="flex min-h-[132px] flex-col rounded-[20px] border border-[var(--mindly-border)] bg-white p-3.5 shadow-[0_12px_26px_rgba(137,94,248,0.08)]"
+                  className="group flex min-h-[132px] flex-col rounded-[20px] border border-[var(--mindly-border)] bg-white p-3.5 shadow-[0_12px_26px_rgba(137,94,248,0.08)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[var(--mindly-lavender-350)] hover:shadow-[0_20px_44px_rgba(137,94,248,0.18)]"
                 >
-                  <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-[12px] bg-[var(--mindly-bg-strong)] text-[var(--mindly-primary)]">
+                  <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-[12px] bg-[var(--mindly-bg-strong)] text-[var(--mindly-primary)] transition-all duration-300 group-hover:scale-110 group-hover:bg-[var(--mindly-lavender-350)]">
                     <Shield className="h-4 w-4" />
                   </div>
                   <h3 className="font-[var(--font-poppins)] text-[14px] font-bold leading-tight text-[var(--mindly-text-strong)]">
@@ -170,7 +170,7 @@ export default function FeaturesHeroBlock() {
                   <p className="mt-2 text-[12px] font-medium leading-5 text-[var(--mindly-purple-muted)]">
                     {desc}
                   </p>
-                  <span className="mt-auto inline-flex w-fit rounded-full border border-[var(--mindly-lavender-600)] bg-white px-3 py-1 text-[11.5px] font-semibold text-[var(--mindly-primary)]">
+                  <span className="mt-auto inline-flex w-fit rounded-full border border-[var(--mindly-lavender-600)] bg-white px-3 py-1 text-[11.5px] font-semibold text-[var(--mindly-primary)] transition-all duration-300 group-hover:bg-[var(--mindly-bg-strong)]">
                     {badge}
                   </span>
                 </article>
