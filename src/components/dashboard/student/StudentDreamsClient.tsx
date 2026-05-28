@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -39,84 +40,19 @@ function getDreamVideoUrl(dream: Dream) {
   return dream.videoUrl || null
 }
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString('fr-FR', {
+function formatDate(value: string, locale: string) {
+  return new Date(value).toLocaleDateString(locale, {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
   })
 }
 
-function getStatusCopy(status: Dream['videoStatus']) {
-  switch (status) {
-    case 'ready':
-      return {
-        label: 'Pret',
-        icon: CheckCircle2,
-        badgeClass: 'student-dream-status student-dream-status-ready',
-        smallBadgeClass: 'student-dream-status student-dream-status-small student-dream-status-ready',
-        dotClass: 'student-dream-dot-ready',
-        description: 'La video et le resume sont disponibles.',
-      }
-    case 'failed':
-      return {
-        label: 'Echec',
-        icon: RefreshCw,
-        badgeClass: 'student-dream-status student-dream-status-failed',
-        smallBadgeClass: 'student-dream-status student-dream-status-small student-dream-status-failed',
-        dotClass: 'student-dream-dot-failed',
-        description: "La generation n'a pas abouti. Vous pouvez relancer un autre reve.",
-      }
-    case 'generating':
-      return {
-        label: 'Generation',
-        icon: Loader2,
-        badgeClass: 'student-dream-status student-dream-status-generating',
-        smallBadgeClass:
-          'student-dream-status student-dream-status-small student-dream-status-generating',
-        dotClass: 'student-dream-dot-generating',
-        description: 'Le workflow video est en cours de traitement.',
-      }
-    case 'waiting_validation':
-      return {
-        label: 'A valider',
-        icon: Clock3,
-        badgeClass: 'student-dream-status student-dream-status-validation',
-        smallBadgeClass:
-          'student-dream-status student-dream-status-small student-dream-status-validation',
-        dotClass: 'student-dream-dot-validation',
-        description: 'Le resume attend votre validation avant la generation video.',
-      }
-    default:
-      return {
-        label: 'En attente',
-        icon: Clock3,
-        badgeClass: 'student-dream-status student-dream-status-pending',
-        smallBadgeClass: 'student-dream-status student-dream-status-small student-dream-status-pending',
-        dotClass: 'student-dream-dot-pending',
-        description: 'Le reve est en file avant generation.',
-      }
-  }
-}
-
-function getAnalysisCopy(dream: Dream) {
-  if (dream.analysis?.trim()) {
-    return dream.analysis.trim()
-  }
-
-  if (dream.videoStatus === 'failed') {
-    return "L'analyse n'a pas pu etre generee pour ce reve. Vous pouvez en relancer un autre quand vous voulez."
-  }
-
-  if (dream.videoStatus === 'ready') {
-    return "L'analyse n'est pas encore disponible pour ce reve."
-  }
-
-  return 'Aucune analyse disponible pour le moment.'
-}
-
 export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) {
   const router = useRouter()
+  const locale = useLocale()
+  const t = useTranslations('dashboard.student.dreams')
+
   const [description, setDescription] = useState('')
   const [query, setQuery] = useState('')
   const [feedback, setFeedback] = useState('')
@@ -132,6 +68,74 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   const hasDreamInProgress = dreams.some(
     (dream) => dream.videoStatus === 'pending' || dream.videoStatus === 'generating',
   )
+
+  function getStatusCopy(status: Dream['videoStatus']) {
+    switch (status) {
+      case 'ready':
+        return {
+          label: t('status.ready'),
+          icon: CheckCircle2,
+          badgeClass: 'student-dream-status student-dream-status-ready',
+          smallBadgeClass: 'student-dream-status student-dream-status-small student-dream-status-ready',
+          dotClass: 'student-dream-dot-ready',
+          description: t('statusDescription.ready'),
+        }
+      case 'failed':
+        return {
+          label: t('status.failed'),
+          icon: RefreshCw,
+          badgeClass: 'student-dream-status student-dream-status-failed',
+          smallBadgeClass: 'student-dream-status student-dream-status-small student-dream-status-failed',
+          dotClass: 'student-dream-dot-failed',
+          description: t('statusDescription.failed'),
+        }
+      case 'generating':
+        return {
+          label: t('status.generating'),
+          icon: Loader2,
+          badgeClass: 'student-dream-status student-dream-status-generating',
+          smallBadgeClass:
+            'student-dream-status student-dream-status-small student-dream-status-generating',
+          dotClass: 'student-dream-dot-generating',
+          description: t('statusDescription.generating'),
+        }
+      case 'waiting_validation':
+        return {
+          label: t('status.waitingValidation'),
+          icon: Clock3,
+          badgeClass: 'student-dream-status student-dream-status-validation',
+          smallBadgeClass:
+            'student-dream-status student-dream-status-small student-dream-status-validation',
+          dotClass: 'student-dream-dot-validation',
+          description: t('statusDescription.waitingValidation'),
+        }
+      default:
+        return {
+          label: t('status.pending'),
+          icon: Clock3,
+          badgeClass: 'student-dream-status student-dream-status-pending',
+          smallBadgeClass: 'student-dream-status student-dream-status-small student-dream-status-pending',
+          dotClass: 'student-dream-dot-pending',
+          description: t('statusDescription.pending'),
+        }
+    }
+  }
+
+  function getAnalysisCopy(dream: Dream) {
+    if (dream.analysis?.trim()) {
+      return dream.analysis.trim()
+    }
+
+    if (dream.videoStatus === 'failed') {
+      return t('analysisFailedError')
+    }
+
+    if (dream.videoStatus === 'ready') {
+      return t('analysisNotAvailable')
+    }
+
+    return t('analysisEmpty')
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -194,7 +198,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
     const trimmedDescription = description.trim()
 
     if (!trimmedDescription) {
-      setError('Decrivez votre reve avant de lancer la generation.')
+      setError(t('submitErrorEmpty'))
       return
     }
 
@@ -213,15 +217,15 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
         const data = await response.json()
 
         if (!response.ok) {
-          setError(data?.error || "Impossible d'envoyer ce reve pour le moment.")
+          setError(data?.error || t('submitErrorServer'))
           return
         }
 
         setDescription('')
-        setFeedback('Reve envoye. La video apparaitra ici des que le workflow termine.')
+        setFeedback(t('submitSuccess'))
         router.refresh()
       } catch {
-        setError("Une erreur reseau est survenue pendant l'envoi.")
+        setError(t('submitErrorFetch'))
       }
     })
   }
@@ -238,14 +242,14 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
 
         if (!response.ok) {
           const data = await response.json().catch(() => null)
-          setError(data?.message || data?.error || 'Suppression impossible pour le moment.')
+          setError(data?.message || data?.error || t('deleteError'))
           return
         }
 
-        setFeedback('Le reve a ete supprime de votre journal.')
+        setFeedback(t('deleteSuccess'))
         router.refresh()
       } catch {
-        setError('Une erreur reseau est survenue pendant la suppression.')
+        setError(t('deleteErrorFetch'))
       }
     })
   }
@@ -262,14 +266,14 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
 
         if (!response.ok) {
           const data = await response.json().catch(() => null)
-          setError(data?.message || data?.error || 'Validation impossible pour le moment.')
+          setError(data?.message || data?.error || t('validateError'))
           return
         }
 
-        setFeedback('Resume valide. La generation video va commencer.')
+        setFeedback(t('validateSuccess'))
         router.refresh()
       } catch {
-        setError('Une erreur reseau est survenue pendant la validation.')
+        setError(t('validateErrorFetch'))
       }
     })
   }
@@ -286,14 +290,14 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
 
         if (!response.ok) {
           const data = await response.json().catch(() => null)
-          setError(data?.message || data?.error || 'Regeneration impossible pour le moment.')
+          setError(data?.message || data?.error || t('regenerateError'))
           return
         }
 
-        setFeedback('Une nouvelle analyse et un nouveau resume sont en cours de generation.')
+        setFeedback(t('regenerateSuccess'))
         router.refresh()
       } catch {
-        setError('Une erreur reseau est survenue pendant la regeneration.')
+        setError(t('regenerateErrorFetch'))
       }
     })
   }
@@ -301,8 +305,8 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   function openAnalysisModal(dream: Dream, content: string) {
     setSelectedAnalysis({
       content,
-      date: formatDate(dream.createdAt),
-      title: dream.summary?.trim() || dream.description.trim().slice(0, 80) || 'Analyse du reve',
+      date: formatDate(dream.createdAt, locale),
+      title: dream.summary?.trim() || dream.description.trim().slice(0, 80) || t('defaultAnalysisTitle'),
     })
   }
 
@@ -314,15 +318,14 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             <div>
               <div className="student-dreams-eyebrow">
                 <Moon />
-                Journal de reves
+                {t('eyebrow')}
               </div>
 
               <h2 className="student-dreams-title">
-                Racontez votre reve, puis validez son resume.
+                {t('heroTitle')}
               </h2>
               <p className="student-dreams-description">
-                Decrivez simplement ce dont vous vous souvenez. L&apos;application prepare un resume
-                et une analyse, puis lance la video apres votre validation.
+                {t('heroDescription')}
               </p>
             </div>
 
@@ -330,7 +333,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
               <Textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Exemple : J'etais dans une maison inconnue, je cherchais quelqu'un et je ressentais de la peur..."
+                placeholder={t('textareaPlaceholder')}
                 className="student-dreams-textarea"
                 disabled={pending}
               />
@@ -344,22 +347,22 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                   {pending ? (
                     <>
                       <Loader2 />
-                      Envoi...
+                      {t('submitPending')}
                     </>
                   ) : (
                     <>
                       <Plus />
-                      Envoyer le reve
+                      {t('submit')}
                     </>
                   )}
                 </Button>
 
                 <div className="student-dreams-limits">
                   <span className="student-dreams-limit-neutral">
-                    {weeklyUsed}/{weeklyLimit} reves cette semaine
+                    {t('weeklyCounter', { used: weeklyUsed, limit: weeklyLimit })}
                   </span>
                   <span className="student-dreams-limit-active">
-                    Encore {remaining} possible{remaining > 1 ? 's' : ''}
+                    {t('remaining', { count: remaining })}
                   </span>
                 </div>
               </div>
@@ -374,9 +377,9 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
           <CardContent className="student-dreams-preview-content">
             <div className="student-dreams-preview-header">
               <div>
-                <p className="student-dreams-small-label">Apercu video</p>
+                <p className="student-dreams-small-label">{t('previewLabel')}</p>
                 <h3 className="student-dreams-preview-title">
-                  {latestDream ? 'Dernier reve' : 'Aucune video encore'}
+                  {latestDream ? t('previewTitle') : t('previewEmpty')}
                 </h3>
               </div>
               <div className="student-dreams-icon-box">
@@ -401,7 +404,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                       {latestDream?.errorMessage ||
                         (latestDream
                           ? getStatusCopy(latestDream.videoStatus).description
-                          : 'La video apparaitra ici apres validation du resume.')}
+                          : t('videoPlaceholder'))}
                     </p>
                   </div>
                 </div>
@@ -411,7 +414,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             {latestDream ? (
               <div className="student-dreams-latest-box">
                 <div className="student-dreams-latest-header">
-                  <p className="student-dreams-date">{formatDate(latestDream.createdAt)}</p>
+                  <p className="student-dreams-date">{formatDate(latestDream.createdAt, locale)}</p>
                   {(() => {
                     const statusCopy = getStatusCopy(latestDream.videoStatus)
                     const StatusIcon = statusCopy.icon
@@ -435,10 +438,9 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
       <section className="student-dreams-journal-header">
         <div className="student-dreams-journal-inner">
           <div>
-            <p className="student-dreams-small-label">Journal</p>
+            <p className="student-dreams-small-label">{t('journalLabel')}</p>
             <h2 className="student-dreams-journal-title">
-              {filteredDreams.length} reve{filteredDreams.length > 1 ? 's' : ''} conserve
-              {filteredDreams.length > 1 ? 's' : ''}
+              {t('journalCount', { count: filteredDreams.length })}
             </h2>
           </div>
 
@@ -447,7 +449,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Rechercher un resume, statut, mot-cle..."
+              placeholder={t('searchPlaceholder')}
               className="student-dreams-search-input"
             />
           </div>
@@ -490,7 +492,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                       )}
 
                       <div className="student-dreams-video-footer">
-                        <span className="student-dreams-date">{formatDate(dream.createdAt)}</span>
+                        <span className="student-dreams-date">{formatDate(dream.createdAt, locale)}</span>
                         <span className={statusCopy.smallBadgeClass}>
                           <StatusIcon />
                           {statusCopy.label}
@@ -504,10 +506,10 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                           <div className="student-dreams-summary-card">
                             <p className="student-dreams-summary-label">
                               <Sparkles />
-                              Resume du reve
+                              {t('summaryLabel')}
                             </p>
                             <p className="student-dreams-summary-text">
-                              {dream.summary || 'Reve en cours de lecture'}
+                              {dream.summary || t('summaryLoading')}
                             </p>
                           </div>
 
@@ -519,7 +521,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                             disabled={pending}
                           >
                             <Trash2 />
-                            Supprimer
+                            {t('delete')}
                           </Button>
                         </div>
 
@@ -531,7 +533,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                               onClick={() => validateDream(dream.id)}
                               disabled={pending}
                             >
-                              Valider le resume
+                              {t('validate')}
                             </Button>
 
                             <Button
@@ -541,7 +543,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                               onClick={() => regenerateDream(dream.id)}
                               disabled={pending}
                             >
-                              Refaire le resume
+                              {t('regenerate')}
                             </Button>
                           </div>
                         ) : null}
@@ -550,7 +552,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                           <div className="student-dreams-info-box">
                             <p className="student-dreams-info-title">
                               <Moon />
-                              Description
+                              {t('descriptionLabel')}
                             </p>
                             <p className="student-dreams-info-text">{dream.description}</p>
                           </div>
@@ -558,7 +560,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                           <div className="student-dreams-analysis-box">
                             <p className="student-dreams-info-title">
                               <Wand2 />
-                              Analyse
+                              {t('analysisLabel')}
                             </p>
                             <p className="student-dreams-info-text">{analysisCopy}</p>
 
@@ -568,7 +570,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                                 onClick={() => openAnalysisModal(dream, analysisCopy)}
                                 className="student-dreams-see-more"
                               >
-                                Voir plus
+                                {t('seeMore')}
                               </button>
                             ) : null}
                           </div>
@@ -583,7 +585,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                             rel="noreferrer"
                             className="student-dreams-video-link"
                           >
-                            Ouvrir la video
+                            {t('openVideo')}
                             <ExternalLink />
                           </a>
                         ) : null}
@@ -597,7 +599,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
         ) : (
           <Card className="student-dreams-empty-card">
             <CardContent className="student-dreams-empty-content">
-              Aucun reve ne correspond a votre recherche pour le moment.
+              {t('noResults')}
             </CardContent>
           </Card>
         )}
@@ -617,10 +619,10 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             <div className="student-dreams-modal-header">
               <div className="student-dreams-modal-heading">
                 <div>
-                  <p className="student-dreams-small-label">Analyse du reve</p>
+                  <p className="student-dreams-small-label">{t('modalTitle')}</p>
                   <h3 className="student-dreams-modal-title">{selectedAnalysis.title}</h3>
                   <p className="student-dreams-modal-date">
-                    Cree le {selectedAnalysis.date}
+                    {t('modalDate', { date: selectedAnalysis.date })}
                   </p>
                 </div>
 
@@ -628,7 +630,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                   type="button"
                   onClick={() => setSelectedAnalysis(null)}
                   className="student-dreams-modal-close"
-                  aria-label="Fermer l'analyse"
+                  aria-label={t('modalCloseAriaLabel')}
                 >
                   <X />
                 </button>
@@ -647,7 +649,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 onClick={() => setSelectedAnalysis(null)}
                 className="student-dreams-modal-close-main"
               >
-                Fermer
+                {t('modalClose')}
               </button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getTranslations } from 'next-intl/server'
 
 import { StudentCoachingClient } from '@/components/dashboard/student/StudentCoachingClient'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
@@ -8,6 +9,7 @@ import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashb
 export default async function StudentCoachingPage() {
   const { user } = await getAuthenticatedDashboardUser()
   const payload = await getPayload({ config })
+  const t = await getTranslations('dashboard.student.coaching')
 
   const sessions = user
     ? await payload.find({
@@ -28,8 +30,8 @@ export default async function StudentCoachingPage() {
   return (
     <div>
       <StudentTopbar
-        title="Smart coaching"
-        description="Choisissez un accompagnement immediat par IA ou une session classique avec un coach humain."
+        title={t('topbar.title')}
+        description={t('topbar.description')}
       />
 
       <StudentCoachingClient initialSessions={sessions.docs as any} />

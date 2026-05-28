@@ -204,29 +204,25 @@ export function LoginClient({
     setSuccessEmail('')
     setGoogleLoading(true)
 
-    if (!signIn) {
-      setErrorMessage(copy.googleError)
-      setGoogleLoading(false)
-      return
-    }
 
-    // Reset loading when user comes back to the tab (popup cancelled or blocker)
+    // Reset loading when user returns to the tab (popup cancelled / redirect failed)
     const resetOnFocus = () => setGoogleLoading(false)
     window.addEventListener('focus', resetOnFocus, { once: true })
 
     try {
-      const { error } = await signIn.sso({
-        strategy: 'oauth_google',
-        oidcPrompt: 'select_account consent',
-        redirectCallbackUrl: ssoCallbackPath, 
-        redirectUrl: redirectPath,            
-      })
-      if (error) {
-        window.removeEventListener('focus', resetOnFocus)
-        setErrorMessage(getErrorMessage(error, copy.googleError))
-        setGoogleLoading(false)
-        return
+      // Use the global Clerk browser instance directly — the v7 SignInFutureResource.sso()
+      // has an incomplete implementation (marked TODO in source) and silently no-ops.
+      // The underlying SignInResource.authenticateWithRedirect() reliably handles the redirect.
+      const clerkGlobal = (window as any).Clerk
+      const clientSignIn = clerkGlobal?.client?.signIn
+      if (!clientSignIn?.authenticateWithRedirect) {
+        throw new Error('Clerk not ready')
       }
+      await clientSignIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: `${origin}${ssoCallbackPath}`,
+        redirectUrlComplete: `${origin}${redirectPath}`,
+      })
       window.removeEventListener('focus', resetOnFocus)
       setGoogleLoading(false)
     } catch (error) {
@@ -357,7 +353,7 @@ export function LoginClient({
 
   const isClerkBusy = fetchStatus === 'fetching'
   const isSubmitting = googleLoading || emailLoading || isClerkBusy
-  const isGoogleDisabled = googleLoading || emailLoading || !isLoaded
+  const isGoogleDisabled = googleLoading || emailLoading
   const isDark = mounted && theme === 'dark'
 
   const toggleTheme = () => {

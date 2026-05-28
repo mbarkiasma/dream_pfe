@@ -1,10 +1,12 @@
 import { notFound, redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { StudentCoachingRegistrationClient } from '@/components/dashboard/student/StudentCoachingRegistrationClient'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
+import { translateCoachingEventToEnglish } from '@/utilities/translateCoachingEvent'
 
 export default async function StudentCoachingEventPage({
   params,
@@ -13,6 +15,8 @@ export default async function StudentCoachingEventPage({
 }) {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.student.seances.register')
+  const locale = await getLocale()
 
   if (!user) {
     redirect('/login')
@@ -64,15 +68,26 @@ export default async function StudentCoachingEventPage({
     limit: 1,
   })
 
+  const tx = locale === 'en'
+    ? await translateCoachingEventToEnglish(event.id, {
+        title: event.title,
+        theme: event.theme,
+        description: event.description,
+      })
+    : null
+
   return (
     <div>
       <StudentTopbar
-        title="Inscription coaching"
-        description="Confirmez votre participation a la seance de coaching."
+        title={t('topbar.title')}
+        description={t('topbar.description')}
       />
 
       <StudentCoachingRegistrationClient
         event={event}
+        translatedTitle={tx?.title}
+        translatedTheme={tx?.theme}
+        translatedDescription={tx?.description}
         existingRegistration={existingRegistration.docs[0] || null}
       />
     </div>

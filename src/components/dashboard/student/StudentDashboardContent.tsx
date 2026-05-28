@@ -126,7 +126,10 @@ export function StudentDashboardContent({
                   <h2 className="mindly-feature-title">{t('home.analysis.title')}</h2>
                 </div>
 
-                <ChevronRight className="mindly-feature-chevron" />
+                <span className="mindly-feature-action">
+                  {t('home.see')}
+                  <ChevronRight />
+                </span>
               </div>
 
               <div className="mindly-feature-content">
@@ -159,7 +162,10 @@ export function StudentDashboardContent({
                   <h2 className="mindly-feature-title">{t('home.appointment.title')}</h2>
                 </div>
 
-                <ChevronRight className="mindly-feature-chevron" />
+                <span className="mindly-feature-action">
+                  {t('home.see')}
+                  <ChevronRight />
+                </span>
               </div>
 
               <div className="mindly-feature-content">

@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getTranslations } from 'next-intl/server'
 
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { StudentDreamsClient } from '@/components/dashboard/student/StudentDreamsClient'
@@ -10,6 +11,7 @@ const WEEKLY_LIMIT = 4
 export default async function StudentDreamsPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.student.dreamsPage')
 
   const now = new Date()
   const day = now.getDay()
@@ -60,8 +62,8 @@ export default async function StudentDreamsPage() {
   return (
     <div>
       <StudentTopbar
-        title="Mes reves"
-        description="Racontez vos reves, suivez leur generation video et revivez chaque scene dans un espace elegant et personnel."
+        title={t('topbar.title')}
+        description={t('topbar.description')}
       />
 
       <StudentDreamsClient

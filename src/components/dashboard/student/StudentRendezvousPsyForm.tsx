@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock, Loader2, Send } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,15 +36,6 @@ type AgendaDay = {
   status: DayStatus
 }
 
-const selectedDateFormatter = new Intl.DateTimeFormat('fr-FR', {
-  weekday: 'long',
-  day: '2-digit',
-  month: 'long',
-  year: 'numeric',
-})
-const agendaDayFormatter = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' })
-const agendaMonthFormatter = new Intl.DateTimeFormat('fr-FR', { month: 'short' })
-
 function formatDateValue(date: Date) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -59,30 +51,29 @@ function addDays(date: Date, days: number) {
   return nextDate
 }
 
-function buildAgendaDays(startDate: Date, count: number) {
+function buildAgendaDays(startDate: Date, count: number, locale: string) {
+  const dayFormatter = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+  const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'short' })
+
   return Array.from({ length: count }, (_, index) => {
     const date = addDays(startDate, index)
 
     return {
       date: formatDateValue(date),
-      dayName: agendaDayFormatter.format(date).replace('.', ''),
+      dayName: dayFormatter.format(date).replace('.', ''),
       dayNumber: String(date.getDate()).padStart(2, '0'),
-      monthName: agendaMonthFormatter.format(date).replace('.', ''),
+      monthName: monthFormatter.format(date).replace('.', ''),
     }
   })
 }
 
-function getSelectedDayMessage(status: DayStatus | undefined) {
-  if (status === 'full') return 'Tous les creneaux de cette journee sont deja pris.'
-  if (status === 'weekend') return 'Le psychologue ne consulte pas le week-end.'
-  if (status === 'closed') return 'Le psychologue ne consulte pas ce jour-la.'
-  if (status === 'past') return 'Cette date est deja passee.'
-
-  return 'Aucun horaire disponible pour cette date.'
-}
-
-function getDateLabel(dateValue: string) {
-  return selectedDateFormatter.format(new Date(`${dateValue}T00:00:00`))
+function getDateLabel(dateValue: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(`${dateValue}T00:00:00`))
 }
 
 function getDateInputLabel(dateValue: string) {
@@ -91,15 +82,6 @@ function getDateInputLabel(dateValue: string) {
   if (!year || !month || !day) return dateValue
 
   return `${day}/${month}/${year}`
-}
-
-function getAgendaStatusLabel(day: AgendaDay) {
-  if (day.status === 'available')
-    return `${day.availableSlots} libre${day.availableSlots > 1 ? 's' : ''}`
-  if (day.status === 'full') return 'Complet'
-  if (day.status === 'weekend') return 'Week-end'
-  if (day.status === 'closed') return 'Ferme'
-  return 'Passe'
 }
 
 function getAgendaStatusClass(day: AgendaDay, isSelected: boolean) {
@@ -117,13 +99,14 @@ function getAgendaStatusClass(day: AgendaDay, isSelected: boolean) {
 }
 
 export function StudentRendezvousPsyForm() {
+  const t = useTranslations('dashboard.student.appointments.form')
+  const locale = useLocale()
   const router = useRouter()
   const searchParams = useSearchParams()
   const orientationId = searchParams.get('orientationId')
   const agendaScrollRef = useRef<HTMLDivElement>(null)
   const today = useMemo(() => formatDateValue(new Date()), [])
-  const tomorrow = useMemo(() => formatDateValue(addDays(new Date(), 1)), [])
-  const agendaDates = useMemo(() => buildAgendaDays(new Date(), 14), [])
+  const agendaDates = useMemo(() => buildAgendaDays(new Date(), 14, locale), [locale])
 
   const [agendaDays, setAgendaDays] = useState<AgendaDay[]>([])
   const [selectedDate, setSelectedDate] = useState(today)
@@ -135,6 +118,22 @@ export function StudentRendezvousPsyForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+
+  function getAgendaStatusLabel(day: AgendaDay) {
+    if (day.status === 'available') return t('agendaStatusAvailable', { count: day.availableSlots })
+    if (day.status === 'full') return t('agendaStatusFull')
+    if (day.status === 'weekend') return t('agendaStatusWeekend')
+    if (day.status === 'closed') return t('agendaStatusClosed')
+    return t('agendaStatusPast')
+  }
+
+  function getSelectedDayMessage(status: DayStatus | undefined) {
+    if (status === 'full') return t('dayMessageFull')
+    if (status === 'weekend') return t('dayMessageWeekend')
+    if (status === 'closed') return t('dayMessageClosed')
+    if (status === 'past') return t('dayMessagePast')
+    return t('dayMessageDefault')
+  }
 
   useEffect(() => {
     let isActive = true
@@ -224,7 +223,7 @@ export function StudentRendezvousPsyForm() {
         if (!response.ok) {
           setSlots([])
           setSelectedDayStatus(undefined)
-          setError(data.error || 'Impossible de charger les creneaux.')
+          setError(data.error || t('errorLoadSlots'))
           return
         }
 
@@ -234,7 +233,7 @@ export function StudentRendezvousPsyForm() {
         if (isActive) {
           setSlots([])
           setSelectedDayStatus(undefined)
-          setError('Impossible de charger les creneaux.')
+          setError(t('errorLoadSlots'))
         }
       } finally {
         if (isActive) {
@@ -250,7 +249,7 @@ export function StudentRendezvousPsyForm() {
     return () => {
       isActive = false
     }
-  }, [selectedDate])
+  }, [selectedDate, t])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -258,7 +257,7 @@ export function StudentRendezvousPsyForm() {
     setError('')
 
     if (!startTime || !reason.trim()) {
-      setError('Choisis un creneau disponible et indique le motif de ta demande.')
+      setError(t('errorSubmitValidation'))
       return
     }
 
@@ -281,16 +280,16 @@ export function StudentRendezvousPsyForm() {
       const data = (await response.json().catch(() => ({}))) as { error?: string }
 
       if (!response.ok) {
-        setError(data.error || "Impossible d'envoyer la demande.")
+        setError(data.error || t('errorSubmit'))
         return
       }
 
-      setMessage('Demande envoyee. Le psychologue pourra la confirmer depuis son espace.')
+      setMessage(t('success'))
       setReason('')
       setStartTime('')
       router.refresh()
     } catch {
-      setError("Impossible d'envoyer la demande.")
+      setError(t('errorSubmit'))
     } finally {
       setIsSubmitting(false)
     }
@@ -308,6 +307,10 @@ export function StudentRendezvousPsyForm() {
   const hiddenUnavailableSlots = slots.length - availableSlots.length
   const selectedAgendaDay = agendaDays.find((day) => day.date === selectedDate)
 
+  const slotCountLabel = availableSlots.length === 0
+    ? t('slotCountZero')
+    : t('slotCount', { count: availableSlots.length })
+
   return (
     <form onSubmit={handleSubmit} className="student-psy-form">
       <div className="student-psy-grid">
@@ -318,8 +321,8 @@ export function StudentRendezvousPsyForm() {
                 <CalendarDays />
               </div>
               <div>
-                <p className="student-psy-card-label">Agenda</p>
-                <p className="student-psy-card-title">Prochains jours</p>
+                <p className="student-psy-card-label">{t('agendaLabel')}</p>
+                <p className="student-psy-card-title">{t('agendaTitle')}</p>
               </div>
             </div>
           </div>
@@ -329,7 +332,7 @@ export function StudentRendezvousPsyForm() {
               <button
                 type="button"
                 className="student-psy-days-arrow"
-                aria-label="Voir les jours precedents"
+                aria-label={t('prevDaysAriaLabel')}
                 onClick={() => scrollAgenda('left')}
               >
                 <ChevronLeft />
@@ -365,7 +368,7 @@ export function StudentRendezvousPsyForm() {
               <button
                 type="button"
                 className="student-psy-days-arrow"
-                aria-label="Voir les jours suivants"
+                aria-label={t('nextDaysAriaLabel')}
                 onClick={() => scrollAgenda('right')}
               >
                 <ChevronRight />
@@ -374,7 +377,7 @@ export function StudentRendezvousPsyForm() {
 
             <div className="student-psy-field student-psy-field-spaced">
               <Label htmlFor="appointment-date" className="student-psy-label">
-                Autre date
+                {t('otherDate')}
               </Label>
               <div className="student-psy-date-input-wrap">
                 <Input
@@ -400,13 +403,11 @@ export function StudentRendezvousPsyForm() {
                 <Clock />
               </div>
               <div>
-                <p className="student-psy-selected-date">{getDateLabel(selectedDate)}</p>
+                <p className="student-psy-selected-date">{getDateLabel(selectedDate, locale)}</p>
                 <p className="student-psy-selected-count">
                   {selectedAgendaDay
                     ? getAgendaStatusLabel(selectedAgendaDay)
-                    : availableSlots.length > 0
-                      ? `${availableSlots.length} creneau${availableSlots.length > 1 ? 'x' : ''} restant${availableSlots.length > 1 ? 's' : ''}`
-                      : 'Aucun creneau restant'}
+                    : slotCountLabel}
                 </p>
               </div>
             </div>
@@ -415,7 +416,7 @@ export function StudentRendezvousPsyForm() {
           {isLoadingDay ? (
             <div className="student-psy-loading">
               <Loader2 className="animate-spin" />
-              Chargement des horaires...
+              {t('loading')}
             </div>
           ) : availableSlots.length > 0 ? (
             <div className="student-psy-slots-list">
@@ -437,10 +438,12 @@ export function StudentRendezvousPsyForm() {
                       <span className="student-psy-slot-time">
                         {slot.startTime} - {slot.endTime}
                       </span>
-                      <span className="student-psy-slot-caption">Consultation disponible</span>
+                      <span className="student-psy-slot-caption">{t('slotCaption')}</span>
                     </span>
 
-                    <span className="student-psy-slot-badge">{active ? 'Choisi' : 'Libre'}</span>
+                    <span className="student-psy-slot-badge">
+                      {active ? t('slotBadgeChosen') : t('slotBadgeFree')}
+                    </span>
                   </Button>
                 )
               })}
@@ -450,7 +453,7 @@ export function StudentRendezvousPsyForm() {
               <div className="student-psy-empty-icon">
                 <Clock />
               </div>
-              <p className="student-psy-empty-title">Aucun horaire disponible</p>
+              <p className="student-psy-empty-title">{t('noSlotTitle')}</p>
               <p className="student-psy-empty-text">
                 {getSelectedDayMessage(selectedDayStatus)}
               </p>
@@ -458,43 +461,40 @@ export function StudentRendezvousPsyForm() {
           )}
 
           {hiddenUnavailableSlots > 0 && availableSlots.length > 0 ? (
-            <p className="student-psy-hidden-note">
-              Les horaires passes ou deja reserves ne sont pas affiches.
-            </p>
+            <p className="student-psy-hidden-note">{t('hiddenNote')}</p>
           ) : null}
         </section>
       </div>
 
       {selectedSlot ? (
         <div className="student-psy-selected-box">
-          Rendez-vous selectionne : {getDateLabel(selectedDate)} de {selectedSlot.startTime} a{' '}
-          {selectedSlot.endTime}.
+          {t('selectedBox', {
+            date: getDateLabel(selectedDate, locale),
+            start: selectedSlot.startTime,
+            end: selectedSlot.endTime,
+          })}
         </div>
       ) : null}
 
       <div className="student-psy-details-grid">
         <div className="student-psy-field">
-          <Label className="student-psy-label">Urgence</Label>
+          <Label className="student-psy-label">{t('urgencyLabel')}</Label>
           {orientationId ? (
-            <div className="student-psy-selected-box">
-              Priorite urgente - orientation coach
-            </div>
+            <div className="student-psy-selected-box">{t('urgencyHigh')}</div>
           ) : (
-            <div className="student-psy-selected-box">
-              Priorite normale
-            </div>
+            <div className="student-psy-selected-box">{t('urgencyNormal')}</div>
           )}
         </div>
 
         <div className="student-psy-field">
           <Label htmlFor="appointment-reason" className="student-psy-label">
-            Motif de la demande
+            {t('reasonLabel')}
           </Label>
           <Textarea
             id="appointment-reason"
             value={reason}
             onChange={(event) => setReason(event.target.value)}
-            placeholder="Explique brievement pourquoi tu souhaites rencontrer le psychologue."
+            placeholder={t('reasonPlaceholder')}
             className="student-psy-textarea"
           />
         </div>
@@ -510,7 +510,7 @@ export function StudentRendezvousPsyForm() {
         className="student-psy-submit"
       >
         {isSubmitting ? <Loader2 className="animate-spin" /> : <Send />}
-        Envoyer la demande
+        {t('btnSubmit')}
       </Button>
     </form>
   )

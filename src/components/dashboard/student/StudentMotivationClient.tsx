@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Heart, Megaphone, X } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -31,16 +32,6 @@ type Props = {
 
 type ReactionValue = 'like'
 
-function formatDate(value?: string | null) {
-  if (!value) return 'Date non precisee'
-
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(value))
-}
-
 function getAuthorName(author: MotivationAnnouncement['author']) {
   if (!author) return 'Coach'
 
@@ -50,6 +41,8 @@ function getAuthorName(author: MotivationAnnouncement['author']) {
 }
 
 export function StudentMotivationClient({ announcements }: Props) {
+  const t = useTranslations('dashboard.student.motivation')
+  const locale = useLocale()
   const router = useRouter()
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<MotivationAnnouncement | null>(
     null,
@@ -57,6 +50,16 @@ export function StudentMotivationClient({ announcements }: Props) {
   const [isMounted, setIsMounted] = useState(false)
   const [pendingReactionId, setPendingReactionId] = useState<string | number | null>(null)
   const [error, setError] = useState('')
+
+  function formatDate(value?: string | null) {
+    if (!value) return t('dateNotSpecified')
+
+    return new Intl.DateTimeFormat(locale, {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(value))
+  }
 
   useEffect(() => {
     setIsMounted(true)
@@ -100,13 +103,13 @@ export function StudentMotivationClient({ announcements }: Props) {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'Reaction impossible pour le moment.')
+        setError(data.error || t('errorReaction'))
         return
       }
 
       router.refresh()
     } catch {
-      setError('Reaction impossible pour le moment.')
+      setError(t('errorReaction'))
     } finally {
       setPendingReactionId(null)
     }
@@ -117,7 +120,7 @@ export function StudentMotivationClient({ announcements }: Props) {
       {announcements.length === 0 ? (
         <Card className="student-motivation-empty-card">
           <CardContent className="student-motivation-empty-content">
-            Aucune annonce de motivation n&apos;est disponible pour le moment.
+            {t('empty')}
           </CardContent>
         </Card>
       ) : null}
@@ -133,13 +136,15 @@ export function StudentMotivationClient({ announcements }: Props) {
               <div>
                 <h2 className="student-motivation-title">{announcement.title}</h2>
                 <p className="student-motivation-meta">
-                  Publiee par {getAuthorName(announcement.author)} -{' '}
-                  {formatDate(announcement.publishedAt || announcement.createdAt)}
+                  {t('publishedBy', {
+                    name: getAuthorName(announcement.author),
+                    date: formatDate(announcement.publishedAt || announcement.createdAt),
+                  })}
                 </p>
               </div>
             </div>
 
-            <span className="student-motivation-badge">Motivation</span>
+            <span className="student-motivation-badge">{t('badge')}</span>
           </div>
 
           <div className="student-motivation-content-box">
@@ -154,7 +159,7 @@ export function StudentMotivationClient({ announcements }: Props) {
               size="xs"
               className="student-motivation-action-button"
             >
-              Voir plus
+              {t('seeMore')}
             </Button>
 
             {(() => {
@@ -200,15 +205,17 @@ export function StudentMotivationClient({ announcements }: Props) {
                 <div className="student-motivation-modal-header">
                   <div className="student-motivation-modal-heading">
                     <div>
-                      <p className="student-motivation-modal-label">Motivation</p>
+                      <p className="student-motivation-modal-label">{t('badge')}</p>
                       <h3 className="student-motivation-modal-title">
                         {selectedAnnouncement.title}
                       </h3>
                       <p className="student-motivation-modal-meta">
-                        Publiee par {getAuthorName(selectedAnnouncement.author)} -{' '}
-                        {formatDate(
-                          selectedAnnouncement.publishedAt || selectedAnnouncement.createdAt,
-                        )}
+                        {t('publishedBy', {
+                          name: getAuthorName(selectedAnnouncement.author),
+                          date: formatDate(
+                            selectedAnnouncement.publishedAt || selectedAnnouncement.createdAt,
+                          ),
+                        })}
                       </p>
                     </div>
 
@@ -216,7 +223,7 @@ export function StudentMotivationClient({ announcements }: Props) {
                       type="button"
                       onClick={() => setSelectedAnnouncement(null)}
                       className="student-motivation-modal-close"
-                      aria-label="Fermer l'annonce"
+                      aria-label={t('closeAriaLabel')}
                     >
                       <X />
                     </button>
@@ -235,7 +242,7 @@ export function StudentMotivationClient({ announcements }: Props) {
                     onClick={() => setSelectedAnnouncement(null)}
                     className="student-motivation-modal-main-button"
                   >
-                    Fermer
+                    {t('close')}
                   </button>
                 </div>
               </div>

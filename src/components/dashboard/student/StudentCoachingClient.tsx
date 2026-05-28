@@ -17,6 +17,7 @@ import {
   Volume2,
   X,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 
@@ -54,6 +55,8 @@ type StudentCoachingClientProps = {
 }
 
 export function StudentCoachingClient({ initialSessions }: StudentCoachingClientProps) {
+  const t = useTranslations('dashboard.student.coaching')
+
   const [sessions, setSessions] = useState(initialSessions)
   const [selectedSessionId, setSelectedSessionId] = useState<string | number | null>(
     initialSessions[0]?.id ?? null,
@@ -91,24 +94,15 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   )
 
   const selectedCoachName = getCoachName(selectedSession)
-  const messageCount = messages.length
 
-  const startButtonLabel =
-    mode === 'smart' ? 'Démarrer avec le Smart coach IA' : 'Planifier avec un coach humain'
+  const startButtonLabel = mode === 'smart' ? t('startSmart') : t('startClassic')
 
-  const emptyChatTitle = selectedSessionId
-    ? 'Commencez votre échange'
-    : 'Choisissez un accompagnement'
-
+  const emptyChatTitle = selectedSessionId ? t('emptyChatTitle') : t('emptyChatTitleEmpty')
   const emptyChatDescription = selectedSessionId
-    ? 'Écrivez votre besoin actuel ou sélectionnez une suggestion pour lancer la discussion.'
-    : "Sélectionnez un type d'accompagnement à gauche, puis démarrez une session."
+    ? t('emptyChatDescription')
+    : t('emptyChatDescriptionEmpty')
 
-  const suggestedPrompts = [
-    'Je me sens stressé avant mes examens.',
-    'Aide-moi à organiser ma semaine.',
-    'Je manque de motivation ces derniers jours.',
-  ]
+  const suggestedPrompts = t.raw('suggestedPrompts') as string[]
 
   useEffect(() => {
     if (!selectedSessionId) {
@@ -153,7 +147,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         const data = await response.json()
 
         if (!response.ok) {
-          throw new Error(data.error || 'Impossible de charger les coachs disponibles.')
+          throw new Error(data.error || t('errorLoadCoaches'))
         }
 
         if (!isMounted) return
@@ -163,13 +157,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         setSelectedCoachId((current) => current ?? coaches[0]?.id ?? null)
 
         if (coaches.length === 0) {
-          setStatusMessage(
-            'Aucun coach humain disponible pour le moment. Vous pouvez utiliser le Smart coach IA.',
-          )
+          setStatusMessage(t('noCoachAvailable'))
         }
       } catch (error) {
         if (isMounted) {
-          const errorMessage = error instanceof Error ? error.message : 'Erreur inattendue.'
+          const errorMessage = error instanceof Error ? error.message : t('errorUnexpected')
           setCoachesError(errorMessage)
           setStatusMessage(errorMessage)
         }
@@ -185,11 +177,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     return () => {
       isMounted = false
     }
-  }, [mode])
+  }, [mode, t])
 
   async function startSession() {
     if (mode === 'classic' && !selectedCoachId) {
-      setStatusMessage('Choisissez un coach disponible ou passez au Smart coach IA.')
+      setStatusMessage(t('statusNoCoach'))
       return
     }
 
@@ -199,13 +191,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     try {
       const response = await fetch('/api/coaching/sessions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mode,
-          coachId: mode === 'classic' ? selectedCoachId : undefined,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode, coachId: mode === 'classic' ? selectedCoachId : undefined }),
       })
 
       const data = await response.json()
@@ -215,16 +202,15 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           setMode('smart')
           setSelectedCoachId(null)
         }
-
-        throw new Error(data.error || 'Impossible de créer la session.')
+        throw new Error(data.error || t('errorCreateSession'))
       }
 
       setSessions((current) => [data.session, ...current])
       setSelectedSessionId(data.session.id)
       setMessages([])
-      setStatusMessage('Session créée avec succès.')
+      setStatusMessage(t('statusSessionCreated'))
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
+      setStatusMessage(error instanceof Error ? error.message : t('errorUnexpected'))
     } finally {
       setIsLoading(false)
     }
@@ -251,19 +237,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     try {
       const response = await fetch('/api/coaching/messages', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: selectedSessionId,
-          content: cleanMessage,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: selectedSessionId, content: cleanMessage }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Message non envoyé.')
+        throw new Error(data.error || t('errorMessage'))
       }
 
       setMessages((current) => [
@@ -280,7 +261,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         current.filter((m) => String(m.id) !== String(optimisticMessage.id)),
       )
       setMessage(cleanMessage)
-      setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
+      setStatusMessage(error instanceof Error ? error.message : t('errorUnexpected'))
     } finally {
       setIsLoading(false)
       setIsAiTyping(false)
@@ -299,11 +280,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
     if (selectedLabels.length === 0) return
 
-    await submitMessage(`Je choisis : ${selectedLabels.join('; ')}`)
-    setSelectedChoicesByMessage((current) => ({
-      ...current,
-      [String(messageId)]: [],
-    }))
+    await submitMessage(`${t('choicePrefix')}${selectedLabels.join('; ')}`)
+    setSelectedChoicesByMessage((current) => ({ ...current, [String(messageId)]: [] }))
   }
 
   async function renameSession(sessionId: string | number) {
@@ -317,18 +295,12 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     try {
       const response = await fetch(`/api/coaching/sessions/${sessionId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: cleanTitle,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: cleanTitle }),
       })
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Renommage impossible.')
-      }
+      if (!response.ok) throw new Error(data.error || t('errorRename'))
 
       setSessions((current) =>
         current.map((session) =>
@@ -337,9 +309,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       )
       setEditingSessionId(null)
       setEditingTitle('')
-      setStatusMessage('Session renommée.')
+      setStatusMessage(t('statusSessionRenamed'))
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
+      setStatusMessage(error instanceof Error ? error.message : t('errorUnexpected'))
     } finally {
       setIsLoading(false)
     }
@@ -352,14 +324,10 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     setStatusMessage('')
 
     try {
-      const response = await fetch(`/api/coaching/sessions/${sessionId}`, {
-        method: 'DELETE',
-      })
+      const response = await fetch(`/api/coaching/sessions/${sessionId}`, { method: 'DELETE' })
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Suppression impossible.')
-      }
+      if (!response.ok) throw new Error(data.error || t('errorDelete'))
 
       setSessions((current) =>
         current.filter((session) => String(session.id) !== String(sessionId)),
@@ -371,10 +339,10 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         setMessages([])
       }
 
-      setStatusMessage('Session supprimée.')
+      setStatusMessage(t('statusSessionDeleted'))
       setSessionToDelete(null)
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
+      setStatusMessage(error instanceof Error ? error.message : t('errorUnexpected'))
     } finally {
       setIsLoading(false)
     }
@@ -391,25 +359,19 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     try {
       const response = await fetch(`/api/coaching/messages/${messageId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: cleanMessage,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: cleanMessage }),
       })
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Modification impossible.')
-      }
+      if (!response.ok) throw new Error(data.error || t('errorUpdate'))
 
       setMessages(data.messages ?? [])
       setEditingMessageId(null)
       setEditingMessageContent('')
-      setStatusMessage('Message modifié et réponse régénérée.')
+      setStatusMessage(t('statusMessageUpdated'))
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
+      setStatusMessage(error instanceof Error ? error.message : t('errorUnexpected'))
     } finally {
       setIsLoading(false)
     }
@@ -432,38 +394,29 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       mediaRecorderRef.current = recorder
 
       recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data)
-        }
+        if (event.data.size > 0) audioChunksRef.current.push(event.data)
       }
 
       recorder.onstop = async () => {
         try {
           setIsLoading(true)
-          setStatusMessage('Transcription en cours...')
+          setStatusMessage(t('statusTranscribing'))
 
           const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
           const audioBase64 = await convertBlobToBase64(audioBlob)
           const response = await fetch('/api/coaching/voice', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              action: 'stt',
-              audioBase64,
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'stt', audioBase64 }),
           })
           const data = await response.json()
 
-          if (!response.ok) {
-            throw new Error(data.error || 'Transcription impossible.')
-          }
+          if (!response.ok) throw new Error(data.error || t('errorTranscription'))
 
           setMessage((current) => `${current}${current ? ' ' : ''}${data.text || ''}`.trim())
-          setStatusMessage(data.text ? 'Texte transcrit.' : 'Aucun texte détecté.')
+          setStatusMessage(data.text ? t('statusTranscribed') : t('statusNoText'))
         } catch (error) {
-          setStatusMessage(error instanceof Error ? error.message : 'Erreur micro.')
+          setStatusMessage(error instanceof Error ? error.message : t('errorMic'))
         } finally {
           setIsLoading(false)
           stream.getTracks().forEach((track) => track.stop())
@@ -472,9 +425,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
       recorder.start()
       setIsRecording(true)
-      setStatusMessage('Enregistrement en cours...')
+      setStatusMessage(t('statusRecording'))
     } catch {
-      setStatusMessage("Impossible d'accéder au microphone.")
+      setStatusMessage(t('errorMic'))
     }
   }
 
@@ -485,13 +438,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
     const response = await fetch('/api/coaching/voice', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        action: 'tts',
-        text: cleanText,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'tts', text: cleanText }),
     })
 
     if (!response.ok) return
@@ -507,7 +455,6 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   return (
     <div className="student-coaching-layout">
       <section className="student-coaching-sidebar">
-        {/* Segment control */}
         <div className="student-sidebar-tabs">
           <button
             type="button"
@@ -515,7 +462,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             className={`student-sidebar-tab ${sidebarTab === 'sessions' ? 'student-sidebar-tab-active' : ''}`}
           >
             <CalendarDays className="h-4 w-4" />
-            Mes sessions
+            {t('mySessions')}
             {sessions.length > 0 && (
               <span className="student-sidebar-tab-badge">{sessions.length}</span>
             )}
@@ -527,15 +474,13 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             className={`student-sidebar-tab ${sidebarTab === 'new' ? 'student-sidebar-tab-active' : ''}`}
           >
             <Plus className="h-4 w-4" />
-            Nouveau
+            {t('new')}
           </button>
         </div>
 
         {sidebarTab === 'new' ? (
           <div className="student-sidebar-content">
-            <p className="student-coaching-copy">
-              Choisissez le type d&apos;accompagnement pour démarrer votre session.
-            </p>
+            <p className="student-coaching-copy">{t('chooseType')}</p>
 
             <div className="student-mode-selector">
               <button
@@ -548,15 +493,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 </div>
 
                 <span className="student-flex-content">
-                  <span className="student-mode-label">Smart coach IA</span>
-                  <span className="student-mode-sub">Instantané · Voix · IA</span>
+                  <span className="student-mode-label">{t('smartCoach')}</span>
+                  <span className="student-mode-sub">{t('smartCoachSub')}</span>
                 </span>
 
-                {mode === 'smart' && (
-                  <div className="student-mode-check">
-                    <Check />
-                  </div>
-                )}
+                {mode === 'smart' && <div className="student-mode-check"><Check /></div>}
               </button>
 
               <button
@@ -569,15 +510,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 </div>
 
                 <span className="student-flex-content">
-                  <span className="student-mode-label">Coach humain</span>
-                  <span className="student-mode-sub">Suivi personnalisé · Humain</span>
+                  <span className="student-mode-label">{t('humanCoach')}</span>
+                  <span className="student-mode-sub">{t('humanCoachSub')}</span>
                 </span>
 
-                {mode === 'classic' && (
-                  <div className="student-mode-check">
-                    <Check />
-                  </div>
-                )}
+                {mode === 'classic' && <div className="student-mode-check"><Check /></div>}
               </button>
             </div>
 
@@ -585,13 +522,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               <div className="student-coach-panel">
                 <div className="student-between-row">
                   <div>
-                    <h3 className="student-subsection-title">Coachs disponibles</h3>
-                    <p className="student-choice-description">
-                      Choisissez un coach pour commencer.
-                    </p>
+                    <h3 className="student-subsection-title">{t('availableCoaches')}</h3>
+                    <p className="student-choice-description">{t('chooseCoach')}</p>
                   </div>
 
-                  {isLoadingCoaches ? <span className="mindly-ui-badge">Chargement</span> : null}
+                  {isLoadingCoaches ? <span className="mindly-ui-badge">{t('loading')}</span> : null}
                 </div>
 
                 <div className="student-list-stack">
@@ -601,18 +536,13 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
                   {!isLoadingCoaches && availableCoaches.length === 0 ? (
                     <div className="mindly-empty">
-                      Aucun coach n&apos;est disponible actuellement. Le Smart coach IA reste
-                      disponible pour continuer l&apos;accompagnement sans attente.
-
+                      {t('noCoachAvailable')}
                       <button
                         type="button"
-                        onClick={() => {
-                          setMode('smart')
-                          setSelectedCoachId(null)
-                        }}
+                        onClick={() => { setMode('smart'); setSelectedCoachId(null) }}
                         className="mindly-btn mindly-btn-primary mt-3 w-full"
                       >
-                        Utiliser le Smart coach IA
+                        {t('useSmartCoach')}
                       </button>
                     </div>
                   ) : null}
@@ -622,21 +552,13 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       key={coach.id}
                       type="button"
                       onClick={() => setSelectedCoachId(coach.id)}
-                      className={`student-choice-card ${
-                        String(selectedCoachId) === String(coach.id)
-                          ? 'student-choice-card-active'
-                          : ''
-                      }`}
+                      className={`student-choice-card ${String(selectedCoachId) === String(coach.id) ? 'student-choice-card-active' : ''}`}
                     >
                       <span className="student-media-row">
-                        <span className="student-choice-icon">
-                          <UserRound />
-                        </span>
-
+                        <span className="student-choice-icon"><UserRound /></span>
                         <span className="student-flex-content">
                           <span className="block truncate text-sm font-semibold">{coach.name}</span>
                           <span className="mindly-ui-badge mt-1">{coach.specialty}</span>
-
                           {coach.bio ? (
                             <span className="student-choice-description-clamped">{coach.bio}</span>
                           ) : null}
@@ -652,10 +574,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               type="button"
               variant="dream"
               size="pillLg"
-              onClick={() => {
-                void startSession()
-                setSidebarTab('sessions')
-              }}
+              onClick={() => { void startSession(); setSidebarTab('sessions') }}
               disabled={isLoading || isLoadingCoaches || (mode === 'classic' && !selectedCoachId)}
               className="mindly-btn mindly-btn-primary student-primary-action"
             >
@@ -668,17 +587,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             {sessions.length === 0 ? (
               <div className="mindly-empty student-session-empty">
                 <CalendarDays />
-                <p className="font-semibold text-[var(--mindly-text-strong)]">
-                  Aucune session pour le moment.
-                </p>
-                <p className="mt-1">Démarrez un accompagnement pour retrouver vos échanges ici.</p>
-
+                <p className="font-semibold text-[var(--mindly-text-strong)]">{t('noSessions')}</p>
+                <p className="mt-1">{t('noSessionsHint')}</p>
                 <button
                   type="button"
                   onClick={() => setSidebarTab('new')}
                   className="mindly-btn mindly-btn-primary mt-3 w-full"
                 >
-                  Commencer maintenant
+                  {t('startNow')}
                 </button>
               </div>
             ) : null}
@@ -687,11 +603,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               {sessions.map((session) => (
                 <div
                   key={session.id}
-                  className={`student-choice-card student-session-card ${
-                    String(selectedSessionId) === String(session.id)
-                      ? 'student-choice-card-active'
-                      : ''
-                  }`}
+                  className={`student-choice-card student-session-card ${String(selectedSessionId) === String(session.id) ? 'student-choice-card-active' : ''}`}
                 >
                   {String(editingSessionId) === String(session.id) ? (
                     <div className="student-edit-stack">
@@ -701,25 +613,20 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         className="student-edit-input"
                         maxLength={120}
                       />
-
                       <div className="student-icon-action-row">
                         <button
                           type="button"
                           onClick={() => void renameSession(session.id)}
                           className="student-icon-action student-icon-action-md student-icon-action-primary"
-                          title="Enregistrer"
+                          title={t('save')}
                         >
                           <Check />
                         </button>
-
                         <button
                           type="button"
-                          onClick={() => {
-                            setEditingSessionId(null)
-                            setEditingTitle('')
-                          }}
+                          onClick={() => { setEditingSessionId(null); setEditingTitle('') }}
                           className="student-icon-action student-icon-action-md student-icon-action-muted"
-                          title="Annuler"
+                          title={t('cancel')}
                         >
                           <X />
                         </button>
@@ -739,20 +646,17 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                           ) : (
                             <UserRound className="student-session-meta-icon" />
                           )}
-                          {session.mode === 'smart' ? 'Smart coach IA' : getCoachName(session)} ·{' '}
-                          {session.status === 'open' ? 'Ouverte' : 'Fermée'}
+                          {session.mode === 'smart' ? t('smartCoachLabel') : getCoachName(session)}{' · '}
+                          {session.status === 'open' ? t('sessionOpen') : t('sessionClosed')}
                         </span>
                       </button>
 
                       <div className="student-session-actions">
                         <button
                           type="button"
-                          onClick={() => {
-                            setEditingSessionId(session.id)
-                            setEditingTitle(session.title)
-                          }}
+                          onClick={() => { setEditingSessionId(session.id); setEditingTitle(session.title) }}
                           className="student-icon-action student-icon-action-sm"
-                          title="Renommer"
+                          title={t('rename')}
                         >
                           <Pencil />
                         </button>
@@ -762,7 +666,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                             type="button"
                             onClick={() => setSessionToDelete(session)}
                             className="student-icon-action student-icon-action-sm student-icon-action-danger"
-                            title="Supprimer"
+                            title={t('delete')}
                           >
                             <Trash2 />
                           </button>
@@ -782,25 +686,18 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           <div className="student-chat-header-inner">
             <div>
               <h2 className="student-chat-title">
-                {selectedSession?.title ?? 'Aucune session sélectionnée'}
+                {selectedSession?.title ?? t('noSessionSelected')}
               </h2>
             </div>
-
-            <div className="student-chat-icon">
-              <MessageCircle />
-            </div>
+            <div className="student-chat-icon"><MessageCircle /></div>
           </div>
         </div>
 
         <div className="student-chat-scroll">
           {messages.length === 0 ? (
             <div className="student-chat-empty student-chat-empty-redesign">
-              <div className="student-empty-hero-icon">
-                <MessageCircle />
-              </div>
-
+              <div className="student-empty-hero-icon"><MessageCircle /></div>
               <p className="student-empty-title">{emptyChatTitle}</p>
-
               <p className="student-empty-description">{emptyChatDescription}</p>
 
               <div className="student-prompt-grid">
@@ -818,10 +715,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               </div>
 
               {!selectedSessionId ? (
-                <p className="student-empty-helper">
-                  Astuce : commencez rapidement avec le Smart coach IA pour un accompagnement
-                  immédiat.
-                </p>
+                <p className="student-empty-helper">{t('hint')}</p>
               ) : null}
             </div>
           ) : null}
@@ -856,10 +750,10 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                 >
                   <p className="student-message-meta">
                     {item.senderRole === 'ai'
-                      ? 'Smart coach IA'
+                      ? t('smartCoachLabel')
                       : item.senderRole === 'coach'
-                        ? (selectedCoachName || 'Coach')
-                        : 'Vous'}
+                        ? (selectedCoachName || t('humanCoach'))
+                        : t('you')}
                   </p>
 
                   {isEditingMessage ? (
@@ -870,25 +764,20 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         rows={4}
                         className="student-message-edit-textarea"
                       />
-
                       <div className="student-icon-action-row-end">
                         <button
                           type="button"
                           onClick={() => void updateMessage(item.id)}
                           className="student-icon-action student-icon-action-md student-icon-action-primary"
-                          title="Enregistrer"
+                          title={t('save')}
                         >
                           <Check />
                         </button>
-
                         <button
                           type="button"
-                          onClick={() => {
-                            setEditingMessageId(null)
-                            setEditingMessageContent('')
-                          }}
+                          onClick={() => { setEditingMessageId(null); setEditingMessageContent('') }}
                           className="student-icon-action student-icon-action-md student-icon-action-muted"
-                          title="Annuler"
+                          title={t('cancel')}
                         >
                           <X />
                         </button>
@@ -916,16 +805,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                                       const nextValues = event.target.checked
                                         ? [...currentValues, choice.label]
                                         : currentValues.filter((value) => value !== choice.label)
-
-                                      return {
-                                        ...current,
-                                        [String(item.id)]: nextValues,
-                                      }
+                                      return { ...current, [String(item.id)]: nextValues }
                                     })
                                   }}
                                   className="student-choice-checkbox"
                                 />
-
                                 <span>
                                   <span className="font-semibold">{choice.label}.</span>{' '}
                                   {choice.text}
@@ -936,13 +820,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
                           <button
                             type="button"
-                            onClick={() =>
-                              void sendSelectedChoices(item.id, multipleChoice.choices)
-                            }
+                            onClick={() => void sendSelectedChoices(item.id, multipleChoice.choices)}
                             disabled={selectedChoices.length === 0 || isLoading}
                             className="student-choice-submit"
                           >
-                            Envoyer mon choix
+                            {t('sendChoice')}
                           </button>
                         </div>
                       ) : null}
@@ -950,14 +832,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       {isMine ? (
                         <button
                           type="button"
-                          onClick={() => {
-                            setEditingMessageId(item.id)
-                            setEditingMessageContent(item.content)
-                          }}
+                          onClick={() => { setEditingMessageId(item.id); setEditingMessageContent(item.content) }}
                           className="student-message-action"
                         >
                           <Pencil />
-                          Modifier
+                          {t('edit')}
                         </button>
                       ) : null}
                     </>
@@ -970,7 +849,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       className="student-message-action"
                     >
                       <Volume2 />
-                      Écouter
+                      {t('listen')}
                     </button>
                   ) : null}
                 </div>
@@ -989,12 +868,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               <div className="student-message-avatar student-message-avatar-assistant">
                 <Bot />
               </div>
-
               <div className="student-message-bubble student-message-bubble-assistant student-typing-bubble">
                 <div className="student-typing-indicator">
-                  <span />
-                  <span />
-                  <span />
+                  <span /><span /><span />
                 </div>
               </div>
             </div>
@@ -1014,7 +890,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               className={`student-recorder-button ${
                 isRecording ? 'student-recorder-button-recording' : 'student-recorder-button-idle'
               }`}
-              title={isRecording ? 'Arrêter' : 'Dicter'}
+              title={isRecording ? t('stop') : t('dictate')}
             >
               {isRecording ? <Square /> : <Mic />}
             </button>
@@ -1030,11 +906,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               }}
               disabled={!selectedSessionId || selectedSession?.status === 'closed'}
               rows={1}
-              placeholder={
-                selectedSessionId
-                  ? 'Écrivez votre besoin actuel...'
-                  : 'Démarrez ou sélectionnez une session pour écrire.'
-              }
+              placeholder={selectedSessionId ? t('composerPlaceholder') : t('composerPlaceholderEmpty')}
               className="student-composer-textarea"
             />
 
@@ -1043,12 +915,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               onClick={() => void sendMessage()}
               disabled={!message.trim() || !selectedSessionId || isLoading}
               className="student-send-button"
-              title="Envoyer"
+              title={t('sendChoice')}
             >
               <Send />
             </button>
           </div>
-
         </div>
       </section>
 
@@ -1056,38 +927,28 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         <div className="mindly-modal-backdrop">
           <div className="student-delete-modal-card">
             <div className="student-media-row">
-              <div className="student-delete-modal-icon">
-                <Trash2 />
-              </div>
-
+              <div className="student-delete-modal-icon"><Trash2 /></div>
               <div className="student-flex-content">
-                <h3 className="student-section-title">Supprimer la session ?</h3>
-
-                <p className="student-delete-modal-text">
-                  Cette action supprimera aussi les messages de cette session. Elle ne pourra pas
-                  être annulée.
-                </p>
-
+                <h3 className="student-section-title">{t('deleteTitle')}</h3>
+                <p className="student-delete-modal-text">{t('deleteWarning')}</p>
                 <p className="student-delete-modal-preview">{sessionToDelete.title}</p>
               </div>
             </div>
-
             <div className="student-modal-actions">
               <button
                 type="button"
                 onClick={() => setSessionToDelete(null)}
                 className="student-modal-cancel"
               >
-                Annuler
+                {t('cancel')}
               </button>
-
               <button
                 type="button"
                 onClick={() => void deleteSession(sessionToDelete.id)}
                 disabled={isLoading}
                 className="student-modal-delete"
               >
-                Supprimer
+                {t('delete')}
               </button>
             </div>
           </div>
@@ -1100,24 +961,16 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 function convertBlobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-
     reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result)
-      } else {
-        reject(new Error('Conversion audio impossible.'))
-      }
+      if (typeof reader.result === 'string') resolve(reader.result)
+      else reject(new Error('Conversion audio impossible.'))
     }
-
     reader.onerror = () => reject(new Error('Lecture audio impossible.'))
     reader.readAsDataURL(blob)
   })
 }
 
-type MultipleChoiceOption = {
-  label: string
-  text: string
-}
+type MultipleChoiceOption = { label: string; text: string }
 
 function parseMultipleChoice(
   content: string,
@@ -1128,30 +981,20 @@ function parseMultipleChoice(
 
   for (const line of lines) {
     const match = line.trim().match(/^([A-D])[.)]\s+(.+)$/i)
-
     if (match) {
-      choices.push({
-        label: match[1].toUpperCase(),
-        text: match[2].trim(),
-      })
+      choices.push({ label: match[1].toUpperCase(), text: match[2].trim() })
     } else {
       promptLines.push(line)
     }
   }
 
-  if (choices.length < 2) {
-    return null
-  }
+  if (choices.length < 2) return null
 
-  return {
-    choices,
-    prompt: promptLines.join('\n').trim(),
-  }
+  return { choices, prompt: promptLines.join('\n').trim() }
 }
 
 function getCoachName(session: CoachingSession | null | undefined): string {
   const coach = session?.coach
   const fullName = `${coach?.firstName ?? ''} ${coach?.lastName ?? ''}`.trim()
-
-  return fullName || coach?.email || 'Coach humain'
+  return fullName || coach?.email || ''
 }

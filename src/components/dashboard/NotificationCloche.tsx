@@ -3,6 +3,7 @@
 import { Bell, CheckCheck } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 
 type Notification = {
   id: string | number
@@ -20,6 +21,8 @@ type NotificationsResponse = {
 }
 
 export function NotificationBell() {
+  const t = useTranslations('dashboard.student.notifications.bell')
+  const locale = useLocale()
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -30,7 +33,7 @@ export function NotificationBell() {
 
   async function loadNotifications() {
     try {
-      const response = await fetch('/api/notifications', {
+      const response = await fetch(`/api/notifications?locale=${locale}`, {
         cache: 'no-store',
       })
 
@@ -150,7 +153,7 @@ export function NotificationBell() {
 
     if (Number.isNaN(date.getTime())) return null
 
-    return new Intl.DateTimeFormat('fr-FR', {
+    return new Intl.DateTimeFormat(locale, {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
@@ -162,7 +165,7 @@ export function NotificationBell() {
     <div ref={containerRef} className="notification-bell-root">
       <button
         type="button"
-        aria-label="Notifications"
+        aria-label={t('ariaLabel')}
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
         className="notification-bell-button"
@@ -177,8 +180,8 @@ export function NotificationBell() {
         <div className="notification-bell-popover">
           <div className="notification-bell-header">
             <div>
-              <p className="notification-bell-title">Notifications</p>
-              <p className="notification-bell-count">{unreadCount} non lue(s)</p>
+              <p className="notification-bell-title">{t('title')}</p>
+              <p className="notification-bell-count">{t('unreadCount', { count: unreadCount })}</p>
             </div>
 
             <button
@@ -186,7 +189,7 @@ export function NotificationBell() {
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
               className="notification-bell-mark-button"
-              aria-label="Tout marquer comme lu"
+              aria-label={t('markAllAriaLabel')}
             >
               <CheckCheck />
             </button>
@@ -194,9 +197,9 @@ export function NotificationBell() {
 
           <div className="notification-bell-list">
             {isLoading ? (
-              <p className="notification-bell-empty">Chargement...</p>
+              <p className="notification-bell-empty">{t('loading')}</p>
             ) : latestNotifications.length === 0 ? (
-              <p className="notification-bell-empty">Aucune notification.</p>
+              <p className="notification-bell-empty">{t('empty')}</p>
             ) : (
               latestNotifications.map((notification) => {
                 const createdAt = formatDate(notification.createdAt)

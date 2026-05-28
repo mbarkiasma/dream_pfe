@@ -5,11 +5,14 @@ type ReportTrait = {
 
 export type ReportWellbeingTheme = 'green' | 'orange' | 'rose'
 
+export type ReportWellbeingKey = 'pending' | 'balanced' | 'toSupport' | 'sensitive'
+
 export function getReportWellbeingTheme(traits?: ReportTrait[] | null) {
   const traitScores = getTraitScores(traits)
 
   if (!traitScores) {
     return {
+      key: 'pending' as ReportWellbeingKey,
       score: null,
       theme: 'orange' as ReportWellbeingTheme,
       label: 'Profil en cours d evaluation',
@@ -28,6 +31,7 @@ export function getReportWellbeingTheme(traits?: ReportTrait[] | null) {
 
   if (score >= 7) {
     return {
+      key: 'balanced' as ReportWellbeingKey,
       score,
       theme: 'green' as ReportWellbeingTheme,
       label: 'Profil globalement equilibre',
@@ -38,6 +42,7 @@ export function getReportWellbeingTheme(traits?: ReportTrait[] | null) {
 
   if (score >= 5) {
     return {
+      key: 'toSupport' as ReportWellbeingKey,
       score,
       theme: 'orange' as ReportWellbeingTheme,
       label: 'Profil a accompagner',
@@ -47,6 +52,7 @@ export function getReportWellbeingTheme(traits?: ReportTrait[] | null) {
   }
 
   return {
+    key: 'sensitive' as ReportWellbeingKey,
     score,
     theme: 'rose' as ReportWellbeingTheme,
     label: 'Profil sensible',

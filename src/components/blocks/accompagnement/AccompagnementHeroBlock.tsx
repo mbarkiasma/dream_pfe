@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-const NODE_SIZE = 104
+const NODE_SIZE = 120
 
 export default function AccompagnementHeroBlock() {
   const t = useTranslations('homePage.hero')
@@ -37,13 +37,13 @@ export default function AccompagnementHeroBlock() {
   }>
 
   const renderNodeIcon = (icon: string) => (
-    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(90deg,#895ef8,#a987ff)] shadow-[0_10px_22px_rgba(137,94,248,0.24)]">
-      {icon === 'mic' && <Mic className="h-5 w-5 text-white" />}
-      {icon === 'clipboard' && <ClipboardList className="h-5 w-5 text-white" />}
-      {icon === 'heart' && <Heart className="h-5 w-5 text-white" />}
-      {icon === 'play' && <Play className="h-5 w-5 text-white" />}
-      {icon === 'handshake' && <Handshake className="h-5 w-5 text-white" />}
-      {icon === 'moon' && <MoonStar className="h-5 w-5 text-white" />}
+    <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(90deg,#895ef8,#a987ff)] shadow-[0_10px_22px_rgba(137,94,248,0.24)]">
+      {icon === 'mic' && <Mic className="h-[22px] w-[22px] text-white" />}
+      {icon === 'clipboard' && <ClipboardList className="h-[22px] w-[22px] text-white" />}
+      {icon === 'heart' && <Heart className="h-[22px] w-[22px] text-white" />}
+      {icon === 'play' && <Play className="h-[22px] w-[22px] text-white" />}
+      {icon === 'handshake' && <Handshake className="h-[22px] w-[22px] text-white" />}
+      {icon === 'moon' && <MoonStar className="h-[22px] w-[22px] text-white" />}
     </div>
   )
 
@@ -58,11 +58,11 @@ export default function AccompagnementHeroBlock() {
       <div className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-full border border-[var(--mindly-primary-soft)] bg-[var(--mindly-primary-soft-3)] px-2 text-center shadow-[0_14px_35px_rgba(137,94,248,0.14)]">
         {renderNodeIcon(node.icon)}
 
-        <p className="w-full max-w-[82px] font-[family-name:var(--font-zain)] text-[11.5px] font-semibold leading-[1.2] text-[var(--mindly-text-strong)]">
+        <p className="w-full max-w-[94px] font-[family-name:var(--font-zain)] text-[12px] font-semibold leading-[1.2] text-[var(--mindly-text-strong)]">
           {node.title}
         </p>
 
-        <p className="mt-1 w-full max-w-[82px] font-[family-name:var(--font-zain)] text-[10px] font-normal leading-tight text-[var(--mindly-purple-muted)]">
+        <p className="mt-1 w-full max-w-[94px] font-[family-name:var(--font-zain)] text-[10.5px] font-normal leading-tight text-[var(--mindly-purple-muted)]">
           {node.subtitle}
         </p>
       </div>

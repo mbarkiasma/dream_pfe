@@ -1,37 +1,12 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
 import { CalendarDays, Clock } from 'lucide-react'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { StudentRendezvousPsyForm } from '@/components/dashboard/student/StudentRendezvousPsyForm'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
-
-const statusLabels: Record<string, string> = {
-  pending: 'En attente',
-  confirmed: 'Confirme',
-  rejected: 'Refuse',
-  cancelled: 'Annule',
-  completed: 'Termine',
-}
-
-const statusClasses: Record<string, string> = {
-  pending: 'student-appointments-status-pending',
-  confirmed: 'student-appointments-status-confirmed',
-  rejected: 'student-appointments-status-rejected',
-  cancelled: 'student-appointments-status-cancelled',
-  completed: 'student-appointments-status-completed',
-}
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return ''
-
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(value))
-}
 
 function getAppointmentDateTime(date: string | null | undefined, startTime: string | null | undefined) {
   if (!date) return Number.POSITIVE_INFINITY
@@ -50,6 +25,34 @@ function getAppointmentDateTime(date: string | null | undefined, startTime: stri
 export default async function StudentAppointmentsPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.student.appointments')
+  const locale = await getLocale()
+
+  const statusLabels: Record<string, string> = {
+    pending: t('status.pending'),
+    confirmed: t('status.confirmed'),
+    rejected: t('status.rejected'),
+    cancelled: t('status.cancelled'),
+    completed: t('status.completed'),
+  }
+
+  const statusClasses: Record<string, string> = {
+    pending: 'student-appointments-status-pending',
+    confirmed: 'student-appointments-status-confirmed',
+    rejected: 'student-appointments-status-rejected',
+    cancelled: 'student-appointments-status-cancelled',
+    completed: 'student-appointments-status-completed',
+  }
+
+  function formatDate(value: string | null | undefined) {
+    if (!value) return ''
+
+    return new Intl.DateTimeFormat(locale, {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(value))
+  }
 
   const appointments = user
     ? await payload.find({
@@ -83,8 +86,8 @@ export default async function StudentAppointmentsPage() {
   return (
     <div>
       <StudentTopbar
-        title="Rendez-vous"
-        description="Demande un accompagnement adapte avec le psychologue et suis l'etat de tes rendez-vous."
+        title={t('topbar.title')}
+        description={t('topbar.description')}
       />
 
       <div className="student-appointments-grid">
@@ -92,7 +95,7 @@ export default async function StudentAppointmentsPage() {
           <Card className="student-appointments-card">
             <CardHeader className="student-appointments-card-header">
               <CardTitle className="student-appointments-title">
-                Demander un rendez-vous
+                {t('requestCard')}
               </CardTitle>
             </CardHeader>
 
@@ -103,7 +106,7 @@ export default async function StudentAppointmentsPage() {
 
           <Card className="student-appointments-card">
             <CardHeader className="student-appointments-card-header">
-              <CardTitle className="student-appointments-title">Mes demandes</CardTitle>
+              <CardTitle className="student-appointments-title">{t('myRequestsCard')}</CardTitle>
             </CardHeader>
 
             <CardContent className="student-appointments-card-content">
@@ -114,8 +117,11 @@ export default async function StudentAppointmentsPage() {
                       <div className="student-appointments-request-header">
                         <div>
                           <p className="student-appointments-request-title">
-                            {formatDate(appointment.date)} de {appointment.startTime} a{' '}
-                            {appointment.endTime}
+                            {t('timeRange', {
+                              date: formatDate(appointment.date),
+                              start: appointment.startTime,
+                              end: appointment.endTime,
+                            })}
                           </p>
 
                           <p className="student-appointments-request-reason">
@@ -125,13 +131,13 @@ export default async function StudentAppointmentsPage() {
                           {appointment.status === 'rejected' && appointment.rejectionReason ? (
                             <div className="student-appointments-rejection">
                               <p className="student-appointments-rejection-title">
-                                Cause du refus
+                                {t('rejectionTitle')}
                               </p>
                               <p className="student-appointments-rejection-text">
                                 {appointment.rejectionReason}
                               </p>
                               <p className="student-appointments-rejection-help">
-                                Merci de choisir un autre rendez-vous disponible dans le calendrier.
+                                {t('rejectionHelp')}
                               </p>
                             </div>
                           ) : null}
@@ -156,10 +162,8 @@ export default async function StudentAppointmentsPage() {
                   </div>
 
                   <div>
-                    <p className="student-appointments-empty-title">Aucune demande envoyee</p>
-                    <p className="student-appointments-empty-text">
-                      Tes demandes de rendez-vous apparaitront ici.
-                    </p>
+                    <p className="student-appointments-empty-title">{t('emptyTitle')}</p>
+                    <p className="student-appointments-empty-text">{t('emptyText')}</p>
                   </div>
                 </div>
               )}
@@ -170,7 +174,7 @@ export default async function StudentAppointmentsPage() {
         <div className="student-appointments-side">
           <Card className="student-appointments-card">
             <CardHeader className="student-appointments-card-header">
-              <CardTitle className="student-appointments-title">Prochaine seance</CardTitle>
+              <CardTitle className="student-appointments-title">{t('nextSession')}</CardTitle>
             </CardHeader>
 
             <CardContent className="student-appointments-card-content">
@@ -190,12 +194,10 @@ export default async function StudentAppointmentsPage() {
                 </div>
               ) : (
                 <>
-                  <p className="student-appointments-text">
-                    Aucune seance n&apos;est encore confirmee pour le moment.
-                  </p>
+                  <p className="student-appointments-text">{t('noNextSession')}</p>
 
                   <div className="mt-4">
-                    <span className="student-appointments-badge">Aucun rendez-vous</span>
+                    <span className="student-appointments-badge">{t('noAppointmentBadge')}</span>
                   </div>
                 </>
               )}
@@ -204,17 +206,14 @@ export default async function StudentAppointmentsPage() {
 
           <Card className="student-appointments-card-soft">
             <CardHeader className="student-appointments-card-header">
-              <CardTitle className="student-appointments-title">Informations</CardTitle>
+              <CardTitle className="student-appointments-title">{t('infoTitle')}</CardTitle>
             </CardHeader>
 
             <CardContent className="student-appointments-card-content">
-              <p className="student-appointments-text">
-                Les creneaux affiches viennent directement de l&apos;agenda du psychologue. Une fois
-                la demande envoyee, elle reste en attente jusqu&apos;a confirmation.
-              </p>
+              <p className="student-appointments-text">{t('infoText')}</p>
 
               <div className="mt-4">
-                <span className="student-appointments-badge">Agenda du psychologue</span>
+                <span className="student-appointments-badge">{t('scheduleBadge')}</span>
               </div>
             </CardContent>
           </Card>

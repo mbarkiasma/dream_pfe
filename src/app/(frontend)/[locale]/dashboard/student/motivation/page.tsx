@@ -1,13 +1,17 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { StudentMotivationClient } from '@/components/dashboard/student/StudentMotivationClient'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
+import { translateAnnouncementToEnglish } from '@/utilities/translateMotivationAnnouncement'
 
 export default async function StudentMotivationPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.student.motivation')
+  const locale = await getLocale()
 
   const announcements = user
     ? await payload.find({
@@ -75,20 +79,31 @@ export default async function StudentMotivationPage() {
     return summary
   }, {})
 
-  const announcementsWithReactions = announcements.docs.map((announcement) => ({
-    ...announcement,
-    reactions: reactionSummaryByAnnouncement[String(announcement.id)] ?? {
-      counts: {
-        like: 0,
-      },
-    },
-  }))
+  const announcementsWithReactions = await Promise.all(
+    announcements.docs.map(async (announcement) => {
+      const tx = locale === 'en'
+        ? await translateAnnouncementToEnglish(announcement.id, {
+            title: announcement.title,
+            content: announcement.content,
+          })
+        : null
+
+      return {
+        ...announcement,
+        title: tx?.title ?? announcement.title,
+        content: tx?.content ?? announcement.content,
+        reactions: reactionSummaryByAnnouncement[String(announcement.id)] ?? {
+          counts: { like: 0 },
+        },
+      }
+    }),
+  )
 
   return (
     <div>
       <StudentTopbar
-        title="Motivation"
-        description="Consultez les annonces et contenus de motivation publies par les coachs."
+        title={t('topbar.title')}
+        description={t('topbar.description')}
       />
 
       <StudentMotivationClient announcements={announcementsWithReactions as any} />

@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { headers as getHeaders } from 'next/headers'
 import { getPayload, type Payload } from 'payload'
 import type { User } from '@/payload-types'
+import { translateNotificationsBatch } from '@/utilities/translateNotification'
 
 type PatchBody = {
   id?: string | number
@@ -20,6 +21,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const limitParam = Number(searchParams.get('limit') || 30)
     const limit = Number.isFinite(limitParam) ? Math.max(1, Math.min(limitParam, 500)) : 30
+    const locale = searchParams.get('locale') ?? 'fr'
 
     const notifications = await payload.find({
       collection: 'notifications',
@@ -55,8 +57,21 @@ export async function GET(request: Request) {
       },
     })
 
+    let docs = notifications.docs
+
+    if (locale === 'en' && docs.length > 0) {
+      const translated = await translateNotificationsBatch(
+        docs.map((doc) => ({ id: doc.id, title: doc.title, message: doc.message })),
+      )
+      const translatedById = new Map(translated.map((item) => [String(item.id), item]))
+      docs = docs.map((doc) => {
+        const tx = translatedById.get(String(doc.id))
+        return tx ? { ...doc, title: tx.title, message: tx.message } : doc
+      })
+    }
+
     return Response.json({
-      notifications: notifications.docs,
+      notifications: docs,
       unreadCount: unread.totalDocs,
     })
   } catch {

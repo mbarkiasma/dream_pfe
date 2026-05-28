@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import { useUser } from '@clerk/nextjs'
-import { Languages, Menu, Moon, Sun, X } from 'lucide-react'
+import { Languages, LogOut, Menu, Moon, Sun, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { appBadgeCtaClass } from '@/components/ui/badge'
@@ -114,12 +114,25 @@ export function Navbar() {
         </div>
 
         <div className="absolute right-8 top-1/2 hidden -translate-y-1/2 items-center gap-8 md:flex lg:right-10">
-          <Link
-            href={accountLink}
-            className={`${appBadgeCtaClass} !min-h-[38px] !min-w-[145px] !w-[145px] px-3 py-1.5 text-[14px]`}
-          >
-            <span className="relative z-10">{accountLabel}</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href={accountLink}
+              className={`${appBadgeCtaClass} !min-h-[38px] !min-w-[145px] !w-[145px] px-3 py-1.5 text-[14px]`}
+            >
+              <span className="relative z-10">{accountLabel}</span>
+            </Link>
+
+            {isLoaded && isSignedIn && (
+              <Link
+                href="/logout"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition hover:border-red-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/30"
+                aria-label={t('logout')}
+                title={t('logout')}
+              >
+                <LogOut className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
 
           <div className="flex items-center gap-2">
             <button
@@ -210,6 +223,18 @@ export function Navbar() {
             >
               {accountLabel}
             </Link>
+
+            {isLoaded && isSignedIn && (
+              <Link
+                href="/logout"
+                onClick={() => setOpen(false)}
+                className="mt-1 flex items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-500 transition hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400"
+                aria-label={t('logout')}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>{t('logout')}</span>
+              </Link>
+            )}
           </div>
         </div>
       )}

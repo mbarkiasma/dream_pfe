@@ -2,22 +2,18 @@ import Link from 'next/link'
 import { ArrowRight, Download, FileText } from 'lucide-react'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 import { getReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
-
-function formatAnalysisDate(value: string) {
-  return new Date(value).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  })
-}
+import { translateAnalysisToEnglish } from '@/utilities/translateAnalysis'
 
 export default async function StudentAnalysesPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.student.analyses')
+  const locale = await getLocale()
 
   const analyses = user
     ? await payload.find({
@@ -37,11 +33,32 @@ export default async function StudentAnalysesPage() {
   const latestAnalysis = analyses.docs[0]
   const reportWellbeing = getReportWellbeingTheme(latestAnalysis?.traits)
 
+  const tx = locale === 'en' && latestAnalysis
+    ? await translateAnalysisToEnglish(latestAnalysis.id, latestAnalysis)
+    : null
+
+  const wellbeingKeyMap = {
+    pending: { label: t('wellbeing.pending.label'), description: t('wellbeing.pending.description') },
+    balanced: { label: t('wellbeing.balanced.label'), description: t('wellbeing.balanced.description') },
+    toSupport: { label: t('wellbeing.toSupport.label'), description: t('wellbeing.toSupport.description') },
+    sensitive: { label: t('wellbeing.sensitive.label'), description: t('wellbeing.sensitive.description') },
+  }
+  const wellbeingLabel = wellbeingKeyMap[reportWellbeing.key].label
+  const wellbeingDescription = wellbeingKeyMap[reportWellbeing.key].description
+
+  const formattedDate = latestAnalysis
+    ? new Date(latestAnalysis.date).toLocaleDateString(locale, {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      })
+    : null
+
   return (
     <div>
       <StudentTopbar
-        title="Mon rapport d'entretien"
-        description="Retrouvez le résumé de votre entretien, les points principaux identifiés et votre rapport PDF."
+        title={t('topbar.title')}
+        description={t('topbar.description')}
       />
 
       <div className="mindly-stack-lg">
@@ -50,9 +67,9 @@ export default async function StudentAnalysesPage() {
         >
           <div className="report-overview-head">
             <div>
-              <p className="report-overview-kicker">Synthèse personnelle</p>
+              <p className="report-overview-kicker">{t('kicker')}</p>
               <h2 className="report-overview-title">
-                {latestAnalysis ? 'Rapport disponible' : 'Rapport en attente'}
+                {latestAnalysis ? t('reportAvailable') : t('reportPending')}
               </h2>
             </div>
 
@@ -62,10 +79,10 @@ export default async function StudentAnalysesPage() {
                   latestAnalysis ? 'mindly-ui-badge mindly-ui-badge-success' : 'mindly-ui-badge'
                 }
               >
-                {latestAnalysis ? 'Entretien terminé' : 'En attente'}
+                {latestAnalysis ? t('statusDone') : t('statusPending')}
               </span>
 
-              <span className="mindly-ui-badge">Rapport unique</span>
+              <span className="mindly-ui-badge">{t('uniqueReport')}</span>
             </div>
           </div>
 
@@ -75,12 +92,11 @@ export default async function StudentAnalysesPage() {
                 <div className="report-summary-top">
                   <div>
                     <p className="report-reference">{latestAnalysis.reference}</p>
-
-                    <p className="report-date">Généré le {formatAnalysisDate(latestAnalysis.date)}</p>
+                    <p className="report-date">{t('generatedOn', { date: formattedDate })}</p>
                   </div>
 
                   <div className="report-wellbeing-pill">
-                    <span>{reportWellbeing.label}</span>
+                    <span>{wellbeingLabel}</span>
                     {reportWellbeing.score !== null ? (
                       <strong>{reportWellbeing.score.toFixed(1)}/10</strong>
                     ) : null}
@@ -89,17 +105,15 @@ export default async function StudentAnalysesPage() {
 
                 <div className="report-summary-grid">
                   <div>
-                    <p className="report-mini-label">Vue d&apos;ensemble</p>
+                    <p className="report-mini-label">{t('overviewLabel')}</p>
                     <p className="report-summary-text">
-                      {latestAnalysis.overview ||
-                        latestAnalysis.conclusion ||
-                        'Résumé non disponible.'}
+                      {tx?.overview ?? tx?.conclusion ?? latestAnalysis.overview ?? latestAnalysis.conclusion ?? t('overviewEmpty')}
                     </p>
                   </div>
 
                   <div>
-                    <p className="report-mini-label">Indice d&apos;équilibre</p>
-                    <p className="report-summary-text">{reportWellbeing.description}</p>
+                    <p className="report-mini-label">{t('balanceLabel')}</p>
+                    <p className="report-summary-text">{wellbeingDescription}</p>
                   </div>
                 </div>
               </div>
@@ -110,7 +124,7 @@ export default async function StudentAnalysesPage() {
                   className="report-action-secondary"
                 >
                   <FileText className="h-4 w-4" />
-                  Voir le rapport
+                  {t('seeReport')}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
 
@@ -120,13 +134,13 @@ export default async function StudentAnalysesPage() {
                   className="report-action-primary"
                 >
                   <Download className="h-4 w-4" />
-                  Télécharger en PDF
+                  {t('downloadPdf')}
                 </Link>
               </div>
             </div>
           ) : (
             <p className="leading-7 text-[var(--mindly-text-soft)]">
-              Votre rapport apparaîtra ici automatiquement après la fin de votre entretien unique.
+              {t('reportEmpty')}
             </p>
           )}
         </section>
@@ -134,11 +148,10 @@ export default async function StudentAnalysesPage() {
         <section className="mindly-card-soft p-6">
           <div>
             <h2 className="text-xl font-bold text-[var(--mindly-text-strong)]">
-              À propos de ce rapport
+              {t('aboutTitle')}
             </h2>
             <p className="mt-4 leading-7 text-[var(--mindly-text-soft)]">
-              Ce rapport est généré à partir de votre entretien unique. Il sert de synthèse
-              personnelle et peut être consulté à tout moment depuis cet espace.
+              {t('aboutDescription')}
             </p>
           </div>
         </section>

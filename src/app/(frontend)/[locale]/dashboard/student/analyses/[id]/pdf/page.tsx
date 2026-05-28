@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { PrintPdfButton } from '@/components/dashboard/student/PrintPdfButton'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 import { getReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
+import { translateAnalysisToEnglish } from '@/utilities/translateAnalysis'
 
 type PageProps = {
   params: Promise<{
@@ -12,18 +14,12 @@ type PageProps = {
   }>
 }
 
-function formatAnalysisDate(value: string) {
-  return new Date(value).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  })
-}
-
 export default async function StudentAnalysisPdfPage({ params }: PageProps) {
   const { id } = await params
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.student.analyses')
+  const locale = await getLocale()
 
   if (!user) {
     notFound()
@@ -40,8 +36,42 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
     notFound()
   }
 
-  const date = formatAnalysisDate(analyse.date)
+  const date = new Date(analyse.date).toLocaleDateString(locale, {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
   const reportWellbeing = getReportWellbeingTheme(analyse.traits)
+
+  const wellbeingKeyMap = {
+    pending: { label: t('wellbeing.pending.label'), description: t('wellbeing.pending.description') },
+    balanced: { label: t('wellbeing.balanced.label'), description: t('wellbeing.balanced.description') },
+    toSupport: { label: t('wellbeing.toSupport.label'), description: t('wellbeing.toSupport.description') },
+    sensitive: { label: t('wellbeing.sensitive.label'), description: t('wellbeing.sensitive.description') },
+  }
+  const wellbeingLabel = wellbeingKeyMap[reportWellbeing.key].label
+  const wellbeingDescription = wellbeingKeyMap[reportWellbeing.key].description
+
+  const tx = locale === 'en'
+    ? await translateAnalysisToEnglish(analyse.id, analyse)
+    : null
+
+  const display = {
+    overview: tx?.overview ?? analyse.overview,
+    conclusion: tx?.conclusion ?? analyse.conclusion,
+    forcesDominantes: tx?.forcesDominantes ?? analyse.forcesDominantes,
+    pointsVigilance: tx?.pointsVigilance ?? analyse.pointsVigilance,
+    styleRelationnel: tx?.styleRelationnel ?? analyse.styleRelationnel,
+    traits: tx?.traits ?? analyse.traits?.map((trait) => ({
+      name: trait.name,
+      analysis: trait.analysis,
+      interpretation: trait.interpretation,
+      indicators: (trait.observedIndicators ?? []).map((i) => i.indicator ?? '').filter(Boolean),
+    })) ?? [],
+    dominantEmotion: tx?.dominantEmotion ?? analyse.profilEmotionnel?.dominantEmotion,
+    emotionalSummary: tx?.emotionalSummary ?? analyse.profilEmotionnel?.emotionalSummary,
+    recommandations: tx?.recommandations ?? (analyse.recommandations ?? []).map((r) => r.text),
+  }
 
   return (
     <main className={`report-print-page report-print-page-${reportWellbeing.theme} min-h-screen bg-[var(--mindly-bg)] px-4 py-8 text-[var(--mindly-text-strong)] print:px-0 print:py-0 print:text-slate-900`}>
@@ -49,17 +79,17 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
         <div className="report-print-header mb-8 flex flex-col gap-4 border-b border-[var(--mindly-border)] pb-6 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.25em] text-[var(--mindly-primary)]">
-              Rapport d&apos;analyse
+              {t('pdf.kicker')}
             </p>
             <h1 className="mt-2 text-3xl font-bold text-[var(--mindly-text-strong)]">
               {analyse.reference}
             </h1>
-            <p className="mt-2 text-sm text-[var(--mindly-text-soft)]">Généré le {date}</p>
+            <p className="mt-2 text-sm text-[var(--mindly-text-soft)]">{t('pdf.generatedOn', { date })}</p>
           </div>
 
           <div className="flex flex-col gap-3 md:items-end">
             <div className="report-wellbeing-pill">
-              <span>{reportWellbeing.label}</span>
+              <span>{wellbeingLabel}</span>
               {reportWellbeing.score !== null ? (
                 <strong>{reportWellbeing.score.toFixed(1)}/10</strong>
               ) : null}
@@ -73,45 +103,45 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
         <div className="hidden">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
-            Rapport d&apos;analyse de personnalité
+            {t('pdf.kicker')}
           </p>
           <h1 className="mt-2 text-3xl font-semibold">{analyse.reference}</h1>
-          <p className="mt-2 text-sm text-slate-600">Date : {date}</p>
+          <p className="mt-2 text-sm text-slate-600">{t('pdf.generatedOn', { date })}</p>
         </div>
 
         <section className="grid gap-4 md:grid-cols-2">
           <article className="report-highlight-panel rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Vue d&apos;ensemble
+              {t('pdf.overviewTitle')}
             </h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.overview || "Aucune vue d'ensemble disponible."}
+              {display.overview || t('pdf.overviewEmpty')}
             </p>
           </article>
 
           <article className="report-highlight-panel rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Conclusion
+              {t('pdf.conclusionTitle')}
             </h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.conclusion || 'Aucune conclusion disponible.'}
+              {display.conclusion || t('pdf.conclusionEmpty')}
             </p>
           </article>
         </section>
 
         <section className="report-balance-panel mt-6 rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] p-5 print:border-slate-200 print:bg-white">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
-            Indice d&apos;équilibre
+            {t('pdf.balanceTitle')}
           </p>
           <h2 className="mt-2 text-xl font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-            {reportWellbeing.label}
+            {wellbeingLabel}
           </h2>
           <p className="mt-2 text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-            {reportWellbeing.description}
+            {wellbeingDescription}
           </p>
           {reportWellbeing.score !== null ? (
             <p className="mt-3 text-sm font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Score d&apos;équilibre : {reportWellbeing.score.toFixed(1)}/10
+              {t('pdf.balanceScore', { score: reportWellbeing.score.toFixed(1) })}
             </p>
           ) : null}
         </section>
@@ -119,104 +149,107 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
             <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
-              Forces dominantes
+              {t('pdf.dominantStrengths')}
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.forcesDominantes || 'Non renseigné.'}
+              {display.forcesDominantes || t('pdf.notProvided')}
             </p>
           </article>
 
           <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
             <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
-              Points de vigilance
+              {t('pdf.attentionPoints')}
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.pointsVigilance || 'Non renseigné.'}
+              {display.pointsVigilance || t('pdf.notProvided')}
             </p>
           </article>
 
           <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none">
             <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-600">
-              Style relationnel
+              {t('pdf.relationalStyle')}
             </h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.styleRelationnel || 'Non renseigné.'}
+              {display.styleRelationnel || t('pdf.notProvided')}
             </p>
           </article>
         </section>
 
         <section className="report-traits-section mt-8">
           <h2 className="text-2xl font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-            Traits Big Five
+            {t('pdf.bigFiveTitle')}
           </h2>
 
           <div className="mt-4 grid gap-4">
-            {analyse.traits?.map((trait, index) => (
-              <article
-                key={`${trait.name}-${index}`}
-                className="report-trait-card rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
-              >
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <h3 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-                    {trait.name}
-                  </h3>
+            {display.traits.map((trait, index) => {
+              const originalTrait = analyse.traits?.[index]
+              return (
+                <article
+                  key={`${trait.name}-${index}`}
+                  className="report-trait-card rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
+                >
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <h3 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
+                      {trait.name}
+                    </h3>
 
-                  <span className="report-trait-score inline-flex w-fit rounded-full border border-[#c4b5fd] bg-white px-3 py-1 text-sm font-bold !text-[#1f114f] print:!bg-white print:!text-slate-900">
-                    Score : {trait.score}/10
-                  </span>
-                </div>
-
-                <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-                  {trait.analysis || trait.interpretation || 'Analyse non disponible.'}
-                </p>
-
-                {trait.observedIndicators && trait.observedIndicators.length > 0 ? (
-                  <div className="mt-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-400">
-                      Indicateurs observés
-                    </p>
-                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
-                      {trait.observedIndicators.map((item, indicatorIndex) => (
-                        <li key={`${trait.name}-indicator-${indicatorIndex}`}>{item.indicator}</li>
-                      ))}
-                    </ul>
+                    <span className="report-trait-score inline-flex w-fit rounded-full border border-[#c4b5fd] bg-white px-3 py-1 text-sm font-bold !text-[#1f114f] print:!bg-white print:!text-slate-900">
+                      {t('pdf.traitScore', { score: originalTrait?.score })}
+                    </span>
                   </div>
-                ) : null}
-              </article>
-            ))}
+
+                  <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
+                    {trait.analysis || trait.interpretation || t('pdf.traitAnalysisEmpty')}
+                  </p>
+
+                  {trait.indicators.length > 0 ? (
+                    <div className="mt-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-400">
+                        {t('pdf.observedIndicators')}
+                      </p>
+                      <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
+                        {trait.indicators.map((indicator, indicatorIndex) => (
+                          <li key={`${trait.name}-indicator-${indicatorIndex}`}>{indicator}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </article>
+              )
+            })}
           </div>
         </section>
 
         <section className="mt-8 grid gap-4 md:grid-cols-2">
           <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Profil émotionnel
+              {t('pdf.emotionalProfile')}
             </h2>
             <p className="mt-3 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
-              Émotion dominante : {analyse.profilEmotionnel?.dominantEmotion || 'Non renseigné'}
+              {t('pdf.dominantEmotion', { value: display.dominantEmotion || t('pdf.notProvidedShort') })}
             </p>
             <p className="mt-2 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
-              Stabilité émotionnelle : {analyse.profilEmotionnel?.emotionalStability || '--'}/10
+              {t('pdf.emotionalStability', { value: analyse.profilEmotionnel?.emotionalStability || '--' })}
             </p>
             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-              {analyse.profilEmotionnel?.emotionalSummary || 'Aucun résumé émotionnel disponible.'}
+              {display.emotionalSummary || t('pdf.emotionalSummaryEmpty')}
             </p>
           </article>
 
           <article className="rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-bg-soft)] p-5 print:bg-slate-50">
             <h2 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-              Recommandations
+              {t('pdf.recommendations')}
             </h2>
 
-            {analyse.recommandations && analyse.recommandations.length > 0 ? (
+            {display.recommandations.length > 0 ? (
               <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-                {analyse.recommandations.map((recommendation, index) => (
-                  <li key={`recommendation-${index}`}>{recommendation.text}</li>
+                {display.recommandations.map((text, index) => (
+                  <li key={`recommendation-${index}`}>{text}</li>
                 ))}
               </ul>
             ) : (
               <p className="mt-3 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
-                Aucune recommandation disponible.
+                {t('pdf.recommendationsEmpty')}
               </p>
             )}
           </article>

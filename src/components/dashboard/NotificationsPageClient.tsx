@@ -3,6 +3,7 @@
 import { Bell, CheckCheck, Circle, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 
 type Notification = {
   id: string | number
@@ -19,15 +20,9 @@ type NotificationsResponse = {
   unreadCount: number
 }
 
-const typeLabels: Record<string, string> = {
-  analyse: 'Analyse',
-  coaching: 'Coaching',
-  motivation: 'Motivation',
-  rendezvous: 'Rendez-vous',
-  system: 'Systeme',
-}
-
 export function NotificationsPageClient() {
+  const t = useTranslations('dashboard.student.notifications.page')
+  const locale = useLocale()
   const router = useRouter()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -38,7 +33,7 @@ export function NotificationsPageClient() {
 
   async function loadNotifications() {
     try {
-      const response = await fetch('/api/notifications?limit=500', {
+      const response = await fetch(`/api/notifications?limit=500&locale=${locale}`, {
         cache: 'no-store',
       })
 
@@ -123,7 +118,7 @@ export function NotificationsPageClient() {
 
     if (Number.isNaN(date.getTime())) return ''
 
-    return new Intl.DateTimeFormat('fr-FR', {
+    return new Intl.DateTimeFormat(locale, {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
@@ -141,11 +136,9 @@ export function NotificationsPageClient() {
       <div className="student-notifications-hero">
         <div className="student-notifications-hero-inner">
           <div>
-            <p className="student-notifications-eyebrow">Centre notifications</p>
-            <h1 className="student-notifications-title">Notifications</h1>
-            <p className="student-notifications-description">
-              Consultez les nouvelles actions et ouvrez directement la page associee.
-            </p>
+            <p className="student-notifications-eyebrow">{t('eyebrow')}</p>
+            <h1 className="student-notifications-title">{t('title')}</h1>
+            <p className="student-notifications-description">{t('description')}</p>
           </div>
 
           <button
@@ -155,7 +148,7 @@ export function NotificationsPageClient() {
             className="student-notifications-mark-all"
           >
             <CheckCheck />
-            Tout marquer comme lu
+            {t('markAll')}
           </button>
         </div>
       </div>
@@ -167,23 +160,27 @@ export function NotificationsPageClient() {
               <Bell />
             </span>
             <div>
-              <p className="student-notifications-panel-title">Toutes les notifications</p>
-              <p className="student-notifications-panel-count">{unreadCount} non lue(s)</p>
+              <p className="student-notifications-panel-title">{t('panelTitle')}</p>
+              <p className="student-notifications-panel-count">{t('unreadCount', { count: unreadCount })}</p>
             </div>
           </div>
         </div>
 
         {isLoading ? (
-          <p className="student-notifications-empty">Chargement...</p>
+          <p className="student-notifications-empty">{t('loading')}</p>
         ) : !hasNotifications ? (
-          <p className="student-notifications-empty">Aucune notification pour le moment.</p>
+          <p className="student-notifications-empty">{t('empty')}</p>
         ) : (
           <div className="student-notifications-list">
             {sortedNotifications.map((notification) => {
               const isUnread = notification.status === 'unread'
-              const typeLabel = notification.type
-                ? typeLabels[notification.type] || notification.type
-                : 'Info'
+              const typeKey = notification.type as 'analyse' | 'coaching' | 'motivation' | 'rendezvous' | 'system' | null
+              const typeLabel = typeKey === 'analyse' ? t('typeAnalyse')
+                : typeKey === 'coaching' ? t('typeCoaching')
+                : typeKey === 'motivation' ? t('typeMotivation')
+                : typeKey === 'rendezvous' ? t('typeRendezvous')
+                : typeKey === 'system' ? t('typeSystem')
+                : t('typeInfo')
 
               return (
                 <button

@@ -1,13 +1,15 @@
 import { CheckCircle2, Clock3, NotebookPen } from 'lucide-react'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { StudentExerciseCheckinForm } from '@/components/dashboard/student/StudentExerciseCheckinForm'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
+import { translateExerciseToEnglish } from '@/utilities/translateExercise'
 
-function getCoachName(coach: unknown) {
-  if (!coach || typeof coach !== 'object') return 'Coach'
+function getCoachName(coach: unknown): string {
+  if (!coach || typeof coach !== 'object') return ''
 
   const data = coach as {
     email?: string | null
@@ -16,38 +18,35 @@ function getCoachName(coach: unknown) {
   }
   const fullName = [data.firstName, data.lastName].filter(Boolean).join(' ').trim()
 
-  return fullName || data.email || 'Coach'
-}
-
-function formatDate(value?: string | null) {
-  if (!value) return 'Sans echeance'
-
-  return new Intl.DateTimeFormat('fr-FR', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value))
-}
-
-function getStatusLabel(status: string) {
-  switch (status) {
-    case 'assigned':
-      return 'A faire'
-    case 'in_progress':
-      return 'En cours'
-    case 'completed':
-      return 'Envoye'
-    case 'reviewed':
-      return 'Corrige'
-    case 'missed':
-      return 'Non fait'
-    default:
-      return status
-  }
+  return fullName || data.email || ''
 }
 
 export default async function StudentCheckinPage() {
   const { user } = await getAuthenticatedDashboardUser()
   const payload = await getPayload({ config })
+  const t = await getTranslations('dashboard.student.checkin')
+  const locale = await getLocale()
+
+  function formatDate(value?: string | null) {
+    if (!value) return t('noDueDate')
+
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value))
+  }
+
+  const statusLabels: Record<string, string> = {
+    assigned: t('status.assigned'),
+    in_progress: t('status.in_progress'),
+    completed: t('status.completed'),
+    reviewed: t('status.reviewed'),
+    missed: t('status.missed'),
+  }
+
+  function getStatusLabel(status: string) {
+    return statusLabels[status] ?? status
+  }
 
   const exercises = user
     ? await payload.find({
@@ -64,6 +63,7 @@ export default async function StudentCheckinPage() {
         limit: 50,
       })
     : { docs: [] }
+
   const now = Date.now()
   const overdueExerciseIds = exercises.docs
     .filter((exercise) => {
@@ -98,6 +98,22 @@ export default async function StudentCheckinPage() {
     status: overdueIds.has(String(exercise.id)) ? 'missed' : exercise.status,
   }))
 
+  const translationsMap = locale === 'en' && displayedExercises.length > 0
+    ? new Map(
+        await Promise.all(
+          displayedExercises.map(async (exercise) => {
+            const tx = await translateExerciseToEnglish(exercise.id, {
+              title: exercise.title,
+              instructions: exercise.instructions,
+              reason: exercise.reason,
+              coachFeedback: exercise.coachFeedback,
+            })
+            return [String(exercise.id), tx] as const
+          }),
+        ),
+      )
+    : null
+
   const sentCount = displayedExercises.filter((exercise) => exercise.status === 'completed').length
   const reviewedCount = displayedExercises.filter((exercise) => exercise.status === 'reviewed').length
   const finishedCount = sentCount + reviewedCount
@@ -110,28 +126,28 @@ export default async function StudentCheckinPage() {
   return (
     <div>
       <StudentTopbar
-        title="Ma progression"
-        description="Suivez votre evolution selon les exercices donnes par votre coach et valides apres feedback."
+        title={t('topbar.title')}
+        description={t('topbar.description')}
       />
 
       <section className="mindly-card mb-6 p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-semibold text-[var(--mindly-primary)]">
-              Progression globale
+              {t('progressTitle')}
             </p>
             <h2 className="mt-2 text-3xl font-bold text-[var(--mindly-text-strong)]">
               {progressPercent}%
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--mindly-text-soft)]">
-              La barre avance quand votre coach valide un exercice avec un feedback.
+              {t('progressHint')}
             </p>
           </div>
 
           <div className="w-full md:max-w-md">
             <div
               className="h-4 overflow-hidden rounded-full bg-slate-100 dark:bg-white/[0.08]"
-              aria-label={`Progression globale ${progressPercent}%`}
+              aria-label={t('progressAriaLabel', { percent: progressPercent })}
               role="progressbar"
               aria-valuemin={0}
               aria-valuemax={100}
@@ -144,7 +160,7 @@ export default async function StudentCheckinPage() {
             </div>
             <div className="mt-2 flex justify-between text-xs font-medium text-[var(--mindly-text-soft)]">
               <span>0%</span>
-              <span>{reviewedCount} exercices valides sur {displayedExercises.length}</span>
+              <span>{t('progressCounter', { reviewed: reviewedCount, total: displayedExercises.length })}</span>
               <span>100%</span>
             </div>
           </div>
@@ -156,7 +172,7 @@ export default async function StudentCheckinPage() {
           <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--mindly-primary-soft-3)] text-[var(--mindly-primary)]">
             <NotebookPen className="h-5 w-5" />
           </div>
-          <p className="text-sm text-[var(--mindly-text-soft)]">Exercices recus</p>
+          <p className="text-sm text-[var(--mindly-text-soft)]">{t('statReceived')}</p>
           <p className="mt-2 text-2xl font-bold text-[var(--mindly-text-strong)]">
             {displayedExercises.length}
           </p>
@@ -166,7 +182,7 @@ export default async function StudentCheckinPage() {
           <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--mindly-primary-soft-3)] text-[var(--mindly-primary)]">
             <Clock3 className="h-5 w-5" />
           </div>
-          <p className="text-sm text-[var(--mindly-text-soft)]">A faire</p>
+          <p className="text-sm text-[var(--mindly-text-soft)]">{t('statTodo')}</p>
           <p className="mt-2 text-2xl font-bold text-[var(--mindly-text-strong)]">{todoCount}</p>
         </article>
 
@@ -174,7 +190,7 @@ export default async function StudentCheckinPage() {
           <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--mindly-primary-soft-3)] text-[var(--mindly-primary)]">
             <CheckCircle2 className="h-5 w-5" />
           </div>
-          <p className="text-sm text-[var(--mindly-text-soft)]">Exercices termines</p>
+          <p className="text-sm text-[var(--mindly-text-soft)]">{t('statDone')}</p>
           <p className="mt-2 text-2xl font-bold text-[var(--mindly-text-strong)]">
             {finishedCount}
           </p>
@@ -186,15 +202,18 @@ export default async function StudentCheckinPage() {
           displayedExercises.map((exercise) => {
             const completed = exercise.status === 'completed' || exercise.status === 'reviewed'
             const missed = exercise.status === 'missed'
+            const tx = translationsMap?.get(String(exercise.id))
 
             return (
               <article key={exercise.id} className="mindly-feature-card">
                 <div className="mindly-feature-header">
                   <div>
-                    <h2 className="mindly-feature-title">{exercise.title}</h2>
-                    <p className="mt-2 text-sm text-dream-muted dark:text-white/65">
-                      Coach : {getCoachName(exercise.coach)}
-                    </p>
+                    <h2 className="mindly-feature-title">{tx?.title ?? exercise.title}</h2>
+                    {getCoachName(exercise.coach) ? (
+                      <p className="mt-2 text-sm text-dream-muted dark:text-white/65">
+                        {t('coachLabel', { name: getCoachName(exercise.coach) })}
+                      </p>
+                    ) : null}
                   </div>
 
                   <span className="mindly-ui-badge">{getStatusLabel(exercise.status)}</span>
@@ -202,25 +221,25 @@ export default async function StudentCheckinPage() {
 
                 <div className="mindly-feature-content">
                   <p className="text-sm text-dream-muted dark:text-white/65">
-                    Echeance : {formatDate(exercise.dueDate)}
+                    {t('dueLabel', { date: formatDate(exercise.dueDate) })}
                   </p>
 
                   <div className="mt-4 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
                     <p className="text-sm font-semibold text-dream-heading dark:text-white">
-                      Consignes
+                      {t('instructionsTitle')}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-white/65">
-                      {exercise.instructions}
+                      {tx?.instructions ?? exercise.instructions}
                     </p>
                   </div>
 
-                  {exercise.reason ? (
+                  {(tx?.reason ?? exercise.reason) ? (
                     <div className="mt-4 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
                       <p className="text-sm font-semibold text-dream-heading dark:text-white">
-                        Pourquoi cet exercice
+                        {t('reasonTitle')}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-white/65">
-                        {exercise.reason}
+                        {tx?.reason ?? exercise.reason}
                       </p>
                     </div>
                   ) : null}
@@ -231,22 +250,22 @@ export default async function StudentCheckinPage() {
                     missed={missed}
                   />
 
-                  {exercise.coachFeedback ? (
+                  {(tx?.coachFeedback ?? exercise.coachFeedback) ? (
                     <div className="mt-4 rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
                       <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-100">
-                        Feedback du coach
+                        {t('feedbackTitle')}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-emerald-700 dark:text-emerald-100/80">
-                        {exercise.coachFeedback}
+                        {tx?.coachFeedback ?? exercise.coachFeedback}
                       </p>
                     </div>
                   ) : completed ? (
                     <div className="mt-4 rounded-2xl bg-sky-50 p-4 dark:bg-sky-500/10">
                       <p className="text-sm font-semibold text-sky-800 dark:text-sky-100">
-                        En attente du feedback du coach
+                        {t('awaitingFeedbackTitle')}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-sky-700 dark:text-sky-100/80">
-                        Votre exercice est envoye. La progression augmentera apres validation du coach.
+                        {t('awaitingFeedbackText')}
                       </p>
                     </div>
                   ) : null}
@@ -258,8 +277,7 @@ export default async function StudentCheckinPage() {
           <section className="mindly-feature-card">
             <div className="mindly-feature-content">
               <p className="mindly-feature-text">
-                Aucun exercice ne vous a encore ete attribue. Vous recevrez une notification quand
-                votre coach vous proposera un exercice personnalise.
+                {t('empty')}
               </p>
             </div>
           </section>

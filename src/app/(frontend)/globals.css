@@ -2540,11 +2540,12 @@
   }
 
   .student-profile-card-header {
-    padding: 1.5rem 1.5rem 0.5rem;
+    padding: 1rem 1.25rem 0.75rem;
   }
 
   .student-profile-card-content {
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem 1.5rem;
+    margin-top: 0.5rem;
   }
 
   .student-profile-card-content-compact {
@@ -6905,6 +6906,18 @@
   [data-theme='dark'] .mindly-feature-title,
   [data-theme='dark'] .mindly-feature-reference,
   [data-theme='dark'] .mindly-sidebar-title,
+  [data-theme='dark'] .student-profile-link-secondary {
+    border-color: var(--mindly-border-violet);
+    background: rgb(255 255 255 / 0.06);
+    color: var(--mindly-text-strong);
+  }
+
+  [data-theme='dark'] .student-profile-link-secondary:hover {
+    background: rgb(137 94 248 / 0.18);
+    border-color: var(--mindly-primary);
+    color: var(--mindly-primary-light);
+  }
+
   [data-theme='dark'] .student-profile-title,
   [data-theme='dark'] .student-profile-title-lg,
   [data-theme='dark'] .student-appointments-title,
@@ -6967,6 +6980,58 @@
   [data-theme='dark'] .student-notifications-type {
     border-color: var(--mindly-border-violet);
     background: var(--mindly-primary-soft-3);
+    color: var(--mindly-primary-light);
+  }
+
+  [data-theme='dark'] .student-notifications-row {
+    border-color: var(--mindly-border);
+  }
+
+  [data-theme='dark'] .student-notifications-row:hover {
+    background: rgb(169 135 255 / 0.08);
+  }
+
+  [data-theme='dark'] .student-notifications-row-unread {
+    background: rgb(137 94 248 / 0.12);
+  }
+
+  [data-theme='dark'] .student-notifications-row-unread:hover {
+    background: rgb(137 94 248 / 0.2);
+  }
+
+  [data-theme='dark'] .student-notifications-status-icon {
+    background: rgb(255 255 255 / 0.07);
+    color: var(--mindly-text-soft);
+  }
+
+  [data-theme='dark'] .student-notifications-status-icon-unread {
+    background: var(--mindly-primary-soft-3);
+    color: var(--mindly-primary-light);
+  }
+
+  [data-theme='dark'] .student-notifications-item-title {
+    color: var(--mindly-text-strong);
+  }
+
+  [data-theme='dark'] .student-notifications-message,
+  [data-theme='dark'] .student-notifications-date,
+  [data-theme='dark'] .student-notifications-external,
+  [data-theme='dark'] .student-notifications-panel-count {
+    color: var(--mindly-text-soft);
+  }
+
+  [data-theme='dark'] .student-notifications-mark-all {
+    border-color: var(--mindly-border-violet);
+    background: rgb(137 94 248 / 0.12);
+    color: var(--mindly-primary-light);
+  }
+
+  [data-theme='dark'] .student-notifications-mark-all:hover:not(:disabled) {
+    background: rgb(137 94 248 / 0.22);
+    color: var(--mindly-primary-light);
+  }
+
+  [data-theme='dark'] .student-notifications-eyebrow {
     color: var(--mindly-primary-light);
   }
 
@@ -12185,6 +12250,28 @@ html[data-static='true'] {
 
 [data-theme='dark'] .student-typing-indicator span {
   background: var(--mindly-primary-light);
+}
+
+[data-theme='dark'] .student-coach-panel {
+  background: var(--mindly-surface-glass);
+  border-color: var(--mindly-border-violet);
+}
+
+[data-theme='dark'] .student-sidebar-tab-active {
+  background: rgb(137 94 248 / 0.2);
+  color: var(--mindly-primary-light);
+  box-shadow: 0 2px 8px rgb(137 94 248 / 0.18);
+}
+
+[data-theme='dark'] .student-icon-action {
+  background: rgb(255 255 255 / 0.07);
+  border-color: var(--mindly-border-violet);
+  color: var(--mindly-primary-light);
+}
+
+[data-theme='dark'] .student-icon-action:hover {
+  background: rgb(137 94 248 / 0.18);
+  border-color: var(--mindly-primary);
 }
 
 /* Responsive */
