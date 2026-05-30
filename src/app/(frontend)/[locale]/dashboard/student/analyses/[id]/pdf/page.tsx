@@ -30,6 +30,7 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
     id,
     user,
     overrideAccess: false,
+    locale: locale as 'fr' | 'en',
   })
 
   if (!analyse) {
@@ -52,7 +53,10 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
   const wellbeingLabel = wellbeingKeyMap[reportWellbeing.key].label
   const wellbeingDescription = wellbeingKeyMap[reportWellbeing.key].description
 
-  const tx = locale === 'en'
+  const needsFallbackTranslation =
+    locale === 'en' && !analyse.overview && !analyse.conclusion && !analyse.forcesDominantes
+
+  const tx = needsFallbackTranslation
     ? await translateAnalysisToEnglish(analyse.id, analyse)
     : null
 
@@ -62,15 +66,15 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
     forcesDominantes: tx?.forcesDominantes ?? analyse.forcesDominantes,
     pointsVigilance: tx?.pointsVigilance ?? analyse.pointsVigilance,
     styleRelationnel: tx?.styleRelationnel ?? analyse.styleRelationnel,
-    traits: tx?.traits ?? analyse.traits?.map((trait) => ({
+    traits: tx?.traits ?? analyse.traits?.map((trait: { name: string; analysis?: string | null; interpretation?: string | null; observedIndicators?: Array<{ indicator?: string | null }> | null }) => ({
       name: trait.name,
       analysis: trait.analysis,
       interpretation: trait.interpretation,
-      indicators: (trait.observedIndicators ?? []).map((i) => i.indicator ?? '').filter(Boolean),
+      indicators: (trait.observedIndicators ?? []).map((i: { indicator?: string | null }) => i.indicator ?? '').filter(Boolean),
     })) ?? [],
     dominantEmotion: tx?.dominantEmotion ?? analyse.profilEmotionnel?.dominantEmotion,
     emotionalSummary: tx?.emotionalSummary ?? analyse.profilEmotionnel?.emotionalSummary,
-    recommandations: tx?.recommandations ?? (analyse.recommandations ?? []).map((r) => r.text),
+    recommandations: tx?.recommandations ?? (analyse.recommandations ?? []).map((r: { text?: string | null }) => r.text),
   }
 
   return (

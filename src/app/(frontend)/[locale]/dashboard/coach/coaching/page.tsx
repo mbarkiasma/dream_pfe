@@ -29,7 +29,7 @@ export default async function CoachCoachingPage() {
     <div>
       <CoachTopbar
         title="Sessions de coaching"
-        description="Suivez les conversations classiques, repondez aux etudiants et enregistrez les notes de suivi."
+        description="Suivez les conversations classiques, répondez aux étudiants et enregistrez les notes de suivi."
       />
 
       <CoachCoachingClient initialSessions={sessions.docs as any} />

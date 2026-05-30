@@ -120,26 +120,26 @@ export default async function PsyStudentsPage() {
   return (
     <div>
       <PsyTopbar
-        title="Etudiants assignes"
-        description="Consultez les etudiants orientes vers le suivi psychologique."
+        title="Étudiants assignés"
+        description="Consultez les étudiants orientés vers le suivi psychologique."
       />
 
       <PsyStatsCards
         stats={[
           {
-            label: 'Etudiants assignes',
+            label: 'Étudiants assignés',
             value: assignedStudents.length,
             hint: 'Suivi clinique',
           },
           {
-            label: 'Rendez-vous prevus',
+            label: 'Rendez-vous prévus',
             value: upcomingAppointments.length,
             hint: 'Consultations',
           },
           {
             label: 'Cas en attente',
             value: pendingAppointments.length,
-            hint: 'A traiter',
+            hint: 'À traiter',
           },
         ]}
       />
@@ -148,7 +148,7 @@ export default async function PsyStudentsPage() {
         <div className="xl:col-span-2">
           <article className="mindly-feature-card">
             <div className="mindly-feature-header">
-              <h2 className="mindly-feature-title">Etudiants assignes</h2>
+              <h2 className="mindly-feature-title">Étudiants assignés</h2>
               <span className="mindly-ui-badge">
                 {assignedStudents.length} dossier{assignedStudents.length > 1 ? 's' : ''}
               </span>
@@ -203,12 +203,12 @@ export default async function PsyStudentsPage() {
                           </p>
                           {item.nextAppointment ? (
                             <p className="mindly-feature-reference mt-2">
-                              {formatDate(item.nextAppointment.date)} a{' '}
+                              {formatDate(item.nextAppointment.date)} à{' '}
                               {item.nextAppointment.startTime}
                             </p>
                           ) : (
                             <p className="mindly-feature-text mt-2">
-                              Aucune consultation confirmee
+                              Aucune consultation confirmée
                             </p>
                           )}
                         </div>
@@ -223,10 +223,10 @@ export default async function PsyStudentsPage() {
                   </div>
                   <div>
                     <p className="mindly-feature-reference">
-                      Aucun etudiant assigne
+                      Aucun étudiant assigné
                     </p>
                     <p className="mindly-feature-text">
-                      Les etudiants apparaitront ici apres une demande de rendez-vous.
+                      Les étudiants apparaîtront ici après une demande de rendez-vous.
                     </p>
                   </div>
                 </div>
@@ -255,7 +255,7 @@ export default async function PsyStudentsPage() {
                         <p className="mindly-feature-reference">
                           {isUser(appointment.student)
                             ? getStudentName(appointment.student)
-                            : 'Etudiant'}
+                            : 'Étudiant'}
                         </p>
                         <p className="mindly-feature-text">
                           {formatDate(appointment.date)} - {appointment.startTime}
@@ -266,7 +266,7 @@ export default async function PsyStudentsPage() {
                 </div>
               ) : (
                 <p className="mindly-feature-text">
-                  Aucune consultation confirmee pour le moment.
+                  Aucune consultation confirmée pour le moment.
                 </p>
               )}
             </div>
@@ -302,7 +302,7 @@ export default async function PsyStudentsPage() {
                 <div className="student-dreams-latest-box flex items-center gap-3">
                   <CalendarDays className="h-5 w-5 text-[var(--mindly-primary)]" />
                   <p className="mindly-feature-text">
-                    Aucun cas urgent actif. Les demandes urgentes seront affichees ici.
+                    Aucun cas urgent actif. Les demandes urgentes seront affichées ici.
                   </p>
                 </div>
               )}

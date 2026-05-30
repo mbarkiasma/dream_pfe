@@ -52,10 +52,10 @@ export function CoachExerciseForm({ students }: CoachExerciseFormProps) {
         }
 
         form.reset()
-        setSuccess('Exercice attribue avec succes.')
+        setSuccess('Exercice attribué avec succès.')
         router.refresh()
       } catch {
-        setError('Erreur reseau pendant la creation de l exercice.')
+        setError("Erreur réseau pendant la création de l'exercice.")
       }
     })
   }
@@ -64,7 +64,7 @@ export function CoachExerciseForm({ students }: CoachExerciseFormProps) {
     <form onSubmit={handleSubmit} className="grid gap-4">
       <div className="grid gap-2">
         <label className="text-sm font-medium text-dream-heading dark:text-white">
-          Etudiant
+          Étudiant
         </label>
         <select
           name="studentId"
@@ -72,7 +72,7 @@ export function CoachExerciseForm({ students }: CoachExerciseFormProps) {
           className="rounded-2xl border border-border bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-white/[0.06]"
           disabled={pending}
         >
-          <option value="">Choisir un etudiant</option>
+          <option value="">Choisir un étudiant</option>
           {students.map((student) => (
             <option key={student.id} value={student.id}>
               {student.label}
@@ -102,7 +102,7 @@ export function CoachExerciseForm({ students }: CoachExerciseFormProps) {
           name="instructions"
           required
           rows={4}
-          placeholder="Expliquez ce que l'etudiant doit faire..."
+          placeholder="Expliquez ce que l'étudiant doit faire..."
           className="rounded-2xl border border-border bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-white/[0.06]"
           disabled={pending}
         />
@@ -115,7 +115,7 @@ export function CoachExerciseForm({ students }: CoachExerciseFormProps) {
         <textarea
           name="reason"
           rows={3}
-          placeholder="Pourquoi cet exercice est utile pour cet etudiant ?"
+          placeholder="Pourquoi cet exercice est utile pour cet étudiant ?"
           className="rounded-2xl border border-border bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-white/[0.06]"
           disabled={pending}
         />
@@ -123,7 +123,7 @@ export function CoachExerciseForm({ students }: CoachExerciseFormProps) {
 
       <div className="grid gap-2">
         <label className="text-sm font-medium text-dream-heading dark:text-white">
-          Echeance
+          Échéance
         </label>
         <input
           name="dueDate"

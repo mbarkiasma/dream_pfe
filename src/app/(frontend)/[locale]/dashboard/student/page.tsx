@@ -3,6 +3,7 @@ import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashb
 import config from '@payload-config'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
+import { getLocale } from 'next-intl/server'
 
 export default async function StudentDashboardPage() {
   const { user } = await getAuthenticatedDashboardUser()
@@ -12,6 +13,7 @@ export default async function StudentDashboardPage() {
   }
 
   const payload = await getPayload({ config })
+  const locale = await getLocale()
 
   const [dreamsResult, analysesResult, latestDreamResult, latestAnalysisResult] = await Promise.all(
     [
@@ -39,6 +41,7 @@ export default async function StudentDashboardPage() {
         collection: 'dreams',
         user,
         overrideAccess: false,
+        locale: locale as 'fr' | 'en',
         depth: 0,
         limit: 1,
         sort: '-createdAt',
@@ -58,6 +61,7 @@ export default async function StudentDashboardPage() {
         collection: 'analyse-personnalite',
         user,
         overrideAccess: false,
+        locale: locale as 'fr' | 'en',
         depth: 0,
         limit: 1,
         sort: '-date',

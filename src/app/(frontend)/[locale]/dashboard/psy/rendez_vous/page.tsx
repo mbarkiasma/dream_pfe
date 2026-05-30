@@ -9,10 +9,10 @@ import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashb
 
 const statusLabels: Record<string, string> = {
   pending: 'En attente',
-  confirmed: 'Confirme',
-  rejected: 'Refuse',
-  cancelled: 'Annule',
-  completed: 'Termine',
+  confirmed: 'Confirmé',
+  rejected: 'Refusé',
+  cancelled: 'Annulé',
+  completed: 'Terminé',
 }
 
 const statusClasses: Record<string, string> = {
@@ -34,7 +34,7 @@ function formatDate(value: string | null | undefined) {
 }
 
 function getStudentName(student: unknown) {
-  if (!student || typeof student !== 'object') return 'Etudiant'
+  if (!student || typeof student !== 'object') return 'Étudiant'
 
   const data = student as {
     firstName?: string | null
@@ -43,7 +43,7 @@ function getStudentName(student: unknown) {
   }
   const fullName = [data.firstName, data.lastName].filter(Boolean).join(' ').trim()
 
-  return fullName || data.email || 'Etudiant'
+  return fullName || data.email || 'Étudiant'
 }
 
 function getAppointmentDateTime(date: string | null | undefined, startTime: string | null | undefined) {
@@ -100,7 +100,7 @@ export default async function PsyRendezVousPage() {
     <div>
       <PsyTopbar
         title="Rendez-vous"
-        description="Consultez les demandes des etudiants et organisez les consultations confirmees."
+        description="Consultez les demandes des étudiants et organisez les consultations confirmées."
       />
 
       <div className="mindly-dashboard-grid">
@@ -108,7 +108,7 @@ export default async function PsyRendezVousPage() {
           <Card className="mindly-feature-card">
             <CardHeader className="mindly-feature-header">
               <CardTitle className="mindly-feature-title">
-                Demandes recues
+                Demandes reçues
               </CardTitle>
             </CardHeader>
 
@@ -128,7 +128,7 @@ export default async function PsyRendezVousPage() {
                           </div>
 
                           <p className="mt-2 mindly-feature-reference">
-                            {formatDate(appointment.date)} de {appointment.startTime} a{' '}
+                            {formatDate(appointment.date)} de {appointment.startTime} à{' '}
                             {appointment.endTime}
                           </p>
 
@@ -138,7 +138,7 @@ export default async function PsyRendezVousPage() {
 
                           {appointment.status === 'rejected' && appointment.rejectionReason ? (
                             <div className="mt-3 rounded-2xl student-dream-status-failed p-3 text-sm">
-                              <p className="font-semibold">Cause du refus envoyee</p>
+                              <p className="font-semibold">Cause du refus envoyée</p>
                               <p className="mt-1">{appointment.rejectionReason}</p>
                             </div>
                           ) : null}
@@ -177,7 +177,7 @@ export default async function PsyRendezVousPage() {
                       Aucune demande pour le moment
                     </p>
                     <p className="mindly-feature-text">
-                      Les demandes envoyees par les etudiants apparaitront ici.
+                      Les demandes envoyées par les étudiants apparaîtront ici.
                     </p>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default async function PsyRendezVousPage() {
                 </div>
               ) : (
                 <p className="mindly-feature-text">
-                  Aucune consultation n&apos;est encore confirmee pour le moment.
+                  Aucune consultation n'est encore confirmée pour le moment.
                 </p>
               )}
             </CardContent>
@@ -219,7 +219,7 @@ export default async function PsyRendezVousPage() {
 
           <Card className="mindly-feature-card">
             <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">Resume</CardTitle>
+              <CardTitle className="mindly-feature-title">Résumé</CardTitle>
             </CardHeader>
 
             <CardContent className="mindly-feature-content">
@@ -234,7 +234,7 @@ export default async function PsyRendezVousPage() {
                   <p className="mindly-stat-value">
                     {confirmedAppointments.length}
                   </p>
-                  <p className="mindly-stat-hint">Confirmes</p>
+                  <p className="mindly-stat-hint">Confirmés</p>
                 </div>
               </div>
             </CardContent>

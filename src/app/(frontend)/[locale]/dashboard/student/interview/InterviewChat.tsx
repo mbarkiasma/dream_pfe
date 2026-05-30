@@ -250,6 +250,7 @@ export function InterviewChat() {
               source: 'text',
             })),
             analysisData: data.analysisData,
+            locale: selectedLanguage,
           }),
         })
 

@@ -71,12 +71,14 @@ export const AnnonceMotivation: CollectionConfig = {
       type: 'text',
       label: 'Titre',
       required: true,
+      localized: true,
     },
     {
       name: 'content',
       type: 'textarea',
       label: 'Contenu',
       required: true,
+      localized: true,
     },
     {
       name: 'author',

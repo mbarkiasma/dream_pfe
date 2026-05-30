@@ -22,7 +22,7 @@ import { LogoutButton } from '@/components/dashboard/student/Logout'
 
 const navItems = [
   { title: 'Dashboard', href: '/dashboard/coach', icon: LayoutDashboard },
-  { title: 'Etudiants', href: '/dashboard/coach/students', icon: UsersRound },
+  { title: 'Étudiants', href: '/dashboard/coach/students', icon: UsersRound },
   { title: 'Sessions', href: '/dashboard/coach/coaching', icon: LifeBuoy },
   { title: 'Exercices', href: '/dashboard/coach/exercices', icon: BookOpenCheck },
   { title: 'Rendez-vous', href: '/dashboard/coach/rendez_vous', icon: CalendarDays },

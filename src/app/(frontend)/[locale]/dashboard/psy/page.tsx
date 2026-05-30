@@ -64,7 +64,7 @@ function getStartOfTodayISO() {
 }
 
 function getAppointmentLabel(appointment: RendezVousPsy | undefined) {
-  if (!appointment) return 'Aucune consultation confirmee'
+  if (!appointment) return 'Aucune consultation confirmée'
 
   return `${formatDate(appointment.date)} - ${appointment.startTime}`
 }
@@ -201,25 +201,25 @@ export default async function PsyDashboardPage() {
     <div>
       <PsyTopbar
         title="Dashboard Psychologue"
-        description="Bienvenue dans votre espace de suivi clinique des etudiants et des rendez-vous."
+        description="Bienvenue dans votre espace de suivi clinique des étudiants et des rendez-vous."
       />
 
       <PsyStatsCards
         stats={[
           {
-            label: 'Etudiants assignes',
+            label: 'Étudiants assignés',
             value: activeStudentIds.size,
             hint: 'Suivi clinique',
           },
           {
-            label: 'Rendez-vous prevus',
+            label: 'Rendez-vous prévus',
             value: upcomingAppointments.length,
             hint: 'Consultations',
           },
           {
             label: 'Cas en attente',
             value: pendingAppointments.length,
-            hint: 'A traiter',
+            hint: 'À traiter',
           },
           {
             icon: Brain,
@@ -235,7 +235,7 @@ export default async function PsyDashboardPage() {
           <Link href="/dashboard/psy/students" className="mindly-feature-link">
             <article className="mindly-feature-card psy-students-card">
               <div className="mindly-feature-header">
-                <h2 className="mindly-feature-title">Etudiants assignes</h2>
+                <h2 className="mindly-feature-title">Étudiants assignés</h2>
                 <span className="mindly-feature-action">
                   Voir
                   <ChevronRight />
@@ -281,7 +281,7 @@ export default async function PsyDashboardPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="mindly-feature-text">Aucun etudiant assigne pour le moment.</p>
+                  <p className="mindly-feature-text">Aucun étudiant assigné pour le moment.</p>
                 )}
               </div>
             </article>
@@ -319,7 +319,7 @@ export default async function PsyDashboardPage() {
                 <div className="student-dreams-latest-box flex items-center gap-3">
                   <Brain className="h-5 w-5 text-[var(--mindly-primary)]" />
                   <p className="mindly-feature-text">
-                    Les moyennes Big Five apparaitront apres les entretiens des etudiants.
+                    Les moyennes Big Five apparaîtront après les entretiens des étudiants.
                   </p>
                 </div>
               )}
@@ -344,7 +344,7 @@ export default async function PsyDashboardPage() {
                         <p className="mindly-feature-reference">
                           {isUser(appointment.student)
                             ? getStudentName(appointment.student)
-                            : 'Etudiant'}
+                            : 'Étudiant'}
                         </p>
                         <p className="mindly-feature-text">
                           {formatDate(appointment.date)} - {appointment.startTime}
@@ -377,7 +377,7 @@ export default async function PsyDashboardPage() {
                         <p className="mindly-feature-reference">
                           {isUser(appointment.student)
                             ? getStudentName(appointment.student)
-                            : 'Etudiant'}
+                            : 'Étudiant'}
                         </p>
                         <p className="mindly-feature-text line-clamp-3">{appointment.reason}</p>
                         <span className="mindly-ui-badge mindly-ui-badge-danger">Urgent</span>
@@ -390,7 +390,7 @@ export default async function PsyDashboardPage() {
                     {pendingAppointments.length > 0 ? (
                       <span className="mindly-ui-badge">
                         {pendingAppointments.length} demande
-                        {pendingAppointments.length > 1 ? 's' : ''} a traiter
+                        {pendingAppointments.length > 1 ? 's' : ''} à traiter
                       </span>
                     ) : (
                       <span className="mindly-ui-badge">Aucun cas</span>

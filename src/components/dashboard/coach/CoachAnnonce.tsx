@@ -93,7 +93,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
 
         resetForm()
         setStatusMessage(
-          isEditing ? 'Annonce modifiee avec succes.' : 'Annonce publiee avec succes.',
+          isEditing ? 'Annonce modifiée avec succès.' : 'Annonce publiée avec succès.',
         )
         router.refresh()
       } catch {
@@ -129,7 +129,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
         if (editingAnnouncement?.id === announcement.id) resetForm()
 
         setAnnouncementToDelete(null)
-        setStatusMessage('Annonce supprimee avec succes.')
+        setStatusMessage('Annonce supprimée avec succès.')
         router.refresh()
       } catch {
         setError("Impossible de supprimer l'annonce.")
@@ -138,7 +138,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
   }
 
   function formatDate(value?: string) {
-    if (!value) return 'Non precisee'
+    if (!value) return 'Non précisée'
 
     return new Intl.DateTimeFormat('fr-FR', {
       day: '2-digit',
@@ -149,9 +149,9 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
   }
 
   function getStudentName(student: ReactionStudent) {
-    if (!student) return 'Etudiant'
+    if (!student) return 'Étudiant'
     const fullName = `${student.firstName ?? ''} ${student.lastName ?? ''}`.trim()
-    return fullName || student.email || 'Etudiant'
+    return fullName || student.email || 'Étudiant'
   }
 
   function getAnnouncementStatusClass(status: Announcement['status']) {
@@ -173,8 +173,8 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                 </h2>
                 <p className="dream-text-form-description">
                   {editingAnnouncement
-                    ? 'Ajustez le titre ou le contenu deja publie.'
-                    : 'Publiez un message de motivation visible par les etudiants.'}
+                    ? 'Ajustez le titre ou le contenu déjà publié.'
+                    : 'Publiez un message de motivation visible par les étudiants.'}
                 </p>
               </div>
             </div>
@@ -189,7 +189,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
               <Textarea
                 value={content}
                 onChange={(event) => setContent(event.target.value)}
-                placeholder="Ecrivez votre message de motivation..."
+                placeholder="Écrivez votre message de motivation..."
                 className="dream-textarea-field"
               />
             </div>
@@ -241,7 +241,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
             <div>
               <h2 className="dream-text-section-title">Mes annonces</h2>
               <p className="dream-text-form-description">
-                Suivi des publications, statuts et reactions.
+                Suivi des publications, statuts et réactions.
               </p>
             </div>
             <span className="dream-badge-count">
@@ -250,7 +250,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
           </div>
 
           {initialAnnouncements.length === 0 ? (
-            <p className="p-6 dream-text-form-description">Aucune annonce publiee pour le moment.</p>
+            <p className="p-6 dream-text-form-description">Aucune annonce publiée pour le moment.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[820px] border-collapse text-left">
@@ -281,7 +281,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                           )}`}
                         >
                           <span className="h-2 w-2 rounded-full bg-current" />
-                          {announcement.status === 'published' ? 'Publiee' : 'Brouillon'}
+                          {announcement.status === 'published' ? 'Publiée' : 'Brouillon'}
                         </span>
                       </td>
                       <td className="px-4 py-4">
@@ -352,7 +352,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <p className="dream-text-section-header">
-                      Reactions
+                      Réactions
                     </p>
                     <h3 className="dream-text-modal-title">
                       {selectedLikesAnnouncement.title}
@@ -368,7 +368,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                     variant="dreamOutline"
                     size="iconLg"
                     className="shrink-0 shadow-dream-card"
-                    aria-label="Fermer les reactions"
+                    aria-label="Fermer les réactions"
                   >
                     <X className="h-5 w-5" />
                   </Button>
@@ -406,7 +406,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                   </div>
                 ) : (
                   <div className="dream-card-dashed rounded-[26px] border p-6 text-center dream-text-form-description">
-                    Aucun etudiant n&apos;a encore aime cette motivation.
+                    Aucun étudiant n'a encore aimé cette motivation.
                   </div>
                 )}
               </div>
@@ -446,7 +446,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                       {selectedAnnouncement.title}
                     </h3>
                     <p className="dream-text-modal-subtitle">
-                      {selectedAnnouncement.status === 'published' ? 'Publiee' : 'Brouillon'}
+                      {selectedAnnouncement.status === 'published' ? 'Publiée' : 'Brouillon'}
                     </p>
                   </div>
 
@@ -503,8 +503,8 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                     Supprimer cette annonce ?
                   </h3>
                   <p className="dream-spacing-top-sm dream-text-body-muted">
-                    Elle ne sera plus visible par les etudiants. Cette action ne pourra pas etre
-                    annulee.
+                    Elle ne sera plus visible par les étudiants. Cette action ne pourra pas être
+                    annulée.
                   </p>
                   <div className="dream-surface dream-spacing-top-md rounded-[20px] border p-4">
                     <p className="dream-text-form-title">

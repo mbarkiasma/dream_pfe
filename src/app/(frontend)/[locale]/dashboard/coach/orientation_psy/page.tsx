@@ -9,11 +9,11 @@ import { getRelationId } from '@/lib/coaching'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
 const statusLabels: Record<PsyOrientation['status'], string> = {
-  appointment_requested: 'Rendez-vous demande',
-  cancelled: 'Annulee',
-  pending_student_response: 'En attente etudiant',
-  student_accepted: 'Acceptee',
-  student_refused: 'Refusee',
+  appointment_requested: 'Rendez-vous demandé',
+  cancelled: 'Annulée',
+  pending_student_response: 'En attente étudiant',
+  student_accepted: 'Acceptée',
+  student_refused: 'Refusée',
 }
 
 function isUser(value: unknown): value is User {
@@ -21,11 +21,11 @@ function isUser(value: unknown): value is User {
 }
 
 function getUserName(user: unknown) {
-  if (!isUser(user)) return 'Etudiant'
+  if (!isUser(user)) return 'Étudiant'
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
 
-  return fullName || user.email || 'Etudiant'
+  return fullName || user.email || 'Étudiant'
 }
 
 function formatDate(value: string | null | undefined) {
@@ -73,14 +73,14 @@ export default async function CoachReferralPage() {
     <div>
       <CoachTopbar
         title="Orientation psy"
-        description="Gerez les etudiants a orienter vers le psychologue lorsque la situation le necessite."
+        description="Gérez les étudiants à orienter vers le psychologue lorsque la situation le nécessite."
       />
 
       <div className="mindly-dashboard-grid">
         <div className="xl:col-span-2">
           <Card className="mindly-feature-card">
             <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">Orienter un etudiant</CardTitle>
+              <CardTitle className="mindly-feature-title">Orienter un étudiant</CardTitle>
             </CardHeader>
 
             <CardContent className="mindly-feature-content">
@@ -134,7 +134,7 @@ export default async function CoachReferralPage() {
               ) : (
                 <>
                   <p className="mindly-feature-text">
-                    Aucune orientation n&apos;a encore ete envoyee.
+                    Aucune orientation n'a encore été envoyée.
                   </p>
 
                   <div className="mt-4">

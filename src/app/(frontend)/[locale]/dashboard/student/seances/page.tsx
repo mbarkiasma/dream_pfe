@@ -7,7 +7,6 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
-import { translateCoachingEventToEnglish } from '@/utilities/translateCoachingEvent'
 
 function getRelationId(value: unknown): string | null {
   if (!value) return null
@@ -56,6 +55,7 @@ export default async function StudentSeancesPage() {
         collection: 'coaching-events',
         user,
         overrideAccess: false,
+        locale: locale as 'fr' | 'en',
         where: {
           status: {
             equals: 'published',
@@ -89,21 +89,6 @@ export default async function StudentSeancesPage() {
       .filter(Boolean),
   )
 
-  const eventTranslationsMap = locale === 'en' && events.docs.length > 0
-    ? new Map(
-        await Promise.all(
-          events.docs.map(async (event) => {
-            const tx = await translateCoachingEventToEnglish(event.id, {
-              title: event.title,
-              theme: event.theme,
-              description: event.description,
-            })
-            return [String(event.id), tx] as const
-          }),
-        ),
-      )
-    : null
-
   return (
     <div>
       <StudentTopbar
@@ -127,7 +112,6 @@ export default async function StudentSeancesPage() {
                 const isPast = Number.isFinite(eventTime) && eventTime <= now
                 const isRegistered = registeredEventIds.has(String(event.id))
                 const coachName = getCoachName(event.coach)
-                const tx = eventTranslationsMap?.get(String(event.id))
 
                 return (
                   <article
@@ -137,10 +121,10 @@ export default async function StudentSeancesPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h2 className="text-lg font-semibold text-dream-heading dark:text-white">
-                          {tx?.title ?? event.title}
+                          {event.title}
                         </h2>
                         <p className="mt-1 text-sm text-dream-muted dark:text-white/65">
-                          {tx?.theme ?? event.theme}
+                          {event.theme}
                         </p>
                       </div>
 
@@ -160,7 +144,7 @@ export default async function StudentSeancesPage() {
                     ) : null}
 
                     <p className="mt-4 line-clamp-3 text-sm leading-6 text-dream-muted dark:text-white/65">
-                      {tx?.description ?? event.description}
+                      {event.description}
                     </p>
 
                     <div className="mt-5">

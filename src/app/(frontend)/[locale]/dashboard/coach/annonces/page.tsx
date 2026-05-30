@@ -84,7 +84,7 @@ export default async function CoachAnnouncementsPage() {
     <div>
       <CoachTopbar
         title="Annonces de motivation"
-        description="Publiez des contenus de motivation destines aux etudiants."
+        description="Publiez des contenus de motivation destinés aux étudiants."
       />
 
       <CoachAnnouncementsClient initialAnnouncements={announcementsWithReactions as any} />

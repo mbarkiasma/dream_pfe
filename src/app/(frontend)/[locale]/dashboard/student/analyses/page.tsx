@@ -7,7 +7,6 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 import { getReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
-import { translateAnalysisToEnglish } from '@/utilities/translateAnalysis'
 
 export default async function StudentAnalysesPage() {
   const payload = await getPayload({ config })
@@ -20,6 +19,7 @@ export default async function StudentAnalysesPage() {
         collection: 'analyse-personnalite',
         user,
         overrideAccess: false,
+        locale: locale as 'fr' | 'en',
         where: {
           user: {
             equals: user.id,
@@ -33,9 +33,6 @@ export default async function StudentAnalysesPage() {
   const latestAnalysis = analyses.docs[0]
   const reportWellbeing = getReportWellbeingTheme(latestAnalysis?.traits)
 
-  const tx = locale === 'en' && latestAnalysis
-    ? await translateAnalysisToEnglish(latestAnalysis.id, latestAnalysis)
-    : null
 
   const wellbeingKeyMap = {
     pending: { label: t('wellbeing.pending.label'), description: t('wellbeing.pending.description') },
@@ -107,7 +104,7 @@ export default async function StudentAnalysesPage() {
                   <div>
                     <p className="report-mini-label">{t('overviewLabel')}</p>
                     <p className="report-summary-text">
-                      {tx?.overview ?? tx?.conclusion ?? latestAnalysis.overview ?? latestAnalysis.conclusion ?? t('overviewEmpty')}
+                      {latestAnalysis.overview ?? latestAnalysis.conclusion ?? t('overviewEmpty')}
                     </p>
                   </div>
 

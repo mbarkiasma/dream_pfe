@@ -136,12 +136,14 @@ export const StudentExercices: CollectionConfig = {
       type: 'text',
       label: 'Titre',
       required: true,
+      localized: true,
     },
     {
       name: 'instructions',
       type: 'textarea',
       label: 'Consignes',
       required: true,
+      localized: true,
     },
     {
       name: 'student',
@@ -171,6 +173,7 @@ export const StudentExercices: CollectionConfig = {
       name: 'reason',
       type: 'textarea',
       label: "Pourquoi cet exercice est attribue",
+      localized: true,
     },
     {
       name: 'status',
@@ -205,6 +208,7 @@ export const StudentExercices: CollectionConfig = {
       name: 'coachFeedback',
       type: 'textarea',
       label: 'Feedback du coach',
+      localized: true,
     },
     {
       name: 'assignedAt',

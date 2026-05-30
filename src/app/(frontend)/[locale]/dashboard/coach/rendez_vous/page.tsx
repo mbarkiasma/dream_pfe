@@ -31,7 +31,7 @@ export default async function CoachAppointmentsPage() {
     <div>
       <CoachTopbar
         title="Rendez-vous"
-        description="Planifiez et gerez les seances de coaching avec les etudiants."
+        description="Planifiez et gérez les séances de coaching avec les étudiants."
       />
 
       <div className="mb-6">
@@ -40,7 +40,7 @@ export default async function CoachAppointmentsPage() {
 
       <Card className="mindly-feature-card">
         <CardHeader className="mindly-feature-header">
-          <CardTitle className="mindly-feature-title">Seances planifiees</CardTitle>
+          <CardTitle className="mindly-feature-title">Séances planifiées</CardTitle>
         </CardHeader>
 
         <CardContent className="mindly-feature-content">

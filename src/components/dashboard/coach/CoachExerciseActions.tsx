@@ -73,11 +73,11 @@ export function CoachExerciseActions({ exercise }: CoachExerciseActionsProps) {
           return
         }
 
-        setSuccess(isReviewing ? 'Feedback envoye. Progression validee.' : 'Exercice modifie.')
+        setSuccess(isReviewing ? 'Feedback envoyé. Progression validée.' : 'Exercice modifié.')
         setIsEditing(false)
         router.refresh()
       } catch {
-        setError('Erreur reseau pendant la modification.')
+        setError('Erreur réseau pendant la modification.')
       }
     })
   }
@@ -114,11 +114,11 @@ export function CoachExerciseActions({ exercise }: CoachExerciseActionsProps) {
           return
         }
 
-        setSuccess("Feedback envoye. L'etudiant a ete notifie.")
+        setSuccess("Feedback envoyé. L'étudiant a été notifié.")
         setIsFeedbackOpen(false)
         router.refresh()
       } catch {
-        setError("Erreur reseau pendant l'envoi du feedback.")
+        setError("Erreur réseau pendant l'envoi du feedback.")
       }
     })
   }
@@ -143,7 +143,7 @@ export function CoachExerciseActions({ exercise }: CoachExerciseActionsProps) {
         setShowDeleteConfirm(false)
         router.refresh()
       } catch {
-        setError('Erreur reseau pendant la suppression.')
+        setError('Erreur réseau pendant la suppression.')
       }
     })
   }
@@ -185,18 +185,18 @@ export function CoachExerciseActions({ exercise }: CoachExerciseActionsProps) {
           className="grid gap-3 rounded-2xl bg-white p-4 dark:bg-white/[0.04]"
         >
           <label className="text-sm font-semibold text-dream-heading dark:text-white">
-            Feedback pour l&apos;etudiant
+            Feedback pour l&apos;étudiant
           </label>
           <textarea
             name="coachFeedback"
             defaultValue={exercise.coachFeedback || ''}
             rows={4}
-            placeholder="Ecrivez votre feedback ici..."
+            placeholder="Écrivez votre feedback ici..."
             required
             className="rounded-2xl border border-border bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-white/[0.06]"
           />
           <p className="text-xs leading-5 text-dream-muted dark:text-white/60">
-            L&apos;etudiant recevra une notification apres l&apos;envoi.
+            L'étudiant recevra une notification après l'envoi.
           </p>
           <button
             type="submit"
@@ -278,8 +278,8 @@ export function CoachExerciseActions({ exercise }: CoachExerciseActionsProps) {
                   Supprimer cet exercice ?
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-dream-muted dark:text-white/70">
-                  Cette action retire l&apos;exercice de l&apos;espace du coach et de
-                  l&apos;etudiant.
+                  Cette action retire l'exercice de lespace du coach et de
+                  l'étudiant.
                 </p>
 
                 <div className="mt-6 flex flex-wrap justify-end gap-3">

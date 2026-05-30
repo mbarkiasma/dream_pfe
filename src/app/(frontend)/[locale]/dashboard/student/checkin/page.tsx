@@ -6,7 +6,6 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { StudentExerciseCheckinForm } from '@/components/dashboard/student/StudentExerciseCheckinForm'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
-import { translateExerciseToEnglish } from '@/utilities/translateExercise'
 
 function getCoachName(coach: unknown): string {
   if (!coach || typeof coach !== 'object') return ''
@@ -53,6 +52,7 @@ export default async function StudentCheckinPage() {
         collection: 'student-exercices',
         user,
         overrideAccess: false,
+        locale: locale as 'fr' | 'en',
         where: {
           student: {
             equals: user.id,
@@ -97,22 +97,6 @@ export default async function StudentCheckinPage() {
     ...exercise,
     status: overdueIds.has(String(exercise.id)) ? 'missed' : exercise.status,
   }))
-
-  const translationsMap = locale === 'en' && displayedExercises.length > 0
-    ? new Map(
-        await Promise.all(
-          displayedExercises.map(async (exercise) => {
-            const tx = await translateExerciseToEnglish(exercise.id, {
-              title: exercise.title,
-              instructions: exercise.instructions,
-              reason: exercise.reason,
-              coachFeedback: exercise.coachFeedback,
-            })
-            return [String(exercise.id), tx] as const
-          }),
-        ),
-      )
-    : null
 
   const sentCount = displayedExercises.filter((exercise) => exercise.status === 'completed').length
   const reviewedCount = displayedExercises.filter((exercise) => exercise.status === 'reviewed').length
@@ -202,13 +186,12 @@ export default async function StudentCheckinPage() {
           displayedExercises.map((exercise) => {
             const completed = exercise.status === 'completed' || exercise.status === 'reviewed'
             const missed = exercise.status === 'missed'
-            const tx = translationsMap?.get(String(exercise.id))
 
             return (
               <article key={exercise.id} className="mindly-feature-card">
                 <div className="mindly-feature-header">
                   <div>
-                    <h2 className="mindly-feature-title">{tx?.title ?? exercise.title}</h2>
+                    <h2 className="mindly-feature-title">{exercise.title}</h2>
                     {getCoachName(exercise.coach) ? (
                       <p className="mt-2 text-sm text-dream-muted dark:text-white/65">
                         {t('coachLabel', { name: getCoachName(exercise.coach) })}
@@ -229,17 +212,17 @@ export default async function StudentCheckinPage() {
                       {t('instructionsTitle')}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-white/65">
-                      {tx?.instructions ?? exercise.instructions}
+                      {exercise.instructions}
                     </p>
                   </div>
 
-                  {(tx?.reason ?? exercise.reason) ? (
+                  {exercise.reason ? (
                     <div className="mt-4 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
                       <p className="text-sm font-semibold text-dream-heading dark:text-white">
                         {t('reasonTitle')}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-white/65">
-                        {tx?.reason ?? exercise.reason}
+                        {exercise.reason}
                       </p>
                     </div>
                   ) : null}
@@ -250,13 +233,13 @@ export default async function StudentCheckinPage() {
                     missed={missed}
                   />
 
-                  {(tx?.coachFeedback ?? exercise.coachFeedback) ? (
+                  {exercise.coachFeedback ? (
                     <div className="mt-4 rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
                       <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-100">
                         {t('feedbackTitle')}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-emerald-700 dark:text-emerald-100/80">
-                        {tx?.coachFeedback ?? exercise.coachFeedback}
+                        {exercise.coachFeedback}
                       </p>
                     </div>
                   ) : completed ? (

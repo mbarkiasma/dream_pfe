@@ -5,7 +5,6 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { StudentMotivationClient } from '@/components/dashboard/student/StudentMotivationClient'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
-import { translateAnnouncementToEnglish } from '@/utilities/translateMotivationAnnouncement'
 
 export default async function StudentMotivationPage() {
   const payload = await getPayload({ config })
@@ -18,6 +17,7 @@ export default async function StudentMotivationPage() {
         collection: 'annonce-motivation',
         user,
         overrideAccess: false,
+        locale: locale as 'fr' | 'en',
         where: {
           status: {
             equals: 'published',
@@ -79,25 +79,12 @@ export default async function StudentMotivationPage() {
     return summary
   }, {})
 
-  const announcementsWithReactions = await Promise.all(
-    announcements.docs.map(async (announcement) => {
-      const tx = locale === 'en'
-        ? await translateAnnouncementToEnglish(announcement.id, {
-            title: announcement.title,
-            content: announcement.content,
-          })
-        : null
-
-      return {
-        ...announcement,
-        title: tx?.title ?? announcement.title,
-        content: tx?.content ?? announcement.content,
-        reactions: reactionSummaryByAnnouncement[String(announcement.id)] ?? {
-          counts: { like: 0 },
-        },
-      }
-    }),
-  )
+  const announcementsWithReactions = announcements.docs.map((announcement) => ({
+    ...announcement,
+    reactions: reactionSummaryByAnnouncement[String(announcement.id)] ?? {
+      counts: { like: 0 },
+    },
+  }))
 
   return (
     <div>

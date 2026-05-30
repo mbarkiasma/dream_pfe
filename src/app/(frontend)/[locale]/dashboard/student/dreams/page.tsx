@@ -1,6 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { StudentDreamsClient } from '@/components/dashboard/student/StudentDreamsClient'
@@ -12,6 +12,7 @@ export default async function StudentDreamsPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
   const t = await getTranslations('dashboard.student.dreamsPage')
+  const locale = await getLocale()
 
   const now = new Date()
   const day = now.getDay()
@@ -26,6 +27,7 @@ export default async function StudentDreamsPage() {
           collection: 'dreams',
           user,
           overrideAccess: false,
+          locale: locale as 'fr' | 'en',
           where: {
             user: {
               equals: user.id,

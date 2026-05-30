@@ -185,7 +185,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Message non envoye.')
+        throw new Error(data.error || 'Message non envoyé.')
       }
 
       setMessages((current) => [...current, data.message])
@@ -226,12 +226,12 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Note non enregistree.')
+        throw new Error(data.error || 'Note non enregistrée.')
       }
 
       setSavedNotes((current) => [{ ...data.note, canManage: true }, ...current])
       setNote('')
-      setStatusMessage('Note de suivi enregistree.')
+      setStatusMessage('Note de suivi enregistrée.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
     } finally {
@@ -271,7 +271,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
       )
       setEditingNoteId(null)
       setEditingNoteContent('')
-      setStatusMessage('Note modifiee.')
+      setStatusMessage('Note modifiée.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
     } finally {
@@ -299,7 +299,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         current.filter((currentNote) => String(currentNote.id) !== String(noteId)),
       )
       setNoteToDelete(null)
-      setStatusMessage('Note supprimee.')
+      setStatusMessage('Note supprimée.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Erreur inattendue.')
     } finally {
@@ -353,7 +353,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
           }
 
           setMessage((current) => `${current}${current ? ' ' : ''}${data.text || ''}`.trim())
-          setStatusMessage(data.text ? 'Texte transcrit.' : 'Aucun texte detecte.')
+          setStatusMessage(data.text ? 'Texte transcrit.' : 'Aucun texte détecté.')
         } catch (error) {
           setStatusMessage(error instanceof Error ? error.message : 'Erreur micro.')
         } finally {
@@ -366,7 +366,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
       setIsRecording(true)
       setStatusMessage('Enregistrement en cours...')
     } catch {
-      setStatusMessage("Impossible d'acceder au microphone.")
+      setStatusMessage("Impossible d'accéder au microphone.")
     }
   }
 
@@ -376,13 +376,13 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         <div className="px-2">
           <h2 className="text-lg font-semibold text-dream-heading">Sessions classiques</h2>
           <p className="mt-1 text-sm leading-6 text-dream-muted">
-            Demandes de coaching humain assignees a vous.
+            Demandes de coaching humain assignées à vous.
           </p>
         </div>
         <div className="mt-4 max-h-[560px] space-y-2 overflow-y-auto pr-1 xl:max-h-[calc(100%-82px)]">
           {sessions.length === 0 ? (
             <p className="dream-surface-muted rounded-[20px] border p-4 text-sm text-dream-muted">
-              Aucune session assignee pour le moment.
+              Aucune session assignée pour le moment.
             </p>
           ) : null}
 
@@ -428,7 +428,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-dream-heading">
-                  {selectedSession?.title ?? 'Aucune session selectionnee'}
+                  {selectedSession?.title ?? 'Aucune session sélectionnée'}
                 </h2>
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium">
                   <span className="dream-badge inline-flex items-center gap-1.5 rounded-full border px-3 py-1">
@@ -451,7 +451,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
             {messages.length === 0 ? (
               <div className="dream-card-dashed rounded-[24px] border p-6 text-sm leading-7 text-dream-muted">
                 Aucun message pour cette session. Vous pouvez attendre le premier message de
-                l&apos;etudiant ou envoyer un message d&apos;accueil.
+                l'étudiant ou envoyer un message d'accueil.
               </div>
             ) : null}
 
@@ -468,7 +468,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                     }`}
                   >
                     <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] opacity-60">
-                      {item.senderRole === 'student' ? 'Etudiant' : 'Coach'}
+                      {item.senderRole === 'student' ? 'Étudiant' : 'Coach'}
                     </p>
                     <p className="whitespace-pre-wrap text-sm leading-7">{item.content}</p>
                   </div>
@@ -486,7 +486,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                 disabled={!selectedSessionId || isLoading}
                 variant={isRecording ? 'destructive' : 'dreamSoft'}
                 className="h-[92px] w-[64px] shrink-0 rounded-[22px]"
-                title={isRecording ? 'Arreter' : 'Dicter'}
+                title={isRecording ? 'Arrêter' : 'Dicter'}
               >
                 {isRecording ? <Square className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
               </Button>
@@ -494,7 +494,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 rows={3}
-                placeholder="Repondre a l'etudiant..."
+                placeholder="Répondre à l'étudiant..."
                 className="dream-field min-h-[92px] flex-1 resize-none rounded-[22px] border px-4 py-3 text-sm leading-6 outline-none"
               />
               <Button
@@ -528,7 +528,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
             {selectedSession ? (
               <div className="dream-surface-muted rounded-[22px] border p-4">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-dream-accent">
-                  Etudiant
+                  Étudiant
                 </p>
                 <p className="mt-2 text-sm font-semibold text-dream-heading">
                   {selectedStudentName}
@@ -568,9 +568,9 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
             <div className="mt-6 border-t border-border pt-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-dream-heading">Notes precedentes</h3>
+                  <h3 className="text-sm font-semibold text-dream-heading">Notes précédentes</h3>
                   <p className="mt-1 text-xs text-dream-muted">
-                    Historique partage pour cet etudiant.
+                    Historique partagé pour cet étudiant.
                   </p>
                 </div>
                 <span className="dream-badge rounded-full border px-3 py-1 text-xs font-semibold">
@@ -581,7 +581,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
               <div className="mt-4 space-y-3">
                 {savedNotes.length === 0 ? (
                   <p className="dream-card-dashed rounded-[18px] border p-4 text-sm leading-6 text-dream-muted">
-                    Aucune note enregistree pour cette session.
+                    Aucune note enregistrée pour cette session.
                   </p>
                 ) : null}
 
@@ -691,8 +691,8 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                   Supprimer cette note ?
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-dream-muted">
-                  Cette note sera supprimee de l&apos;historique de suivi et de Payload. Cette action ne
-                  pourra pas etre annulee.
+                  Cette note sera supprimée de l'historique de suivi et de Payload. Cette action ne
+                  pourra pas être annulée.
                 </p>
                 <div className="dream-surface mt-4 rounded-[20px] border p-4">
                   <p className="truncate text-sm font-semibold text-dream-heading">
@@ -754,7 +754,7 @@ function getStudentName(session: CoachingSession | null | undefined): string {
   const student = session?.student
   const fullName = `${student?.firstName ?? ''} ${student?.lastName ?? ''}`.trim()
 
-  return fullName || student?.email || 'Etudiant'
+  return fullName || student?.email || 'Étudiant'
 }
 
 function getCoachName(coach: CoachNote['coach']): string {

@@ -76,7 +76,7 @@ export default async function PsyProfilPage() {
     <div>
       <PsyTopbar
         title="Mon profil"
-        description="Consultez vos informations generales et les parametres lies a votre activite."
+        description="Consultez vos informations générales et les paramètres liés à votre activité."
       />
 
       <div className="mindly-dashboard-grid">
@@ -95,7 +95,7 @@ export default async function PsyProfilPage() {
                     </CardTitle>
                     <p className="mt-2 flex items-center gap-2 text-sm text-dream-muted dark:text-white/65">
                       <Mail className="h-4 w-4 shrink-0" />
-                      <span className="break-all">{user.email || 'Non renseigne'}</span>
+                      <span className="break-all">{user.email || 'Non renseigné'}</span>
                     </p>
                   </div>
                 </div>
@@ -116,12 +116,12 @@ export default async function PsyProfilPage() {
                 <div className="rounded-2xl border border-border bg-slate-50 p-5 dark:border-white/10 dark:bg-white/[0.06]">
                   <p className="mindly-feature-reference">Email</p>
                   <p className="mt-2 break-words text-lg font-semibold text-dream-heading dark:text-white">
-                    {user.email || 'Non renseigne'}
+                    {user.email || 'Non renseigné'}
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-border bg-slate-50 p-5 dark:border-white/10 dark:bg-white/[0.06]">
-                  <p className="mindly-feature-reference">Role</p>
+                  <p className="mindly-feature-reference">Rôle</p>
                   <p className="mt-2 text-lg font-semibold text-dream-heading dark:text-white">
                     Psychologue
                   </p>

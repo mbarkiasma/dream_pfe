@@ -211,6 +211,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
           },
           body: JSON.stringify({
             description: trimmedDescription,
+            locale,
           }),
         })
 
@@ -306,7 +307,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
     setSelectedAnalysis({
       content,
       date: formatDate(dream.createdAt, locale),
-      title: dream.summary?.trim() || dream.description.trim().slice(0, 80) || t('defaultAnalysisTitle'),
+      title: dream.summary?.trim() || (dream.description ?? '').trim().slice(0, 80) || t('defaultAnalysisTitle'),
     })
   }
 
@@ -427,7 +428,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                   })()}
                 </div>
                 <p className="student-dreams-latest-text">
-                  {latestDream.summary || latestDream.description}
+                  {latestDream.summary || latestDream.description || ''}
                 </p>
               </div>
             ) : null}
@@ -464,6 +465,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             const dreamVideoUrl = getDreamVideoUrl(dream)
             const analysisCopy = getAnalysisCopy(dream)
             const canExpandAnalysis = analysisCopy.length > 260
+            const canExpandDescription = (dream.description ?? '').length > 260
 
             return (
               <Card key={dream.id} className="student-dreams-card-soft student-dreams-entry-card">
@@ -554,7 +556,17 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                               <Moon />
                               {t('descriptionLabel')}
                             </p>
-                            <p className="student-dreams-info-text">{dream.description}</p>
+                            <p className="student-dreams-info-text">{dream.description ?? ''}</p>
+
+                            {canExpandDescription ? (
+                              <button
+                                type="button"
+                                onClick={() => openAnalysisModal(dream, dream.description ?? '')}
+                                className="student-dreams-see-more"
+                              >
+                                {t('seeMore')}
+                              </button>
+                            ) : null}
                           </div>
 
                           <div className="student-dreams-analysis-box">

@@ -1,5 +1,4 @@
 import config from '@payload-config'
-import { cookies } from 'next/headers'
 import { getPayload } from 'payload'
 
 import { getDashboardPath, requiresInitialInterview } from '@/utilities/dashboardAuth'
@@ -24,26 +23,19 @@ function withLocalePath(path: string, locale: string) {
 
 export async function GET(request: Request) {
   const payload = await getPayload({ config })
-  const cookieStore = cookies()
-  const authHeaders = new Headers(request.headers)
   const cookiePrefix = payload.config.cookiePrefix || 'payload'
   const payloadTokenCookieName = `${cookiePrefix}-token`
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((cookie) => `${cookie.name}=${cookie.value}`)
+
+  const rawCookieHeader = request.headers.get('cookie') ?? ''
+  const filteredCookies = rawCookieHeader
+    .split(';')
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0 && !c.startsWith(`${payloadTokenCookieName}=`))
     .join('; ')
 
-  if (cookieHeader) {
-    const clerkOnlyCookies = cookieHeader
-      .split(';')
-      .map((cookie) => cookie.trim())
-      .filter((cookie) => !cookie.startsWith(`${payloadTokenCookieName}=`))
-
-    if (clerkOnlyCookies.length > 0) {
-      authHeaders.set('cookie', clerkOnlyCookies.join('; '))
-    } else {
-      authHeaders.set('cookie', cookieHeader)
-    }
+  const authHeaders = new Headers(request.headers)
+  if (filteredCookies) {
+    authHeaders.set('cookie', filteredCookies)
   }
 
   const locale = getLocaleFromRequest(request)

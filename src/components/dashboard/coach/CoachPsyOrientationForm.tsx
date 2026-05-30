@@ -23,7 +23,7 @@ type CoachPsyOrientationFormProps = {
 function getStudentName(student: Pick<User, 'email' | 'firstName' | 'lastName'>) {
   const fullName = [student.firstName, student.lastName].filter(Boolean).join(' ').trim()
 
-  return fullName || student.email || 'Etudiant'
+  return fullName || student.email || 'Étudiant'
 }
 
 export function CoachPsyOrientationForm({ students }: CoachPsyOrientationFormProps) {
@@ -62,7 +62,7 @@ export function CoachPsyOrientationForm({ students }: CoachPsyOrientationFormPro
       setStudentId('')
       setReason('')
       setObservation('')
-      setMessage("Orientation envoyee. L'etudiant va recevoir une notification et un email.")
+      setMessage("Orientation envoyée. L'étudiant va recevoir une notification et un email.")
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Une erreur est survenue.')
     } finally {
@@ -73,10 +73,10 @@ export function CoachPsyOrientationForm({ students }: CoachPsyOrientationFormPro
   return (
     <form className="mindly-stack-sm" onSubmit={handleSubmit}>
       <div className="student-psy-field">
-        <Label className="student-psy-label">Etudiant</Label>
+        <Label className="student-psy-label">Étudiant</Label>
         <Select value={studentId} onValueChange={setStudentId}>
           <SelectTrigger className="student-psy-select-trigger">
-            <SelectValue placeholder="Choisir un etudiant" />
+            <SelectValue placeholder="Choisir un étudiant" />
           </SelectTrigger>
           <SelectContent>
             {students.map((student) => (
@@ -96,7 +96,7 @@ export function CoachPsyOrientationForm({ students }: CoachPsyOrientationFormPro
           id="orientation-reason"
           value={reason}
           onChange={(eventChange) => setReason(eventChange.target.value)}
-          placeholder="Ex: stress important, anxiete avant entretien, besoin de soutien..."
+          placeholder="Ex : stress important, anxiété avant entretien, besoin de soutien..."
           className="student-psy-textarea"
           required
         />

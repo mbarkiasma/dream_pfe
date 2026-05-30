@@ -14,17 +14,11 @@ import { Textarea } from '@/components/ui/textarea'
 type StudentCoachingRegistrationClientProps = {
   event: CoachingEvent
   existingRegistration?: CoachingRegistration | null
-  translatedTitle?: string | null
-  translatedTheme?: string | null
-  translatedDescription?: string | null
 }
 
 export function StudentCoachingRegistrationClient({
   event,
   existingRegistration,
-  translatedTitle,
-  translatedTheme,
-  translatedDescription,
 }: StudentCoachingRegistrationClientProps) {
   const t = useTranslations('dashboard.student.seances.register')
   const locale = useLocale()
@@ -84,7 +78,7 @@ export function StudentCoachingRegistrationClient({
         <Card className="rounded-[28px] border border-border bg-card/80 shadow-dream-card backdrop-blur dark:border-white/10 dark:bg-white/[0.06]">
           <CardHeader>
             <CardTitle className="text-xl text-dream-heading dark:text-white">
-              {translatedTitle ?? event.title}
+              {event.title}
             </CardTitle>
           </CardHeader>
 
@@ -92,7 +86,7 @@ export function StudentCoachingRegistrationClient({
             <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
               <CalendarDays className="mt-1 h-5 w-5 text-indigo-600 dark:text-indigo-200" />
               <div>
-                <p className="font-medium text-dream-heading dark:text-white">{translatedTheme ?? event.theme}</p>
+                <p className="font-medium text-dream-heading dark:text-white">{event.theme}</p>
                 <p className="text-sm text-dream-muted dark:text-white/65">
                   {formatDate(event.scheduledAt)}
                 </p>
@@ -102,7 +96,7 @@ export function StudentCoachingRegistrationClient({
               </div>
             </div>
 
-            <p className="leading-7 text-dream-muted dark:text-white/65">{translatedDescription ?? event.description}</p>
+            <p className="leading-7 text-dream-muted dark:text-white/65">{event.description}</p>
           </CardContent>
         </Card>
       </div>

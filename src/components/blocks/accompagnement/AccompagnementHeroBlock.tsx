@@ -75,7 +75,7 @@ export default function AccompagnementHeroBlock() {
 
       <div className="relative z-10 mx-auto grid max-w-[1320px] gap-8 lg:grid-cols-[minmax(0,690px)_minmax(430px,1fr)] lg:items-center lg:gap-8 xl:gap-10">
         {/* Texte à gauche */}
-        <div className="order-1 max-w-[760px]">
+        <div className="order-1 min-w-0 w-full max-w-[760px]">
           <BlurFade delay={0.15} inView>
             <AppBadge dot dotClassName={sectionBadgeDotClass} className={sectionBadgeClass}>
               {t('badge')}
@@ -83,8 +83,8 @@ export default function AccompagnementHeroBlock() {
           </BlurFade>
 
           <BlurFade delay={0.25} inView>
-            <h1 className="mt-6 max-w-[760px] font-[family-name:var(--font-zain)] text-[38px] font-bold leading-[1.08] tracking-normal text-[var(--mindly-text)] sm:text-[46px] lg:text-[50px] xl:text-[54px]">
-              <span className="block whitespace-nowrap">
+            <h1 className="mt-6 max-w-[760px] font-[family-name:var(--font-zain)] text-[32px] font-bold leading-[1.08] tracking-normal text-[var(--mindly-text)] sm:text-[42px] md:text-[46px] lg:text-[50px] xl:text-[54px]">
+              <span className="block">
                 <span className="inline-block pb-[0.08em] bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-transparent">
                   MindBloom
                 </span>
@@ -102,8 +102,8 @@ export default function AccompagnementHeroBlock() {
           </BlurFade>
 
           <BlurFade delay={0.35} inView>
-            <div className="mt-5 overflow-x-auto pb-1">
-              <div className="flex min-w-max flex-nowrap gap-3">
+            <div className="mt-5 pb-1">
+              <div className="flex flex-wrap gap-3">
                 {quickBadges.map(({ icon, label }) => (
                   <div
                     key={label}
@@ -127,12 +127,12 @@ export default function AccompagnementHeroBlock() {
 
           <BlurFade delay={0.55} inView>
             <div className="mt-7">
-              <div className="flex flex-wrap gap-4">
-                <Link href="/login" className={`${appBadgeCtaClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
+              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:gap-4">
+                <Link href="/login" className={`${appBadgeCtaClass} !min-h-11 !min-w-0 !whitespace-normal px-3 py-2.5 text-[12px] sm:text-[14px] sm:!whitespace-nowrap sm:!min-w-[200px]`}>
                   {t('ctaMain')}
                 </Link>
 
-                <AppBadge asChild size="md" className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-[220px] px-5 py-2.5 text-[14px]`}>
+                <AppBadge asChild size="md" className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-0 !whitespace-normal px-3 py-2.5 text-[12px] sm:text-[14px] sm:!whitespace-nowrap sm:!min-w-[200px]`}>
                   <Link href="/fonctionnalites">
                     {t('ctaSecondary')}
                   </Link>
@@ -146,59 +146,62 @@ export default function AccompagnementHeroBlock() {
         <BlurFade
           delay={0.2}
           inView
-          className="relative order-2 flex h-[420px] w-full items-center justify-center lg:h-[470px] lg:translate-x-0 xl:translate-x-4"
+          className="relative order-2 min-w-0 flex h-[360px] w-full items-center justify-center overflow-hidden sm:h-[420px] md:h-[460px] lg:h-[470px] xl:h-[520px] lg:translate-x-0 xl:translate-x-4"
         >
-          <svg
-            className="pointer-events-none absolute h-[430px] w-[430px] lg:h-[470px] lg:w-[470px]"
-            viewBox="0 0 620 620"
-            fill="none"
-          >
-            <circle
-              cx="310"
-              cy="310"
-              r="202"
-              stroke="var(--mindly-primary-light)"
-              strokeWidth="1.8"
-              strokeDasharray="5 8"
-              opacity="0.58"
-            />
-            <circle
-              cx="310"
-              cy="310"
-              r="152"
-              stroke="var(--mindly-primary)"
-              strokeWidth="1.5"
-              strokeDasharray="4 8"
-              opacity="0.48"
-            />
-          </svg>
+          {/* 540×540 wrapper fully contains outer orbit (radius 202 + node 60 = 262px from center → 524px needed) */}
+          <div className="relative flex h-[540px] w-[540px] flex-shrink-0 items-center justify-center scale-[0.60] sm:scale-[0.75] md:scale-[0.82] lg:scale-[0.78] xl:scale-[0.95]">
+            <svg
+              className="pointer-events-none absolute inset-0 size-full"
+              viewBox="0 0 620 620"
+              fill="none"
+            >
+              <circle
+                cx="310"
+                cy="310"
+                r="202"
+                stroke="var(--mindly-primary-light)"
+                strokeWidth="1.8"
+                strokeDasharray="5 8"
+                opacity="0.58"
+              />
+              <circle
+                cx="310"
+                cy="310"
+                r="152"
+                stroke="var(--mindly-primary)"
+                strokeWidth="1.5"
+                strokeDasharray="4 8"
+                opacity="0.48"
+              />
+            </svg>
 
-          <div className="absolute z-20 flex h-[92px] w-[92px] items-center justify-center rounded-full border border-[var(--mindly-primary-light)]/45 bg-[linear-gradient(90deg,#895ef8,#a987ff)] shadow-[0_18px_36px_rgba(137,94,248,0.28)]">
-            <div className="absolute inset-2 rounded-full border border-white/40" />
-            <div className="absolute inset-5 rounded-full border border-white/30" />
-            <BrainCircuit className="relative h-10 w-10 text-white" />
+            <div className="absolute z-20 flex h-[92px] w-[92px] items-center justify-center rounded-full border border-[var(--mindly-primary-light)]/45 bg-[linear-gradient(90deg,#895ef8,#a987ff)] shadow-[0_18px_36px_rgba(137,94,248,0.28)]">
+              <div className="absolute inset-2 rounded-full border border-white/40" />
+              <div className="absolute inset-5 rounded-full border border-white/30" />
+              <BrainCircuit className="relative h-10 w-10 text-white" />
+            </div>
+
+            <OrbitingCircles
+              radius={202}
+              duration={36}
+              iconSize={NODE_SIZE}
+              path={false}
+              className="z-10"
+            >
+              {nodes.slice(0, 3).map(renderNode)}
+            </OrbitingCircles>
+
+            <OrbitingCircles
+              radius={152}
+              reverse
+              duration={30}
+              iconSize={NODE_SIZE}
+              path={false}
+              className="z-10"
+            >
+              {nodes.slice(3).map(renderNode)}
+            </OrbitingCircles>
           </div>
-
-          <OrbitingCircles
-            radius={202}
-            duration={36}
-            iconSize={NODE_SIZE}
-            path={false}
-            className="z-10"
-          >
-            {nodes.slice(0, 3).map(renderNode)}
-          </OrbitingCircles>
-
-          <OrbitingCircles
-            radius={152}
-            reverse
-            duration={30}
-            iconSize={NODE_SIZE}
-            path={false}
-            className="z-10"
-          >
-            {nodes.slice(3).map(renderNode)}
-          </OrbitingCircles>
         </BlurFade>
       </div>
 

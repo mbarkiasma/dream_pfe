@@ -41,7 +41,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
       const data = (await response.json().catch(() => ({}))) as { error?: string }
 
       if (!response.ok) {
-        setError(data.error || 'Impossible de mettre a jour le rendez-vous.')
+        setError(data.error || 'Impossible de mettre à jour le rendez-vous.')
         return
       }
 
@@ -49,7 +49,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
       setIsRejecting(false)
       setRejectionReason('')
     } catch {
-      setError('Impossible de mettre a jour le rendez-vous.')
+      setError('Impossible de mettre à jour le rendez-vous.')
     } finally {
       setLoadingStatus(null)
     }
@@ -105,7 +105,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
           <Textarea
             value={rejectionReason}
             onChange={(event) => setRejectionReason(event.target.value)}
-            placeholder="Exemple : indisponibilite exceptionnelle, merci de choisir un autre creneau."
+            placeholder="Exemple : indisponibilité exceptionnelle, merci de choisir un autre créneau."
             className="dream-field dream-action-textarea"
           />
           <div className="dream-action-row-spaced">
@@ -153,7 +153,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
           ) : (
             <Check className="dream-action-icon" />
           )}
-          Marquer comme termine
+          Marquer comme terminé
         </Button>
       ) : null}
 

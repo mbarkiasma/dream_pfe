@@ -76,18 +76,21 @@ export const CoachingEvents: CollectionConfig = {
       type: 'text',
       label: 'Titre',
       required: true,
+      localized: true,
     },
     {
       name: 'theme',
       type: 'text',
       label: 'Thème',
       required: true,
+      localized: true,
     },
     {
       name: 'description',
       type: 'textarea',
       label: 'Description',
       required: true,
+      localized: true,
     },
     {
       name: 'coach',

@@ -485,7 +485,7 @@ export function LoginClient({
               className="login-captcha"
               data-cl-language={locale === 'fr' ? 'fr-FR' : 'en-US'}
               data-cl-size="flexible"
-              data-cl-theme={theme === 'dark' ? 'dark' : 'light'}
+              data-cl-theme={isDark ? 'dark' : 'light'}
               id="clerk-captcha"
             />
 

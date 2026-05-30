@@ -6,7 +6,6 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { StudentCoachingRegistrationClient } from '@/components/dashboard/student/StudentCoachingRegistrationClient'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
-import { translateCoachingEventToEnglish } from '@/utilities/translateCoachingEvent'
 
 export default async function StudentCoachingEventPage({
   params,
@@ -33,6 +32,7 @@ export default async function StudentCoachingEventPage({
     id: eventId,
     user,
     overrideAccess: false,
+    locale: locale as 'fr' | 'en',
     depth: 1,
   })
 
@@ -68,14 +68,6 @@ export default async function StudentCoachingEventPage({
     limit: 1,
   })
 
-  const tx = locale === 'en'
-    ? await translateCoachingEventToEnglish(event.id, {
-        title: event.title,
-        theme: event.theme,
-        description: event.description,
-      })
-    : null
-
   return (
     <div>
       <StudentTopbar
@@ -85,9 +77,6 @@ export default async function StudentCoachingEventPage({
 
       <StudentCoachingRegistrationClient
         event={event}
-        translatedTitle={tx?.title}
-        translatedTheme={tx?.theme}
-        translatedDescription={tx?.description}
         existingRegistration={existingRegistration.docs[0] || null}
       />
     </div>

@@ -91,17 +91,17 @@ export default function FeaturesHeroBlock() {
             </p>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-4">
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:gap-4">
             <Link
               href="/contact"
-              className="inline-flex min-h-11 min-w-[210px] items-center justify-center rounded-[14px] bg-[linear-gradient(90deg,#895ef8,#a987ff)] px-5 py-2.5 text-[14px] font-bold text-[var(--mindly-white)] shadow-[0_12px_28px_rgba(137,94,248,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(137,94,248,0.30)] active:scale-[0.98]"
+              className="flex min-h-11 w-full items-center justify-center rounded-[14px] bg-[linear-gradient(90deg,#895ef8,#a987ff)] px-3 py-2.5 text-center text-[13px] font-bold text-[var(--mindly-white)] shadow-[0_12px_28px_rgba(137,94,248,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(137,94,248,0.30)] active:scale-[0.98] sm:w-auto sm:min-w-[190px] sm:px-5 sm:text-[14px]"
             >
               {t('contactButton')}
             </Link>
 
             <Link
               href="/a-propos"
-              className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-[210px] px-5 py-2.5 text-[14px]`}
+              className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-0 !whitespace-nowrap !text-[13px] !px-3 !py-2.5 w-full text-center sm:w-auto sm:!text-[14px] sm:!px-5 sm:!min-w-[190px]`}
             >
               {t('aboutButton')}
             </Link>

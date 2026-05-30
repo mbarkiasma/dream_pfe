@@ -17,14 +17,14 @@ const defaultStats: PsyStat[] = [
   {
     href: '/dashboard/psy/students',
     icon: UsersRound,
-    label: 'Etudiants assignes',
+    label: 'Étudiants assignés',
     value: 0,
     hint: 'Suivi clinique',
   },
   {
     href: '/dashboard/psy/rendez_vous',
     icon: CalendarDays,
-    label: 'Rendez-vous prevus',
+    label: 'Rendez-vous prévus',
     value: 0,
     hint: 'Consultations',
   },
@@ -33,7 +33,7 @@ const defaultStats: PsyStat[] = [
     icon: AlertTriangle,
     label: 'Cas en attente',
     value: 0,
-    hint: 'A traiter',
+    hint: 'À traiter',
   },
 ]
 

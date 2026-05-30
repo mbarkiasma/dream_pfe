@@ -157,10 +157,12 @@ export const AnalysePersonnalite: CollectionConfig = {
         {
           name: 'analysis',
           type: 'textarea',
+          localized: true,
         },
         {
           name: 'interpretation',
           type: 'textarea',
+          localized: true,
         },
         {
           name: 'confidence',
@@ -175,6 +177,7 @@ export const AnalysePersonnalite: CollectionConfig = {
         {
           name: 'confidenceReason',
           type: 'text',
+          localized: true,
         },
         {
           name: 'observedIndicators',
@@ -185,6 +188,7 @@ export const AnalysePersonnalite: CollectionConfig = {
             {
               name: 'indicator',
               type: 'text',
+              localized: true,
             },
           ],
         },
@@ -198,6 +202,7 @@ export const AnalysePersonnalite: CollectionConfig = {
         {
           name: 'dominantEmotion',
           type: 'text',
+          localized: true,
         },
         {
           name: 'emotionalStability',
@@ -208,6 +213,7 @@ export const AnalysePersonnalite: CollectionConfig = {
         {
           name: 'emotionalSummary',
           type: 'textarea',
+          localized: true,
         },
       ],
     },
@@ -215,21 +221,25 @@ export const AnalysePersonnalite: CollectionConfig = {
       name: 'overview',
       type: 'textarea',
       label: 'Vue d ensemble',
+      localized: true,
     },
     {
       name: 'forcesDominantes',
       type: 'textarea',
       label: 'Forces dominantes',
+      localized: true,
     },
     {
       name: 'pointsVigilance',
       type: 'textarea',
       label: 'Points de vigilance',
+      localized: true,
     },
     {
       name: 'styleRelationnel',
       type: 'textarea',
       label: 'Style relationnel',
+      localized: true,
     },
     {
       name: 'recommandations',
@@ -241,6 +251,7 @@ export const AnalysePersonnalite: CollectionConfig = {
           name: 'text',
           type: 'textarea',
           required: true,
+          localized: true,
         },
       ],
     },
@@ -248,6 +259,7 @@ export const AnalysePersonnalite: CollectionConfig = {
       name: 'conclusion',
       type: 'textarea',
       label: 'Conclusion generale',
+      localized: true,
     },
   ],
 }

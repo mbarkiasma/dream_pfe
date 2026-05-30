@@ -18,7 +18,7 @@ function getStats({
     {
       href: '/dashboard/coach/students',
       icon: UsersRound,
-      label: 'Etudiants assignes',
+      label: 'Étudiants assignés',
       value: String(assignedStudentsCount),
       hint: assignedStudentsCount > 0 ? 'Suivi actif' : 'Aucun suivi',
     },
@@ -27,21 +27,21 @@ function getStats({
       icon: BookOpenCheck,
       label: 'Exercices actifs',
       value: String(activeExercisesCount),
-      hint: activeExercisesCount > 0 ? 'A accompagner' : 'Aucun exercice',
+      hint: activeExercisesCount > 0 ? 'À accompagner' : 'Aucun exercice',
     },
     {
       href: '/dashboard/coach/rendez_vous',
       icon: CalendarDays,
-      label: 'Rendez-vous prevus',
+      label: 'Rendez-vous prévus',
       value: String(upcomingEventsCount),
       hint: upcomingEventsCount > 0 ? 'Planning' : 'Aucun planning',
     },
     {
       href: '/dashboard/coach/orientation_psy',
       icon: Stethoscope,
-      label: 'Cas a orienter',
+      label: 'Cas à orienter',
       value: String(orientationCasesCount),
-      hint: orientationCasesCount > 0 ? 'Priorite' : 'Aucun cas',
+      hint: orientationCasesCount > 0 ? 'Priorité' : 'Aucun cas',
     },
   ]
 }

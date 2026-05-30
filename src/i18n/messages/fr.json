@@ -1,6 +1,6 @@
 {
   "logout": {
-    "title": "Deconnexion",
+    "title": "Déconnexion",
     "text": "Nous fermons votre session avant de vous rediriger."
   },
   "navbar": {
@@ -12,7 +12,7 @@
     "login": "Se connecter",
     "tagline": "Bien-être & IA",
     "switchLanguage": "Passer en anglais",
-    "logout": "Se deconnecter",
+    "logout": "Se déconnecter",
     "darkMode": "Activer le mode sombre",
     "lightMode": "Activer le mode clair",
     "dark": "Sombre",
@@ -22,13 +22,13 @@
     "student": {
       "topbar": {
         "title": "Espace étudiant",
-        "description": "Suivez vos reves, vos analyses, vos rendez-vous et votre accompagnement dans un espace unifie."
+        "description": "Suivez vos rêves, vos analyses, vos rendez-vous et votre accompagnement dans un espace unifié."
       },
       "home": {
         "latestDream": {
-          "title": "Mon dernier reve",
-          "empty": "Aucun reve enregistre pour le moment.",
-          "videoLabel": "Video : {status}"
+          "title": "Mon dernier rêve",
+          "empty": "Aucun rêve enregistré pour le moment.",
+          "videoLabel": "Vidéo : {status}"
         },
         "latestDreamStatusPending": "En attente",
         "latestDreamStatusWaitingValidation": "En attente de validation",
@@ -38,7 +38,7 @@
         "latestDreamStatusUnknown": "Inconnu",
         "analysis": {
           "title": "Analyse IA",
-          "empty": "Aucune analyse generee pour le moment.",
+          "empty": "Aucune analyse générée pour le moment.",
           "overview": "Analyse disponible dans votre espace analyses.",
           "confidence": "Confiance : {value}"
         },
@@ -48,17 +48,17 @@
         "analysisConfidenceUnknown": "Inconnu",
         "appointment": {
           "title": "Prochain rendez-vous",
-          "empty": "Aucun rendez-vous planifie pour le moment."
+          "empty": "Aucun rendez-vous planifié pour le moment."
         },
         "see": "Voir"
       },
       "stats": {
-        "dreams": "Mes reves",
+        "dreams": "Mes rêves",
         "dreamsHint": "Journal personnel",
         "analyses": "Mes analyses",
         "analysesHint": "Suivi IA",
         "appointments": "Rendez-vous",
-        "appointmentsHint": "Planifies"
+        "appointmentsHint": "Planifiés"
       },
       "sidebar": {
         "title": "Espace étudiant",
@@ -66,11 +66,11 @@
         "openMenu": "Ouvrir le menu",
         "closeMenu": "Fermer le menu",
         "dashboard": "Dashboard",
-        "dreams": "Mes reves",
+        "dreams": "Mes rêves",
         "analyses": "Mon rapport",
         "coaching": "Smart coaching",
         "checkin": "Ma progression",
-        "seances": "Seances coach",
+        "seances": "Séances coach",
         "motivation": "Annonces de motivation",
         "appointments": "Rendez-vous",
         "notifications": "Notifications",
@@ -149,74 +149,74 @@
       "checkin": {
         "topbar": {
           "title": "Ma progression",
-          "description": "Suivez votre evolution selon les exercices donnes par votre coach et valides apres feedback."
+          "description": "Suivez votre évolution selon les exercices donnés par votre coach et validés après feedback."
         },
         "progressTitle": "Progression globale",
         "progressHint": "La barre avance quand votre coach valide un exercice avec un feedback.",
-        "progressCounter": "{reviewed} exercices valides sur {total}",
+        "progressCounter": "{reviewed} exercices validés sur {total}",
         "progressAriaLabel": "Progression globale {percent}%",
-        "statReceived": "Exercices recus",
-        "statTodo": "A faire",
-        "statDone": "Exercices termines",
+        "statReceived": "Exercices reçus",
+        "statTodo": "À faire",
+        "statDone": "Exercices terminés",
         "coachLabel": "Coach : {name}",
-        "dueLabel": "Echeance : {date}",
-        "noDueDate": "Sans echeance",
+        "dueLabel": "Échéance : {date}",
+        "noDueDate": "Sans échéance",
         "instructionsTitle": "Consignes",
         "reasonTitle": "Pourquoi cet exercice",
         "feedbackTitle": "Feedback du coach",
         "awaitingFeedbackTitle": "En attente du feedback du coach",
-        "awaitingFeedbackText": "Votre exercice est envoye. La progression augmentera apres validation du coach.",
-        "empty": "Aucun exercice ne vous a encore ete attribue. Vous recevrez une notification quand votre coach vous proposera un exercice personnalise.",
+        "awaitingFeedbackText": "Votre exercice est envoyé. La progression augmentera après validation du coach.",
+        "empty": "Aucun exercice ne vous a encore été attribué. Vous recevrez une notification quand votre coach vous proposera un exercice personnalisé.",
         "status": {
-          "assigned": "A faire",
+          "assigned": "À faire",
           "in_progress": "En cours",
-          "completed": "Envoye",
-          "reviewed": "Corrige",
+          "completed": "Envoyé",
+          "reviewed": "Corrigé",
           "missed": "Non fait"
         },
         "form": {
           "label": "Ma progression",
           "checkboxLabel": "Exercice fait",
           "errorSubmit": "Impossible d'envoyer votre progression.",
-          "errorNetwork": "Erreur reseau pendant l'envoi de votre progression.",
-          "successSubmit": "Progression envoyee au coach.",
+          "errorNetwork": "Erreur réseau pendant l'envoi de votre progression.",
+          "successSubmit": "Progression envoyée au coach.",
           "btnMissed": "Exercice non fait",
-          "btnDone": "Exercice deja fait",
+          "btnDone": "Exercice déjà fait",
           "btnPending": "Envoi...",
           "btnSubmit": "Envoyer ma progression"
         }
       },
       "seances": {
         "topbar": {
-          "title": "Seances de coaching",
-          "description": "Consultez les seances proposees par les coachs et confirmez votre participation aux prochaines rencontres."
+          "title": "Séances de coaching",
+          "description": "Consultez les séances proposées par les coachs et confirmez votre participation aux prochaines rencontres."
         },
-        "allSessions": "Toutes les seances",
-        "statusPast": "Passee",
-        "statusUpcoming": "A venir",
+        "allSessions": "Toutes les séances",
+        "statusPast": "Passée",
+        "statusUpcoming": "À venir",
         "coachLabel": "Coach : {name}",
-        "btnEnded": "Seance terminee",
-        "btnConfirmed": "Participation confirmee",
+        "btnEnded": "Séance terminée",
+        "btnConfirmed": "Participation confirmée",
         "btnConfirm": "Confirmer ma participation",
-        "empty": "Aucune seance de coaching n'est disponible pour le moment.",
+        "empty": "Aucune séance de coaching n'est disponible pour le moment.",
         "register": {
           "topbar": {
             "title": "Inscription coaching",
-            "description": "Confirmez votre participation a la seance de coaching."
+            "description": "Confirmez votre participation à la séance de coaching."
           },
-          "duration": "Duree : {minutes} minutes",
-          "dateNotSet": "Date non renseignee",
-          "cardTitleConfirmed": "Participation confirmee",
+          "duration": "Durée : {minutes} minutes",
+          "dateNotSet": "Date non renseignée",
+          "cardTitleConfirmed": "Participation confirmée",
           "cardTitleForm": "Formulaire",
-          "alreadyConfirmed": "Votre participation a deja ete confirmee.",
+          "alreadyConfirmed": "Votre participation a déjà été confirmée.",
           "motivationLabel": "Pourquoi voulez-vous participer ?",
           "questionsLabel": "Questions pour le coach",
           "specialNeedsLabel": "Besoin particulier",
-          "noQuestions": "Aucune question renseignee.",
-          "noSpecialNeeds": "Aucun besoin particulier renseigne.",
+          "noQuestions": "Aucune question renseignée.",
+          "noSpecialNeeds": "Aucun besoin particulier renseigné.",
           "errorSubmit": "Impossible d'enregistrer votre inscription.",
           "errorUnexpected": "Une erreur est survenue.",
-          "successMessage": "Votre participation est confirmee. Vous recevrez le lien Teams avant la seance.",
+          "successMessage": "Votre participation est confirmée. Vous recevrez le lien Teams avant la séance.",
           "btnPending": "Confirmation...",
           "btnConfirm": "Confirmer ma participation"
         }
@@ -224,76 +224,76 @@
       "motivation": {
         "topbar": {
           "title": "Motivation",
-          "description": "Consultez les annonces et contenus de motivation publies par les coachs."
+          "description": "Consultez les annonces et contenus de motivation publiés par les coachs."
         },
         "badge": "Motivation",
-        "publishedBy": "Publiee par {name} - {date}",
-        "dateNotSpecified": "Date non precisee",
+        "publishedBy": "Publiée par {name} - {date}",
+        "dateNotSpecified": "Date non précisée",
         "seeMore": "Voir plus",
         "close": "Fermer",
         "closeAriaLabel": "Fermer l'annonce",
-        "errorReaction": "Reaction impossible pour le moment.",
+        "errorReaction": "Réaction impossible pour le moment.",
         "empty": "Aucune annonce de motivation n'est disponible pour le moment."
       },
       "appointments": {
         "topbar": {
           "title": "Rendez-vous",
-          "description": "Demande un accompagnement adapte avec le psychologue et suis l'etat de tes rendez-vous."
+          "description": "Demande un accompagnement adapté avec le psychologue et suis l'état de tes rendez-vous."
         },
         "requestCard": "Demander un rendez-vous",
         "myRequestsCard": "Mes demandes",
-        "timeRange": "{date} de {start} a {end}",
+        "timeRange": "{date} de {start} à {end}",
         "status": {
           "pending": "En attente",
-          "confirmed": "Confirme",
-          "rejected": "Refuse",
-          "cancelled": "Annule",
-          "completed": "Termine"
+          "confirmed": "Confirmé",
+          "rejected": "Refusé",
+          "cancelled": "Annulé",
+          "completed": "Terminé"
         },
         "rejectionTitle": "Cause du refus",
         "rejectionHelp": "Merci de choisir un autre rendez-vous disponible dans le calendrier.",
-        "emptyTitle": "Aucune demande envoyee",
-        "emptyText": "Tes demandes de rendez-vous apparaitront ici.",
-        "nextSession": "Prochaine seance",
-        "noNextSession": "Aucune seance n'est encore confirmee pour le moment.",
+        "emptyTitle": "Aucune demande envoyée",
+        "emptyText": "Tes demandes de rendez-vous apparaîtront ici.",
+        "nextSession": "Prochaine séance",
+        "noNextSession": "Aucune séance n'est encore confirmée pour le moment.",
         "noAppointmentBadge": "Aucun rendez-vous",
         "infoTitle": "Informations",
-        "infoText": "Les creneaux affiches viennent directement de l'agenda du psychologue. Une fois la demande envoyee, elle reste en attente jusqu'a confirmation.",
+        "infoText": "Les créneaux affichés viennent directement de l'agenda du psychologue. Une fois la demande envoyée, elle reste en attente jusqu'à confirmation.",
         "scheduleBadge": "Agenda du psychologue",
         "form": {
           "agendaLabel": "Agenda",
           "agendaTitle": "Prochains jours",
           "otherDate": "Autre date",
-          "prevDaysAriaLabel": "Voir les jours precedents",
+          "prevDaysAriaLabel": "Voir les jours précédents",
           "nextDaysAriaLabel": "Voir les jours suivants",
           "slotCaption": "Consultation disponible",
           "slotBadgeChosen": "Choisi",
           "slotBadgeFree": "Libre",
           "noSlotTitle": "Aucun horaire disponible",
-          "slotCountZero": "Aucun creneau restant",
-          "slotCount": "{count} creneaux restants",
+          "slotCountZero": "Aucun créneau restant",
+          "slotCount": "{count} créneaux restants",
           "agendaStatusFull": "Complet",
           "agendaStatusWeekend": "Week-end",
-          "agendaStatusClosed": "Ferme",
-          "agendaStatusPast": "Passe",
+          "agendaStatusClosed": "Fermé",
+          "agendaStatusPast": "Passé",
           "agendaStatusAvailable": "{count} libre",
-          "dayMessageFull": "Tous les creneaux de cette journee sont deja pris.",
+          "dayMessageFull": "Tous les créneaux de cette journée sont déjà pris.",
           "dayMessageWeekend": "Le psychologue ne consulte pas le week-end.",
-          "dayMessageClosed": "Le psychologue ne consulte pas ce jour-la.",
-          "dayMessagePast": "Cette date est deja passee.",
+          "dayMessageClosed": "Le psychologue ne consulte pas ce jour-là.",
+          "dayMessagePast": "Cette date est déjà passée.",
           "dayMessageDefault": "Aucun horaire disponible pour cette date.",
           "loading": "Chargement des horaires...",
-          "hiddenNote": "Les horaires passes ou deja reserves ne sont pas affiches.",
-          "selectedBox": "Rendez-vous selectionne : {date} de {start} a {end}.",
+          "hiddenNote": "Les horaires passés ou déjà réservés ne sont pas affichés.",
+          "selectedBox": "Rendez-vous sélectionné : {date} de {start} à {end}.",
           "urgencyLabel": "Urgence",
-          "urgencyHigh": "Priorite urgente - orientation coach",
-          "urgencyNormal": "Priorite normale",
+          "urgencyHigh": "Priorité urgente - orientation coach",
+          "urgencyNormal": "Priorité normale",
           "reasonLabel": "Motif de la demande",
-          "reasonPlaceholder": "Explique brievement pourquoi tu souhaites rencontrer le psychologue.",
-          "errorLoadSlots": "Impossible de charger les creneaux.",
-          "errorSubmitValidation": "Choisis un creneau disponible et indique le motif de ta demande.",
+          "reasonPlaceholder": "Explique brièvement pourquoi tu souhaites rencontrer le psychologue.",
+          "errorLoadSlots": "Impossible de charger les créneaux.",
+          "errorSubmitValidation": "Choisis un créneau disponible et indique le motif de ta demande.",
           "errorSubmit": "Impossible d'envoyer la demande.",
-          "success": "Demande envoyee. Le psychologue pourra la confirmer depuis son espace.",
+          "success": "Demande envoyée. Le psychologue pourra la confirmer depuis son espace.",
           "btnSubmit": "Envoyer la demande"
         }
       },
@@ -309,7 +309,7 @@
         "page": {
           "eyebrow": "Centre notifications",
           "title": "Notifications",
-          "description": "Consultez les nouvelles actions et ouvrez directement la page associee.",
+          "description": "Consultez les nouvelles actions et ouvrez directement la page associée.",
           "markAll": "Tout marquer comme lu",
           "panelTitle": "Toutes les notifications",
           "unreadCount": "{count} non lue(s)",
@@ -319,36 +319,36 @@
           "typeCoaching": "Coaching",
           "typeMotivation": "Motivation",
           "typeRendezvous": "Rendez-vous",
-          "typeSystem": "Systeme",
+          "typeSystem": "Système",
           "typeInfo": "Info"
         }
       },
       "profile": {
         "topbar": {
           "title": "Mon profil",
-          "description": "Consultez vos informations generales et votre rapport d'analyse."
+          "description": "Consultez vos informations générales et votre rapport d'analyse."
         },
-        "profileLabel": "Profil etudiant",
+        "profileLabel": "Profil étudiant",
         "activeAccount": "Compte actif",
-        "notProvided": "Non renseigne",
+        "notProvided": "Non renseigné",
         "fullName": "Nom complet",
         "email": "Email",
         "branch": "Branche",
         "level": "Niveau",
         "reportCard": "Mon rapport en PDF",
-        "generatedOn": "Genere le {date}",
+        "generatedOn": "Généré le {date}",
         "viewReport": "Voir le rapport",
-        "downloadPdf": "Telecharger en PDF",
-        "reportEmpty": "Aucun rapport n'est encore disponible. Des que votre analyse est prete, le rapport PDF apparaitra ici.",
+        "downloadPdf": "Télécharger en PDF",
+        "reportEmpty": "Aucun rapport n'est encore disponible. Dès que votre analyse est prête, le rapport PDF apparaîtra ici.",
         "reportSideTitle": "Rapport disponible",
-        "reportSideText": "Votre rapport d'analyse est centralise dans cet espace et peut etre consulte ou exporte en PDF.",
+        "reportSideText": "Votre rapport d'analyse est centralisé dans cet espace et peut être consulté ou exporté en PDF.",
         "reportCount": "1 rapport",
         "noReport": "Aucun rapport"
       },
       "dreamsPage": {
         "topbar": {
-          "title": "Mes reves",
-          "description": "Racontez vos reves, suivez leur generation video et revivez chaque scene dans un espace elegant et personnel."
+          "title": "Mes rêves",
+          "description": "Racontez vos rêves, suivez leur génération vidéo et revivez chaque scène dans un espace élégant et personnel."
         }
       },
       "analyses": {
@@ -416,65 +416,65 @@
         }
       },
       "dreams": {
-        "eyebrow": "Journal de reves",
-        "heroTitle": "Racontez votre reve, puis validez son resume.",
-        "heroDescription": "Decrivez simplement ce dont vous vous souvenez. L'application prepare un resume et une analyse, puis lance la video apres votre validation.",
-        "textareaPlaceholder": "Exemple : J'etais dans une maison inconnue, je cherchais quelqu'un et je ressentais de la peur...",
-        "submit": "Envoyer le reve",
+        "eyebrow": "Journal de rêves",
+        "heroTitle": "Racontez votre rêve, puis validez son résumé.",
+        "heroDescription": "Décrivez simplement ce dont vous vous souvenez. L'application prépare un résumé et une analyse, puis lance la vidéo après votre validation.",
+        "textareaPlaceholder": "Exemple : J'étais dans une maison inconnue, je cherchais quelqu'un et je ressentais de la peur...",
+        "submit": "Envoyer le rêve",
         "submitPending": "Envoi...",
-        "weeklyCounter": "{used}/{limit} reves cette semaine",
+        "weeklyCounter": "{used}/{limit} rêves cette semaine",
         "remaining": "{count, plural, one {Encore # possible} other {Encore # possibles}}",
-        "submitSuccess": "Reve envoye. La video apparaitra ici des que le workflow termine.",
-        "submitErrorEmpty": "Decrivez votre reve avant de lancer la generation.",
-        "submitErrorServer": "Impossible d'envoyer ce reve pour le moment.",
-        "submitErrorFetch": "Une erreur reseau est survenue pendant l'envoi.",
+        "submitSuccess": "Rêve envoyé. La vidéo apparaîtra ici dès que le workflow termine.",
+        "submitErrorEmpty": "Décrivez votre rêve avant de lancer la génération.",
+        "submitErrorServer": "Impossible d'envoyer ce rêve pour le moment.",
+        "submitErrorFetch": "Une erreur réseau est survenue pendant l'envoi.",
         "deleteError": "Suppression impossible pour le moment.",
-        "deleteSuccess": "Le reve a ete supprime de votre journal.",
-        "deleteErrorFetch": "Une erreur reseau est survenue pendant la suppression.",
+        "deleteSuccess": "Le rêve a été supprimé de votre journal.",
+        "deleteErrorFetch": "Une erreur réseau est survenue pendant la suppression.",
         "validateError": "Validation impossible pour le moment.",
-        "validateSuccess": "Resume valide. La generation video va commencer.",
-        "validateErrorFetch": "Une erreur reseau est survenue pendant la validation.",
-        "regenerateError": "Regeneration impossible pour le moment.",
-        "regenerateSuccess": "Une nouvelle analyse et un nouveau resume sont en cours de generation.",
-        "regenerateErrorFetch": "Une erreur reseau est survenue pendant la regeneration.",
-        "previewLabel": "Apercu video",
-        "previewTitle": "Dernier reve",
-        "previewEmpty": "Aucune video encore",
-        "videoPlaceholder": "La video apparaitra ici apres validation du resume.",
+        "validateSuccess": "Résumé validé. La génération vidéo va commencer.",
+        "validateErrorFetch": "Une erreur réseau est survenue pendant la validation.",
+        "regenerateError": "Régénération impossible pour le moment.",
+        "regenerateSuccess": "Une nouvelle analyse et un nouveau résumé sont en cours de génération.",
+        "regenerateErrorFetch": "Une erreur réseau est survenue pendant la régénération.",
+        "previewLabel": "Aperçu vidéo",
+        "previewTitle": "Dernier rêve",
+        "previewEmpty": "Aucune vidéo encore",
+        "videoPlaceholder": "La vidéo apparaîtra ici après validation du résumé.",
         "journalLabel": "Journal",
-        "journalCount": "{count, plural, one {# reve conserve} other {# reves conserves}}",
-        "searchPlaceholder": "Rechercher un resume, statut, mot-cle...",
-        "summaryLabel": "Resume du reve",
-        "summaryLoading": "Reve en cours de lecture",
+        "journalCount": "{count, plural, one {# rêve conservé} other {# rêves conservés}}",
+        "searchPlaceholder": "Rechercher un résumé, statut, mot-clé...",
+        "summaryLabel": "Résumé du rêve",
+        "summaryLoading": "Rêve en cours de lecture",
         "delete": "Supprimer",
-        "validate": "Valider le resume",
-        "regenerate": "Refaire le resume",
+        "validate": "Valider le résumé",
+        "regenerate": "Refaire le résumé",
         "descriptionLabel": "Description",
         "analysisLabel": "Analyse",
         "seeMore": "Voir plus",
-        "openVideo": "Ouvrir la video",
-        "noResults": "Aucun reve ne correspond a votre recherche pour le moment.",
-        "modalTitle": "Analyse du reve",
-        "modalDate": "Cree le {date}",
+        "openVideo": "Ouvrir la vidéo",
+        "noResults": "Aucun rêve ne correspond à votre recherche pour le moment.",
+        "modalTitle": "Analyse du rêve",
+        "modalDate": "Créé le {date}",
         "modalCloseAriaLabel": "Fermer l'analyse",
         "modalClose": "Fermer",
-        "defaultAnalysisTitle": "Analyse du reve",
+        "defaultAnalysisTitle": "Analyse du rêve",
         "status": {
-          "ready": "Pret",
-          "failed": "Echec",
-          "generating": "Generation",
-          "waitingValidation": "A valider",
+          "ready": "Prêt",
+          "failed": "Échec",
+          "generating": "Génération",
+          "waitingValidation": "À valider",
           "pending": "En attente"
         },
         "statusDescription": {
-          "ready": "La video et le resume sont disponibles.",
-          "failed": "La generation n'a pas abouti. Vous pouvez relancer un autre reve.",
-          "generating": "Le workflow video est en cours de traitement.",
-          "waitingValidation": "Le resume attend votre validation avant la generation video.",
-          "pending": "Le reve est en file avant generation."
+          "ready": "La vidéo et le résumé sont disponibles.",
+          "failed": "La génération n'a pas abouti. Vous pouvez relancer un autre rêve.",
+          "generating": "Le workflow vidéo est en cours de traitement.",
+          "waitingValidation": "Le résumé attend votre validation avant la génération vidéo.",
+          "pending": "Le rêve est en file avant génération."
         },
-        "analysisFailedError": "L'analyse n'a pas pu etre generee pour ce reve. Vous pouvez en relancer un autre quand vous voulez.",
-        "analysisNotAvailable": "L'analyse n'est pas encore disponible pour ce reve.",
+        "analysisFailedError": "L'analyse n'a pas pu être générée pour ce rêve. Vous pouvez en relancer un autre quand vous voulez.",
+        "analysisNotAvailable": "L'analyse n'est pas encore disponible pour ce rêve.",
         "analysisEmpty": "Aucune analyse disponible pour le moment."
       }
     }

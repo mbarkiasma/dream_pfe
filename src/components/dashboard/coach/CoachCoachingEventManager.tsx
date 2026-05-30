@@ -26,9 +26,9 @@ function formatEventDate(value: string) {
 }
 
 function getStatusLabel(status: string | null | undefined) {
-  if (status === 'published') return 'Publiee'
-  if (status === 'cancelled') return 'Annulee'
-  if (status === 'completed') return 'Terminee'
+  if (status === 'published') return 'Publiée'
+  if (status === 'cancelled') return 'Annulée'
+  if (status === 'completed') return 'Terminée'
   return 'Brouillon'
 }
 
@@ -72,7 +72,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        throw new Error(data.error || 'Impossible de mettre a jour la seance.')
+        throw new Error(data.error || 'Impossible de mettre à jour la séance.')
       }
 
       setEvents((currentEvents) =>
@@ -81,7 +81,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
         ),
       )
       setEditingId(null)
-      setMessage('Seance mise a jour. Les etudiants inscrits ont ete notifies.')
+      setMessage('Séance mise à jour. Les étudiants inscrits ont été notifiés.')
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Une erreur est survenue.')
     } finally {
@@ -90,7 +90,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
   }
 
   async function cancelEvent(event: EditableEvent) {
-    const confirmed = window.confirm('Voulez-vous vraiment annuler cette seance ?')
+    const confirmed = window.confirm('Voulez-vous vraiment annuler cette séance ?')
 
     if (!confirmed) return
 
@@ -112,7 +112,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        throw new Error(data.error || "Impossible d'annuler la seance.")
+        throw new Error(data.error || "Impossible d'annuler la séance.")
       }
 
       setEvents((currentEvents) =>
@@ -120,7 +120,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
           currentEvent.id === event.id ? data.event : currentEvent,
         ),
       )
-      setMessage('Seance annulee. Les etudiants inscrits ont ete notifies.')
+      setMessage('Séance annulée. Les étudiants inscrits ont été notifiés.')
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Une erreur est survenue.')
     } finally {
@@ -136,9 +136,9 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
         </div>
 
         <div>
-          <p className="mindly-feature-reference">Aucune seance</p>
+          <p className="mindly-feature-reference">Aucune séance</p>
           <p className="mindly-feature-text">
-            Les seances publiees apparaitront ici automatiquement.
+            Les séances publiées apparaîtront ici automatiquement.
           </p>
         </div>
       </div>
@@ -170,7 +170,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor={`theme-${event.id}`}>Theme</Label>
+                  <Label htmlFor={`theme-${event.id}`}>Thème</Label>
                   <Input id={`theme-${event.id}`} name="theme" defaultValue={event.theme} required />
                 </div>
 
@@ -197,7 +197,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor={`duration-${event.id}`}>Duree en minutes</Label>
+                    <Label htmlFor={`duration-${event.id}`}>Durée en minutes</Label>
                     <Input
                       id={`duration-${event.id}`}
                       name="durationMinutes"
@@ -260,7 +260,7 @@ export function CoachCoachingEventManager({ initialEvents }: { initialEvents: Co
                     onClick={() => cancelEvent(event)}
                   >
                     <XCircle className="mr-2 h-4 w-4" />
-                    Annuler la seance
+                    Annuler la séance
                   </Button>
                 </div>
               </>

@@ -24,11 +24,11 @@ function isUser(value: unknown): value is User {
 function getStudentName(student: User) {
   const fullName = [student.firstName, student.lastName].filter(Boolean).join(' ').trim()
 
-  return fullName || student.email || 'Etudiant'
+  return fullName || student.email || 'Étudiant'
 }
 
 function formatDate(value: string | null | undefined) {
-  if (!value) return 'Date non renseignee'
+  if (!value) return 'Date non renseignée'
 
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'medium',
@@ -57,7 +57,7 @@ function addStudent(
 
   students.set(String(studentId), {
     id: studentId,
-    name: `Etudiant #${studentId}`,
+    name: `Étudiant #${studentId}`,
     source,
   })
 }
@@ -133,7 +133,7 @@ export default async function CoachDashboardPage() {
     addStudent(students, (session as CoachingSession).student, 'Session classique'),
   )
   registrations.docs.forEach((registration) =>
-    addStudent(students, registration.student, 'Inscription seance'),
+    addStudent(students, registration.student, 'Inscription séance'),
   )
 
   const studentList = Array.from(students.values()).slice(0, 5)
@@ -170,7 +170,7 @@ export default async function CoachDashboardPage() {
     <div>
       <CoachTopbar
         title="Dashboard Coach"
-        description="Bienvenue dans votre espace de suivi des etudiants, des exercices et des rendez-vous."
+        description="Bienvenue dans votre espace de suivi des étudiants, des exercices et des rendez-vous."
       />
 
       <CoachStatsCards
@@ -185,7 +185,7 @@ export default async function CoachDashboardPage() {
           <Link href="/dashboard/coach/students" className="mindly-feature-link">
             <article className="mindly-feature-card">
               <div className="mindly-feature-header">
-                <h2 className="mindly-feature-title">Etudiants a suivre</h2>
+                <h2 className="mindly-feature-title">Étudiants à suivre</h2>
                 <span className="mindly-feature-action">
                   Voir
                   <ChevronRight />
@@ -201,7 +201,7 @@ export default async function CoachDashboardPage() {
                           <div>
                             <p className="mindly-feature-reference">{student.name}</p>
                             <p className="mindly-feature-text mt-1">
-                              {student.email || 'Email non renseigne'}
+                              {student.email || 'Email non renseigné'}
                             </p>
                           </div>
                           <span className="mindly-ui-badge">{student.source}</span>
@@ -212,11 +212,11 @@ export default async function CoachDashboardPage() {
                 ) : (
                   <>
                     <p className="mindly-feature-text">
-                      Aucun etudiant n&apos;est encore rattache a vos sessions ou seances.
+                      Aucun étudiant n'est encore rattaché à vos sessions ou séances.
                     </p>
 
                     <div className="mt-4">
-                      <span className="mindly-ui-badge">Aucun etudiant</span>
+                      <span className="mindly-ui-badge">Aucun étudiant</span>
                     </div>
                   </>
                 )}
@@ -229,7 +229,7 @@ export default async function CoachDashboardPage() {
           <Link href="/dashboard/coach/exercices" className="mindly-feature-link">
             <article className="mindly-feature-card">
               <div className="mindly-feature-header">
-                <h2 className="mindly-feature-title">Exercices recents</h2>
+                <h2 className="mindly-feature-title">Exercices récents</h2>
                 <span className="mindly-feature-action">
                   Voir
                   <ChevronRight />
@@ -238,8 +238,8 @@ export default async function CoachDashboardPage() {
 
               <div className="mindly-feature-content">
                 <p className="mindly-feature-text">
-                  Aucun exercice n&apos;est encore attribue. Le module exercices pourra etre connecte a
-                  une collection dediee lorsque vous commencerez cette partie.
+                  Aucun exercice n'est encore attribué. Le module exercices pourra être connecté à
+                  une collection dédiée lorsque vous commencerez cette partie.
                 </p>
 
                 <div className="mt-4">
@@ -270,14 +270,14 @@ export default async function CoachDashboardPage() {
                         <p className="mindly-feature-text mt-1">
                           Analyse du {formatDate(analyse.date)}
                         </p>
-                        <span className="mindly-ui-badge mt-3">Confiance moderee</span>
+                        <span className="mindly-ui-badge mt-3">Confiance modérée</span>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <>
                     <p className="mindly-feature-text">
-                      Aucun cas prioritaire detecte parmi les etudiants suivis pour le moment.
+                      Aucun cas prioritaire détecté parmi les étudiants suivis pour le moment.
                     </p>
 
                     <div className="mt-4">

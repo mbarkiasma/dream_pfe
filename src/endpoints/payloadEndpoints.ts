@@ -3,6 +3,26 @@ import type { Endpoint, File } from 'payload'
 import { createNotification } from '@/utilities/createNotification'
 import { getServerSideURL } from '@/utilities/getURL'
 
+const getDreamsVideoCallbackUrl = (): string => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SERVER_URL?.trim() ||
+    process.env.__NEXT_PRIVATE_ORIGIN?.trim() ||
+    getServerSideURL()
+
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '')
+
+  if (
+    normalizedBaseUrl.startsWith('http://localhost') &&
+    process.env.NODE_ENV === 'production'
+  ) {
+    console.warn(
+      'Using localhost as callback host in production. Set NEXT_PUBLIC_SERVER_URL to a public URL reachable from n8n.',
+    )
+  }
+
+  return `${normalizedBaseUrl}/api/dreams-video-callback`
+}
+
 type NormalizedBigFiveTrait = {
   name: BigFiveTraitName
   score: number
@@ -241,7 +261,7 @@ export const payloadEndpoints: Endpoint[] = [
 
       try {
         const body = await (req as Request).json()
-        const { sessionId, conversation, analysisData } = body
+        const { sessionId, conversation, analysisData, locale = 'fr' } = body
 
         if (!analysisData) {
           return Response.json({ error: 'analysisData requis.' }, { status: 400 })
@@ -283,6 +303,7 @@ export const payloadEndpoints: Endpoint[] = [
         const doc = await req.payload.create({
           collection: 'analyse-personnalite',
           req,
+          locale: (locale === 'en' ? 'en' : 'fr') as 'fr' | 'en',
           data: {
             reference: analysis.reference || reference,
             user: req.user.id,
@@ -316,6 +337,100 @@ export const payloadEndpoints: Endpoint[] = [
             conclusion: analysis?.conclusion || '',
           },
         })
+
+        // Translate and store the other locale automatically
+        try {
+          const primaryLocale = (locale === 'en' ? 'en' : 'fr') as 'fr' | 'en'
+          const otherLocale: 'fr' | 'en' = primaryLocale === 'fr' ? 'en' : 'fr'
+          const groqApiKey = process.env.GROQ_API_KEY?.trim()
+
+          if (groqApiKey) {
+            const translateDirection =
+              primaryLocale === 'fr'
+                ? 'Translate all string values from French to English.'
+                : 'Translate all string values from English to French.'
+
+            const textPayload = {
+              overview: resumeExecutif.overview || '',
+              conclusion: analysis?.conclusion || '',
+              forcesDominantes: resumeExecutif.dominant_strengths || '',
+              pointsVigilance: resumeExecutif.watch_points || '',
+              styleRelationnel: resumeExecutif.relational_style || '',
+              traitTexts: normalizedTraits.map((t) => ({
+                analysis: t.analysis || '',
+                interpretation: t.interpretation || '',
+                confidenceReason: t.confidenceReason || '',
+                indicators: t.observedIndicators.map((i) => i.indicator).filter(Boolean),
+              })),
+              dominantEmotion: donneesProfilEmotionnel.dominant_emotion || '',
+              emotionalSummary: donneesProfilEmotionnel.emotional_summary || '',
+              recommandations: recs
+                .map((r: any) => (typeof r === 'string' ? r : r?.text || ''))
+                .filter(Boolean),
+            }
+
+            const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${groqApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
+                messages: [
+                  {
+                    role: 'system',
+                    content: `You are a professional translator. ${translateDirection} Preserve the exact JSON structure and all keys unchanged. Return valid JSON only — no markdown, no code fences, no explanation.`,
+                  },
+                  { role: 'user', content: JSON.stringify(textPayload) },
+                ],
+                temperature: 0.1,
+                max_tokens: 3000,
+              }),
+            })
+
+            if (groqResponse.ok) {
+              const groqResult = await groqResponse.json()
+              const raw: string = groqResult?.choices?.[0]?.message?.content?.trim() ?? ''
+              const cleaned = raw.replace(/^```json\s*|\s*```$/g, '').trim()
+              const translated = JSON.parse(cleaned)
+
+              await req.payload.update({
+                collection: 'analyse-personnalite',
+                id: doc.id,
+                req,
+                locale: otherLocale,
+                data: {
+                  overview: translated.overview || '',
+                  forcesDominantes: translated.forcesDominantes || '',
+                  pointsVigilance: translated.pointsVigilance || '',
+                  styleRelationnel: translated.styleRelationnel || '',
+                  conclusion: translated.conclusion || '',
+                  profilEmotionnel: {
+                    dominantEmotion: translated.dominantEmotion || '',
+                    emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
+                    emotionalSummary: translated.emotionalSummary || '',
+                  },
+                  recommandations: (Array.isArray(translated.recommandations)
+                    ? translated.recommandations
+                    : []
+                  ).map((text: string) => ({ text: text || '' })),
+                  traits: normalizedTraits.map((trait, i) => ({
+                    ...trait,
+                    analysis: translated.traitTexts?.[i]?.analysis || '',
+                    interpretation: translated.traitTexts?.[i]?.interpretation || '',
+                    confidenceReason: translated.traitTexts?.[i]?.confidenceReason || '',
+                    observedIndicators: (translated.traitTexts?.[i]?.indicators || []).map(
+                      (indicator: string) => ({ indicator }),
+                    ),
+                  })),
+                },
+              })
+            }
+          }
+        } catch (translationError) {
+          console.error('Auto-translation to other locale failed (non-blocking):', translationError)
+        }
 
         await req.payload.update({
           collection: 'users',
@@ -374,7 +489,9 @@ export const payloadEndpoints: Endpoint[] = [
       }
 
       const body = await (req as Request).json()
-      const { description } = body
+      const { description, locale: dreamLocale = 'fr' } = body
+      const primaryDreamLocale = dreamLocale === 'en' ? 'en' : 'fr'
+      const otherDreamLocale: 'fr' | 'en' = primaryDreamLocale === 'fr' ? 'en' : 'fr'
 
       if (!description || typeof description !== 'string' || !description.trim()) {
         return Response.json({ error: 'Description requise.' }, { status: 400 })
@@ -431,6 +548,7 @@ export const payloadEndpoints: Endpoint[] = [
       const dream = await req.payload.create({
         collection: 'dreams',
         req,
+        locale: primaryDreamLocale,
         data: {
           user: req.user.id,
           description: trimmedDescription,
@@ -439,7 +557,7 @@ export const payloadEndpoints: Endpoint[] = [
       })
 
       const callbackSecret = process.env.N8N_CALLBACK_SECRET?.trim()
-      const callbackUrl = `${getServerSideURL()}/api/dreams-video-callback`
+      const callbackUrl = getDreamsVideoCallbackUrl()
 
       const n8nResponse = await fetch(n8nDreamWebhookUrl, {
         method: 'POST',
@@ -453,6 +571,7 @@ export const payloadEndpoints: Endpoint[] = [
           text: trimmedDescription,
           input: trimmedDescription,
           userId: req.user.id,
+          locale: primaryDreamLocale,
           callbackUrl,
           callbackSecret,
         }),
@@ -486,7 +605,12 @@ export const payloadEndpoints: Endpoint[] = [
       }
 
       const summary = typeof n8nData?.summary === 'string' ? n8nData.summary.trim() : ''
-      const analysis = typeof n8nData?.output === 'string' ? n8nData.output.trim() : ''
+      const analysis =
+        typeof n8nData?.analysis === 'string' && n8nData.analysis.trim()
+          ? n8nData.analysis.trim()
+          : typeof n8nData?.output === 'string'
+            ? n8nData.output.trim()
+            : ''
       const videoStatus =
         n8nData?.videoStatus === 'waiting_validation' ? 'waiting_validation' : 'pending'
 
@@ -517,14 +641,15 @@ export const payloadEndpoints: Endpoint[] = [
     path: '/dreams-video-callback',
     method: 'post',
     handler: async (req) => {
-      const secret = process.env.N8N_CALLBACK_SECRET
-      const authHeader = req.headers.get('authorization')
+      try {
+        const secret = process.env.N8N_CALLBACK_SECRET
+        const authHeader = req.headers.get('authorization')
 
-      if (!secret || authHeader !== `Bearer ${secret}`) {
-        return Response.json({ error: 'Unauthorized callback.' }, { status: 401 })
-      }
+        if (!secret || authHeader !== `Bearer ${secret}`) {
+          return Response.json({ error: 'Unauthorized callback.' }, { status: 401 })
+        }
 
-      const body = await (req as Request).json()
+        const body = await (req as Request).json()
       const {
         dreamId,
         summary,
@@ -620,10 +745,12 @@ export const payloadEndpoints: Endpoint[] = [
         }
       }
 
+      // Save in FR (n8n generates in FR)
       const updatedDream = await req.payload.update({
         collection: 'dreams',
         id: normalizedDreamId,
         req,
+        locale: 'fr',
         data: {
           summary: typeof summary === 'string' ? summary : undefined,
           analysis: typeof analysis === 'string' ? analysis : undefined,
@@ -645,11 +772,62 @@ export const payloadEndpoints: Endpoint[] = [
         },
       })
 
+      // Translate summary/analysis FR→EN automatically
+      try {
+        const groqApiKey = process.env.GROQ_API_KEY?.trim()
+        const callbackSummary = typeof summary === 'string' ? summary : ''
+        const callbackAnalysis = typeof analysis === 'string' ? analysis : ''
+
+        if (groqApiKey && (callbackSummary || callbackAnalysis)) {
+          const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
+              messages: [
+                { role: 'system', content: 'You are a professional French-to-English translator. Translate all string values in the JSON. Return valid JSON only — no markdown, no explanation.' },
+                { role: 'user', content: JSON.stringify({ summary: callbackSummary, analysis: callbackAnalysis }) },
+              ],
+              temperature: 0.1,
+              max_tokens: 1500,
+            }),
+          })
+
+          if (groqResponse.ok) {
+            const groqResult = await groqResponse.json()
+            const raw: string = groqResult?.choices?.[0]?.message?.content?.trim() ?? ''
+            const cleaned = raw.replace(/^```json\s*|\s*```$/g, '').trim()
+            const translated = JSON.parse(cleaned)
+
+            await req.payload.update({
+              collection: 'dreams',
+              id: normalizedDreamId,
+              req,
+              locale: 'en',
+              data: {
+                summary: translated.summary || '',
+                analysis: translated.analysis || '',
+              },
+            })
+          }
+        }
+      } catch (translationError) {
+        console.error('Dream callback translation failed (non-blocking):', translationError)
+      }
+
       return Response.json({
         success: true,
         dreamId: updatedDream.id,
         videoStatus: updatedDream.videoStatus,
       })
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Erreur interne du callback video.'
+
+      console.error('dreams-video-callback error:', error)
+
+      return Response.json({ error: message }, { status: 500 })
+    }
     },
   },
   // Valide le resume d'un reve puis declenche le workflow n8n de generation video.
@@ -681,7 +859,7 @@ export const payloadEndpoints: Endpoint[] = [
 
       if (dream.videoStatus !== 'waiting_validation') {
         return Response.json(
-          { error: 'Ce reve n’est pas en attente de validation.' },
+          { error: "Ce reve n'est pas en attente de validation." },
           { status: 400 },
         )
       }
@@ -692,7 +870,17 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'N8N_DREAM_VIDEO_START_URL manquante.' }, { status: 500 })
       }
 
-      const summary = typeof dream.summary === 'string' ? dream.summary.trim() : ''
+      const rawSummary = dream.summary
+      const summary =
+        typeof rawSummary === 'string'
+          ? rawSummary.trim()
+          : typeof rawSummary === 'object' && rawSummary !== null
+            ? String(
+                (rawSummary as Record<string, unknown>).fr ??
+                (rawSummary as Record<string, unknown>).en ??
+                '',
+              ).trim()
+            : ''
 
       if (!summary) {
         return Response.json(
@@ -702,7 +890,7 @@ export const payloadEndpoints: Endpoint[] = [
       }
 
       const callbackSecret = process.env.N8N_CALLBACK_SECRET?.trim()
-      const callbackUrl = `${getServerSideURL()}/api/dreams-video-callback`
+      const callbackUrl = getDreamsVideoCallbackUrl()
 
       const generatingDream = await req.payload.update({
         collection: 'dreams',
@@ -798,7 +986,7 @@ export const payloadEndpoints: Endpoint[] = [
       }
 
       const callbackSecret = process.env.N8N_CALLBACK_SECRET?.trim()
-      const callbackUrl = `${getServerSideURL()}/api/dreams-video-callback`
+      const callbackUrl = getDreamsVideoCallbackUrl()
 
       const n8nResponse = await fetch(n8nDreamWebhookUrl, {
         method: 'POST',
@@ -830,7 +1018,12 @@ export const payloadEndpoints: Endpoint[] = [
       }
 
       const summary = typeof n8nData?.summary === 'string' ? n8nData.summary.trim() : ''
-      const analysis = typeof n8nData?.output === 'string' ? n8nData.output.trim() : ''
+      const analysis =
+        typeof n8nData?.analysis === 'string' && n8nData.analysis.trim()
+          ? n8nData.analysis.trim()
+          : typeof n8nData?.output === 'string'
+            ? n8nData.output.trim()
+            : ''
       const videoStatus =
         n8nData?.videoStatus === 'waiting_validation' ? 'waiting_validation' : 'pending'
 

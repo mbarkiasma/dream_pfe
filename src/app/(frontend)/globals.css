@@ -2502,6 +2502,12 @@
     gap: 1.5rem;
   }
 
+  @media (width >= 64rem) {
+    .student-profile-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (width >= 80rem) {
     .student-profile-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2783,6 +2789,21 @@
     background: #ffffff;
     box-shadow: 0 24px 70px rgb(15 23 42 / 0.22);
     isolation: isolate;
+  }
+
+  /* Mobile: position relative to topbar card instead of the bell button */
+  @media (width < 40rem) {
+    .notification-bell-root {
+      position: static;
+    }
+
+    .notification-bell-popover {
+      top: 100%;
+      right: 0;
+      left: 0;
+      width: auto;
+      margin-top: 0.5rem;
+    }
   }
 
   .notification-bell-header {
@@ -4665,6 +4686,21 @@
     border-color: rgb(255 255 255 / 0.1);
     background: rgb(255 255 255 / 0.04);
   }
+
+  [data-theme='dark'] .student-dreams-validation-box {
+    border-color: rgb(255 255 255 / 0.1);
+    background: rgb(255 255 255 / 0.05);
+  }
+
+  [data-theme='dark'] .student-dreams-action-secondary {
+    border-color: rgb(255 255 255 / 0.14);
+    background: rgb(255 255 255 / 0.07);
+    color: #e2d9ff;
+  }
+
+  [data-theme='dark'] .student-dreams-action-secondary:hover {
+    background: rgb(255 255 255 / 0.12);
+  }
   /* ============================= */
 /* STUDENT COACHING LAYOUT FIX */
 /* ============================= */
@@ -5481,6 +5517,12 @@
     gap: 1.5rem;
   }
 
+  @media (width >= 64rem) {
+    .mindly-dashboard-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (width >= 80rem) {
     .mindly-dashboard-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5859,7 +5901,7 @@
     flex-direction: column;
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     .mindly-dashboard-shell {
       min-height: calc(100vh - 3rem);
       gap: 1.5rem;
@@ -5892,10 +5934,17 @@
     position: relative;
     z-index: 50;
     margin-bottom: 1rem;
-    border: 1px solid var(--mindly-border);
+    border: 1px solid transparent;
     border-radius: var(--mindly-radius-xl);
-    background: rgb(255 255 255 / 0.76);
+    background: transparent;
     padding: 0.875rem;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  [data-theme='light'] .mindly-dashboard-topbar {
+    border-color: var(--mindly-border);
+    background: rgb(255 255 255 / 0.76);
     box-shadow: var(--mindly-shadow-md);
     backdrop-filter: blur(16px);
   }
@@ -6007,7 +6056,7 @@
     margin-bottom: 0;
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     .mindly-sidebar {
       position: fixed;
       top: 1.5rem;
@@ -6043,7 +6092,7 @@
     box-shadow: var(--mindly-shadow-xs);
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     .mindly-sidebar-profile {
       margin-bottom: 1.5rem;
       flex: 0 0 auto;
@@ -6085,7 +6134,7 @@
     color: var(--mindly-primary-dark);
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     .mindly-sidebar-mobile-bar {
       display: block;
     }
@@ -6161,7 +6210,7 @@
     margin-top: 0;
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     .mindly-sidebar-nav {
       display: block;
       position: static;
@@ -6294,7 +6343,7 @@
     display: none;
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     .mindly-sidebar-icon,
     .mindly-sidebar-link-active .mindly-sidebar-icon {
       height: 2.5rem;
@@ -6302,7 +6351,7 @@
     }
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     .mindly-sidebar-footer {
       display: block;
       margin-top: 1rem;
@@ -6326,7 +6375,7 @@
     }
   }
 
-  @media (width >= 80rem) {
+  @media (width >= 64rem) {
     .mindly-stats-grid-three {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -6805,9 +6854,20 @@
     background: var(--mindly-page-gradient);
   }
 
-  [data-theme='dark'] .mindly-dashboard-content,
-  [data-theme='dark'] .mindly-dashboard-topbar,
-  [data-theme='dark'] .mindly-sidebar,
+  [data-theme='dark'] .mindly-dashboard-topbar {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  [data-theme='dark'] .mindly-dashboard-content {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
   [data-theme='dark'] .mindly-stat-card,
   [data-theme='dark'] .mindly-feature-card,
   [data-theme='dark'] .student-profile-card,
@@ -6823,6 +6883,31 @@
     border-color: var(--mindly-border);
     background: var(--mindly-surface-glass);
     box-shadow: var(--mindly-shadow-xl);
+  }
+
+  /* Sidebar: transparent on mobile, glass panel on desktop */
+  [data-theme='dark'] .mindly-sidebar {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  @media (width >= 64rem) {
+    [data-theme='dark'] .mindly-sidebar {
+      border-color: var(--mindly-border) !important;
+      background: var(--mindly-surface-glass) !important;
+      box-shadow: var(--mindly-shadow-xl) !important;
+    }
+  }
+
+  [data-theme='dark'] .mindly-sidebar-mobile-toggle {
+    border-color: var(--mindly-border);
+    background: rgb(255 255 255 / 0.07);
+    color: var(--mindly-primary-light);
+  }
+
+  [data-theme='dark'] .mindly-sidebar-mobile-toggle:hover {
+    background: rgb(255 255 255 / 0.12);
   }
 
   [data-theme='dark'] .mindly-sidebar-nav {
@@ -6845,7 +6930,11 @@
   }
 
   [data-theme='dark'] .mindly-sidebar-profile,
-  [data-theme='dark'] .mindly-sidebar-link,
+  [data-theme='dark'] .mindly-sidebar-link {
+    border-color: transparent !important;
+    background: transparent !important;
+  }
+
   [data-theme='dark'] .mindly-theme-toggle,
   [data-theme='dark'] .psy-student-row,
   [data-theme='dark'] .psy-priority-row,
@@ -6875,14 +6964,23 @@
     background: rgb(169 135 255 / 0.12);
   }
 
-  [data-theme='dark'] .mindly-sidebar-link-active,
+  [data-theme='dark'] .mindly-sidebar-link-active {
+    border-color: var(--mindly-border-violet) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #e2d9ff !important;
+  }
+
+  [data-theme='dark'] .mindly-sidebar-link-active:hover {
+    background: rgb(169 135 255 / 0.08);
+  }
+
   [data-theme='dark'] .mindly-logout-button {
     border-color: var(--mindly-border-violet);
     background: rgb(169 135 255 / 0.12);
     box-shadow: var(--mindly-shadow-xs);
   }
 
-  [data-theme='dark'] .mindly-sidebar-link-active:hover,
   [data-theme='dark'] .mindly-logout-button:hover {
     border-color: var(--mindly-border-strong);
     background: rgb(169 135 255 / 0.18);
@@ -6901,11 +6999,15 @@
     color: var(--mindly-text-strong);
   }
 
-  [data-theme='dark'] .mindly-dashboard-title,
   [data-theme='dark'] .mindly-stat-value,
   [data-theme='dark'] .mindly-feature-title,
   [data-theme='dark'] .mindly-feature-reference,
   [data-theme='dark'] .mindly-sidebar-title,
+  [data-theme='dark'] .mindly-dashboard-title {
+    background: transparent;
+    color: var(--mindly-text-strong);
+  }
+
   [data-theme='dark'] .student-profile-link-secondary {
     border-color: var(--mindly-border-violet);
     background: rgb(255 255 255 / 0.06);
@@ -7078,6 +7180,17 @@
   [data-theme='dark'] textarea::placeholder {
     color: rgb(255 255 255 / 0.45);
   }
+}
+
+/* ============================= */
+/* DARK MODE TOPBAR OVERRIDE */
+/* ============================= */
+
+[data-theme='dark'] .mindly-dashboard-topbar {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
 
 /* ============================= */

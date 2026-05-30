@@ -33,14 +33,14 @@ type SharedFollowUpItem = {
 }
 
 const exerciseStatusLabels: Record<string, string> = {
-  assigned: 'Attribue',
-  completed: 'Termine',
+  assigned: 'Attribué',
+  completed: 'Terminé',
   in_progress: 'En cours',
   missed: 'Non fait',
-  reviewed: 'Corrige',
+  reviewed: 'Corrigé',
 }
 
-function getPersonName(person: unknown, fallback = 'Etudiant') {
+function getPersonName(person: unknown, fallback = 'Étudiant') {
   if (!person || typeof person !== 'object') return fallback
 
   const data = person as {
@@ -55,7 +55,7 @@ function getPersonName(person: unknown, fallback = 'Etudiant') {
 }
 
 function formatShortDate(value?: string | null) {
-  if (!value) return 'Date non precisee'
+  if (!value) return 'Date non précisée'
 
   return new Intl.DateTimeFormat('fr-FR', {
     day: '2-digit',
@@ -193,9 +193,9 @@ export default async function CoachStudentsPage() {
       return {
         createdAt: getStringField(session, 'createdAt') || getStringField(session, 'startedAt'),
         details: [
-          { label: 'Etudiant', value: getPersonName(student) },
+          { label: 'Étudiant', value: getPersonName(student) },
           { label: 'Type', value: 'Session de coaching classique' },
-          { label: 'Statut', value: status === 'closed' ? 'Cloturee' : 'Ouverte' },
+          { label: 'Statut', value: status === 'closed' ? 'Clôturée' : 'Ouverte' },
           {
             label: 'Date',
             value: formatShortDate(getStringField(session, 'startedAt') || session.createdAt),
@@ -203,7 +203,7 @@ export default async function CoachStudentsPage() {
         ],
         href: '/dashboard/coach/coaching',
         id: `session-${session.id}`,
-        meta: `Session ${status === 'closed' ? 'cloturee' : 'ouverte'}`,
+        meta: `Session ${status === 'closed' ? 'clôturée' : 'ouverte'}`,
         studentName: getPersonName(student),
         title: getStringField(session, 'title') || 'Session de coaching',
         type: 'session' as const,
@@ -216,15 +216,15 @@ export default async function CoachStudentsPage() {
       return {
         createdAt: getStringField(note, 'createdAt'),
         details: [
-          { label: 'Etudiant', value: getPersonName(student) },
-          { label: 'Type', value: 'Note partagee' },
+          { label: 'Étudiant', value: getPersonName(student) },
+          { label: 'Type', value: 'Note partagée' },
           { label: 'Titre', value: getStringField(note, 'title') || 'Note de suivi' },
-          { label: 'Contenu', value: getStringField(note, 'content') || 'Aucun contenu renseigne' },
+          { label: 'Contenu', value: getStringField(note, 'content') || 'Aucun contenu renseigné' },
           { label: 'Date', value: formatShortDate(note.createdAt) },
         ],
         href: '/dashboard/coach/coaching',
         id: `note-${note.id}`,
-        meta: 'Note partagee',
+        meta: 'Note partagée',
         studentName: getPersonName(student),
         title: getStringField(note, 'title') || 'Note de suivi',
         type: 'note' as const,
@@ -238,15 +238,15 @@ export default async function CoachStudentsPage() {
       return {
         createdAt: getStringField(exercise, 'createdAt') || getStringField(exercise, 'assignedAt'),
         details: [
-          { label: 'Etudiant', value: getPersonName(student) },
-          { label: 'Type', value: 'Exercice attribue' },
+          { label: 'Étudiant', value: getPersonName(student) },
+          { label: 'Type', value: 'Exercice attribué' },
           { label: 'Statut', value: exerciseStatusLabels[status] || 'Exercice' },
           {
             label: 'Consignes',
-            value: getStringField(exercise, 'instructions') || 'Aucune consigne renseignee',
+            value: getStringField(exercise, 'instructions') || 'Aucune consigne renseignée',
           },
           {
-            label: 'Echeance',
+            label: 'Échéance',
             value: formatShortDate(getStringField(exercise, 'dueDate')),
           },
         ],
@@ -254,7 +254,7 @@ export default async function CoachStudentsPage() {
         id: `exercise-${exercise.id}`,
         meta: exerciseStatusLabels[status] || 'Exercice',
         studentName: getPersonName(student),
-        title: getStringField(exercise, 'title') || 'Exercice attribue',
+        title: getStringField(exercise, 'title') || 'Exercice attribué',
         type: 'exercise' as const,
       }
     }),
@@ -270,15 +270,15 @@ export default async function CoachStudentsPage() {
   return (
     <div>
       <CoachTopbar
-        title="Etudiants assignes"
-        description="Consultez les profils des etudiants suivis par le coach."
+        title="Étudiants assignés"
+        description="Consultez les profils des étudiants suivis par le coach."
       />
 
       <div className="mindly-stack-lg">
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
             <CardTitle className="mindly-feature-title">
-              {students.length > 0 ? 'Mes etudiants' : 'Aucun etudiant assigne'}
+              {students.length > 0 ? 'Mes étudiants' : 'Aucun étudiant assigné'}
             </CardTitle>
           </CardHeader>
 
@@ -312,7 +312,7 @@ export default async function CoachStudentsPage() {
                           {student.notesCount}
                         </p>
                         <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                          Notes partagees
+                          Notes partagées
                         </p>
                       </div>
                       <div className="rounded-2xl bg-white p-4 dark:bg-white/[0.04]">
@@ -339,12 +339,12 @@ export default async function CoachStudentsPage() {
             ) : (
               <>
                 <p className="mindly-feature-text">
-                  Les etudiants apparaissent ici quand ils demarrent une session de coaching
+                  Les étudiants apparaissent ici quand ils démarrent une session de coaching
                   classique avec vous.
                 </p>
 
                 <div className="mt-4">
-                  <span className="mindly-ui-badge">Aucun etudiant</span>
+                  <span className="mindly-ui-badge">Aucun étudiant</span>
                 </div>
               </>
             )}
@@ -353,7 +353,7 @@ export default async function CoachStudentsPage() {
 
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
-            <CardTitle className="mindly-feature-title">Suivi partage</CardTitle>
+            <CardTitle className="mindly-feature-title">Suivi partagé</CardTitle>
           </CardHeader>
 
           <CardContent className="mindly-feature-content">
@@ -372,7 +372,7 @@ export default async function CoachStudentsPage() {
                   {notes.docs.length}
                 </p>
                 <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                  Notes partagees
+                  Notes partagées
                 </p>
               </div>
 
@@ -381,7 +381,7 @@ export default async function CoachStudentsPage() {
                   {exercises.docs.length}
                 </p>
                 <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                  Exercices attribues
+                  Exercices attribués
                 </p>
               </div>
             </div>
@@ -437,7 +437,7 @@ export default async function CoachStudentsPage() {
               </div>
             ) : (
               <p className="mt-5 mindly-feature-text">
-                Aucun suivi partage n&apos;est encore disponible pour vos etudiants assignes.
+                Aucun suivi partagé n'est encore disponible pour vos étudiants assignés.
               </p>
             )}
           </CardContent>

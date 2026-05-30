@@ -18,7 +18,7 @@ import { LogoutButton } from '@/components/dashboard/student/Logout'
 
 const navItems = [
   { title: 'Dashboard', href: '/dashboard/psy', icon: LayoutDashboard },
-  { title: 'Etudiants', href: '/dashboard/psy/students', icon: UsersRound },
+  { title: 'Étudiants', href: '/dashboard/psy/students', icon: UsersRound },
   { title: 'Rendez-vous', href: '/dashboard/psy/rendez_vous', icon: CalendarDays },
   { title: 'Notifications', href: '/dashboard/psy/notifications', icon: Bell },
   { title: 'Mon profil', href: '/dashboard/psy/profil', icon: UserRound },

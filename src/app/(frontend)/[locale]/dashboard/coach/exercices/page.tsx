@@ -9,7 +9,7 @@ import { CoachExerciseForm } from '@/components/dashboard/coach/CoachExerciseFor
 import { getRelationId } from '@/lib/coaching'
 
 function getStudentName(student: unknown) {
-  if (!student || typeof student !== 'object') return 'Etudiant'
+  if (!student || typeof student !== 'object') return 'Étudiant'
 
   const data = student as {
     email?: string | null
@@ -37,7 +37,7 @@ function getCoachName(coach: unknown) {
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return 'Sans echeance'
+  if (!value) return 'Sans échéance'
 
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'medium',
@@ -48,13 +48,13 @@ function formatDate(value?: string | null) {
 function getStatusLabel(status: string) {
   switch (status) {
     case 'assigned':
-      return 'Attribue'
+      return 'Attribué'
     case 'in_progress':
       return 'En cours'
     case 'completed':
-      return 'Deja fait'
+      return 'Déjà fait'
     case 'reviewed':
-      return 'Feedback donne'
+      return 'Feedback donné'
     case 'missed':
       return 'Non fait'
     default:
@@ -130,7 +130,7 @@ export default async function CoachExercisesPage() {
     <div>
       <CoachTopbar
         title="Exercices"
-        description="Attribuez des exercices personnalises aux etudiants et suivez leur avancement."
+        description="Attribuez des exercices personnalisés aux étudiants et suivez leur avancement."
       />
 
       <div className="mindly-stack-lg">
@@ -145,7 +145,7 @@ export default async function CoachExercisesPage() {
 
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
-            <CardTitle className="mindly-feature-title">Exercices partages</CardTitle>
+            <CardTitle className="mindly-feature-title">Exercices partagés</CardTitle>
           </CardHeader>
 
           <CardContent className="mindly-feature-content">
@@ -162,10 +162,10 @@ export default async function CoachExercisesPage() {
                           {exercice.title}
                         </h2>
                         <p className="mt-1 text-sm text-dream-muted dark:text-white/65">
-                          Etudiant : {getStudentName(exercice.student)}
+                          Étudiant : {getStudentName(exercice.student)}
                         </p>
                         <p className="mt-1 text-sm text-dream-muted dark:text-white/65">
-                          Donne par : {getCoachName(exercice.coach)}
+                          Donné par : {getCoachName(exercice.coach)}
                         </p>
                       </div>
 
@@ -185,13 +185,13 @@ export default async function CoachExercisesPage() {
                     ) : null}
 
                     <p className="mt-3 text-sm text-dream-muted dark:text-white/65">
-                      Echeance : {formatDate(exercice.dueDate)}
+                      Échéance : {formatDate(exercice.dueDate)}
                     </p>
 
                     {exercice.studentResponse ? (
                       <div className="mt-4 rounded-2xl bg-white p-4 dark:bg-white/[0.04]">
                         <p className="text-sm font-semibold text-dream-heading dark:text-white">
-                          Reponse de l&apos;etudiant
+                          Réponse de l'étudiant
                         </p>
                         <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-white/65">
                           {exercice.studentResponse}
@@ -228,7 +228,7 @@ export default async function CoachExercisesPage() {
                 ))}
               </div>
             ) : (
-              <p className="mindly-feature-text">Aucun exercice attribue pour le moment.</p>
+              <p className="mindly-feature-text">Aucun exercice attribué pour le moment.</p>
             )}
           </CardContent>
         </Card>

@@ -115,14 +115,17 @@ export const Dreams: CollectionConfig = {
       name: 'description',
       type: 'textarea',
       required: true,
+      localized: true,
     },
     {
       name: 'summary',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'analysis',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'videoStatus',
