@@ -1,19 +1,12 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
 import { CalendarDays, Clock, UserRound } from 'lucide-react'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { PsyRendezvousActions } from '@/components/dashboard/psy/PsyRendezvousActions'
 import { PsyTopbar } from '@/components/dashboard/psy/PsyTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
-
-const statusLabels: Record<string, string> = {
-  pending: 'En attente',
-  confirmed: 'Confirmé',
-  rejected: 'Refusé',
-  cancelled: 'Annulé',
-  completed: 'Terminé',
-}
 
 const statusClasses: Record<string, string> = {
   pending: 'student-dream-status-generating',
@@ -23,18 +16,18 @@ const statusClasses: Record<string, string> = {
   completed: 'student-dream-status-ready',
 }
 
-function formatDate(value: string | null | undefined) {
+function formatDate(value: string | null | undefined, locale: string) {
   if (!value) return ''
 
-  return new Intl.DateTimeFormat('fr-FR', {
+  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-GB', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
   }).format(new Date(value))
 }
 
-function getStudentName(student: unknown) {
-  if (!student || typeof student !== 'object') return 'Étudiant'
+function getStudentName(student: unknown, fallback: string) {
+  if (!student || typeof student !== 'object') return fallback
 
   const data = student as {
     firstName?: string | null
@@ -43,10 +36,13 @@ function getStudentName(student: unknown) {
   }
   const fullName = [data.firstName, data.lastName].filter(Boolean).join(' ').trim()
 
-  return fullName || data.email || 'Étudiant'
+  return fullName || data.email || fallback
 }
 
-function getAppointmentDateTime(date: string | null | undefined, startTime: string | null | undefined) {
+function getAppointmentDateTime(
+  date: string | null | undefined,
+  startTime: string | null | undefined,
+) {
   if (!date) return Number.POSITIVE_INFINITY
 
   const appointmentDate = new Date(date)
@@ -63,17 +59,15 @@ function getAppointmentDateTime(date: string | null | undefined, startTime: stri
 export default async function PsyRendezVousPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.psy.rendezVous')
+  const locale = await getLocale()
 
   const appointments = user
     ? await payload.find({
         collection: 'rendez-vous-psy',
         user,
         overrideAccess: false,
-        where: {
-          psychologist: {
-            equals: user.id,
-          },
-        },
+        where: { psychologist: { equals: user.id } },
         depth: 1,
         sort: '-createdAt',
         limit: 50,
@@ -81,64 +75,61 @@ export default async function PsyRendezVousPage() {
     : null
 
   const docs = appointments?.docs || []
-  const sortedAppointments = [...docs].sort(
-    (a, b) =>
-      getAppointmentDateTime(a.date, a.startTime) - getAppointmentDateTime(b.date, b.startTime),
-  )
-  const pendingAppointments = docs.filter((appointment) => appointment.status === 'pending')
-  const confirmedAppointments = docs.filter((appointment) => appointment.status === 'confirmed')
+  const pendingAppointments = docs.filter((a) => a.status === 'pending')
+  const confirmedAppointments = docs.filter((a) => a.status === 'confirmed')
   const now = Date.now()
   const nextAppointment =
     confirmedAppointments
-      .filter((appointment) => getAppointmentDateTime(appointment.date, appointment.startTime) >= now)
+      .filter((a) => getAppointmentDateTime(a.date, a.startTime) >= now)
       .sort(
         (a, b) =>
           getAppointmentDateTime(a.date, a.startTime) - getAppointmentDateTime(b.date, b.startTime),
       )[0] || null
 
+  const statusLabels: Record<string, string> = {
+    pending: t('status.pending'),
+    confirmed: t('status.confirmed'),
+    rejected: t('status.rejected'),
+    cancelled: t('status.cancelled'),
+    completed: t('status.completed'),
+  }
+
   return (
     <div>
-      <PsyTopbar
-        title="Rendez-vous"
-        description="Consultez les demandes des étudiants et organisez les consultations confirmées."
-      />
+      <PsyTopbar title={t('title')} description={t('description')} />
 
       <div className="mindly-dashboard-grid">
         <div className="xl:col-span-2">
           <Card className="mindly-feature-card">
             <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">
-                Demandes reçues
-              </CardTitle>
+              <CardTitle className="mindly-feature-title">{t('requests.title')}</CardTitle>
             </CardHeader>
 
             <CardContent className="mindly-feature-content">
               {docs.length > 0 ? (
                 <div className="mindly-stack-md">
-                  {sortedAppointments.map((appointment) => (
-                    <div
-                      key={appointment.id}
-                      className="student-dreams-latest-box"
-                    >
+                  {docs.map((appointment) => (
+                    <div key={appointment.id} className="student-dreams-latest-box">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 text-sm font-medium mindly-feature-text">
                             <UserRound className="h-4 w-4" />
-                            {getStudentName(appointment.student)}
+                            {getStudentName(appointment.student, t('student'))}
                           </div>
 
                           <p className="mt-2 mindly-feature-reference">
-                            {formatDate(appointment.date)} de {appointment.startTime} à{' '}
-                            {appointment.endTime}
+                            {formatDate(appointment.date, locale)}{' '}
+                            {t('requests.from', {
+                              start: appointment.startTime ?? '',
+                              end: appointment.endTime ?? '',
+                            })}
                           </p>
 
-                          <p className="mt-2 mindly-feature-text">
-                            {appointment.reason}
-                          </p>
+                          <p className="mt-2 mindly-feature-text">{appointment.reason}</p>
 
                           {appointment.status === 'rejected' && appointment.rejectionReason ? (
                             <div className="mt-3 rounded-2xl student-dream-status-failed p-3 text-sm">
-                              <p className="font-semibold">Cause du refus envoyée</p>
+                              <p className="font-semibold">{t('requests.rejectionLabel')}</p>
                               <p className="mt-1">{appointment.rejectionReason}</p>
                             </div>
                           ) : null}
@@ -153,7 +144,9 @@ export default async function PsyRendezVousPage() {
                             </span>
 
                             <span className="mindly-ui-badge">
-                              {appointment.urgency === 'urgent' ? 'Urgente' : 'Normale'}
+                              {appointment.urgency === 'urgent'
+                                ? t('requests.urgencyUrgent')
+                                : t('requests.urgencyNormal')}
                             </span>
                           </div>
                         </div>
@@ -173,12 +166,8 @@ export default async function PsyRendezVousPage() {
                   </div>
 
                   <div>
-                    <p className="mindly-feature-reference">
-                      Aucune demande pour le moment
-                    </p>
-                    <p className="mindly-feature-text">
-                      Les demandes envoyées par les étudiants apparaîtront ici.
-                    </p>
+                    <p className="mindly-feature-reference">{t('requests.empty')}</p>
+                    <p className="mindly-feature-text">{t('requests.emptyHint')}</p>
                   </div>
                 </div>
               )}
@@ -189,9 +178,7 @@ export default async function PsyRendezVousPage() {
         <div className="mindly-stack-lg">
           <Card className="mindly-feature-card">
             <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">
-                Prochaine consultation
-              </CardTitle>
+              <CardTitle className="mindly-feature-title">{t('next.title')}</CardTitle>
             </CardHeader>
 
             <CardContent className="mindly-feature-content">
@@ -202,7 +189,7 @@ export default async function PsyRendezVousPage() {
                   </div>
                   <div>
                     <p className="mindly-feature-reference">
-                      {formatDate(nextAppointment.date)}
+                      {formatDate(nextAppointment.date, locale)}
                     </p>
                     <p className="mindly-feature-text">
                       {nextAppointment.startTime} - {nextAppointment.endTime}
@@ -210,31 +197,25 @@ export default async function PsyRendezVousPage() {
                   </div>
                 </div>
               ) : (
-                <p className="mindly-feature-text">
-                  Aucune consultation n'est encore confirmée pour le moment.
-                </p>
+                <p className="mindly-feature-text">{t('next.empty')}</p>
               )}
             </CardContent>
           </Card>
 
           <Card className="mindly-feature-card">
             <CardHeader className="mindly-feature-header">
-              <CardTitle className="mindly-feature-title">Résumé</CardTitle>
+              <CardTitle className="mindly-feature-title">{t('summary.title')}</CardTitle>
             </CardHeader>
 
             <CardContent className="mindly-feature-content">
               <div className="grid grid-cols-2 gap-3">
                 <div className="student-dreams-latest-box">
-                  <p className="mindly-stat-value">
-                    {pendingAppointments.length}
-                  </p>
-                  <p className="mindly-stat-hint">En attente</p>
+                  <p className="mindly-stat-value">{pendingAppointments.length}</p>
+                  <p className="mindly-stat-hint">{t('summary.pending')}</p>
                 </div>
                 <div className="student-dreams-latest-box">
-                  <p className="mindly-stat-value">
-                    {confirmedAppointments.length}
-                  </p>
-                  <p className="mindly-stat-hint">Confirmés</p>
+                  <p className="mindly-stat-value">{confirmedAppointments.length}</p>
+                  <p className="mindly-stat-hint">{t('summary.confirmed')}</p>
                 </div>
               </div>
             </CardContent>

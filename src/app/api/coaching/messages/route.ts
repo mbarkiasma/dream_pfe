@@ -7,6 +7,7 @@ import { generateSmartCoachingReply } from '@/lib/smart-coaching'
 import { createNotification } from '@/utilities/createNotification'
 
 type SendMessageBody = {
+  attachments?: (string | number)[]
   content?: string
   sessionId?: string
 }
@@ -21,8 +22,9 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => ({}))) as SendMessageBody
   const content = sanitizeCoachingMessage(body.content)
+  const attachmentIds = Array.isArray(body.attachments) ? body.attachments : []
 
-  if (!body.sessionId || !content) {
+  if (!body.sessionId || (!content && attachmentIds.length === 0)) {
     return Response.json({ error: 'Session et message requis.' }, { status: 400 })
   }
 
@@ -56,7 +58,8 @@ export async function POST(request: Request) {
       session: session.id,
       senderRole,
       senderUser: user.id,
-      content,
+      content: content || '',
+      attachments: attachmentIds.map((mediaId) => ({ media: mediaId })),
     },
   })
 

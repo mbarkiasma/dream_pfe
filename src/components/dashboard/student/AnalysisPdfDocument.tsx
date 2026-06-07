@@ -18,8 +18,7 @@ type AnalysisPdfDocumentProps = {
 
 Font.registerHyphenationCallback((word) => [word])
 
-// React PDF cannot import globals.css, so these tokens mirror the current
-// MindBloom report theme used by the platform page.
+
 const mindlyPdfTheme = {
   bg: '#f8f5ff',
   reportCream: '#fff2df',

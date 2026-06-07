@@ -6,11 +6,5 @@ type PsyTopbarProps = {
 }
 
 export function PsyTopbar({ description, title }: PsyTopbarProps) {
-  return (
-    <DashboardTopbar
-      eyebrow="Espace psy"
-      title={title}
-      description={description}
-    />
-  )
+  return <DashboardTopbar title={title} description={description} />
 }

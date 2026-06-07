@@ -1,12 +1,13 @@
 ﻿'use client'
 
 import { useUser } from '@clerk/nextjs'
-import { Languages, LogOut, Menu, Moon, Sun, X } from 'lucide-react'
+import { Globe, LogOut, Menu, Moon, Sun, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { appBadgeCtaClass } from '@/components/ui/badge'
 import { Link, usePathname, useRouter, type Locale } from '@/i18n/routing'
 import { useTheme } from '@/providers/Theme'
+import { Logo } from '@/components/Logo/Logo'
 
 export function Navbar() {
   const pathname = usePathname()
@@ -79,13 +80,8 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-[100] border-b border-[var(--mindly-border)] bg-[var(--mindly-surface-glass)] backdrop-blur-[18px]">
       <div className="relative mx-auto flex h-[70px] w-full max-w-none items-center justify-between px-5 lg:px-14">
-        <Link href="/home" className="flex flex-col lg:translate-x-4" onClick={() => setOpen(false)}>
-          <span className="bg-gradient-to-r from-[#895EF8] to-[#A987FF] bg-clip-text font-[family-name:var(--font-zain)] text-[19px] font-bold leading-none text-transparent">
-            MindBloom
-          </span>
-          <span className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-[var(--mindly-purple-muted)]">
-            {t('tagline')}
-          </span>
+        <Link href="/home" className="flex items-center lg:translate-x-4" onClick={() => setOpen(false)}>
+          <Logo className="h-12 w-auto" />
         </Link>
 
         <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-4 md:flex">
@@ -117,7 +113,7 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <Link
               href={accountLink}
-              className={`${appBadgeCtaClass} !min-h-[38px] !min-w-[145px] !w-[145px] px-3 py-1.5 text-[14px]`}
+              className={`${appBadgeCtaClass} !h-9 !min-h-0 !min-w-0 !w-auto px-4 py-0 text-[13px] leading-none`}
             >
               <span className="relative z-10">{accountLabel}</span>
             </Link>
@@ -137,21 +133,20 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={switchLanguage}
-              className="flex h-9 items-center gap-1 rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-3 text-xs font-bold text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
-              aria-label={t('switchLanguage')}
-              title={t('switchLanguage')}
-            >
-              <Languages className="h-4 w-4" />
-              <span>{locale.toUpperCase()}</span>
-            </button>
-            <button
-              type="button"
               onClick={toggleTheme}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition duration-150 hover:-translate-y-px hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
               aria-label={!isDark ? t('darkMode') : t('lightMode')}
             >
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={switchLanguage}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition duration-150 hover:-translate-y-px hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
+              aria-label={t('switchLanguage')}
+              title={`${locale.toUpperCase()} — ${t('switchLanguage')}`}
+            >
+              <Globe className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -191,16 +186,16 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={switchLanguage}
-                className="flex items-center justify-center gap-2 rounded-xl border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-4 py-3 text-sm font-bold text-[var(--mindly-primary)]"
+                className="flex items-center justify-center gap-2 rounded-xl border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-4 py-3 text-sm font-bold text-[var(--mindly-primary)] transition duration-150 hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
                 aria-label={t('switchLanguage')}
               >
-                <Languages className="h-4 w-4" />
+                <Globe className="h-4 w-4" />
                 <span>{locale.toUpperCase()}</span>
               </button>
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="flex items-center justify-center gap-2 rounded-xl border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-4 py-3 text-sm font-bold text-[var(--mindly-primary)]"
+                className="flex items-center justify-center gap-2 rounded-xl border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-4 py-3 text-sm font-bold text-[var(--mindly-primary)] transition duration-150 hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
               >
                 {isDark ? (
                   <>

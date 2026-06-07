@@ -13,16 +13,9 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 import { LogoutButton } from '@/components/dashboard/student/Logout'
-
-const navItems = [
-  { title: 'Dashboard', href: '/dashboard/psy', icon: LayoutDashboard },
-  { title: 'Étudiants', href: '/dashboard/psy/students', icon: UsersRound },
-  { title: 'Rendez-vous', href: '/dashboard/psy/rendez_vous', icon: CalendarDays },
-  { title: 'Notifications', href: '/dashboard/psy/notifications', icon: Bell },
-  { title: 'Mon profil', href: '/dashboard/psy/profil', icon: UserRound },
-]
 
 function isActivePath(pathname: string, href: string) {
   if (href === '/dashboard/psy') {
@@ -35,6 +28,15 @@ function isActivePath(pathname: string, href: string) {
 export function PsySidebar() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+  const t = useTranslations('dashboard.psy.sidebar')
+
+  const navItems = [
+    { title: t('nav.dashboard'), href: '/dashboard/psy', icon: LayoutDashboard },
+    { title: t('nav.students'), href: '/dashboard/psy/students', icon: UsersRound },
+    { title: t('nav.appointments'), href: '/dashboard/psy/rendez_vous', icon: CalendarDays },
+    { title: t('nav.notifications'), href: '/dashboard/psy/notifications', icon: Bell },
+    { title: t('nav.profile'), href: '/dashboard/psy/profil', icon: UserRound },
+  ]
 
   return (
     <aside className={menuOpen ? 'mindly-sidebar mindly-sidebar-open' : 'mindly-sidebar'}>
@@ -44,8 +46,8 @@ export function PsySidebar() {
             <HeartPulse />
           </div>
           <div className="min-w-0">
-            <p className="mindly-sidebar-title">Espace psy</p>
-            <p className="mindly-sidebar-subtitle">Suivi clinique</p>
+            <p className="mindly-sidebar-title">{t('title')}</p>
+            <p className="mindly-sidebar-subtitle">{t('subtitle')}</p>
           </div>
         </div>
 
@@ -53,11 +55,11 @@ export function PsySidebar() {
           type="button"
           className="mindly-sidebar-mobile-toggle"
           aria-expanded={menuOpen}
-          aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-label={menuOpen ? t('closeMenu') : t('openMenu')}
           onClick={() => setMenuOpen((open) => !open)}
         >
           {menuOpen ? <X /> : <Menu />}
-          <span>Menu</span>
+          <span>{t('menu')}</span>
         </button>
       </div>
 

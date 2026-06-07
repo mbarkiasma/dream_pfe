@@ -68,7 +68,18 @@ export const CoachingMessages: CollectionConfig = {
     {
       name: 'content',
       type: 'textarea',
-      required: true,
+    },
+    {
+      name: 'attachments',
+      type: 'array',
+      fields: [
+        {
+          name: 'media',
+          type: 'relationship',
+          relationTo: 'media',
+          required: true,
+        },
+      ],
     },
     {
       name: 'audioUrl',

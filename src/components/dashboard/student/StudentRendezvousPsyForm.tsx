@@ -104,6 +104,7 @@ export function StudentRendezvousPsyForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const orientationId = searchParams.get('orientationId')
+  const isCoachReferral = Boolean(orientationId)
   const agendaScrollRef = useRef<HTMLDivElement>(null)
   const today = useMemo(() => formatDateValue(new Date()), [])
   const agendaDates = useMemo(() => buildAgendaDays(new Date(), 14, locale), [locale])
@@ -493,8 +494,14 @@ export function StudentRendezvousPsyForm() {
           <Textarea
             id="appointment-reason"
             value={reason}
-            onChange={(event) => setReason(event.target.value)}
+            onChange={(event) => {
+              if (!isCoachReferral) {
+                setReason(event.target.value)
+              }
+            }}
             placeholder={t('reasonPlaceholder')}
+            readOnly={isCoachReferral}
+            aria-readonly={isCoachReferral}
             className="student-psy-textarea"
           />
         </div>

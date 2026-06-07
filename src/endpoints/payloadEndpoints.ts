@@ -96,6 +96,12 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'N8N_CHAT_URL manquante.' }, { status: 500 })
       }
 
+      const prevAiMessages = (Array.isArray(conversationHistory) ? conversationHistory : [])
+        .filter((m: any) => m?.role === 'ai')
+      const applicationAnswerDetected =
+        detectApplicationLanguage(userText) &&
+        prevAiMessages.some((m: any) => detectApplicationQuestion(String(m?.content || '')))
+
       let n8nResponse: Response
 
       try {
@@ -124,6 +130,7 @@ export const payloadEndpoints: Endpoint[] = [
             interactiveQuestionMode:
               interactiveQuestionMode === 'occasional' ? 'occasional' : 'text',
             hasAskedRequiredInteractive: hasAskedRequiredInteractive === true,
+            applicationAnswerDetected,
           }),
         })
       } catch (error) {
@@ -188,6 +195,8 @@ export const payloadEndpoints: Endpoint[] = [
               studentMessageCount:
                 typeof studentMessageCount === 'number' ? studentMessageCount : undefined,
               supportsInteractiveQuestions: supportsInteractiveQuestions === true,
+              conversationHistory: Array.isArray(conversationHistory) ? conversationHistory : [],
+              userText,
             })
 
       let audioBase64Reponse: string | null = null
@@ -411,17 +420,20 @@ export const payloadEndpoints: Endpoint[] = [
                     emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
                     emotionalSummary: translated.emotionalSummary || '',
                   },
-                  recommandations: (Array.isArray(translated.recommandations)
-                    ? translated.recommandations
-                    : []
-                  ).map((text: string) => ({ text: text || '' })),
-                  traits: normalizedTraits.map((trait, i) => ({
-                    ...trait,
+                  recommandations: (doc.recommandations ?? []).map((docRec: any, i: number) => ({
+                    id: docRec.id,
+                    text: (Array.isArray(translated.recommandations) ? translated.recommandations[i] : '') || '',
+                  })),
+                  traits: (doc.traits ?? []).map((docTrait: any, i: number) => ({
+                    id: docTrait.id,
                     analysis: translated.traitTexts?.[i]?.analysis || '',
                     interpretation: translated.traitTexts?.[i]?.interpretation || '',
                     confidenceReason: translated.traitTexts?.[i]?.confidenceReason || '',
-                    observedIndicators: (translated.traitTexts?.[i]?.indicators || []).map(
-                      (indicator: string) => ({ indicator }),
+                    observedIndicators: (docTrait.observedIndicators ?? []).map(
+                      (docIndicator: any, j: number) => ({
+                        id: docIndicator.id,
+                        indicator: translated.traitTexts?.[i]?.indicators?.[j] || '',
+                      }),
                     ),
                   })),
                 },
@@ -491,7 +503,6 @@ export const payloadEndpoints: Endpoint[] = [
       const body = await (req as Request).json()
       const { description, locale: dreamLocale = 'fr' } = body
       const primaryDreamLocale = dreamLocale === 'en' ? 'en' : 'fr'
-      const otherDreamLocale: 'fr' | 'en' = primaryDreamLocale === 'fr' ? 'en' : 'fr'
 
       if (!description || typeof description !== 'string' || !description.trim()) {
         return Response.json({ error: 'Description requise.' }, { status: 400 })
@@ -614,14 +625,90 @@ export const payloadEndpoints: Endpoint[] = [
       const videoStatus =
         n8nData?.videoStatus === 'waiting_validation' ? 'waiting_validation' : 'pending'
 
+      const otherLocale: 'fr' | 'en' = primaryDreamLocale === 'fr' ? 'en' : 'fr'
+      const groqKeyDesc = process.env.GROQ_API_KEY?.trim()
+
+      // Unified translation function with retry (up to 3 attempts, exponential backoff)
+      async function translate(
+        text: string,
+        targetLang: 'fr' | 'en',
+        maxTokens = 1000,
+      ): Promise<string> {
+        if (!groqKeyDesc || !text.trim()) return text
+        const instruction =
+          targetLang === 'fr'
+            ? `Translate the following text to French. Rules: (1) If already entirely in French, return it EXACTLY unchanged. (2) Translate EVERY sentence — do NOT omit or summarize any part. (3) Preserve ALL emojis exactly where they are. (4) Preserve ALL line breaks exactly. (5) Return ONLY the translated text, nothing else.`
+            : `Translate the following text to English. Rules: (1) If already entirely in English, return it EXACTLY unchanged. (2) Translate EVERY sentence — do NOT omit or summarize any part. (3) Preserve ALL emojis exactly where they are. (4) Preserve ALL line breaks exactly. (5) Return ONLY the translated text, nothing else.`
+        // Use a stronger model for long texts (analysis)
+        const model =
+          maxTokens > 1000 ? 'llama-3.3-70b-versatile' : 'llama-3.3-70b-versatile'
+
+        for (let attempt = 0; attempt < 3; attempt++) {
+          if (attempt > 0) await new Promise((r) => setTimeout(r, 600 * attempt))
+          try {
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${groqKeyDesc}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model,
+                messages: [
+                  { role: 'system', content: instruction },
+                  { role: 'user', content: text },
+                ],
+                temperature: 0.1,
+                max_tokens: maxTokens,
+              }),
+            })
+            if (res.ok) {
+              const r = await res.json()
+              const result = r?.choices?.[0]?.message?.content?.trim()
+              if (result) return result
+            }
+          } catch { /* retry */ }
+        }
+        return text // all 3 attempts failed — return original as last resort
+      }
+
+      // Translate all fields sequentially (2 at a time) to avoid Groq rate-limiting
+      const descriptionFr = await translate(trimmedDescription, 'fr', 2000)
+      const descriptionEn = await translate(trimmedDescription, 'en', 2000)
+      const [summaryFr, summaryEn] = await Promise.all([
+        translate(summary, 'fr', 2000),
+        translate(summary, 'en', 2000),
+      ])
+      const [analysisFr, analysisEn] = await Promise.all([
+        translate(analysis, 'fr', 4000),
+        translate(analysis, 'en', 4000),
+      ])
+
+      // Save primary locale
+      await req.payload.update({
+        collection: 'dreams',
+        id: dream.id,
+        req,
+        locale: primaryDreamLocale,
+        data: {
+          description: primaryDreamLocale === 'fr' ? descriptionFr : descriptionEn,
+          summary: primaryDreamLocale === 'fr' ? summaryFr : summaryEn,
+          analysis: primaryDreamLocale === 'fr' ? analysisFr : analysisEn,
+          videoStatus,
+          errorMessage: '',
+        },
+      })
+
+      // Save other locale
       const updatedDream = await req.payload.update({
         collection: 'dreams',
         id: dream.id,
         req,
+        locale: otherLocale,
         data: {
-          summary,
-          analysis,
-          videoStatus,
+          description: otherLocale === 'fr' ? descriptionFr : descriptionEn,
+          summary: otherLocale === 'fr' ? summaryFr : summaryEn,
+          analysis: otherLocale === 'fr' ? analysisFr : analysisEn,
           errorMessage: '',
         },
       })
@@ -630,9 +717,9 @@ export const payloadEndpoints: Endpoint[] = [
         success: true,
         message: 'Reve envoye au workflow avec succes.',
         dreamId: updatedDream.id,
-        videoStatus: updatedDream.videoStatus,
-        summary: updatedDream.summary,
-        analysis: updatedDream.analysis,
+        videoStatus,
+        summary,
+        analysis,
       })
     },
   },
@@ -778,38 +865,61 @@ export const payloadEndpoints: Endpoint[] = [
         const callbackSummary = typeof summary === 'string' ? summary : ''
         const callbackAnalysis = typeof analysis === 'string' ? analysis : ''
 
-        if (groqApiKey && (callbackSummary || callbackAnalysis)) {
-          const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        // Translate summary (plain text) and analysis (JSON) separately for reliability
+        let enSummary: string | undefined
+        let enAnalysis: string | undefined
+
+        if (groqApiKey && callbackSummary) {
+          const sumRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: { Authorization: `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
               model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
               messages: [
-                { role: 'system', content: 'You are a professional French-to-English translator. Translate all string values in the JSON. Return valid JSON only — no markdown, no explanation.' },
-                { role: 'user', content: JSON.stringify({ summary: callbackSummary, analysis: callbackAnalysis }) },
+                { role: 'system', content: 'Translate the following text from French to English. Return only the translated text, no explanation, no preamble.' },
+                { role: 'user', content: callbackSummary },
               ],
               temperature: 0.1,
-              max_tokens: 1500,
+              max_tokens: 800,
             }),
           })
-
-          if (groqResponse.ok) {
-            const groqResult = await groqResponse.json()
-            const raw: string = groqResult?.choices?.[0]?.message?.content?.trim() ?? ''
-            const cleaned = raw.replace(/^```json\s*|\s*```$/g, '').trim()
-            const translated = JSON.parse(cleaned)
-
-            await req.payload.update({
-              collection: 'dreams',
-              id: normalizedDreamId,
-              req,
-              locale: 'en',
-              data: {
-                summary: translated.summary || '',
-                analysis: translated.analysis || '',
-              },
-            })
+          if (sumRes.ok) {
+            const r = await sumRes.json()
+            enSummary = r?.choices?.[0]?.message?.content?.trim() || undefined
           }
+        }
+
+        if (groqApiKey && callbackAnalysis) {
+          const anaRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
+              messages: [
+                { role: 'system', content: 'Translate the following text from French to English. Return only the translated text. Preserve ALL emojis exactly as-is. Preserve ALL line breaks exactly as-is. No explanation, no preamble.' },
+                { role: 'user', content: callbackAnalysis },
+              ],
+              temperature: 0.1,
+              max_tokens: 4000,
+            }),
+          })
+          if (anaRes.ok) {
+            const r = await anaRes.json()
+            enAnalysis = r?.choices?.[0]?.message?.content?.trim() || undefined
+          }
+        }
+
+        if (enSummary || enAnalysis) {
+          await req.payload.update({
+            collection: 'dreams',
+            id: normalizedDreamId,
+            req,
+            locale: 'en',
+            data: {
+              summary: enSummary,
+              analysis: enAnalysis,
+            },
+          })
         }
       } catch (translationError) {
         console.error('Dream callback translation failed (non-blocking):', translationError)
@@ -870,17 +980,23 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'N8N_DREAM_VIDEO_START_URL manquante.' }, { status: 500 })
       }
 
-      const rawSummary = dream.summary
-      const summary =
-        typeof rawSummary === 'string'
-          ? rawSummary.trim()
-          : typeof rawSummary === 'object' && rawSummary !== null
-            ? String(
-                (rawSummary as Record<string, unknown>).fr ??
-                (rawSummary as Record<string, unknown>).en ??
-                '',
-              ).trim()
-            : ''
+      let summary = (dream.summary ?? '').toString().trim()
+
+      if (!summary) {
+        try {
+          const fallback = await (req.payload.find as any)({
+            collection: 'dreams',
+            where: { id: { equals: dreamId } },
+            locale: 'en',
+            depth: 0,
+            limit: 1,
+            overrideAccess: true,
+          })
+          summary = (fallback?.docs?.[0]?.summary ?? '').toString().trim()
+        } catch {
+          // locale fallback failed — continue with empty summary
+        }
+      }
 
       if (!summary) {
         return Response.json(
@@ -979,7 +1095,23 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'N8N_DREAM_WEBHOOK_URL manquante.' }, { status: 500 })
       }
 
-      const description = typeof dream.description === 'string' ? dream.description.trim() : ''
+      let description = (dream.description ?? '').toString().trim()
+
+      if (!description) {
+        try {
+          const fallback = await (req.payload.find as any)({
+            collection: 'dreams',
+            where: { id: { equals: dreamId } },
+            locale: 'en',
+            depth: 0,
+            limit: 1,
+            overrideAccess: true,
+          })
+          description = (fallback?.docs?.[0]?.description ?? '').toString().trim()
+        } catch {
+          // locale fallback failed — continue with empty description
+        }
+      }
 
       if (!description) {
         return Response.json({ error: 'Description du reve introuvable.' }, { status: 400 })
@@ -1064,13 +1196,26 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'dreamId requis.' }, { status: 400 })
       }
 
-      const dream = await req.payload.findByID({
-        collection: 'dreams',
-        id: dreamId,
-        user: req.user,
-        overrideAccess: false,
-        depth: 0,
-      })
+      let dream: Awaited<ReturnType<typeof req.payload.findByID<'dreams'>>> | null = null
+      try {
+        dream = await req.payload.findByID({
+          collection: 'dreams',
+          id: dreamId,
+          overrideAccess: true,
+          depth: 0,
+        })
+      } catch {
+        return Response.json({ error: 'Rêve introuvable.' }, { status: 404 })
+      }
+
+      if (!dream) {
+        return Response.json({ error: 'Rêve introuvable.' }, { status: 404 })
+      }
+
+      const ownerId = typeof dream.user === 'object' ? dream.user.id : dream.user
+      if (String(ownerId) !== String(req.user.id)) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 })
+      }
 
       const currentVideoAssetId =
         dream.videoAsset && typeof dream.videoAsset === 'object'
@@ -1078,18 +1223,15 @@ export const payloadEndpoints: Endpoint[] = [
           : dream.videoAsset || null
 
       if (currentVideoAssetId) {
-        await req.payload.delete({
-          collection: 'media',
-          id: currentVideoAssetId,
-          req,
-        })
+        try {
+          await req.payload.delete({ collection: 'media', id: currentVideoAssetId, req })
+        } catch { /* non-blocking */ }
       }
 
       await req.payload.delete({
         collection: 'dreams',
         id: dreamId,
-        user: req.user,
-        overrideAccess: false,
+        overrideAccess: true,
         req,
       })
 
@@ -1336,40 +1478,15 @@ function retirerJsonInteractifDuTexte(texte: string) {
   return `${texte.slice(0, debut)}${texte.slice(fin + 1)}`.trim()
 }
 
-function creerQuestionInteractiveSecours({
-  interviewLanguage,
-  studentMessageCount,
-  supportsInteractiveQuestions,
-}: {
-  interviewLanguage: 'fr' | 'en'
+function creerQuestionInteractiveSecours({}: {
+  interviewLanguage?: 'fr' | 'en'
   studentMessageCount?: number
-  supportsInteractiveQuestions: boolean
+  supportsInteractiveQuestions?: boolean
+  conversationHistory?: Array<{ role: string; content: string }>
+  userText?: string
 }) {
-  if (!supportsInteractiveQuestions || studentMessageCount !== 4) {
-    return null
-  }
-
-  if (interviewLanguage === 'en') {
-    return {
-      type: 'checkbox',
-      options: [
-        { label: 'Stress or pressure', value: 'stress_pressure' },
-        { label: 'Organization or time management', value: 'organization_time' },
-        { label: 'Relationships or group work', value: 'relationships_group' },
-        { label: 'Motivation or confidence', value: 'motivation_confidence' },
-      ],
-    }
-  }
-
-  return {
-    type: 'checkbox',
-    options: [
-      { label: 'Stress ou pression', value: 'stress_pression' },
-      { label: 'Organisation ou gestion du temps', value: 'organisation_temps' },
-      { label: 'Relations ou travail en groupe', value: 'relations_groupe' },
-      { label: 'Motivation ou confiance', value: 'motivation_confiance' },
-    ],
-  }
+  // Les questions interactives sont entièrement générées par l'agent n8n selon le contexte.
+  return null
 }
 
 function normaliserTexteAssistant(texte: string, langue: 'fr' | 'en' = 'fr'): string {
@@ -1425,6 +1542,34 @@ function normaliserConfianceTrait(confiance: string): 'eleve' | 'moyen' | 'faibl
   }
 
   return 'moyen'
+}
+
+function normalizeLoopText(text: string): string {
+  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+function detectApplicationQuestion(text: string): boolean {
+  const n = normalizeLoopText(text)
+  return (
+    n.includes('exemple concret de ce que vous allez appliquer dans les prochains jours') ||
+    n.includes('concrete example of how you will apply')
+  )
+}
+
+function detectApplicationLanguage(text: string): boolean {
+  const n = normalizeLoopText(text)
+  if (n.length < 25) return false
+  return (
+    n.includes('planning') ||
+    n.includes('creneaux') ||
+    n.includes('je vais faire') ||
+    n.includes('je vais appliquer') ||
+    n.includes('je vais organiser') ||
+    n.includes('prochains jours') ||
+    n.includes('i will') ||
+    n.includes('i plan to') ||
+    n.includes('i am going to')
+  )
 }
 
 function getFirstString(value: unknown): string | undefined {

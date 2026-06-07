@@ -3,8 +3,9 @@ import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { ChevronRight } from 'lucide-react'
+import { getLocale, getTranslations } from 'next-intl/server'
 
-import type { AnalysePersonnalite, CoachingEvent, CoachingSession, User } from '@/payload-types'
+import type { CoachingEvent, CoachingSession, PsyOrientation, User } from '@/payload-types'
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
 import { CoachStatsCards } from '@/components/dashboard/coach/CoachStatsCards'
 import { getRelationId } from '@/lib/coaching'
@@ -27,10 +28,10 @@ function getStudentName(student: User) {
   return fullName || student.email || 'Étudiant'
 }
 
-function formatDate(value: string | null | undefined) {
-  if (!value) return 'Date non renseignée'
+function formatDate(value: string | null | undefined, locale: string) {
+  if (!value) return ''
 
-  return new Intl.DateTimeFormat('fr-FR', {
+  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-GB', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value))
@@ -79,6 +80,9 @@ export default async function CoachDashboardPage() {
   if (!user) {
     redirect('/login')
   }
+
+  const t = await getTranslations('dashboard.coach.dashboard')
+  const locale = await getLocale()
 
   const sessions = await payload.find({
     collection: 'coaching-sessions',
@@ -137,46 +141,28 @@ export default async function CoachDashboardPage() {
   )
 
   const studentList = Array.from(students.values()).slice(0, 5)
-  const studentIds = Array.from(students.keys())
   const upcomingEvents = getUpcomingEvents(events.docs as CoachingEvent[])
 
-  const orientationAnalyses =
-    studentIds.length > 0
-      ? await payload.find({
-          collection: 'analyse-personnalite',
-          user,
-          overrideAccess: false,
-          where: {
-            and: [
-              {
-                user: {
-                  in: studentIds,
-                },
-              },
-              {
-                niveauConfiance: {
-                  equals: 'modere',
-                },
-              },
-            ],
-          },
-          depth: 1,
-          sort: '-date',
-          limit: 5,
-        })
-      : { docs: [] }
+  const orientations = user
+    ? await payload.find({
+        collection: 'psy-orientations',
+        user,
+        overrideAccess: false,
+        where: { coach: { equals: user.id } },
+        depth: 1,
+        sort: '-createdAt',
+        limit: 3,
+      })
+    : { docs: [] }
 
   return (
     <div>
-      <CoachTopbar
-        title="Dashboard Coach"
-        description="Bienvenue dans votre espace de suivi des étudiants, des exercices et des rendez-vous."
-      />
+      <CoachTopbar title={t('title')} description={t('description')} />
 
       <CoachStatsCards
         activeExercisesCount={0}
         assignedStudentsCount={students.size}
-        orientationCasesCount={orientationAnalyses.docs.length}
+        orientationCasesCount={orientations.docs.length}
         upcomingEventsCount={upcomingEvents.length}
       />
 
@@ -185,9 +171,9 @@ export default async function CoachDashboardPage() {
           <Link href="/dashboard/coach/students" className="mindly-feature-link">
             <article className="mindly-feature-card">
               <div className="mindly-feature-header">
-                <h2 className="mindly-feature-title">Étudiants à suivre</h2>
+                <h2 className="mindly-feature-title">{t('students.title')}</h2>
                 <span className="mindly-feature-action">
-                  Voir
+                  {t('students.see')}
                   <ChevronRight />
                 </span>
               </div>
@@ -201,7 +187,7 @@ export default async function CoachDashboardPage() {
                           <div>
                             <p className="mindly-feature-reference">{student.name}</p>
                             <p className="mindly-feature-text mt-1">
-                              {student.email || 'Email non renseigné'}
+                              {student.email || t('students.emailEmpty')}
                             </p>
                           </div>
                           <span className="mindly-ui-badge">{student.source}</span>
@@ -211,12 +197,9 @@ export default async function CoachDashboardPage() {
                   </div>
                 ) : (
                   <>
-                    <p className="mindly-feature-text">
-                      Aucun étudiant n'est encore rattaché à vos sessions ou séances.
-                    </p>
-
+                    <p className="mindly-feature-text">{t('students.empty')}</p>
                     <div className="mt-4">
-                      <span className="mindly-ui-badge">Aucun étudiant</span>
+                      <span className="mindly-ui-badge">{t('students.emptyBadge')}</span>
                     </div>
                   </>
                 )}
@@ -229,21 +212,17 @@ export default async function CoachDashboardPage() {
           <Link href="/dashboard/coach/exercices" className="mindly-feature-link">
             <article className="mindly-feature-card">
               <div className="mindly-feature-header">
-                <h2 className="mindly-feature-title">Exercices récents</h2>
+                <h2 className="mindly-feature-title">{t('exercises.title')}</h2>
                 <span className="mindly-feature-action">
-                  Voir
+                  {t('exercises.see')}
                   <ChevronRight />
                 </span>
               </div>
 
               <div className="mindly-feature-content">
-                <p className="mindly-feature-text">
-                  Aucun exercice n'est encore attribué. Le module exercices pourra être connecté à
-                  une collection dédiée lorsque vous commencerez cette partie.
-                </p>
-
+                <p className="mindly-feature-text">{t('exercises.empty')}</p>
                 <div className="mt-4">
-                  <span className="mindly-ui-badge">0 exercice actif</span>
+                  <span className="mindly-ui-badge">{t('exercises.emptyBadge')}</span>
                 </div>
               </div>
             </article>
@@ -252,36 +231,47 @@ export default async function CoachDashboardPage() {
           <Link href="/dashboard/coach/orientation_psy" className="mindly-feature-link">
             <article className="mindly-feature-card">
               <div className="mindly-feature-header">
-                <h2 className="mindly-feature-title">Orientation vers psychologue</h2>
+                <h2 className="mindly-feature-title">{t('orientation.title')}</h2>
                 <span className="mindly-feature-action">
-                  Voir
+                  {t('orientation.see')}
                   <ChevronRight />
                 </span>
               </div>
 
               <div className="mindly-feature-content">
-                {orientationAnalyses.docs.length > 0 ? (
+                {orientations.docs.length > 0 ? (
                   <div className="mindly-stack-sm">
-                    {(orientationAnalyses.docs as AnalysePersonnalite[]).map((analyse) => (
-                      <div key={analyse.id} className="student-dreams-latest-box">
-                        <p className="mindly-feature-reference">
-                          {isUser(analyse.user) ? getStudentName(analyse.user) : 'Etudiant'}
-                        </p>
-                        <p className="mindly-feature-text mt-1">
-                          Analyse du {formatDate(analyse.date)}
-                        </p>
-                        <span className="mindly-ui-badge mt-3">Confiance modérée</span>
-                      </div>
-                    ))}
+                    {(orientations.docs as PsyOrientation[]).map((orientation) => {
+                      const studentName =
+                        isUser(orientation.student)
+                          ? getStudentName(orientation.student)
+                          : 'Étudiant'
+                      return (
+                        <div key={orientation.id} className="student-dreams-latest-box">
+                          <p className="mindly-feature-reference">{studentName}</p>
+                          <p className="mindly-feature-text mt-1">
+                            {formatDate(orientation.createdAt, locale)}
+                          </p>
+                          <span className="mindly-ui-badge mt-3">
+                            {orientation.status === 'appointment_requested'
+                              ? 'RDV demandé'
+                              : orientation.status === 'student_accepted'
+                                ? 'Acceptée'
+                                : orientation.status === 'student_refused'
+                                  ? 'Refusée'
+                                  : orientation.status === 'cancelled'
+                                    ? 'Annulée'
+                                    : 'En attente'}
+                          </span>
+                        </div>
+                      )
+                    })}
                   </div>
                 ) : (
                   <>
-                    <p className="mindly-feature-text">
-                      Aucun cas prioritaire détecté parmi les étudiants suivis pour le moment.
-                    </p>
-
+                    <p className="mindly-feature-text">{t('orientation.empty')}</p>
                     <div className="mt-4">
-                      <span className="mindly-ui-badge">Aucun cas</span>
+                      <span className="mindly-ui-badge">{t('orientation.emptyBadge')}</span>
                     </div>
                   </>
                 )}

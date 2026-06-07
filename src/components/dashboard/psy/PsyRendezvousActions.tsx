@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, Loader2, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,6 +17,7 @@ type ActionStatus = 'confirmed' | 'rejected' | 'completed'
 
 export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousActionsProps) {
   const router = useRouter()
+  const t = useTranslations('dashboard.psy.actions')
   const [loadingStatus, setLoadingStatus] = useState<ActionStatus | null>(null)
   const [isRejecting, setIsRejecting] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
@@ -28,20 +30,14 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
     try {
       const response = await fetch('/api/rendezvouspsy', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: appointmentId,
-          rejectionReason: reason,
-          status: nextStatus,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: appointmentId, rejectionReason: reason, status: nextStatus }),
       })
 
       const data = (await response.json().catch(() => ({}))) as { error?: string }
 
       if (!response.ok) {
-        setError(data.error || 'Impossible de mettre à jour le rendez-vous.')
+        setError(data.error || t('errorUpdate'))
         return
       }
 
@@ -49,7 +45,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
       setIsRejecting(false)
       setRejectionReason('')
     } catch {
-      setError('Impossible de mettre à jour le rendez-vous.')
+      setError(t('errorUpdate'))
     } finally {
       setLoadingStatus(null)
     }
@@ -57,7 +53,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
 
   function handleReject() {
     if (!rejectionReason.trim()) {
-      setError("Indique la cause du refus avant d'envoyer.")
+      setError(t('errorReason'))
       return
     }
 
@@ -80,7 +76,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
             ) : (
               <Check className="dream-action-icon" />
             )}
-            Confirmer
+            {t('confirm')}
           </Button>
 
           <Button
@@ -94,18 +90,18 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
             disabled={loadingStatus !== null}
           >
             <X className="dream-action-icon" />
-            Refuser
+            {t('reject')}
           </Button>
         </div>
       ) : null}
 
       {status === 'pending' && isRejecting ? (
         <div className="dream-danger-panel">
-          <label className="dream-danger-label">Cause du refus</label>
+          <label className="dream-danger-label">{t('rejectionLabel')}</label>
           <Textarea
             value={rejectionReason}
             onChange={(event) => setRejectionReason(event.target.value)}
-            placeholder="Exemple : indisponibilité exceptionnelle, merci de choisir un autre créneau."
+            placeholder={t('rejectionPlaceholder')}
             className="dream-field dream-action-textarea"
           />
           <div className="dream-action-row-spaced">
@@ -121,7 +117,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
               ) : (
                 <X className="dream-action-icon" />
               )}
-              Envoyer le refus
+              {t('sendRejection')}
             </Button>
             <Button
               type="button"
@@ -134,7 +130,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
               }}
               disabled={loadingStatus !== null}
             >
-              Annuler
+              {t('cancel')}
             </Button>
           </div>
         </div>
@@ -153,7 +149,7 @@ export function PsyRendezvousActions({ appointmentId, status }: PsyRendezvousAct
           ) : (
             <Check className="dream-action-icon" />
           )}
-          Marquer comme terminé
+          {t('markCompleted')}
         </Button>
       ) : null}
 

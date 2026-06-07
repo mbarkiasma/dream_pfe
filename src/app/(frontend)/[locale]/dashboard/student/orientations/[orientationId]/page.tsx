@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getTranslations } from 'next-intl/server'
 
 import { StudentPsyOrientationClient } from '@/components/dashboard/student/StudentPsyOrientation'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
@@ -36,11 +37,13 @@ export default async function StudentPsyOrientationPage({
     notFound()
   }
 
+  const t = await getTranslations('dashboard.student.psyOrientation')
+
   return (
     <div>
       <StudentTopbar
-        title="Orientation psychologique"
-        description="Consultez la recommandation de votre coach et choisissez votre reponse."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
       />
 
       <StudentPsyOrientationClient orientation={orientation} />

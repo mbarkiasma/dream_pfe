@@ -88,14 +88,14 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as AppointmentBody
   const date = body.date?.trim()
   const startTime = body.startTime?.trim()
-  const reason = body.reason?.trim()
+  let reason = body.reason?.trim() || ''
   const orientationId = body.orientationId
   let urgency: 'normal' | 'urgent' = 'normal'
   let orientation: PsyOrientation | null = null
 
-  if (!date || !startTime || !reason) {
+  if (!date || !startTime) {
     return Response.json(
-      { error: 'Date, heure et motif sont requis.' },
+      { error: 'Date et heure sont requises.' },
       { status: 400 },
     )
   }
@@ -124,6 +124,14 @@ export async function POST(request: Request) {
     }
 
     urgency = 'urgent'
+    reason = orientation.reason.trim()
+  }
+
+  if (!reason) {
+    return Response.json(
+      { error: 'Le motif est requis.' },
+      { status: 400 },
+    )
   }
 
   const psychologists = await payload.find({

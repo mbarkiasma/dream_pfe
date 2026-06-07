@@ -1,5 +1,8 @@
+'use client'
+
 import { BookOpenCheck, CalendarDays, Stethoscope, UsersRound } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 type CoachStatsCardsProps = {
   activeExercisesCount?: number
@@ -8,46 +11,44 @@ type CoachStatsCardsProps = {
   upcomingEventsCount: number
 }
 
-function getStats({
+export function CoachStatsCards({
   activeExercisesCount = 0,
   assignedStudentsCount,
   orientationCasesCount,
   upcomingEventsCount,
 }: CoachStatsCardsProps) {
-  return [
+  const t = useTranslations('dashboard.coach.stats')
+
+  const stats = [
     {
       href: '/dashboard/coach/students',
       icon: UsersRound,
-      label: 'Étudiants assignés',
+      label: t('students'),
       value: String(assignedStudentsCount),
-      hint: assignedStudentsCount > 0 ? 'Suivi actif' : 'Aucun suivi',
+      hint: assignedStudentsCount > 0 ? t('studentsHintActive') : t('studentsHintEmpty'),
     },
     {
       href: '/dashboard/coach/exercices',
       icon: BookOpenCheck,
-      label: 'Exercices actifs',
+      label: t('exercises'),
       value: String(activeExercisesCount),
-      hint: activeExercisesCount > 0 ? 'À accompagner' : 'Aucun exercice',
+      hint: activeExercisesCount > 0 ? t('exercisesHintActive') : t('exercisesHintEmpty'),
     },
     {
       href: '/dashboard/coach/rendez_vous',
       icon: CalendarDays,
-      label: 'Rendez-vous prévus',
+      label: t('appointments'),
       value: String(upcomingEventsCount),
-      hint: upcomingEventsCount > 0 ? 'Planning' : 'Aucun planning',
+      hint: upcomingEventsCount > 0 ? t('appointmentsHintActive') : t('appointmentsHintEmpty'),
     },
     {
       href: '/dashboard/coach/orientation_psy',
       icon: Stethoscope,
-      label: 'Cas à orienter',
+      label: t('cases'),
       value: String(orientationCasesCount),
-      hint: orientationCasesCount > 0 ? 'Priorité' : 'Aucun cas',
+      hint: orientationCasesCount > 0 ? t('casesHintActive') : t('casesHintEmpty'),
     },
   ]
-}
-
-export function CoachStatsCards(props: CoachStatsCardsProps) {
-  const stats = getStats(props)
 
   return (
     <div className="mindly-stats-grid-four">

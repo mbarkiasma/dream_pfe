@@ -1,70 +1,86 @@
 import config from '@payload-config'
 import Link from 'next/link'
 import { getPayload } from 'payload'
-import { AlertTriangle, CalendarDays, Clock, Mail, UserRound } from 'lucide-react'
+import { getLocale, getTranslations } from 'next-intl/server'
+import { AlertTriangle, Clock, Mail, UserRound } from 'lucide-react'
 
 import type { RendezVousPsy, User } from '@/payload-types'
-import { PsyStatsCards } from '@/components/dashboard/psy/PsyStatsCards'
 import { PsyTopbar } from '@/components/dashboard/psy/PsyTopbar'
+import { PsyStudentSearch } from '@/components/dashboard/psy/PsyStudentSearch'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 
-type AssignedStudent = {
+type StudentStatus = 'urgent' | 'pending' | 'active'
+
+type StudentDossier = {
   user: User
-  appointments: RendezVousPsy[]
+  totalSessions: number
+  lastAppointmentDate: string | null
   nextAppointment?: RendezVousPsy
-  pendingCount: number
+  status: StudentStatus
   urgentCount: number
+  pendingCount: number
 }
 
 function isUser(value: unknown): value is User {
   return Boolean(value && typeof value === 'object' && 'id' in value && 'email' in value)
 }
 
-function formatDate(value: string | null | undefined) {
-  if (!value) return ''
+function getStudentName(student: User) {
+  const fullName = [student.firstName, student.lastName].filter(Boolean).join(' ').trim()
+  return fullName || student.email
+}
 
-  return new Intl.DateTimeFormat('fr-FR', {
+function formatDate(value: string | null | undefined, locale: string) {
+  if (!value) return ''
+  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-GB', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   }).format(new Date(value))
 }
 
-function getStudentName(student: User) {
-  const fullName = [student.firstName, student.lastName].filter(Boolean).join(' ').trim()
-
-  return fullName || student.email
-}
-
 function getStartOfTodayISO() {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-
   return today.toISOString()
 }
 
-function buildAssignedStudents(appointments: RendezVousPsy[]): AssignedStudent[] {
-  const students = new Map<number, AssignedStudent>()
+const ACTIVE_STATUSES = new Set(['pending', 'confirmed', 'completed'])
+
+function buildStudentDossiers(appointments: RendezVousPsy[]): StudentDossier[] {
+  const students = new Map<number, StudentDossier>()
   const startOfToday = getStartOfTodayISO()
 
   for (const appointment of appointments) {
     if (!isUser(appointment.student)) continue
+    if (!ACTIVE_STATUSES.has(appointment.status ?? '')) continue
 
-    const current = students.get(appointment.student.id) || {
+    const current: StudentDossier = students.get(appointment.student.id) || {
       user: appointment.student,
-      appointments: [],
-      pendingCount: 0,
+      totalSessions: 0,
+      lastAppointmentDate: null,
       urgentCount: 0,
+      pendingCount: 0,
+      status: 'active',
     }
 
-    current.appointments.push(appointment)
+    if (appointment.status === 'confirmed' || appointment.status === 'completed') {
+      current.totalSessions += 1
+    }
 
-    if (appointment.status === 'pending') {
-      current.pendingCount += 1
+    if (
+      appointment.status === 'completed' &&
+      (!current.lastAppointmentDate || appointment.date > current.lastAppointmentDate)
+    ) {
+      current.lastAppointmentDate = appointment.date
     }
 
     if (appointment.urgency === 'urgent' && appointment.status !== 'completed') {
       current.urgentCount += 1
+    }
+
+    if (appointment.status === 'pending') {
+      current.pendingCount += 1
     }
 
     if (
@@ -78,237 +94,199 @@ function buildAssignedStudents(appointments: RendezVousPsy[]): AssignedStudent[]
     students.set(appointment.student.id, current)
   }
 
-  return Array.from(students.values()).sort((a, b) => {
-    const aDate = a.nextAppointment?.date || a.appointments[0]?.date || ''
-    const bDate = b.nextAppointment?.date || b.appointments[0]?.date || ''
+  for (const dossier of students.values()) {
+    if (dossier.urgentCount > 0) dossier.status = 'urgent'
+    else if (dossier.pendingCount > 0) dossier.status = 'pending'
+    else dossier.status = 'active'
+  }
 
-    return bDate.localeCompare(aDate)
+  const order: Record<StudentStatus, number> = { urgent: 0, pending: 1, active: 2 }
+
+  return Array.from(students.values()).sort((a, b) => {
+    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status]
+    return (b.lastAppointmentDate || '').localeCompare(a.lastAppointmentDate || '')
   })
 }
 
-export default async function PsyStudentsPage() {
+export default async function PsyStudentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.psy.students')
+  const d = await getTranslations('dashboard.psy.students.dossiers')
+  const locale = await getLocale()
 
   const appointmentsResult = user
     ? await payload.find({
         collection: 'rendez-vous-psy',
         user,
         overrideAccess: false,
-        where: {
-          psychologist: {
-            equals: user.id,
-          },
-        },
+        where: { psychologist: { equals: user.id } },
         depth: 1,
         sort: '-date',
         limit: 100,
       })
     : null
 
+  const { q } = await searchParams
+  const query = q?.trim().toLowerCase() ?? ''
+
   const appointments = (appointmentsResult?.docs || []) as RendezVousPsy[]
-  const assignedStudents = buildAssignedStudents(appointments)
-  const startOfToday = getStartOfTodayISO()
-  const upcomingAppointments = appointments.filter(
-    (appointment) => appointment.status === 'confirmed' && appointment.date >= startOfToday,
-  )
-  const pendingAppointments = appointments.filter((appointment) => appointment.status === 'pending')
-  const urgentAppointments = appointments.filter(
-    (appointment) => appointment.urgency === 'urgent' && appointment.status !== 'completed',
-  )
+  const allDossiers = buildStudentDossiers(appointments)
+  const dossiers = query
+    ? allDossiers.filter((dossier) => {
+        const name = getStudentName(dossier.user).toLowerCase()
+        const email = dossier.user.email.toLowerCase()
+        return name.includes(query) || email.includes(query)
+      })
+    : allDossiers
+
+  const urgentCount = dossiers.filter((x) => x.status === 'urgent').length
+  const pendingCount = dossiers.filter((x) => x.status === 'pending').length
+
+  const statusLabel: Record<StudentStatus, string> = {
+    urgent: d('statusUrgent'),
+    pending: d('statusPending'),
+    active: d('statusActive'),
+  }
+
+  const statusBadge: Record<StudentStatus, string> = {
+    urgent: 'mindly-ui-badge mindly-ui-badge-danger',
+    pending: 'mindly-ui-badge',
+    active: 'mindly-ui-badge',
+  }
 
   return (
     <div>
-      <PsyTopbar
-        title="Étudiants assignés"
-        description="Consultez les étudiants orientés vers le suivi psychologique."
-      />
+      <PsyTopbar title={t('title')} description={t('description')} />
 
-      <PsyStatsCards
-        stats={[
-          {
-            label: 'Étudiants assignés',
-            value: assignedStudents.length,
-            hint: 'Suivi clinique',
-          },
-          {
-            label: 'Rendez-vous prévus',
-            value: upcomingAppointments.length,
-            hint: 'Consultations',
-          },
-          {
-            label: 'Cas en attente',
-            value: pendingAppointments.length,
-            hint: 'À traiter',
-          },
-        ]}
-      />
-
-      <div className="mindly-dashboard-grid">
-        <div className="xl:col-span-2">
-          <article className="mindly-feature-card">
-            <div className="mindly-feature-header">
-              <h2 className="mindly-feature-title">Étudiants assignés</h2>
+      <div className="mindly-page-content">
+        <article className="mindly-feature-card">
+          <div className="mindly-feature-header">
+            <h2 className="mindly-feature-title">{d('title')}</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              {urgentCount > 0 ? (
+                <span className="mindly-ui-badge mindly-ui-badge-danger">
+                  {urgentCount} {urgentCount > 1 ? d('urgentPlural') : d('urgent')}
+                </span>
+              ) : null}
+              {pendingCount > 0 ? (
+                <span className="mindly-ui-badge">
+                  {pendingCount} {d('pending')}
+                </span>
+              ) : null}
               <span className="mindly-ui-badge">
-                {assignedStudents.length} dossier{assignedStudents.length > 1 ? 's' : ''}
+                {allDossiers.length} {allDossiers.length > 1 ? d('filePlural') : d('file')}
               </span>
             </div>
+          </div>
 
-            <div className="mindly-feature-content">
-              {assignedStudents.length > 0 ? (
-                <div className="grid gap-3">
-                  {assignedStudents.map((item) => (
-                    <Link
-                      key={item.user.id}
-                      href="/dashboard/psy/rendez_vous"
-                      className="student-dreams-latest-box group block transition hover:-translate-y-0.5"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-3">
-                            <div className="mindly-feature-icon">
-                              <UserRound />
-                            </div>
-                            <div>
+          <div className="mindly-feature-search">
+            <PsyStudentSearch
+              placeholder={d('searchPlaceholder')}
+              suggestions={allDossiers.map((dossier) => ({
+                name: getStudentName(dossier.user),
+                email: dossier.user.email,
+              }))}
+            />
+          </div>
+
+          <div className="mindly-feature-content">
+            {dossiers.length > 0 ? (
+              <div className="grid gap-3">
+                {dossiers.map((dossier) => (
+                  <Link
+                    key={dossier.user.id}
+                    href="/dashboard/psy/rendez_vous"
+                    className="student-dreams-latest-box group block transition hover:-translate-y-0.5"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-3">
+                          <div className="mindly-feature-icon shrink-0">
+                            <UserRound />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
                               <p className="mindly-feature-reference">
-                                {getStudentName(item.user)}
+                                {getStudentName(dossier.user)}
                               </p>
-                              <p className="mindly-feature-text mt-1 flex items-center gap-1">
-                                <Mail className="h-3.5 w-3.5" />
-                                {item.user.email}
-                              </p>
+                              <span className={statusBadge[dossier.status]}>
+                                {statusLabel[dossier.status]}
+                              </span>
                             </div>
+                            <p className="mindly-feature-text mt-0.5 flex items-center gap-1">
+                              <Mail className="h-3.5 w-3.5 shrink-0" />
+                              {dossier.user.email}
+                            </p>
                           </div>
+                        </div>
 
-                          <div className="mt-4 flex flex-wrap gap-2">
+                        <div className="mt-3 flex flex-wrap gap-2 pl-12">
+                          <span className="mindly-ui-badge">
+                            {dossier.totalSessions}{' '}
+                            {dossier.totalSessions > 1 ? d('sessionsPlural') : d('sessions')}
+                          </span>
+                          {dossier.lastAppointmentDate ? (
                             <span className="mindly-ui-badge">
-                              {item.appointments.length} rendez-vous
+                              {d('lastDate', {
+                                date: formatDate(dossier.lastAppointmentDate, locale),
+                              })}
                             </span>
-                            {item.pendingCount > 0 ? (
-                              <span className="mindly-ui-badge">
-                                {item.pendingCount} en attente
-                              </span>
-                            ) : null}
-                            {item.urgentCount > 0 ? (
-                              <span className="mindly-ui-badge">
-                                {item.urgentCount} urgent
-                              </span>
-                            ) : null}
-                          </div>
+                          ) : null}
+                          {dossier.urgentCount > 0 ? (
+                            <span className="mindly-ui-badge mindly-ui-badge-danger">
+                              <AlertTriangle className="mr-1 h-3 w-3" />
+                              {dossier.urgentCount}{' '}
+                              {dossier.urgentCount > 1 ? d('alertsPlural') : d('alerts')}
+                            </span>
+                          ) : null}
                         </div>
+                      </div>
 
-                        <div className="student-dreams-latest-box min-w-[190px]">
-                          <p className="mindly-dashboard-eyebrow">
-                            Prochaine consultation
+                      <div className="student-dreams-latest-box min-w-[200px] shrink-0">
+                        <p className="mindly-dashboard-eyebrow flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5" />
+                          {d('nextAppointment')}
+                        </p>
+                        {dossier.nextAppointment ? (
+                          <p className="mindly-feature-reference mt-1.5">
+                            {formatDate(dossier.nextAppointment.date, locale)}{' '}
+                            {d('at')} {dossier.nextAppointment.startTime}
                           </p>
-                          {item.nextAppointment ? (
-                            <p className="mindly-feature-reference mt-2">
-                              {formatDate(item.nextAppointment.date)} à{' '}
-                              {item.nextAppointment.startTime}
-                            </p>
-                          ) : (
-                            <p className="mindly-feature-text mt-2">
-                              Aucune consultation confirmée
-                            </p>
-                          )}
-                        </div>
+                        ) : (
+                          <p className="mindly-feature-text mt-1.5">{d('noConfirmed')}</p>
+                        )}
                       </div>
-                    </Link>
-                  ))}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : query ? (
+              <div className="student-dreams-latest-box flex items-center gap-3">
+                <div className="mindly-feature-icon">
+                  <UserRound />
                 </div>
-              ) : (
-                <div className="student-dreams-latest-box flex items-center gap-3">
-                  <div className="mindly-feature-icon">
-                    <UserRound />
-                  </div>
-                  <div>
-                    <p className="mindly-feature-reference">
-                      Aucun étudiant assigné
-                    </p>
-                    <p className="mindly-feature-text">
-                      Les étudiants apparaîtront ici après une demande de rendez-vous.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </article>
-        </div>
-
-        <div className="mindly-stack-lg">
-          <article className="mindly-feature-card">
-            <div className="mindly-feature-header">
-              <h2 className="mindly-feature-title">Rendez-vous</h2>
-            </div>
-
-            <div className="mindly-feature-content">
-              {upcomingAppointments.length > 0 ? (
-                <div className="space-y-3">
-                  {upcomingAppointments.slice(0, 4).map((appointment) => (
-                    <Link
-                      key={appointment.id}
-                      className="student-dreams-latest-box flex items-start gap-3 transition hover:-translate-y-0.5"
-                      href="/dashboard/psy/rendez_vous"
-                    >
-                      <Clock className="mt-0.5 h-4 w-4 text-[var(--mindly-primary)]" />
-                      <div>
-                        <p className="mindly-feature-reference">
-                          {isUser(appointment.student)
-                            ? getStudentName(appointment.student)
-                            : 'Étudiant'}
-                        </p>
-                        <p className="mindly-feature-text">
-                          {formatDate(appointment.date)} - {appointment.startTime}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
                 <p className="mindly-feature-text">
-                  Aucune consultation confirmée pour le moment.
+                  {d('noResults')} "{q}"
                 </p>
-              )}
-            </div>
-          </article>
-
-          <article className="mindly-feature-card">
-            <div className="mindly-feature-header">
-              <h2 className="mindly-feature-title">Suivi clinique</h2>
-            </div>
-
-            <div className="mindly-feature-content">
-              {urgentAppointments.length > 0 ? (
-                <div className="space-y-3">
-                  {urgentAppointments.slice(0, 4).map((appointment) => (
-                    <Link
-                      key={appointment.id}
-                      className="student-dreams-latest-box block transition hover:-translate-y-0.5"
-                      href="/dashboard/psy/rendez_vous"
-                    >
-                      <p className="flex items-center gap-2 text-sm font-semibold text-[var(--mindly-primary)]">
-                        <AlertTriangle className="h-4 w-4" />
-                        {isUser(appointment.student)
-                          ? getStudentName(appointment.student)
-                          : 'Etudiant'}
-                      </p>
-                      <p className="mindly-feature-text mt-1">
-                        {appointment.reason}
-                      </p>
-                    </Link>
-                  ))}
+              </div>
+            ) : (
+              <div className="student-dreams-latest-box flex items-center gap-3">
+                <div className="mindly-feature-icon">
+                  <UserRound />
                 </div>
-              ) : (
-                <div className="student-dreams-latest-box flex items-center gap-3">
-                  <CalendarDays className="h-5 w-5 text-[var(--mindly-primary)]" />
-                  <p className="mindly-feature-text">
-                    Aucun cas urgent actif. Les demandes urgentes seront affichées ici.
-                  </p>
+                <div>
+                  <p className="mindly-feature-reference">{d('empty')}</p>
+                  <p className="mindly-feature-text">{d('emptyDescription')}</p>
                 </div>
-              )}
-            </div>
-          </article>
-        </div>
+              </div>
+            )}
+          </div>
+        </article>
       </div>
     </div>
   )

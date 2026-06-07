@@ -825,6 +825,25 @@ export interface User {
   coachingSpecialty?: string | null;
   coachingBio?: string | null;
   /**
+   * Courte phrase d'accroche, ex: Accompagner, motiver, transformer.
+   */
+  coachTagline?: string | null;
+  phone?: string | null;
+  /**
+   * Exemple : Paris, France
+   */
+  location?: string | null;
+  coachAvailabilities?:
+    | {
+        days: string;
+        startTime?: string | null;
+        endTime?: string | null;
+        closed?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  avatar?: (number | null) | Media;
+  /**
    * Derniers traits Big Five enregistres automatiquement apres l'entretien de personnalite.
    */
   bigFiveProfile?: {
@@ -967,7 +986,13 @@ export interface CoachingMessage {
   session: number | CoachingSession;
   senderRole: 'student' | 'coach' | 'ai';
   senderUser?: (number | null) | User;
-  content: string;
+  content?: string | null;
+  attachments?:
+    | {
+        media: number | Media;
+        id?: string | null;
+      }[]
+    | null;
   audioUrl?: string | null;
   transcription?: string | null;
   updatedAt: string;
@@ -1839,6 +1864,19 @@ export interface UsersSelect<T extends boolean = true> {
   isAvailableForCoaching?: T;
   coachingSpecialty?: T;
   coachingBio?: T;
+  coachTagline?: T;
+  phone?: T;
+  location?: T;
+  coachAvailabilities?:
+    | T
+    | {
+        days?: T;
+        startTime?: T;
+        endTime?: T;
+        closed?: T;
+        id?: T;
+      };
+  avatar?: T;
   bigFiveProfile?:
     | T
     | {
@@ -1991,6 +2029,12 @@ export interface CoachingMessagesSelect<T extends boolean = true> {
   senderRole?: T;
   senderUser?: T;
   content?: T;
+  attachments?:
+    | T
+    | {
+        media?: T;
+        id?: T;
+      };
   audioUrl?: T;
   transcription?: T;
   updatedAt?: T;

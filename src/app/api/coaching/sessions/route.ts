@@ -37,8 +37,7 @@ export async function POST(request: Request) {
         coach = await payload.findByID({
           collection: 'users',
           id: body.coachId,
-          user,
-          overrideAccess: false,
+          overrideAccess: true,
           depth: 0,
         })
       } catch {
@@ -53,8 +52,7 @@ export async function POST(request: Request) {
     } else {
       const coaches = await payload.find({
         collection: 'users',
-        user,
-        overrideAccess: false,
+        overrideAccess: true,
         where: {
           and: [
             {

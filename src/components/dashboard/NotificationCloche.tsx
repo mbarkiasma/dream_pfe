@@ -31,10 +31,11 @@ export function NotificationBell() {
 
   const latestNotifications = useMemo(() => notifications.slice(0, 8), [notifications])
 
-  async function loadNotifications() {
+  async function loadNotifications(signal?: AbortSignal) {
     try {
       const response = await fetch(`/api/notifications?locale=${locale}`, {
         cache: 'no-store',
+        signal,
       })
 
       if (!response.ok) {
@@ -45,6 +46,8 @@ export function NotificationBell() {
 
       setNotifications(data.notifications)
       setUnreadCount(data.unreadCount)
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return
     } finally {
       setIsLoading(false)
     }
@@ -111,14 +114,19 @@ export function NotificationBell() {
   }
 
   useEffect(() => {
-    void loadNotifications()
+    const controller = new AbortController()
+
+    void loadNotifications(controller.signal)
 
     const interval = window.setInterval(() => {
-      void loadNotifications()
+      void loadNotifications(controller.signal)
     }, 30000)
 
-    return () => window.clearInterval(interval)
-  }, [])
+    return () => {
+      controller.abort()
+      window.clearInterval(interval)
+    }
+  }, [locale])
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {

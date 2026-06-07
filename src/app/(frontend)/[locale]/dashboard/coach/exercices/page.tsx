@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -36,35 +37,21 @@ function getCoachName(coach: unknown) {
   return fullName || data.email || 'Coach'
 }
 
-function formatDate(value?: string | null) {
-  if (!value) return 'Sans échéance'
+function formatDate(value: string | null | undefined, locale: string, noDeadlineLabel: string) {
+  if (!value) return noDeadlineLabel
 
-  return new Intl.DateTimeFormat('fr-FR', {
+  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-GB', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value))
 }
 
-function getStatusLabel(status: string) {
-  switch (status) {
-    case 'assigned':
-      return 'Attribué'
-    case 'in_progress':
-      return 'En cours'
-    case 'completed':
-      return 'Déjà fait'
-    case 'reviewed':
-      return 'Feedback donné'
-    case 'missed':
-      return 'Non fait'
-    default:
-      return status
-  }
-}
 
 export default async function CoachExercisesPage() {
   const { user } = await getAuthenticatedDashboardUser()
   const payload = await getPayload({ config })
+  const t = await getTranslations('dashboard.coach.exercises')
+  const locale = await getLocale()
 
   const sessions = user
     ? await payload.find({
@@ -128,15 +115,12 @@ export default async function CoachExercisesPage() {
 
   return (
     <div>
-      <CoachTopbar
-        title="Exercices"
-        description="Attribuez des exercices personnalisés aux étudiants et suivez leur avancement."
-      />
+      <CoachTopbar title={t('title')} description={t('description')} />
 
       <div className="mindly-stack-lg">
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
-            <CardTitle className="mindly-feature-title">Attribuer un exercice</CardTitle>
+            <CardTitle className="mindly-feature-title">{t('assignTitle')}</CardTitle>
           </CardHeader>
           <CardContent className="mindly-feature-content">
             <CoachExerciseForm students={assignedStudents} />
@@ -145,7 +129,7 @@ export default async function CoachExercisesPage() {
 
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
-            <CardTitle className="mindly-feature-title">Exercices partagés</CardTitle>
+            <CardTitle className="mindly-feature-title">{t('listTitle')}</CardTitle>
           </CardHeader>
 
           <CardContent className="mindly-feature-content">
@@ -162,15 +146,19 @@ export default async function CoachExercisesPage() {
                           {exercice.title}
                         </h2>
                         <p className="mt-1 text-sm text-dream-muted dark:text-white/65">
-                          Étudiant : {getStudentName(exercice.student)}
+                          {t('studentLabel')} {getStudentName(exercice.student)}
                         </p>
                         <p className="mt-1 text-sm text-dream-muted dark:text-white/65">
-                          Donné par : {getCoachName(exercice.coach)}
+                          {t('givenBy')} {getCoachName(exercice.coach)}
                         </p>
                       </div>
 
                       <span className="mindly-ui-badge shrink-0">
-                        {getStatusLabel(exercice.status)}
+                        {exercice.status === 'assigned' ? t('statusAssigned')
+                          : exercice.status === 'in_progress' ? t('statusInProgress')
+                          : exercice.status === 'completed' ? t('statusCompleted')
+                          : exercice.status === 'reviewed' ? t('statusReviewed')
+                          : t('statusMissed')}
                       </span>
                     </div>
 
@@ -180,18 +168,18 @@ export default async function CoachExercisesPage() {
 
                     {exercice.reason ? (
                       <p className="mt-3 text-sm leading-6 text-dream-muted dark:text-white/65">
-                        Raison : {exercice.reason}
+                        {t('reason')} {exercice.reason}
                       </p>
                     ) : null}
 
                     <p className="mt-3 text-sm text-dream-muted dark:text-white/65">
-                      Échéance : {formatDate(exercice.dueDate)}
+                      {t('dueDateLabel')} {formatDate(exercice.dueDate, locale, t('noDeadline'))}
                     </p>
 
                     {exercice.studentResponse ? (
                       <div className="mt-4 rounded-2xl bg-white p-4 dark:bg-white/[0.04]">
                         <p className="text-sm font-semibold text-dream-heading dark:text-white">
-                          Réponse de l'étudiant
+                          {t('studentResponse')}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-white/65">
                           {exercice.studentResponse}
@@ -202,7 +190,7 @@ export default async function CoachExercisesPage() {
                     {exercice.coachFeedback ? (
                       <div className="mt-4 rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
                         <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-100">
-                          Feedback du coach
+                          {t('coachFeedback')}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-emerald-700 dark:text-emerald-100/80">
                           {exercice.coachFeedback}
@@ -228,7 +216,7 @@ export default async function CoachExercisesPage() {
                 ))}
               </div>
             ) : (
-              <p className="mindly-feature-text">Aucun exercice attribué pour le moment.</p>
+              <p className="mindly-feature-text">{t('empty')}</p>
             )}
           </CardContent>
         </Card>

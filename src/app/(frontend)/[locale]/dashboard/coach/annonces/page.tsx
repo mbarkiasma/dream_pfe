@@ -1,5 +1,6 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
+import { getTranslations } from 'next-intl/server'
 
 import { CoachAnnouncementsClient } from '@/components/dashboard/coach/CoachAnnonce'
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
@@ -8,6 +9,7 @@ import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashb
 export default async function CoachAnnouncementsPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.coach.announcements')
 
   const announcements = user
     ? await payload.find({
@@ -82,10 +84,7 @@ export default async function CoachAnnouncementsPage() {
 
   return (
     <div>
-      <CoachTopbar
-        title="Annonces de motivation"
-        description="Publiez des contenus de motivation destinés aux étudiants."
-      />
+      <CoachTopbar title={t('title')} description={t('description')} />
 
       <CoachAnnouncementsClient initialAnnouncements={announcementsWithReactions as any} />
     </div>

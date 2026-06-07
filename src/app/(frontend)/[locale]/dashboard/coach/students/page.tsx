@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,13 +33,6 @@ type SharedFollowUpItem = {
   type: 'exercise' | 'note' | 'session'
 }
 
-const exerciseStatusLabels: Record<string, string> = {
-  assigned: 'Attribué',
-  completed: 'Terminé',
-  in_progress: 'En cours',
-  missed: 'Non fait',
-  reviewed: 'Corrigé',
-}
 
 function getPersonName(person: unknown, fallback = 'Étudiant') {
   if (!person || typeof person !== 'object') return fallback
@@ -54,10 +48,10 @@ function getPersonName(person: unknown, fallback = 'Étudiant') {
   return fullName || data.email || fallback
 }
 
-function formatShortDate(value?: string | null) {
-  if (!value) return 'Date non précisée'
+function formatShortDate(value: string | null | undefined, locale: string, fallback: string) {
+  if (!value) return fallback
 
-  return new Intl.DateTimeFormat('fr-FR', {
+  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-GB', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -88,6 +82,9 @@ export default async function CoachStudentsPage() {
   if (!user) {
     redirect('/login')
   }
+
+  const t = await getTranslations('dashboard.coach.students')
+  const locale = await getLocale()
 
   const sessions = await payload.find({
     collection: 'coaching-sessions',
@@ -193,19 +190,19 @@ export default async function CoachStudentsPage() {
       return {
         createdAt: getStringField(session, 'createdAt') || getStringField(session, 'startedAt'),
         details: [
-          { label: 'Étudiant', value: getPersonName(student) },
-          { label: 'Type', value: 'Session de coaching classique' },
-          { label: 'Statut', value: status === 'closed' ? 'Clôturée' : 'Ouverte' },
+          { label: t('student'), value: getPersonName(student) },
+          { label: t('type'), value: t('typeSession') },
+          { label: t('status'), value: status === 'closed' ? t('statusClosed') : t('statusOpen') },
           {
-            label: 'Date',
-            value: formatShortDate(getStringField(session, 'startedAt') || session.createdAt),
+            label: t('date'),
+            value: formatShortDate(getStringField(session, 'startedAt') || session.createdAt, locale, t('dateNotSpecified')),
           },
         ],
         href: '/dashboard/coach/coaching',
         id: `session-${session.id}`,
-        meta: `Session ${status === 'closed' ? 'clôturée' : 'ouverte'}`,
+        meta: status === 'closed' ? t('metaClosed') : t('metaOpen'),
         studentName: getPersonName(student),
-        title: getStringField(session, 'title') || 'Session de coaching',
+        title: getStringField(session, 'title') || t('defaultSession'),
         type: 'session' as const,
       }
     }),
@@ -216,17 +213,17 @@ export default async function CoachStudentsPage() {
       return {
         createdAt: getStringField(note, 'createdAt'),
         details: [
-          { label: 'Étudiant', value: getPersonName(student) },
-          { label: 'Type', value: 'Note partagée' },
-          { label: 'Titre', value: getStringField(note, 'title') || 'Note de suivi' },
-          { label: 'Contenu', value: getStringField(note, 'content') || 'Aucun contenu renseigné' },
-          { label: 'Date', value: formatShortDate(note.createdAt) },
+          { label: t('student'), value: getPersonName(student) },
+          { label: t('type'), value: t('typeNote') },
+          { label: t('titleLabel'), value: getStringField(note, 'title') || t('defaultNote') },
+          { label: t('content'), value: getStringField(note, 'content') || t('noContent') },
+          { label: t('date'), value: formatShortDate(note.createdAt, locale, t('dateNotSpecified')) },
         ],
         href: '/dashboard/coach/coaching',
         id: `note-${note.id}`,
-        meta: 'Note partagée',
+        meta: t('metaNote'),
         studentName: getPersonName(student),
-        title: getStringField(note, 'title') || 'Note de suivi',
+        title: getStringField(note, 'title') || t('defaultNote'),
         type: 'note' as const,
       }
     }),
@@ -238,23 +235,34 @@ export default async function CoachStudentsPage() {
       return {
         createdAt: getStringField(exercise, 'createdAt') || getStringField(exercise, 'assignedAt'),
         details: [
-          { label: 'Étudiant', value: getPersonName(student) },
-          { label: 'Type', value: 'Exercice attribué' },
-          { label: 'Statut', value: exerciseStatusLabels[status] || 'Exercice' },
+          { label: t('student'), value: getPersonName(student) },
+          { label: t('type'), value: t('typeExercise') },
           {
-            label: 'Consignes',
-            value: getStringField(exercise, 'instructions') || 'Aucune consigne renseignée',
+            label: t('status'),
+            value: status === 'assigned' ? t('statusAssigned')
+              : status === 'completed' ? t('statusCompleted')
+              : status === 'in_progress' ? t('statusInProgress')
+              : status === 'missed' ? t('statusMissed')
+              : t('statusReviewed'),
           },
           {
-            label: 'Échéance',
-            value: formatShortDate(getStringField(exercise, 'dueDate')),
+            label: t('instructions'),
+            value: getStringField(exercise, 'instructions') || t('noInstructions'),
+          },
+          {
+            label: t('dueDate'),
+            value: formatShortDate(getStringField(exercise, 'dueDate'), locale, t('dateNotSpecified')),
           },
         ],
         href: '/dashboard/coach/exercices',
         id: `exercise-${exercise.id}`,
-        meta: exerciseStatusLabels[status] || 'Exercice',
+        meta: status === 'assigned' ? t('statusAssigned')
+          : status === 'completed' ? t('statusCompleted')
+          : status === 'in_progress' ? t('statusInProgress')
+          : status === 'missed' ? t('statusMissed')
+          : t('statusReviewed'),
         studentName: getPersonName(student),
-        title: getStringField(exercise, 'title') || 'Exercice attribué',
+        title: getStringField(exercise, 'title') || t('defaultExercise'),
         type: 'exercise' as const,
       }
     }),
@@ -269,16 +277,13 @@ export default async function CoachStudentsPage() {
 
   return (
     <div>
-      <CoachTopbar
-        title="Étudiants assignés"
-        description="Consultez les profils des étudiants suivis par le coach."
-      />
+      <CoachTopbar title={t('title')} description={t('description')} />
 
       <div className="mindly-stack-lg">
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
             <CardTitle className="mindly-feature-title">
-              {students.length > 0 ? 'Mes étudiants' : 'Aucun étudiant assigné'}
+              {students.length > 0 ? t('myStudents') : t('noStudents')}
             </CardTitle>
           </CardHeader>
 
@@ -288,49 +293,31 @@ export default async function CoachStudentsPage() {
                 {students.map((student) => (
                   <article
                     key={student.id}
-                    className="rounded-2xl border border-border bg-slate-50 p-5 dark:border-white/10 dark:bg-white/[0.06]"
+                    className="student-dreams-latest-box"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h2 className="truncate text-lg font-semibold text-dream-heading dark:text-white">
-                          {getPersonName(student)}
-                        </h2>
+                        <p className="mindly-feature-reference">{getPersonName(student)}</p>
                         {student.email ? (
-                          <p className="mt-1 truncate text-sm text-dream-muted dark:text-white/65">
-                            {student.email}
-                          </p>
+                          <p className="mindly-feature-text mt-1">{student.email}</p>
                         ) : null}
                       </div>
                       <span className="mindly-ui-badge shrink-0">
-                        {student.sessionsCount} session{student.sessionsCount > 1 ? 's' : ''}
+                        {student.sessionsCount} {student.sessionsCount > 1 ? t('sessionsPlural') : t('sessions')}
                       </span>
                     </div>
 
-                    <div className="mt-5 grid grid-cols-2 gap-3">
-                      <div className="rounded-2xl bg-white p-4 dark:bg-white/[0.04]">
-                        <p className="text-2xl font-bold text-dream-heading dark:text-white">
-                          {student.notesCount}
-                        </p>
-                        <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                          Notes partagées
-                        </p>
-                      </div>
-                      <div className="rounded-2xl bg-white p-4 dark:bg-white/[0.04]">
-                        <p className="text-2xl font-bold text-dream-heading dark:text-white">
-                          {student.exercisesCount}
-                        </p>
-                        <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                          Exercices
-                        </p>
-                      </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="mindly-ui-badge">{student.notesCount} {t('sharedNotes').toLowerCase()}</span>
+                      <span className="mindly-ui-badge">{student.exercisesCount} {t('exercises').toLowerCase()}</span>
                     </div>
 
-                    <div className="mt-5 flex flex-wrap gap-3">
+                    <div className="mt-3 flex flex-wrap gap-2">
                       <Link className="mindly-ui-badge" href="/dashboard/coach/coaching">
-                        Voir les notes
+                        {t('seeNotes')}
                       </Link>
                       <Link className="mindly-ui-badge" href="/dashboard/coach/exercices">
-                        Voir exercices
+                        {t('seeExercises')}
                       </Link>
                     </div>
                   </article>
@@ -338,13 +325,9 @@ export default async function CoachStudentsPage() {
               </div>
             ) : (
               <>
-                <p className="mindly-feature-text">
-                  Les étudiants apparaissent ici quand ils démarrent une session de coaching
-                  classique avec vous.
-                </p>
-
+                <p className="mindly-feature-text">{t('emptyDescription')}</p>
                 <div className="mt-4">
-                  <span className="mindly-ui-badge">Aucun étudiant</span>
+                  <span className="mindly-ui-badge">{t('emptyBadge')}</span>
                 </div>
               </>
             )}
@@ -353,35 +336,35 @@ export default async function CoachStudentsPage() {
 
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
-            <CardTitle className="mindly-feature-title">Suivi partagé</CardTitle>
+            <CardTitle className="mindly-feature-title">{t('sharedFollowUp')}</CardTitle>
           </CardHeader>
 
           <CardContent className="mindly-feature-content">
             <div className="grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-border bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.06]">
-                <p className="text-2xl font-bold text-dream-heading dark:text-white">
+              <div className="student-dreams-latest-box">
+                <p className="mindly-stat-value">
                   {sessions.docs.length}
                 </p>
-                <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                  Sessions classiques
+                <p className="mindly-feature-text mt-1">
+                  {t('classicSessions')}
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-border bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.06]">
-                <p className="text-2xl font-bold text-dream-heading dark:text-white">
+              <div className="student-dreams-latest-box">
+                <p className="mindly-stat-value">
                   {notes.docs.length}
                 </p>
-                <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                  Notes partagées
+                <p className="mindly-feature-text mt-1">
+                  {t('sharedNotes')}
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-border bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.06]">
-                <p className="text-2xl font-bold text-dream-heading dark:text-white">
+              <div className="student-dreams-latest-box">
+                <p className="mindly-stat-value">
                   {exercises.docs.length}
                 </p>
-                <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                  Exercices attribués
+                <p className="mindly-feature-text mt-1">
+                  {t('assignedExercises')}
                 </p>
               </div>
             </div>
@@ -391,54 +374,40 @@ export default async function CoachStudentsPage() {
                 {latestSharedFollowUp.map((item) => (
                   <details
                     key={item.id}
-                    className="group rounded-2xl border border-border bg-white transition open:border-violet-300 open:bg-violet-50/50 dark:border-white/10 dark:bg-white/[0.04] dark:open:bg-white/[0.08]"
+                    className="student-dreams-latest-box group"
                   >
-                    <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
+                    <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-dream-heading dark:text-white">
-                          {item.title}
-                        </p>
-                        <p className="mt-1 text-xs font-semibold text-dream-muted dark:text-white/65">
-                          {item.studentName} - {item.meta}
+                        <p className="mindly-feature-reference">{item.title}</p>
+                        <p className="mindly-feature-text mt-1">
+                          {item.studentName} — {item.meta}
                         </p>
                       </div>
-
-                      <span className="flex shrink-0 items-center gap-3">
-                        <span className="mindly-ui-badge">{formatShortDate(item.createdAt)}</span>
-                        <span className="text-lg leading-none text-violet-500 transition group-open:rotate-180">
-                          v
-                        </span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        <span className="mindly-ui-badge">{formatShortDate(item.createdAt, locale, t('dateNotSpecified'))}</span>
+                        <span className="mindly-feature-text transition group-open:rotate-180 inline-block">▾</span>
                       </span>
                     </summary>
 
-                    <div className="border-t border-border px-4 pb-4 pt-3 dark:border-white/10">
-                      <dl className="grid gap-3 md:grid-cols-2">
-                        {item.details.map((detail) => (
-                          <div
-                            key={`${item.id}-${detail.label}`}
-                            className="rounded-2xl bg-white p-3 dark:bg-white/[0.04]"
-                          >
-                            <dt className="text-xs font-bold uppercase text-dream-muted dark:text-white/50">
-                              {detail.label}
-                            </dt>
-                            <dd className="mt-1 whitespace-pre-line text-sm font-semibold text-dream-heading dark:text-white">
-                              {detail.value}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
+                    <div className="mt-3 grid gap-2 md:grid-cols-2">
+                      {item.details.map((detail) => (
+                        <div key={`${item.id}-${detail.label}`} className="student-dreams-latest-box">
+                          <p className="mindly-dashboard-eyebrow">{detail.label}</p>
+                          <p className="mindly-feature-text mt-1 whitespace-pre-line">{detail.value}</p>
+                        </div>
+                      ))}
+                    </div>
 
-                      <Link className="mt-3 inline-flex mindly-ui-badge" href={item.href}>
-                        Ouvrir la page
+                    <div className="mt-3">
+                      <Link className="mindly-ui-badge" href={item.href}>
+                        {t('openPage')}
                       </Link>
                     </div>
                   </details>
                 ))}
               </div>
             ) : (
-              <p className="mt-5 mindly-feature-text">
-                Aucun suivi partagé n'est encore disponible pour vos étudiants assignés.
-              </p>
+              <p className="mt-5 mindly-feature-text">{t('noSharedFollowUp')}</p>
             )}
           </CardContent>
         </Card>

@@ -8,7 +8,6 @@ type CoachTopbarProps = {
 export function CoachTopbar({ description, title }: CoachTopbarProps) {
   return (
     <DashboardTopbar
-      eyebrow="Espace coach"
       title={title}
       description={description}
     />

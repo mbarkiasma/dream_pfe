@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { CalendarDays, CheckCircle2, Loader2, XCircle } from 'lucide-react'
 
 import type { PsyOrientation } from '@/payload-types'
@@ -23,21 +24,22 @@ function getPersonName(value: unknown, fallback: string) {
   return fullName || data.email || fallback
 }
 
-const statusLabels: Record<string, string> = {
-  appointment_requested: 'Rendez-vous demande',
-  cancelled: 'Annulee',
-  pending_student_response: 'En attente de votre reponse',
-  student_accepted: 'Acceptee',
-  student_refused: 'Refusee',
-}
-
 export function StudentPsyOrientationClient({ orientation }: { orientation: PsyOrientation }) {
+  const t = useTranslations('dashboard.student.psyOrientation')
   const router = useRouter()
   const [status, setStatus] = useState(orientation.status)
   const [refusalReason, setRefusalReason] = useState('')
   const [isRefusing, setIsRefusing] = useState(false)
   const [loadingAction, setLoadingAction] = useState<'accept' | 'refuse' | null>(null)
   const [error, setError] = useState('')
+
+  const statusLabels: Record<string, string> = {
+    appointment_requested: t('statusAppointmentRequested'),
+    cancelled: t('statusCancelled'),
+    pending_student_response: t('statusPending'),
+    student_accepted: t('statusAccepted'),
+    student_refused: t('statusRefused'),
+  }
 
   async function respond(action: 'accept' | 'refuse') {
     setError('')
@@ -46,19 +48,14 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
     try {
       const response = await fetch(`/api/psy-orientation/${orientation.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action,
-          refusalReason,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, refusalReason }),
       })
 
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        throw new Error(data.error || 'Impossible de traiter votre reponse.')
+        throw new Error(data.error || t('errorDefault'))
       }
 
       setStatus(data.orientation.status)
@@ -70,7 +67,7 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
 
       router.refresh()
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Une erreur est survenue.')
+      setError(submitError instanceof Error ? submitError.message : t('errorDefault'))
     } finally {
       setLoadingAction(null)
     }
@@ -84,42 +81,31 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
       <div className="xl:col-span-2">
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
-            <CardTitle className="mindly-feature-title">
-              Recommandation du coach
-            </CardTitle>
+            <CardTitle className="mindly-feature-title">{t('recommendationTitle')}</CardTitle>
           </CardHeader>
 
           <CardContent className="mindly-feature-content">
             <div className="mindly-stack-sm">
               <div className="student-dreams-latest-box">
                 <p className="mindly-feature-reference">
-                  Coach: {getPersonName(orientation.coach, 'Coach')}
+                  {t('coachLabel')}: {getPersonName(orientation.coach, t('coachLabel'))}
                 </p>
 
                 <p className="mindly-feature-text mt-3">{orientation.reason}</p>
 
                 {orientation.observation ? (
-                  <div className="mt-4 rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.06]">
-                    <p className="text-sm font-semibold text-dream-heading dark:text-white">
-                      Observation du coach
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-dream-muted dark:text-white/65">
-                      {orientation.observation}
-                    </p>
+                  <div className="student-dreams-latest-box mt-4">
+                    <p className="mindly-feature-reference">{t('observationTitle')}</p>
+                    <p className="mindly-feature-text mt-2">{orientation.observation}</p>
                   </div>
                 ) : null}
 
                 <div className="mt-4">
-                  <span className="mindly-ui-badge">
-                    {statusLabels[status] || status}
-                  </span>
+                  <span className="mindly-ui-badge">{statusLabels[status] ?? status}</span>
                 </div>
               </div>
 
-              <p className="mindly-feature-text">
-                Si vous acceptez, vous serez redirige vers la page de prise de rendez-vous avec le
-                psychologue. Cette demande sera traitee comme urgente.
-              </p>
+              <p className="mindly-feature-text">{t('infoText')}</p>
             </div>
           </CardContent>
         </Card>
@@ -128,7 +114,7 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
       <div>
         <Card className="mindly-feature-card">
           <CardHeader className="mindly-feature-header">
-            <CardTitle className="mindly-feature-title">Votre reponse</CardTitle>
+            <CardTitle className="mindly-feature-title">{t('responseTitle')}</CardTitle>
           </CardHeader>
 
           <CardContent className="mindly-feature-content">
@@ -138,8 +124,8 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
                   <div className="mindly-stack-sm">
                     <Textarea
                       value={refusalReason}
-                      onChange={(event) => setRefusalReason(event.target.value)}
-                      placeholder="Raison du refus (optionnelle)"
+                      onChange={(e) => setRefusalReason(e.target.value)}
+                      placeholder={t('refusalPlaceholder')}
                     />
 
                     <div className="flex flex-wrap gap-2">
@@ -147,14 +133,14 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
                         type="button"
                         variant="destructive"
                         disabled={loadingAction !== null}
-                        onClick={() => respond('refuse')}
+                        onClick={() => void respond('refuse')}
                       >
                         {loadingAction === 'refuse' ? (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                           <XCircle className="mr-2 h-4 w-4" />
                         )}
-                        Confirmer le refus
+                        {t('confirmRefusal')}
                       </Button>
 
                       <Button
@@ -163,7 +149,7 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
                         disabled={loadingAction !== null}
                         onClick={() => setIsRefusing(false)}
                       >
-                        Retour
+                        {t('back')}
                       </Button>
                     </div>
                   </div>
@@ -172,14 +158,14 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
                     <Button
                       type="button"
                       disabled={loadingAction !== null}
-                      onClick={() => respond('accept')}
+                      onClick={() => void respond('accept')}
                     >
                       {loadingAction === 'accept' ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
                         <CheckCircle2 className="mr-2 h-4 w-4" />
                       )}
-                      Accepter et choisir un rendez-vous
+                      {t('acceptBtn')}
                     </Button>
 
                     <Button
@@ -189,7 +175,7 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
                       onClick={() => setIsRefusing(true)}
                     >
                       <XCircle className="mr-2 h-4 w-4" />
-                      Refuser
+                      {t('refuseBtn')}
                     </Button>
                   </div>
                 )}
@@ -200,7 +186,7 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
               <div className="mindly-stack-sm">
                 <div className="mindly-alert-success flex items-start gap-2 rounded-2xl p-3 text-sm font-medium">
                   <CheckCircle2 className="mt-0.5 h-4 w-4" />
-                  <span>Orientation acceptee. Vous pouvez maintenant choisir un rendez-vous.</span>
+                  <span>{t('acceptedInfo')}</span>
                 </div>
 
                 <Button
@@ -210,13 +196,13 @@ export function StudentPsyOrientationClient({ orientation }: { orientation: PsyO
                   }
                 >
                   <CalendarDays className="mr-2 h-4 w-4" />
-                  Choisir un rendez-vous
+                  {t('chooseAppointment')}
                 </Button>
               </div>
             ) : (
               <div className="mindly-alert-success flex items-start gap-2 rounded-2xl p-3 text-sm font-medium">
                 <CheckCircle2 className="mt-0.5 h-4 w-4" />
-                <span>Votre reponse a deja ete enregistree.</span>
+                <span>{t('alreadyAnswered')}</span>
               </div>
             )}
           </CardContent>

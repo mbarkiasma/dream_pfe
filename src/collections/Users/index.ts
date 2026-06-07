@@ -45,7 +45,7 @@ function isManagedStaffRole(role: unknown): role is (typeof managedStaffRoles)[n
 }
 
 function isAdminDeletableRole(role: unknown): role is (typeof adminDeletableRoles)[number] {
-  return role === 'etudiant' || role === 'coach' || role === 'psy'
+  return role === 'etudiant' || isManagedStaffRole(role)
 }
 
 function assertAdminManagesOnlyStaff(data: Partial<User> | undefined) {
@@ -75,10 +75,30 @@ export const Users: CollectionConfig = {
       if (!user) return false
       if (hasRole(user, ['admin'])) return adminManagedUsersOrSelfWhere(user as User)
 
+      if (hasRole(user, ['psy'])) {
+        return {
+          or: [
+            { id: { equals: user.id } },
+            { role: { equals: 'etudiant' } },
+          ],
+        }
+      }
+
+      if (hasRole(user, ['coach'])) {
+        return {
+          or: [
+            { id: { equals: user.id } },
+            { role: { equals: 'etudiant' } },
+          ],
+        }
+      }
+
+      // étudiant : peut lire son propre profil + les profils coach (pour voir le nom du coach dans les sessions)
       return {
-        id: {
-          equals: user.id,
-        },
+        or: [
+          { id: { equals: user.id } },
+          { role: { equals: 'coach' } },
+        ],
       }
     },
     update: adminOrSelf,
@@ -204,14 +224,33 @@ export const Users: CollectionConfig = {
           })
         }
 
+        const userSessions = await req.payload.find({
+          collection: 'coaching-sessions',
+          where: {
+            or: [{ student: { equals: userId } }, { coach: { equals: userId } }],
+          },
+          depth: 0,
+          limit: 1000,
+          overrideAccess: true,
+          req,
+        })
+        const userSessionIds = userSessions.docs.map((s) => s.id)
+
+        if (userSessionIds.length > 0) {
+          await req.payload.delete({
+            collection: 'coaching-messages',
+            where: {
+              session: { in: userSessionIds },
+            },
+            overrideAccess: true,
+            req,
+          })
+        }
+
         await req.payload.delete({
           collection: 'coaching-messages',
           where: {
-            or: [
-              { senderUser: { equals: userId } },
-              { 'session.student': { equals: userId } },
-              { 'session.coach': { equals: userId } },
-            ],
+            senderUser: { equals: userId },
           },
           overrideAccess: true,
           req,
@@ -312,6 +351,15 @@ export const Users: CollectionConfig = {
             author: {
               equals: userId,
             },
+          },
+          overrideAccess: true,
+          req,
+        })
+
+        await req.payload.delete({
+          collection: 'student-exercices',
+          where: {
+            or: [{ student: { equals: userId } }, { coach: { equals: userId } }],
           },
           overrideAccess: true,
           req,
@@ -572,6 +620,49 @@ export const Users: CollectionConfig = {
       admin: {
         condition: (_, siblingData) => siblingData?.role === 'coach',
       },
+    },
+    {
+      name: 'coachTagline',
+      type: 'text',
+      label: 'Accroche coach',
+      maxLength: 120,
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'coach',
+        description: "Courte phrase d'accroche, ex: Accompagner, motiver, transformer.",
+      },
+    },
+    {
+      name: 'phone',
+      type: 'text',
+      label: 'Téléphone',
+    },
+    {
+      name: 'location',
+      type: 'text',
+      label: 'Localisation',
+      admin: {
+        description: 'Exemple : Paris, France',
+      },
+    },
+    {
+      name: 'coachAvailabilities',
+      type: 'array',
+      label: 'Disponibilités coach',
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'coach',
+      },
+      fields: [
+        { name: 'days', type: 'text', label: 'Jours (ex: Lundi - Vendredi)', required: true },
+        { name: 'startTime', type: 'text', label: 'Début (HH:mm)' },
+        { name: 'endTime', type: 'text', label: 'Fin (HH:mm)' },
+        { name: 'closed', type: 'checkbox', label: 'Fermé', defaultValue: false },
+      ],
+    },
+    {
+      name: 'avatar',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Photo de profil',
     },
     {
       name: 'bigFiveProfile',

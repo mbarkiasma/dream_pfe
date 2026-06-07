@@ -1,6 +1,7 @@
 'use client'
 
 import { Heart, Lock } from 'lucide-react'
+import { Logo } from '@/components/Logo/Logo'
 import { useLocale } from 'next-intl'
 
 import { Link } from '@/i18n/routing'
@@ -81,12 +82,7 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4 sm:col-span-2 lg:col-span-1 lg:-translate-x-8">
             <div>
-              <span className="bg-gradient-to-r from-[var(--mindly-primary)] to-[var(--mindly-primary-light)] bg-clip-text text-xl font-extrabold text-transparent drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
-                MindBloom
-              </span>
-              <p className="mt-0.5 text-[9px] font-extrabold uppercase tracking-widest text-[var(--mindly-primary-light)]">
-                {copy.tagline}
-              </p>
+              <Logo className="h-12 w-auto" />
             </div>
             <p className="max-w-xs text-sm font-medium leading-[1.7] tracking-normal text-[var(--mindly-primary-light)]">
               {copy.description}

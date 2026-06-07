@@ -7,7 +7,7 @@ import {
   BrainCircuit,
   CheckCircle2,
   HeartHandshake,
-  Languages,
+  Globe,
   Loader2,
   Mail,
   MailCheck,
@@ -369,22 +369,21 @@ export function LoginClient({
       <div className="login-theme-switch flex gap-2">
         <button
           type="button"
-          onClick={switchLanguage}
-          className="flex h-9 items-center gap-1 rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-3 text-xs font-bold text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
-          aria-label={copy.switchLanguage}
-          title={copy.switchLanguage}
+          onClick={toggleTheme}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition duration-150 hover:-translate-y-px hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
+          aria-label={!isDark ? copy.themeDarkAria : copy.themeLightAria}
         >
-          <Languages className="h-4 w-4" />
-          <span>{locale.toUpperCase()}</span>
+          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
 
         <button
           type="button"
-          onClick={toggleTheme}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
-          aria-label={!isDark ? copy.themeDarkAria : copy.themeLightAria}
+          onClick={switchLanguage}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition duration-150 hover:-translate-y-px hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
+          aria-label={copy.switchLanguage}
+          title={`${locale.toUpperCase()} — ${copy.switchLanguage}`}
         >
-          {isDark ? <Sun /> : <Moon />}
+          <Globe className="h-4 w-4" />
         </button>
       </div>
 

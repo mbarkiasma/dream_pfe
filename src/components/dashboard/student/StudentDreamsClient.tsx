@@ -1,17 +1,19 @@
 'use client'
 
-import { useDeferredValue, useEffect, useState, useTransition } from 'react'
+import { useDeferredValue, useEffect, useRef, useState, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 import {
   CheckCircle2,
   Clock3,
   ExternalLink,
   Loader2,
+  Mic,
   Moon,
   Plus,
   RefreshCw,
   Search,
   Sparkles,
+  Square,
   Trash2,
   Video,
   Wand2,
@@ -57,11 +59,17 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   const [query, setQuery] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
+  const [isRecording, setIsRecording] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const [validationError, setValidationError] = useState<Record<string, string>>({})
   const [mounted, setMounted] = useState(false)
   const [selectedAnalysis, setSelectedAnalysis] = useState<{
     content: string
     date: string
     title: string
+    type: 'analysis' | 'description'
   } | null>(null)
   const [pending, startTransition] = useTransition()
   const deferredQuery = useDeferredValue(query)
@@ -121,9 +129,53 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
     }
   }
 
+  function renderAnalysisLines(text: string): React.ReactNode[] {
+    const lines = text.split('\n')
+    return lines.flatMap((line, i) => {
+      const trimmed = line.trim()
+      const suffix = i < lines.length - 1 ? '\n' : ''
+      if (!trimmed) return [<span key={i}>{suffix}</span>]
+      // Skip orphan emoji lines (emoji with no text after it)
+      const withoutEmoji = trimmed.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}]/gu, '').trim()
+      if (!withoutEmoji) return []
+      // Title: short line with no sentence-ending punctuation
+      const isTitle = trimmed.length < 80 && !/[.!?,;:…]$/.test(trimmed)
+      if (isTitle) {
+        return [<strong key={i} className="student-dreams-analysis-title">{trimmed}{suffix}</strong>]
+      }
+      return [<span key={i}>{trimmed}{suffix}</span>]
+    })
+  }
+
+  function formatAnalysisText(text: string): string {
+    return text
+      .replace(/\s*([🌊🧭🔮💙🌿✨🌙⭐🎯🔑])/gu, '\n\n$1')
+      .trim()
+  }
+
+  function stripLeadingDreamText(analysis: string, description: string): string {
+    const desc = description.trim()
+    if (!desc) return analysis
+
+    // Direct match at the start
+    if (analysis.toLowerCase().startsWith(desc.toLowerCase())) {
+      return analysis.slice(desc.length).trimStart()
+    }
+
+    // Partial match: check first 60 chars then cut at the next double newline
+    const chunk = desc.slice(0, Math.min(60, desc.length)).toLowerCase()
+    if (chunk.length > 20 && analysis.toLowerCase().startsWith(chunk)) {
+      const cut = analysis.indexOf('\n\n')
+      if (cut > 0) return analysis.slice(cut).trimStart()
+    }
+
+    return analysis
+  }
+
   function getAnalysisCopy(dream: Dream) {
     if (dream.analysis?.trim()) {
-      return dream.analysis.trim()
+      const raw = stripLeadingDreamText(dream.analysis.trim(), dream.description ?? '')
+      return formatAnalysisText(raw)
     }
 
     if (dream.videoStatus === 'failed') {
@@ -256,58 +308,113 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   }
 
   function validateDream(id: string | number) {
-    setError('')
-    setFeedback('')
+    setValidationError((prev) => ({ ...prev, [String(id)]: '' }))
 
     startTransition(async () => {
       try {
         const response = await fetch(`/api/dreams-validate/${id}`, {
           method: 'POST',
+          credentials: 'include',
         })
 
         if (!response.ok) {
           const data = await response.json().catch(() => null)
-          setError(data?.message || data?.error || t('validateError'))
+          const msg = data?.error || data?.message || t('validateError')
+          console.error('[validateDream]', response.status, msg)
+          setValidationError((prev) => ({ ...prev, [String(id)]: msg }))
           return
         }
 
-        setFeedback(t('validateSuccess'))
         router.refresh()
-      } catch {
-        setError(t('validateErrorFetch'))
+      } catch (err) {
+        console.error('[validateDream] fetch error', err)
+        setValidationError((prev) => ({ ...prev, [String(id)]: t('validateErrorFetch') }))
       }
     })
   }
 
   function regenerateDream(id: string | number) {
-    setError('')
-    setFeedback('')
+    setValidationError((prev) => ({ ...prev, [String(id)]: '' }))
 
     startTransition(async () => {
       try {
         const response = await fetch(`/api/dreams-regenerate/${id}`, {
           method: 'POST',
+          credentials: 'include',
         })
 
         if (!response.ok) {
           const data = await response.json().catch(() => null)
-          setError(data?.message || data?.error || t('regenerateError'))
+          const msg = data?.error || data?.message || t('regenerateError')
+          console.error('[regenerateDream]', response.status, msg)
+          setValidationError((prev) => ({ ...prev, [String(id)]: msg }))
           return
         }
 
-        setFeedback(t('regenerateSuccess'))
         router.refresh()
-      } catch {
-        setError(t('regenerateErrorFetch'))
+      } catch (err) {
+        console.error('[regenerateDream] fetch error', err)
+        setValidationError((prev) => ({ ...prev, [String(id)]: t('regenerateErrorFetch') }))
       }
     })
   }
 
-  function openAnalysisModal(dream: Dream, content: string) {
+  async function toggleRecording() {
+    if (isRecording) {
+      mediaRecorderRef.current?.stop()
+      setIsRecording(false)
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      audioChunksRef.current = []
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) audioChunksRef.current.push(event.data)
+      }
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop())
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        const reader = new FileReader()
+        reader.onloadend = async () => {
+          try {
+            setIsTranscribing(true)
+            const base64 = reader.result as string
+            const res = await fetch('/api/coaching/voice', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'stt', audioBase64: base64 }),
+            })
+            const data = await res.json()
+            if (data.text) {
+              setDescription((prev) => prev ? `${prev} ${data.text}` : data.text)
+            }
+          } catch {
+            setError(t('errorMic'))
+          } finally {
+            setIsTranscribing(false)
+          }
+        }
+        reader.readAsDataURL(audioBlob)
+      }
+
+      recorder.start()
+      mediaRecorderRef.current = recorder
+      setIsRecording(true)
+    } catch {
+      setError(t('errorMic'))
+    }
+  }
+
+  function openAnalysisModal(dream: Dream, content: string, type: 'analysis' | 'description') {
     setSelectedAnalysis({
       content,
       date: formatDate(dream.createdAt, locale),
       title: dream.summary?.trim() || (dream.description ?? '').trim().slice(0, 80) || t('defaultAnalysisTitle'),
+      type,
     })
   }
 
@@ -331,13 +438,24 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             </div>
 
             <form onSubmit={submitDream} className="student-dreams-form">
-              <Textarea
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                placeholder={t('textareaPlaceholder')}
-                className="student-dreams-textarea"
-                disabled={pending}
-              />
+              <div className="student-dreams-textarea-wrapper">
+                <Textarea
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  placeholder={t('textareaPlaceholder')}
+                  className="student-dreams-textarea"
+                  disabled={pending || isRecording || isTranscribing}
+                />
+                <button
+                  type="button"
+                  onClick={() => void toggleRecording()}
+                  disabled={pending || isTranscribing}
+                  className={`student-dreams-mic-button ${isRecording ? 'student-dreams-mic-button-active' : ''}`}
+                  title={isRecording ? t('stopRecording') : t('startRecording')}
+                >
+                  {isTranscribing ? <Loader2 className="student-dreams-mic-spin" /> : isRecording ? <Square /> : <Mic />}
+                </button>
+              </div>
 
               <div className="student-dreams-actions-row">
                 <Button
@@ -547,6 +665,12 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                             >
                               {t('regenerate')}
                             </Button>
+
+                            {validationError[String(dream.id)] ? (
+                              <p className="student-dreams-error text-xs">
+                                {validationError[String(dream.id)]}
+                              </p>
+                            ) : null}
                           </div>
                         ) : null}
 
@@ -561,7 +685,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                             {canExpandDescription ? (
                               <button
                                 type="button"
-                                onClick={() => openAnalysisModal(dream, dream.description ?? '')}
+                                onClick={() => openAnalysisModal(dream, dream.description ?? '', 'description')}
                                 className="student-dreams-see-more"
                               >
                                 {t('seeMore')}
@@ -574,12 +698,12 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                               <Wand2 />
                               {t('analysisLabel')}
                             </p>
-                            <p className="student-dreams-info-text">{analysisCopy}</p>
+                            <p className="student-dreams-info-text">{renderAnalysisLines(analysisCopy)}</p>
 
                             {canExpandAnalysis ? (
                               <button
                                 type="button"
-                                onClick={() => openAnalysisModal(dream, analysisCopy)}
+                                onClick={() => openAnalysisModal(dream, analysisCopy, 'analysis')}
                                 className="student-dreams-see-more"
                               >
                                 {t('seeMore')}
@@ -632,7 +756,6 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
               <div className="student-dreams-modal-heading">
                 <div>
                   <p className="student-dreams-small-label">{t('modalTitle')}</p>
-                  <h3 className="student-dreams-modal-title">{selectedAnalysis.title}</h3>
                   <p className="student-dreams-modal-date">
                     {t('modalDate', { date: selectedAnalysis.date })}
                   </p>
@@ -651,7 +774,11 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
 
             <div className="student-dreams-modal-body">
               <div className="student-dreams-modal-content">
-                <p className="student-dreams-modal-text">{selectedAnalysis.content}</p>
+                <p className="student-dreams-modal-text">
+                  {selectedAnalysis.type === 'analysis'
+                    ? renderAnalysisLines(selectedAnalysis.content)
+                    : selectedAnalysis.content}
+                </p>
               </div>
             </div>
 

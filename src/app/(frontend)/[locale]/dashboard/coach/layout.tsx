@@ -9,7 +9,7 @@ export default async function CoachDashboardLayout({ children }: { children: Rea
   await requireDashboardRole('coach')
 
   return (
-    <section className="mindly-dashboard-page">
+    <section className="mindly-dashboard-page coach-dashboard">
       <div className="mindly-dashboard-shell">
         <CoachSidebar />
         <div className="dashboard-content mindly-dashboard-content">{children}</div>

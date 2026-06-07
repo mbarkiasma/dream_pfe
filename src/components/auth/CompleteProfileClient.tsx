@@ -1,11 +1,11 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { AlertCircle, ArrowRight, Languages, Loader2, UserRound } from 'lucide-react'
+import { AlertCircle, ArrowRight, Globe, Loader2, Moon, Sun, UserRound } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import { useRouter, usePathname } from '@/i18n/routing'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useTheme } from '@/providers/Theme'
 
 type CompleteProfileClientProps = {
   defaultFirstName?: string
@@ -109,6 +109,12 @@ export function CompleteProfileClient({
   const [studentLevel, setStudentLevel] = useState(defaultStudentLevel)
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const { setTheme, theme } = useTheme()
+
+  useEffect(() => { setMounted(true) }, [])
+
+  const isDark = mounted && theme === 'dark'
 
   const switchLanguage = () => {
     router.replace(pathname, { locale: locale === 'fr' ? 'en' : 'fr' })
@@ -170,16 +176,22 @@ export function CompleteProfileClient({
       <div className="login-theme-switch flex gap-2">
         <button
           type="button"
-          onClick={switchLanguage}
-          className="flex h-9 items-center gap-1 rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] px-3 text-xs font-bold text-[var(--mindly-primary)] transition hover:bg-[var(--mindly-surface)]"
-          aria-label={copy.switchLanguage}
-          title={copy.switchLanguage}
+          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition duration-150 hover:-translate-y-px hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
+          aria-label={copy.themeLabel}
         >
-          <Languages className="h-4 w-4" />
-          <span>{locale.toUpperCase()}</span>
+          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
 
-        <ThemeToggle className="login-theme-toggle" />
+        <button
+          type="button"
+          onClick={switchLanguage}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface-glass)] text-[var(--mindly-primary)] transition duration-150 hover:-translate-y-px hover:border-[var(--mindly-primary-light)] hover:bg-[var(--mindly-surface)] hover:text-[var(--mindly-primary-dark)]"
+          aria-label={copy.switchLanguage}
+          title={`${locale.toUpperCase()} — ${copy.switchLanguage}`}
+        >
+          <Globe className="h-4 w-4" />
+        </button>
       </div>
 
       <div className="complete-profile-shell">

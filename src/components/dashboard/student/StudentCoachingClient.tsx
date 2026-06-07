@@ -5,8 +5,10 @@ import {
   Bot,
   CalendarDays,
   Check,
+  FileText,
   MessageCircle,
   Mic,
+  Paperclip,
   Pencil,
   Plus,
   Send,
@@ -35,11 +37,27 @@ type CoachingSession = {
   } | null
 }
 
+type MessageAttachment = {
+  id: string | number
+  media:
+    | { id: string | number; filename?: string | null; mimeType?: string | null; url?: string | null }
+    | string
+    | number
+}
+
+type PendingAttachment = {
+  id: string | number
+  filename: string
+  mimeType: string
+  url: string
+}
+
 type CoachingMessage = {
   id: string | number
   content: string
   createdAt?: string
   senderRole: 'ai' | 'coach' | 'student'
+  attachments?: MessageAttachment[]
 }
 
 type CoachOption = {
@@ -84,9 +102,13 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     initialSessions.length > 0 ? 'sessions' : 'new',
   )
 
+  const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([])
+  const [isUploading, setIsUploading] = useState(false)
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const selectedSession = useMemo(
     () => sessions.find((session) => String(session.id) === String(selectedSessionId)) ?? null,
@@ -117,7 +139,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       const data = await response.json()
 
       if (isMounted && response.ok) {
-        setMessages(data.messages ?? [])
+        setMessages(deduplicateMessages(data.messages ?? []))
       }
     }
 
@@ -216,19 +238,54 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     }
   }
 
+  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? [])
+    if (!files.length) return
+
+    setIsUploading(true)
+    setStatusMessage('')
+
+    try {
+      const uploads = await Promise.all(
+        files.map(async (file) => {
+          const fd = new FormData()
+          fd.append('file', file)
+          const res = await fetch('/api/coaching/upload', { method: 'POST', body: fd })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || t('errorUpload'))
+          return data as PendingAttachment
+        }),
+      )
+      setPendingAttachments((current) => [...current, ...uploads])
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : t('errorUpload'))
+    } finally {
+      setIsUploading(false)
+      if (event.target) event.target.value = ''
+    }
+  }
+
   async function submitMessage(content: string) {
     const cleanMessage = content.trim()
+    const hasAttachments = pendingAttachments.length > 0
 
-    if (!selectedSessionId || !cleanMessage || isLoading) return
+    if (!selectedSessionId || (!cleanMessage && !hasAttachments) || isLoading) return
 
     setIsLoading(true)
     setIsAiTyping(true)
     setStatusMessage('')
 
+    const attachmentsSnapshot = [...pendingAttachments]
+    setPendingAttachments([])
+
     const optimisticMessage: CoachingMessage = {
       id: `optimistic-${Date.now()}`,
       content: cleanMessage,
       senderRole: 'student',
+      attachments: attachmentsSnapshot.map((a) => ({
+        id: a.id,
+        media: { id: a.id, filename: a.filename, mimeType: a.mimeType, url: a.url },
+      })),
     }
 
     setMessages((current) => [...current, optimisticMessage])
@@ -238,7 +295,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
       const response = await fetch('/api/coaching/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: selectedSessionId, content: cleanMessage }),
+        body: JSON.stringify({
+          sessionId: selectedSessionId,
+          content: cleanMessage,
+          attachments: attachmentsSnapshot.map((a) => a.id),
+        }),
       })
 
       const data = await response.json()
@@ -247,11 +308,13 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         throw new Error(data.error || t('errorMessage'))
       }
 
-      setMessages((current) => [
-        ...current.filter((m) => String(m.id) !== String(optimisticMessage.id)),
-        data.message,
-        ...(data.aiMessage ? [data.aiMessage] : []),
-      ])
+      setMessages((current) =>
+        deduplicateMessages([
+          ...current.filter((m) => String(m.id) !== String(optimisticMessage.id)),
+          data.message,
+          ...(data.aiMessage ? [data.aiMessage] : []),
+        ])
+      )
 
       if (data.aiMessage?.content) {
         void playText(data.aiMessage.content)
@@ -261,6 +324,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         current.filter((m) => String(m.id) !== String(optimisticMessage.id)),
       )
       setMessage(cleanMessage)
+      setPendingAttachments(attachmentsSnapshot)
       setStatusMessage(error instanceof Error ? error.message : t('errorUnexpected'))
     } finally {
       setIsLoading(false)
@@ -366,7 +430,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
 
       if (!response.ok) throw new Error(data.error || t('errorUpdate'))
 
-      setMessages(data.messages ?? [])
+      setMessages(deduplicateMessages(data.messages ?? []))
       setEditingMessageId(null)
       setEditingMessageContent('')
       setStatusMessage(t('statusMessageUpdated'))
@@ -639,14 +703,20 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         onClick={() => setSelectedSessionId(session.id)}
                         className="student-flex-button-content"
                       >
-                        <span className="block truncate text-sm font-semibold">{session.title}</span>
+                        <span className="block truncate text-sm font-semibold">
+                          {session.mode === 'classic'
+                            ? t('humanCoachLabel')
+                            : session.title}
+                        </span>
                         <span className="student-session-meta">
                           {session.mode === 'smart' ? (
                             <Bot className="student-session-meta-icon" />
                           ) : (
                             <UserRound className="student-session-meta-icon" />
                           )}
-                          {session.mode === 'smart' ? t('smartCoachLabel') : getCoachName(session)}{' · '}
+                          {session.mode === 'smart'
+                            ? t('smartCoachLabel')
+                            : getCoachName(session) || t('humanCoach')}{' · '}
                           {session.status === 'open' ? t('sessionOpen') : t('sessionClosed')}
                         </span>
                       </button>
@@ -694,33 +764,39 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         </div>
 
         <div className="student-chat-scroll">
-          {messages.length === 0 ? (
-            <div className="student-chat-empty student-chat-empty-redesign">
-              <div className="student-empty-hero-icon"><MessageCircle /></div>
-              <p className="student-empty-title">{emptyChatTitle}</p>
-              <p className="student-empty-description">{emptyChatDescription}</p>
+          {/* Spacer only when no messages — centers the empty state card */}
+          {messages.length === 0 && <div className="student-chat-messages-spacer" />}
 
-              <div className="student-prompt-grid">
-                {suggestedPrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    onClick={() => setMessage(prompt)}
-                    disabled={!selectedSessionId || selectedSession?.status === 'closed'}
-                    className="student-prompt-chip"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
+          <div className={`student-chat-empty student-chat-empty-redesign${messages.length > 0 ? ' student-chat-card-active' : ''}`}>
+            {messages.length === 0 ? (
+              <>
+                <div className="student-empty-hero-icon"><MessageCircle /></div>
+                <p className="student-empty-title">{emptyChatTitle}</p>
+                <p className="student-empty-description">{emptyChatDescription}</p>
 
-              {!selectedSessionId ? (
-                <p className="student-empty-helper">{t('hint')}</p>
-              ) : null}
-            </div>
-          ) : null}
+                <div className="student-prompt-grid">
+                  {suggestedPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => setMessage(prompt)}
+                      disabled={!selectedSessionId || selectedSession?.status === 'closed'}
+                      className="student-prompt-chip"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
 
-          {messages.map((item) => {
+                {!selectedSessionId ? (
+                  <p className="student-empty-helper">{t('hint')}</p>
+                ) : null}
+              </>
+            ) : (
+              <div className="student-chat-messages-spacer" />
+            )}
+
+            {messages.map((item) => {
             const isMine = item.senderRole === 'student'
             const isEditingMessage = String(editingMessageId) === String(item.id)
             const multipleChoice = parseMultipleChoice(item.content)
@@ -743,113 +819,155 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                   </div>
                 )}
 
-                <div
-                  className={`student-message-bubble ${
-                    isMine ? 'student-message-bubble-mine' : 'student-message-bubble-assistant'
-                  }`}
-                >
-                  <p className="student-message-meta">
-                    {item.senderRole === 'ai'
-                      ? t('smartCoachLabel')
-                      : item.senderRole === 'coach'
-                        ? (selectedCoachName || t('humanCoach'))
-                        : t('you')}
-                  </p>
+                <div className={`student-message-group ${isMine ? 'student-message-group-mine' : 'student-message-group-assistant'}`}>
+                  <div
+                    className={`student-message-bubble ${
+                      isMine ? 'student-message-bubble-mine' : 'student-message-bubble-assistant'
+                    }`}
+                  >
+                    <p className="student-message-meta">
+                      {item.senderRole === 'ai'
+                        ? t('smartCoachLabel')
+                        : item.senderRole === 'coach'
+                          ? (selectedCoachName || t('humanCoach'))
+                          : t('you')}
+                    </p>
 
-                  {isEditingMessage ? (
-                    <div className="student-edit-stack">
-                      <textarea
-                        value={editingMessageContent}
-                        onChange={(event) => setEditingMessageContent(event.target.value)}
-                        rows={4}
-                        className="student-message-edit-textarea"
-                      />
-                      <div className="student-icon-action-row-end">
-                        <button
-                          type="button"
-                          onClick={() => void updateMessage(item.id)}
-                          className="student-icon-action student-icon-action-md student-icon-action-primary"
-                          title={t('save')}
-                        >
-                          <Check />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditingMessageId(null); setEditingMessageContent('') }}
-                          className="student-icon-action student-icon-action-md student-icon-action-muted"
-                          title={t('cancel')}
-                        >
-                          <X />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="student-message-content">
-                        {multipleChoice?.prompt || item.content}
-                      </p>
-
-                      {!isMine && multipleChoice ? (
-                        <div className="student-multiple-choice-stack">
-                          {multipleChoice.choices.map((choice) => {
-                            const checked = selectedChoices.includes(choice.label)
-
-                            return (
-                              <label key={choice.label} className="student-choice-option">
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  onChange={(event) => {
-                                    setSelectedChoicesByMessage((current) => {
-                                      const currentValues = current[String(item.id)] ?? []
-                                      const nextValues = event.target.checked
-                                        ? [...currentValues, choice.label]
-                                        : currentValues.filter((value) => value !== choice.label)
-                                      return { ...current, [String(item.id)]: nextValues }
-                                    })
-                                  }}
-                                  className="student-choice-checkbox"
-                                />
-                                <span>
-                                  <span className="font-semibold">{choice.label}.</span>{' '}
-                                  {choice.text}
-                                </span>
-                              </label>
-                            )
-                          })}
-
+                    {isEditingMessage ? (
+                      <div className="student-edit-stack">
+                        <textarea
+                          value={editingMessageContent}
+                          onChange={(event) => setEditingMessageContent(event.target.value)}
+                          rows={4}
+                          className="student-message-edit-textarea"
+                        />
+                        <div className="student-icon-action-row-end">
                           <button
                             type="button"
-                            onClick={() => void sendSelectedChoices(item.id, multipleChoice.choices)}
-                            disabled={selectedChoices.length === 0 || isLoading}
-                            className="student-choice-submit"
+                            onClick={() => void updateMessage(item.id)}
+                            className="student-icon-action student-icon-action-md student-icon-action-primary"
+                            title={t('save')}
                           >
-                            {t('sendChoice')}
+                            <Check />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditingMessageId(null); setEditingMessageContent('') }}
+                            className="student-icon-action student-icon-action-md student-icon-action-muted"
+                            title={t('cancel')}
+                          >
+                            <X />
                           </button>
                         </div>
-                      ) : null}
+                      </div>
+                    ) : (
+                      <>
+                        {(multipleChoice?.prompt || item.content) ? (
+                          <p className="student-message-content">
+                            {multipleChoice?.prompt || item.content}
+                          </p>
+                        ) : null}
 
-                      {isMine ? (
-                        <button
-                          type="button"
-                          onClick={() => { setEditingMessageId(item.id); setEditingMessageContent(item.content) }}
-                          className="student-message-action"
-                        >
-                          <Pencil />
-                          {t('edit')}
-                        </button>
-                      ) : null}
-                    </>
-                  )}
+                        {item.attachments && item.attachments.length > 0 ? (
+                          <div className="coaching-message-files">
+                            {item.attachments.map((att) => {
+                              const media = typeof att.media === 'object' && att.media !== null ? att.media as { id: string | number; filename?: string | null; mimeType?: string | null; url?: string | null } : null
+                              if (!media?.url) return null
+                              const isImage = media.mimeType?.startsWith('image/')
+                              return isImage ? (
+                                <a
+                                  key={att.id}
+                                  href={media.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="coaching-message-img-link"
+                                >
+                                  <img
+                                    src={media.url}
+                                    alt={media.filename ?? 'image'}
+                                    className="coaching-message-img"
+                                  />
+                                </a>
+                              ) : (
+                                <a
+                                  key={att.id}
+                                  href={media.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="coaching-message-file-link"
+                                >
+                                  <FileText className="h-4 w-4 shrink-0" />
+                                  <span className="truncate">{media.filename ?? 'Fichier'}</span>
+                                </a>
+                              )
+                            })}
+                          </div>
+                        ) : null}
 
-                  {item.senderRole !== 'student' ? (
+                        {!isMine && multipleChoice ? (
+                          <div className="student-multiple-choice-stack">
+                            {multipleChoice.choices.map((choice) => {
+                              const checked = selectedChoices.includes(choice.label)
+
+                              return (
+                                <label key={choice.label} className="student-choice-option">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={(event) => {
+                                      setSelectedChoicesByMessage((current) => {
+                                        const currentValues = current[String(item.id)] ?? []
+                                        const nextValues = event.target.checked
+                                          ? [...currentValues, choice.label]
+                                          : currentValues.filter((value) => value !== choice.label)
+                                        return { ...current, [String(item.id)]: nextValues }
+                                      })
+                                    }}
+                                    className="student-choice-checkbox"
+                                  />
+                                  <span>
+                                    <span className="font-semibold">{choice.label}.</span>{' '}
+                                    {choice.text}
+                                  </span>
+                                </label>
+                              )
+                            })}
+
+                            <button
+                              type="button"
+                              onClick={() => void sendSelectedChoices(item.id, multipleChoice.choices)}
+                              disabled={selectedChoices.length === 0 || isLoading}
+                              className="student-choice-submit"
+                            >
+                              {t('sendChoice')}
+                            </button>
+                          </div>
+                        ) : null}
+
+                        {item.senderRole !== 'student' ? (
+                          <div className="student-message-action-row">
+                            <button
+                              type="button"
+                              onClick={() => void playText(item.content)}
+                              className="student-message-action student-message-action-icon"
+                              title={t('listen')}
+                            >
+                              <Volume2 />
+                            </button>
+                          </div>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+
+                  {isMine ? (
                     <button
                       type="button"
-                      onClick={() => void playText(item.content)}
-                      className="student-message-action"
+                      onClick={() => { setEditingMessageId(item.id); setEditingMessageContent(item.content) }}
+                      className="student-message-edit-icon"
+                      title={t('edit')}
                     >
-                      <Volume2 />
-                      {t('listen')}
+                      <Pencil />
                     </button>
                   ) : null}
                 </div>
@@ -863,24 +981,48 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             )
           })}
 
-          {isAiTyping && (
-            <div className="student-message-row-assistant">
-              <div className="student-message-avatar student-message-avatar-assistant">
-                <Bot />
-              </div>
-              <div className="student-message-bubble student-message-bubble-assistant student-typing-bubble">
-                <div className="student-typing-indicator">
-                  <span /><span /><span />
+            {isAiTyping && (
+              <div className="student-message-row-assistant">
+                <div className="student-message-avatar student-message-avatar-assistant">
+                  <Bot />
+                </div>
+                <div className="student-message-bubble student-message-bubble-assistant student-typing-bubble">
+                  <div className="student-typing-indicator">
+                    <span /><span /><span />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} />
+          </div>
         </div>
 
         <div className="student-chat-composer">
           {statusMessage ? <p className="student-status-message">{statusMessage}</p> : null}
+
+          {pendingAttachments.length > 0 ? (
+            <div className="coaching-pending-attachments">
+              {pendingAttachments.map((att) => (
+                <div key={att.id} className="coaching-pending-file">
+                  {att.mimeType.startsWith('image/') ? (
+                    <img src={att.url} alt={att.filename} className="coaching-pending-img" />
+                  ) : (
+                    <FileText className="h-4 w-4 shrink-0 text-[var(--mindly-primary)]" />
+                  )}
+                  <span className="truncate text-xs">{att.filename}</span>
+                  <button
+                    type="button"
+                    onClick={() => setPendingAttachments((c) => c.filter((a) => a.id !== att.id))}
+                    className="coaching-pending-remove"
+                    title={t('removeAttachment')}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
 
           <div className="student-composer-row">
             <button
@@ -893,6 +1035,26 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               title={isRecording ? t('stop') : t('dictate')}
             >
               {isRecording ? <Square /> : <Mic />}
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip"
+              className="hidden"
+              onChange={(e) => void handleFileUpload(e)}
+              disabled={!selectedSessionId || selectedSession?.status === 'closed'}
+            />
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!selectedSessionId || selectedSession?.status === 'closed' || isUploading}
+              className="student-file-button"
+              title={t('attachFile')}
+            >
+              <Paperclip />
             </button>
 
             <textarea
@@ -913,7 +1075,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             <button
               type="button"
               onClick={() => void sendMessage()}
-              disabled={!message.trim() || !selectedSessionId || isLoading}
+              disabled={(!message.trim() && pendingAttachments.length === 0) || !selectedSessionId || isLoading}
               className="student-send-button"
               title={t('sendChoice')}
             >
@@ -997,4 +1159,14 @@ function getCoachName(session: CoachingSession | null | undefined): string {
   const coach = session?.coach
   const fullName = `${coach?.firstName ?? ''} ${coach?.lastName ?? ''}`.trim()
   return fullName || coach?.email || ''
+}
+
+function deduplicateMessages(messages: CoachingMessage[]): CoachingMessage[] {
+  const seen = new Set<string>()
+  return messages.filter((msg) => {
+    const key = String(msg.id)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }

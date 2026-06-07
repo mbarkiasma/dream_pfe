@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getTranslations } from 'next-intl/server'
 
 import { CoachCoachingEventManager } from '@/components/dashboard/coach/CoachCoachingEventManager'
 import { CoachCoachingEventForm } from '@/components/dashboard/coach/CoachingEventForm'
@@ -10,6 +11,7 @@ import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashb
 export default async function CoachAppointmentsPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
+  const t = await getTranslations('dashboard.coach.appointments')
 
   const events = user
     ? await payload.find({
@@ -30,8 +32,8 @@ export default async function CoachAppointmentsPage() {
   return (
     <div>
       <CoachTopbar
-        title="Rendez-vous"
-        description="Planifiez et gérez les séances de coaching avec les étudiants."
+        title={t('title')}
+        description={t('description')}
       />
 
       <div className="mb-6">
@@ -40,7 +42,7 @@ export default async function CoachAppointmentsPage() {
 
       <Card className="mindly-feature-card">
         <CardHeader className="mindly-feature-header">
-          <CardTitle className="mindly-feature-title">Séances planifiées</CardTitle>
+          <CardTitle className="mindly-feature-title">{t('scheduledSessions')}</CardTitle>
         </CardHeader>
 
         <CardContent className="mindly-feature-content">

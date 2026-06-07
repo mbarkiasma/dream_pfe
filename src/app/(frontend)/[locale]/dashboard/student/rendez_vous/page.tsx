@@ -71,13 +71,14 @@ export default async function StudentAppointmentsPage() {
     : null
 
   const docs = appointments?.docs || []
-  const sortedAppointments = [...docs].sort(
+  const requestAppointments = docs
+  const chronologicalAppointments = [...docs].sort(
     (a, b) =>
       getAppointmentDateTime(a.date, a.startTime) - getAppointmentDateTime(b.date, b.startTime),
   )
   const now = Date.now()
   const nextAppointment =
-    sortedAppointments.find(
+    chronologicalAppointments.find(
       (appointment) =>
         appointment.status === 'confirmed' &&
         getAppointmentDateTime(appointment.date, appointment.startTime) >= now,
@@ -112,7 +113,7 @@ export default async function StudentAppointmentsPage() {
             <CardContent className="student-appointments-card-content">
               {docs.length > 0 ? (
                 <div className="student-appointments-list">
-                  {sortedAppointments.map((appointment) => (
+                  {requestAppointments.map((appointment) => (
                     <div key={appointment.id} className="student-appointments-request">
                       <div className="student-appointments-request-header">
                         <div>

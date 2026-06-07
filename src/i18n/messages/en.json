@@ -68,7 +68,7 @@
         "dashboard": "Dashboard",
         "dreams": "My dreams",
         "analyses": "My report",
-        "coaching": "Smart coaching",
+        "coaching": "Coaching",
         "checkin": "My progress",
         "seances": "Coach sessions",
         "motivation": "Motivation posts",
@@ -87,6 +87,7 @@
         "smartCoach": "Smart AI coach",
         "smartCoachSub": "Instant · Voice · AI",
         "humanCoach": "Human coach",
+        "humanCoachLabel": "Classic coaching",
         "humanCoachSub": "Personalised support · Human",
         "startSmart": "Start with Smart AI coach",
         "startClassic": "Schedule with a human coach",
@@ -144,7 +145,11 @@
         "errorUpdate": "Update not possible.",
         "errorTranscription": "Transcription not possible.",
         "errorMic": "Unable to access microphone.",
-        "errorUnexpected": "Unexpected error."
+        "errorUnexpected": "Unexpected error.",
+        "attachFile": "Attach a file",
+        "statusUploading": "Uploading file...",
+        "errorUpload": "File upload failed.",
+        "removeAttachment": "Remove"
       },
       "checkin": {
         "topbar": {
@@ -234,6 +239,29 @@
         "closeAriaLabel": "Close post",
         "errorReaction": "Unable to react at the moment.",
         "empty": "No motivation post is available at the moment."
+      },
+      "psyOrientation": {
+        "pageTitle": "Psychological orientation",
+        "pageDescription": "View your coach's recommendation and choose your response.",
+        "recommendationTitle": "Coach's recommendation",
+        "coachLabel": "Coach",
+        "observationTitle": "Coach observation",
+        "infoText": "If you accept, you will be redirected to the appointment booking page with the psychologist. This request will be treated as urgent.",
+        "responseTitle": "Your response",
+        "refusalPlaceholder": "Reason for refusal (optional)",
+        "confirmRefusal": "Confirm refusal",
+        "back": "Back",
+        "acceptBtn": "Accept and choose an appointment",
+        "refuseBtn": "Refuse",
+        "acceptedInfo": "Orientation accepted. You can now choose an appointment.",
+        "chooseAppointment": "Choose an appointment",
+        "alreadyAnswered": "Your response has already been recorded.",
+        "errorDefault": "Unable to process your response.",
+        "statusPending": "Awaiting your response",
+        "statusAccepted": "Accepted",
+        "statusRefused": "Refused",
+        "statusCancelled": "Cancelled",
+        "statusAppointmentRequested": "Appointment requested"
       },
       "appointments": {
         "topbar": {
@@ -343,7 +371,8 @@
         "reportSideTitle": "Report available",
         "reportSideText": "Your analysis report is centralised in this space and can be viewed or exported as PDF.",
         "reportCount": "1 report",
-        "noReport": "No report"
+        "noReport": "No report",
+        "sectionInfo": "Personal information"
       },
       "dreamsPage": {
         "topbar": {
@@ -428,6 +457,9 @@
         "submitErrorEmpty": "Describe your dream before starting the generation.",
         "submitErrorServer": "Unable to send this dream right now.",
         "submitErrorFetch": "A network error occurred while sending.",
+        "startRecording": "Speak your dream",
+        "stopRecording": "Stop recording",
+        "errorMic": "Unable to access microphone.",
         "deleteError": "Deletion not possible right now.",
         "deleteSuccess": "The dream has been removed from your journal.",
         "deleteErrorFetch": "A network error occurred while deleting.",
@@ -477,6 +509,383 @@
         "analysisNotAvailable": "The analysis is not yet available for this dream.",
         "analysisEmpty": "No analysis available at the moment."
       }
+    },
+    "psy": {
+      "eyebrow": "Psychologist space",
+      "dashboard": {
+        "title": "Psychologist Dashboard",
+        "description": "Overview of your day and active alerts.",
+        "stats": {
+          "students": "Assigned students",
+          "studentsHint": "Active files",
+          "todayAppointments": "Today's appointments",
+          "todayAppointmentsHint": "Today's consultations",
+          "pending": "Pending requests",
+          "pendingHint": "To process",
+          "upcoming": "Upcoming appointments",
+          "upcomingHint": "All confirmed"
+        },
+        "agenda": {
+          "title": "Today's agenda",
+          "empty": "No consultation scheduled today.",
+          "urgent": "Urgent"
+        },
+        "alerts": {
+          "title": "Urgent alerts",
+          "see": "See",
+          "empty": "No active urgent cases."
+        },
+        "pendingSection": {
+          "title": "Pending requests",
+          "see": "See",
+          "requestDate": "Request from {date}",
+          "empty": "No pending requests."
+        }
+      },
+      "students": {
+        "title": "Assigned students",
+        "description": "Manage your students' psychological follow-up files.",
+        "dossiers": {
+          "title": "Files",
+          "statusUrgent": "Urgent",
+          "statusPending": "Pending",
+          "statusActive": "Active",
+          "nextAppointment": "Next appointment",
+          "noConfirmed": "No appointment",
+          "searchPlaceholder": "Search a student...",
+          "noResults": "No student found for",
+          "empty": "No assigned student",
+          "emptyDescription": "Students will appear here after an appointment request.",
+          "lastDate": "Last: {date}",
+          "at": "at",
+          "sessions": "session",
+          "sessionsPlural": "sessions",
+          "alerts": "alert",
+          "alertsPlural": "alerts",
+          "urgent": "urgent",
+          "urgentPlural": "urgent",
+          "pending": "pending",
+          "file": "file",
+          "filePlural": "files"
+        }
+      },
+      "sidebar": {
+        "title": "Psychologist space",
+        "subtitle": "Clinical monitoring",
+        "menu": "Menu",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu",
+        "nav": {
+          "dashboard": "Dashboard",
+          "students": "Students",
+          "appointments": "Appointments",
+          "notifications": "Notifications",
+          "profile": "My profile"
+        }
+      },
+      "rendezVous": {
+        "title": "Appointments",
+        "description": "View student requests and manage confirmed consultations.",
+        "requests": {
+          "title": "Received requests",
+          "empty": "No requests at the moment",
+          "emptyHint": "Requests sent by students will appear here.",
+          "from": "from {start} to {end}",
+          "rejectionLabel": "Rejection reason sent",
+          "urgencyUrgent": "Urgent",
+          "urgencyNormal": "Normal"
+        },
+        "status": {
+          "pending": "Pending",
+          "confirmed": "Confirmed",
+          "rejected": "Rejected",
+          "cancelled": "Cancelled",
+          "completed": "Completed"
+        },
+        "next": {
+          "title": "Next consultation",
+          "empty": "No consultation confirmed yet."
+        },
+        "summary": {
+          "title": "Summary",
+          "pending": "Pending",
+          "confirmed": "Confirmed"
+        },
+        "student": "Student",
+        "consultation": "consultation",
+        "consultations": "consultations"
+      },
+      "actions": {
+        "confirm": "Confirm",
+        "reject": "Reject",
+        "rejectionLabel": "Rejection reason",
+        "rejectionPlaceholder": "Example: exceptional unavailability, please choose another time slot.",
+        "sendRejection": "Send rejection",
+        "cancel": "Cancel",
+        "markCompleted": "Mark as completed",
+        "errorUpdate": "Unable to update the appointment.",
+        "errorReason": "Please provide a rejection reason before sending."
+      },
+      "profil": {
+        "title": "My profile",
+        "description": "View your general information and settings related to your activity.",
+        "header": "Psychologist profile",
+        "active": "Active account",
+        "fullName": "Full name",
+        "email": "Email",
+        "role": "Role",
+        "rolePsy": "Psychologist",
+        "notSet": "Not set",
+        "activity": {
+          "title": "Activity",
+          "students": "{count} student(s)",
+          "appointments": "{count} appointment(s)",
+          "confirmed": "{count} confirmed",
+          "pending": "{count} pending",
+          "orientations": "{count} orientation(s)"
+        },
+        "psyBadge": "Psychologist",
+        "edit": "Edit profile",
+        "editTitle": "Edit profile",
+        "save": "Save",
+        "errorSave": "Unable to save changes.",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "phone": "Phone",
+        "location": "Location",
+        "tagline": "Tagline",
+        "language": "Language",
+        "memberSince": "Member since {date}",
+        "sectionInfo": "Personal information"
+      }
+    },
+    "coach": {
+      "eyebrow": "Coach space",
+      "sidebar": {
+        "title": "Coach space",
+        "subtitle": "Coaching",
+        "dashboard": "Dashboard",
+        "students": "Students",
+        "sessions": "Sessions",
+        "exercises": "Exercises",
+        "appointments": "Appointments",
+        "notifications": "Notifications",
+        "orientationPsy": "Psy referral",
+        "announcements": "Announcements",
+        "profile": "My profile",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu",
+        "menu": "Menu"
+      },
+      "stats": {
+        "students": "Assigned students",
+        "studentsHintActive": "Active follow-up",
+        "studentsHintEmpty": "No follow-up",
+        "exercises": "Active exercises",
+        "exercisesHintActive": "To support",
+        "exercisesHintEmpty": "No exercise",
+        "appointments": "Upcoming appointments",
+        "appointmentsHintActive": "Schedule",
+        "appointmentsHintEmpty": "No schedule",
+        "cases": "Cases to refer",
+        "casesHintActive": "Priority",
+        "casesHintEmpty": "No case"
+      },
+      "dashboard": {
+        "title": "Coach Dashboard",
+        "description": "Welcome to your student tracking, exercises and appointments space.",
+        "students": {
+          "title": "Students to follow",
+          "see": "See",
+          "emailEmpty": "No email provided",
+          "empty": "No student is yet linked to your sessions.",
+          "emptyBadge": "No student"
+        },
+        "exercises": {
+          "title": "Recent exercises",
+          "see": "See",
+          "empty": "No exercise assigned yet.",
+          "emptyBadge": "0 active exercises"
+        },
+        "orientation": {
+          "title": "Psychologist referral",
+          "see": "See",
+          "analysisDate": "Analysis from {date}",
+          "moderateConfidence": "Moderate confidence",
+          "empty": "No priority case detected among tracked students.",
+          "emptyBadge": "No case"
+        }
+      },
+      "students": {
+        "title": "Assigned students",
+        "description": "View the profiles of students followed by the coach.",
+        "myStudents": "My students",
+        "noStudents": "No assigned student",
+        "sessions": "session",
+        "sessionsPlural": "sessions",
+        "sharedNotes": "Shared notes",
+        "exercises": "Exercises",
+        "seeNotes": "See notes",
+        "seeExercises": "See exercises",
+        "emptyDescription": "Students appear here when they start a classic coaching session with you.",
+        "emptyBadge": "No student",
+        "sharedFollowUp": "Shared follow-up",
+        "classicSessions": "Classic sessions",
+        "assignedExercises": "Assigned exercises",
+        "noSharedFollowUp": "No shared follow-up available for your assigned students yet.",
+        "openPage": "Open page",
+        "dateNotSpecified": "Date not specified",
+        "student": "Student",
+        "type": "Type",
+        "status": "Status",
+        "date": "Date",
+        "instructions": "Instructions",
+        "dueDate": "Due date",
+        "titleLabel": "Title",
+        "content": "Content",
+        "typeSession": "Classic coaching session",
+        "typeNote": "Shared note",
+        "typeExercise": "Assigned exercise",
+        "statusClosed": "Closed",
+        "statusOpen": "Open",
+        "metaClosed": "Closed session",
+        "metaOpen": "Open session",
+        "metaNote": "Shared note",
+        "defaultSession": "Coaching session",
+        "defaultNote": "Follow-up note",
+        "defaultExercise": "Assigned exercise",
+        "noInstructions": "No instructions provided",
+        "noContent": "No content provided",
+        "statusAssigned": "Assigned",
+        "statusCompleted": "Completed",
+        "statusInProgress": "In progress",
+        "statusMissed": "Not done",
+        "statusReviewed": "Reviewed"
+      },
+      "exercises": {
+        "title": "Exercises",
+        "description": "Assign personalised exercises to students and track their progress.",
+        "assignTitle": "Assign an exercise",
+        "listTitle": "Shared exercises",
+        "studentLabel": "Student:",
+        "givenBy": "Given by:",
+        "reason": "Reason:",
+        "dueDateLabel": "Due date:",
+        "studentResponse": "Student response",
+        "coachFeedback": "Coach feedback",
+        "empty": "No exercise assigned yet.",
+        "noDeadline": "No deadline",
+        "statusAssigned": "Assigned",
+        "statusInProgress": "In progress",
+        "statusCompleted": "Completed",
+        "statusReviewed": "Feedback given",
+        "statusMissed": "Not done"
+      },
+      "coaching": {
+        "title": "Coaching sessions",
+        "description": "Follow classic conversations, reply to students and save follow-up notes.",
+        "classicSessions": "Classic sessions",
+        "noSession": "No assigned session.",
+        "senderStudent": "Student",
+        "senderCoach": "Coach",
+        "noMessage": "No messages for this session. You can wait for the student's first message or send a welcome message.",
+        "replyPlaceholder": "Reply to student...",
+        "notesTitle": "Follow-up notes",
+        "notesStudent": "Student",
+        "notesSave": "Save note",
+        "notesPrevious": "Previous notes",
+        "notesPlaceholder": "Observations, goals, next steps...",
+        "notesSelectSession": "Select a session to take notes.",
+        "badgeNew": "New",
+        "transcribing": "Transcribing...",
+        "recording": "Recording...",
+        "noMic": "Cannot access microphone.",
+        "deleteNoteTitle": "Delete this note?",
+        "deleteNoteBody": "This note will be permanently deleted from the follow-up history.",
+        "deleteNoteConfirm": "Confirmation",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "announcements": {
+        "title": "Motivation announcements",
+        "description": "Publish motivational content for students."
+      },
+      "appointments": {
+        "title": "Appointments",
+        "description": "Schedule and manage coaching sessions with students.",
+        "scheduledSessions": "Scheduled sessions"
+      },
+      "profile": {
+        "title": "My profile",
+        "description": "View your general information and settings related to your coaching activity.",
+        "eyebrow": "Coach profile",
+        "fullName": "Full name",
+        "email": "Email",
+        "emailEmpty": "Not provided",
+        "specialty": "Specialty",
+        "specialtyEmpty": "Not specified",
+        "activeAccount": "Active account"
+      },
+      "orientationPsy": {
+        "title": "Psy referral",
+        "description": "Manage students to refer to the psychologist when necessary.",
+        "formTitle": "Refer a student",
+        "historyTitle": "History",
+        "appointmentRef": "Appointment #{id}",
+        "noHistory": "No referral has been sent yet.",
+        "noHistoryBadge": "No referral",
+        "statusAppointmentRequested": "Appointment requested",
+        "statusCancelled": "Cancelled",
+        "statusPendingStudent": "Awaiting student",
+        "statusAccepted": "Accepted",
+        "statusRefused": "Refused"
+      },
+      "profil": {
+        "title": "Coach profile",
+        "description": "Manage your professional information and settings.",
+        "header": "Coach profile",
+        "coachBadge": "Professional coach",
+        "active": "Active account",
+        "edit": "Edit profile",
+        "editTitle": "Edit profile",
+        "save": "Save",
+        "errorSave": "Unable to save changes.",
+        "fullName": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "location": "Location",
+        "tagline": "Tagline",
+        "specialty": "Specialty",
+        "bio": "About",
+        "language": "Language",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "notSet": "Not set",
+        "memberSince": "Member since {date}",
+        "sectionInfo": "Personal information",
+        "sectionAvailability": "Availability",
+        "closed": "Closed",
+        "noAvailability": "No availability configured.",
+        "availabilityHint": "These hours are visible to your clients when booking sessions.",
+        "sectionActivity": "Coaching activity",
+        "activity": {
+          "available": "Available",
+          "unavailable": "Unavailable",
+          "students": "Active students",
+          "studentsSub": "Open sessions",
+          "sessions": "Total sessions",
+          "sessionsSub": "Coaching done",
+          "events": "Events",
+          "eventsSub": "Workshops created",
+          "orientations": "Psy referrals",
+          "orientationsSub": "Referrals sent",
+          "announcements": "Announcements",
+          "announcementsSub": "Publications",
+          "since": "Member since",
+          "sinceSub": "Registered on platform",
+          "hint": "This data reflects your overall activity on the platform."
+        }
+      }
     }
   },
   "contactPage": {
@@ -484,10 +893,26 @@
       "title": "contact our team",
       "description": "A question, bug, or partnership request? Our team replies personally within 24h.",
       "stats": [
-        { "icon": "sparkles", "value": "<24h", "label": "Response time" },
-        { "icon": "shieldCheck", "value": "100%", "label": "End-to-end encryption" },
-        { "icon": "star", "value": "4.9", "label": "Customer satisfaction" },
-        { "icon": "users", "value": "12 400+", "label": "Students helped" }
+        {
+          "icon": "sparkles",
+          "value": "<24h",
+          "label": "Response time"
+        },
+        {
+          "icon": "shieldCheck",
+          "value": "100%",
+          "label": "End-to-end encryption"
+        },
+        {
+          "icon": "star",
+          "value": "4.9",
+          "label": "Customer satisfaction"
+        },
+        {
+          "icon": "users",
+          "value": "12 400+",
+          "label": "Students helped"
+        }
       ]
     },
     "form": {
@@ -520,10 +945,30 @@
       "sending": "Sending…",
       "sendMessage": "Send message",
       "subjects": [
-        { "val": "general", "icon": "circle-help", "name": "General question", "desc": "Information, features" },
-        { "val": "bug", "icon": "bug", "name": "Technical bug", "desc": "Error, malfunction" },
-        { "val": "partner", "icon": "building-2", "name": "Partnership", "desc": "University, institution" },
-        { "val": "access", "icon": "key-round", "name": "Access issue", "desc": "Login, locked account" }
+        {
+          "val": "general",
+          "icon": "circle-help",
+          "name": "General question",
+          "desc": "Information, features"
+        },
+        {
+          "val": "bug",
+          "icon": "bug",
+          "name": "Technical bug",
+          "desc": "Error, malfunction"
+        },
+        {
+          "val": "partner",
+          "icon": "building-2",
+          "name": "Partnership",
+          "desc": "University, institution"
+        },
+        {
+          "val": "access",
+          "icon": "key-round",
+          "name": "Access issue",
+          "desc": "Login, locked account"
+        }
       ]
     },
     "infos": {
@@ -534,14 +979,34 @@
       "copied": "Copied !",
       "online": "Online now",
       "emails": [
-        { "icon": "mail", "tag": "Direct email", "address": "adminpfe0@gmail.com", "desc": "Reply within 24 business hours" }
+        {
+          "icon": "mail",
+          "tag": "Direct email",
+          "address": "adminpfe0@gmail.com",
+          "desc": "Reply within 24 business hours"
+        }
       ],
       "faqItems": [
-        { "q": "How can I contact MindBloom?", "a": "Via the form, email, or phone. We reply quickly." },
-        { "q": "Is my data secure?", "a": "Yes, your data is end-to-end encrypted and never resold." },
-        { "q": "Technical issue: what should I do?", "a": "Write to adminpfe0@gmail.com and we will reply quickly." },
-        { "q": "How can I contact a coach or psychologist?", "a": "The platform automatically routes you to the right support." },
-        { "q": "Average response time?", "a": "We usually reply within 24 business hours." }
+        {
+          "q": "How can I contact MindBloom?",
+          "a": "Via the form, email, or phone. We reply quickly."
+        },
+        {
+          "q": "Is my data secure?",
+          "a": "Yes, your data is end-to-end encrypted and never resold."
+        },
+        {
+          "q": "Technical issue: what should I do?",
+          "a": "Write to adminpfe0@gmail.com and we will reply quickly."
+        },
+        {
+          "q": "How can I contact a coach or psychologist?",
+          "a": "The platform automatically routes you to the right support."
+        },
+        {
+          "q": "Average response time?",
+          "a": "We usually reply within 24 business hours."
+        }
       ]
     }
   },
@@ -555,17 +1020,53 @@
       "subtitle": "Intelligent support with AI.",
       "intro": "An innovative platform dedicated to student well-being, connecting students with certified professionals while leveraging AI to provide personalized support.",
       "quickBadges": [
-        { "icon": "building2", "label": "ESSTHS · Sousse" },
-        { "icon": "heart", "label": "100% free" },
-        { "icon": "sparkles", "label": "AI integrated" }
+        {
+          "icon": "building2",
+          "label": "ESSTHS · Sousse"
+        },
+        {
+          "icon": "heart",
+          "label": "100% free"
+        },
+        {
+          "icon": "sparkles",
+          "label": "AI integrated"
+        }
       ],
       "nodes": [
-        { "icon": "mic", "title": "Consultation", "subtitle": "Voice analysis", "badge": "Active" },
-        { "icon": "clipboard", "title": "Personality analysis", "subtitle": "Psych profile" },
-        { "icon": "heart", "title": "Global well-being", "subtitle": "This week", "badge": "87%" },
-        { "icon": "play", "title": "Dream video", "subtitle": "AI summary", "badge": "NEW" },
-        { "icon": "handshake", "title": "Coaching", "subtitle": "real-smart" },
-        { "icon": "moon", "title": "Dream analysis", "subtitle": "4 tries" }
+        {
+          "icon": "mic",
+          "title": "Consultation",
+          "subtitle": "Voice analysis",
+          "badge": "Active"
+        },
+        {
+          "icon": "clipboard",
+          "title": "Personality analysis",
+          "subtitle": "Psych profile"
+        },
+        {
+          "icon": "heart",
+          "title": "Global well-being",
+          "subtitle": "This week",
+          "badge": "87%"
+        },
+        {
+          "icon": "play",
+          "title": "Dream video",
+          "subtitle": "AI summary",
+          "badge": "NEW"
+        },
+        {
+          "icon": "handshake",
+          "title": "Coaching",
+          "subtitle": "real-smart"
+        },
+        {
+          "icon": "moon",
+          "title": "Dream analysis",
+          "subtitle": "4 tries"
+        }
       ],
       "process": {
         "badge": "simple & fast",
@@ -619,14 +1120,35 @@
       "journalDesc": "AI-generated illustrated video · Summary of your night",
       "videoBadge": "AI video",
       "quickBadges": [
-        { "icon": "building2", "label": "ESSTHS · Sousse" },
-        { "icon": "heart", "label": "100% free" },
-        { "icon": "sparkles", "label": "AI integrated" }
+        {
+          "icon": "building2",
+          "label": "ESSTHS · Sousse"
+        },
+        {
+          "icon": "heart",
+          "label": "100% free"
+        },
+        {
+          "icon": "sparkles",
+          "label": "AI integrated"
+        }
       ],
       "cards": [
-        { "title": "ESSTHS · Sousse", "desc": "100% encrypted, never shared. Your privacy first.", "badge": "Private" },
-        { "title": "100% free", "desc": "Human or AI, always available.", "badge": "For students" },
-        { "title": "AI integrated", "desc": "A guided conversation to better understand your emotional state.", "badge": "Voice analysis" }
+        {
+          "title": "ESSTHS · Sousse",
+          "desc": "100% encrypted, never shared. Your privacy first.",
+          "badge": "Private"
+        },
+        {
+          "title": "100% free",
+          "desc": "Human or AI, always available.",
+          "badge": "For students"
+        },
+        {
+          "title": "AI integrated",
+          "desc": "A guided conversation to better understand your emotional state.",
+          "badge": "Voice analysis"
+        }
       ]
     }
   },
@@ -659,10 +1181,30 @@
     "ethics": {
       "title": "A strong ethics at the core of",
       "values": [
-        { "icon": "lock", "title": "Privacy", "description": "All your personal data, conversations and reports stay strictly private. No sharing with third parties, ever.", "quote": "\"Your privacy is a fundamental right.\"" },
-        { "icon": "shieldCheck", "title": "Security", "description": "The platform is protected by advanced protocols: magic link, encryption and secure authentication.", "quote": "\"Your security is our top priority.\"" },
-        { "icon": "handHeart", "title": "Kindness", "description": "Every feature is designed with empathy and respect for students, in a friendly, judgment-free space.", "quote": "\"People first, always.\"" },
-        { "icon": "scale", "title": "Responsibility", "description": "We deliver reliable information validated by certified professionals, in a serious framework.", "quote": "\"Serious care, real results.\"" }
+        {
+          "icon": "lock",
+          "title": "Privacy",
+          "description": "All your personal data, conversations and reports stay strictly private. No sharing with third parties, ever.",
+          "quote": "\"Your privacy is a fundamental right.\""
+        },
+        {
+          "icon": "shieldCheck",
+          "title": "Security",
+          "description": "The platform is protected by advanced protocols: magic link, encryption and secure authentication.",
+          "quote": "\"Your security is our top priority.\""
+        },
+        {
+          "icon": "handHeart",
+          "title": "Kindness",
+          "description": "Every feature is designed with empathy and respect for students, in a friendly, judgment-free space.",
+          "quote": "\"People first, always.\""
+        },
+        {
+          "icon": "scale",
+          "title": "Responsibility",
+          "description": "We deliver reliable information validated by certified professionals, in a serious framework.",
+          "quote": "\"Serious care, real results.\""
+        }
       ]
     },
     "vision": {
@@ -733,37 +1275,61 @@
         {
           "title": "Educational support coach",
           "description": "Supports students in organizing their studies, managing stress, and improving their academic journey.",
-          "specialties": ["Organization", "Stress", "Academic path"],
+          "specialties": [
+            "Organization",
+            "Stress",
+            "Academic path"
+          ],
           "note": "4.9"
         },
         {
           "title": "Personal development coach",
           "description": "Supports students with motivation, self-confidence, and orientation choices.",
-          "specialties": ["Motivation", "Confidence", "Orientation"],
+          "specialties": [
+            "Motivation",
+            "Confidence",
+            "Orientation"
+          ],
           "note": "4.8"
         },
         {
           "title": "Academic success coach",
           "description": "Helps improve productivity, time management, and learning methods.",
-          "specialties": ["Productivity", "Methods", "Time management"],
+          "specialties": [
+            "Productivity",
+            "Methods",
+            "Time management"
+          ],
           "note": "5"
         },
         {
           "title": "Emotional regulation coach",
           "description": "Supports students in emotional regulation, interpersonal communication, and preventing emotional overload.",
-          "specialties": ["Emotions", "Communication", "Overload"],
+          "specialties": [
+            "Emotions",
+            "Communication",
+            "Overload"
+          ],
           "note": "4.9"
         },
         {
           "title": "Compassionate communication coach",
           "description": "Guides students in public speaking, non-violent communication, and conflict management in university settings.",
-          "specialties": ["NVC", "Public speaking", "Conflicts"],
+          "specialties": [
+            "NVC",
+            "Public speaking",
+            "Conflicts"
+          ],
           "note": "4.7"
         },
         {
           "title": "University clinical psychologist",
           "description": "Provides professional psychological support for anxiety disorders, student distress, and vulnerability situations.",
-          "specialties": ["Anxiety", "Psychology", "Well-being"],
+          "specialties": [
+            "Anxiety",
+            "Psychology",
+            "Well-being"
+          ],
           "note": "5"
         }
       ]
