@@ -33,8 +33,6 @@ const navItems = [
   { key: 'profile', href: '/dashboard/student/profile', icon: UserRound },
 ] as const
 
-type SidebarNavItem = (typeof navItems)[number]
-
 function isActivePath(pathname: string, href: string) {
   if (href === '/dashboard/student') {
     return pathname === href
@@ -88,7 +86,7 @@ export function StudentSidebar() {
               <span className="mindly-sidebar-icon">
                 <Icon />
               </span>
-              <span className="truncate">{t(item.key)}</span>
+              <span className="leading-tight">{t(item.key)}</span>
             </Link>
           )
         })}

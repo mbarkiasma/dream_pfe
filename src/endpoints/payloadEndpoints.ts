@@ -177,7 +177,7 @@ export const payloadEndpoints: Endpoint[] = [
       const analysisData = rawIsFinished ? extraireAnalysisData(n8nData) : null
       const isPrematureFinish = rawIsFinished && !analysisData
       const isFinished = rawIsFinished && Boolean(analysisData)
-      const cleanText = isPrematureFinish
+      const rawCleanText = isPrematureFinish
         ? interviewLanguage === 'en'
           ? 'Before finishing, could you share one recent situation where you had to make an important study-related decision?'
           : "Avant de terminer, pouvez-vous me parler d'une situation r\u00e9cente o\u00f9 vous avez d\u00fb prendre une d\u00e9cision importante li\u00e9e \u00e0 vos \u00e9tudes ?"
@@ -185,6 +185,14 @@ export const payloadEndpoints: Endpoint[] = [
             iaTextNettoye.replace(/\[FIN\]/gi, ''),
             interviewLanguage === 'en' ? 'en' : 'fr',
           ).trim()
+      // Guard against n8n looping the same closing question after the student already answered it
+      const isLoopedApplicationQuestion =
+        !isFinished && applicationAnswerDetected && detectApplicationQuestion(rawCleanText)
+      const cleanText = isLoopedApplicationQuestion
+        ? interviewLanguage === 'en'
+          ? "Thank you for sharing that. Is there anything else you'd like to add before we conclude our interview?"
+          : "Merci pour votre r\u00e9ponse. Y a-t-il quelque chose d\u2019autre que vous souhaiteriez partager avant de conclure notre entretien ?"
+        : rawCleanText
       const interactiveQuestion =
         isFinished
           ? null

@@ -2,6 +2,7 @@
 
 import { useClerk, useSignIn, useSignUp, useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/Logo/Logo'
 import {
   AlertCircle,
   BrainCircuit,
@@ -428,11 +429,7 @@ export function LoginClient({
 
         <section className="login-card">
           <div className="login-header">
-            <div className="login-icon">
-              <Moon />
-            </div>
-
-            <p className="login-eyebrow">{copy.brand}</p>
+            <Logo className="h-10 w-auto mx-auto mb-2" />
 
             <h1 className="login-title">{copy.title}</h1>
 

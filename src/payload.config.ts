@@ -205,6 +205,53 @@ export default buildConfig({
         return authHeader === `Bearer ${secret}`
       },
     },
-    tasks: [],
+    tasks: [
+      {
+        slug: 'sendPsyReminder',
+        label: 'Rappel rendez-vous psy (10 min avant)',
+        inputSchema: [
+          { name: 'appointmentId', type: 'text', required: true },
+          { name: 'studentEmail', type: 'email', required: true },
+          { name: 'studentName', type: 'text', required: true },
+          { name: 'teamsUrl', type: 'text', required: true },
+          { name: 'appointmentDate', type: 'text', required: true },
+          { name: 'startTime', type: 'text', required: true },
+        ],
+        handler: async ({ input, payload: jobPayload }) => {
+          const { studentEmail, studentName, teamsUrl, appointmentDate, startTime } = input as {
+            appointmentId: string
+            studentEmail: string
+            studentName: string
+            teamsUrl: string
+            appointmentDate: string
+            startTime: string
+          }
+
+          await jobPayload.sendEmail({
+            to: studentEmail,
+            subject: 'Rappel : votre rendez-vous psy commence dans 10 minutes',
+            html: `
+              <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#f5f3ff;border-radius:16px;">
+                <h2 style="color:#895ef8;margin-bottom:8px;">Votre rendez-vous commence bientôt</h2>
+                <p style="color:#4b5563;margin-bottom:4px;">Bonjour <strong>${studentName}</strong>,</p>
+                <p style="color:#4b5563;margin-bottom:24px;">
+                  Votre rendez-vous avec le psychologue prévu le <strong>${appointmentDate}</strong> à <strong>${startTime}</strong>
+                  commence dans <strong>10 minutes</strong>.
+                </p>
+                <a href="${teamsUrl}"
+                   style="display:inline-block;background:#895ef8;color:#fff;text-decoration:none;padding:12px 28px;border-radius:12px;font-weight:600;font-size:15px;">
+                  Rejoindre Microsoft Teams
+                </a>
+                <p style="color:#9ca3af;font-size:12px;margin-top:24px;">
+                  Si le bouton ne fonctionne pas, copiez ce lien : ${teamsUrl}
+                </p>
+              </div>
+            `,
+          })
+
+          return { output: {} }
+        },
+      },
+    ],
   },
 })

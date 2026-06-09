@@ -18,8 +18,10 @@ type AppointmentBody = {
 
 type UpdateAppointmentBody = {
   id?: string | number
+  modality?: 'presentiel' | 'en_ligne'
   rejectionReason?: string
   status?: 'confirmed' | 'rejected' | 'cancelled' | 'completed'
+  teamsJoinUrl?: string
 }
 
 function timeToMinutes(time: string) {
@@ -300,6 +302,8 @@ export async function PATCH(request: Request) {
   const appointmentId = body.id
   const rejectionReason = body.rejectionReason?.trim()
   const status = body.status
+  const modality = body.modality
+  const teamsJoinUrl = body.teamsJoinUrl?.trim()
 
   if (!appointmentId || !status) {
     return Response.json({ error: 'Rendez-vous et statut requis.' }, { status: 400 })
@@ -309,12 +313,20 @@ export async function PATCH(request: Request) {
     return Response.json({ error: 'La cause du refus est requise.' }, { status: 400 })
   }
 
+  if (status === 'confirmed' && !modality) {
+    return Response.json({ error: 'La modalite est requise pour confirmer.' }, { status: 400 })
+  }
+
+  if (status === 'confirmed' && modality === 'en_ligne' && !teamsJoinUrl) {
+    return Response.json({ error: 'Le lien Teams est requis pour un rendez-vous en ligne.' }, { status: 400 })
+  }
+
   const appointment = await payload.findByID({
     collection: 'rendez-vous-psy',
     id: appointmentId,
     user,
     overrideAccess: false,
-    depth: 0,
+    depth: 1,
   })
 
   const psychologistId =
@@ -334,11 +346,59 @@ export async function PATCH(request: Request) {
     data: {
       rejectionReason: status === 'rejected' ? rejectionReason : '',
       status,
-    },
+      ...(status === 'confirmed' && {
+        modality,
+        teamsJoinUrl: modality === 'en_ligne' ? teamsJoinUrl : '',
+      }),
+    } as Record<string, unknown>,
   })
 
   const studentId =
     typeof appointment.student === 'object' ? appointment.student.id : appointment.student
+
+  // Queue the Teams reminder job 10 min before the appointment (only for online confirmed appointments)
+  if (status === 'confirmed' && modality === 'en_ligne' && teamsJoinUrl && appointment.date && appointment.startTime) {
+    try {
+      const studentObj = typeof appointment.student === 'object' ? appointment.student : null
+      const studentEmail = studentObj && 'email' in studentObj ? (studentObj as { email?: string }).email : null
+      const studentFirstName = studentObj && 'firstName' in studentObj ? (studentObj as { firstName?: string | null }).firstName : null
+      const studentLastName = studentObj && 'lastName' in studentObj ? (studentObj as { lastName?: string | null }).lastName : null
+      const studentName = [studentFirstName, studentLastName].filter(Boolean).join(' ').trim() || studentEmail || 'Etudiant'
+
+      if (studentEmail) {
+        // Parse appointment date (stored as ISO) + startTime (HH:MM) → exact datetime
+        const apptBase = new Date(appointment.date)
+        const [hours, minutes] = appointment.startTime.split(':').map(Number)
+        const apptDateTime = new Date(
+          apptBase.getUTCFullYear(),
+          apptBase.getUTCMonth(),
+          apptBase.getUTCDate(),
+          hours,
+          minutes,
+          0,
+          0,
+        )
+        const reminderTime = new Date(apptDateTime.getTime() - 10 * 60 * 1000)
+
+        if (reminderTime > new Date()) {
+          await payload.jobs.queue({
+            task: 'sendPsyReminder',
+            waitUntil: reminderTime,
+            input: {
+              appointmentId: String(appointmentId),
+              studentEmail,
+              studentName,
+              teamsUrl: teamsJoinUrl,
+              appointmentDate: appointment.date,
+              startTime: appointment.startTime,
+            },
+          })
+        }
+      }
+    } catch (err) {
+      console.error('Failed to queue psy reminder job:', err)
+    }
+  }
 
   const statusLabels: Record<NonNullable<UpdateAppointmentBody['status']>, string> = {
     cancelled: 'annule',
@@ -348,14 +408,22 @@ export async function PATCH(request: Request) {
   }
 
   try {
+    const notifMessage = (() => {
+      if (status === 'rejected') return `Votre rendez-vous psy a ete refuse. Motif: ${rejectionReason}.`
+      if (status === 'confirmed' && modality === 'en_ligne') {
+        return `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est confirme. Il se tiendra en ligne via Microsoft Teams. Vous recevrez le lien par email 10 minutes avant la seance.`
+      }
+      if (status === 'confirmed' && modality === 'presentiel') {
+        return `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est confirme. Il se tiendra en presentiel.`
+      }
+      return `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est ${statusLabels[status]}.`
+    })()
+
     await createNotification({
       actor: user.id,
       event: `rendezvous_${status}`,
       link: '/dashboard/student/rendez_vous',
-      message:
-        status === 'rejected'
-          ? `Votre rendez-vous psy a ete refuse. Motif: ${rejectionReason}.`
-          : `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est ${statusLabels[status]}.`,
+      message: notifMessage,
       payload,
       recipient: studentId,
       sendEmail: true,

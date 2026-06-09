@@ -1,6 +1,6 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
-import { CalendarDays, Clock, UserRound } from 'lucide-react'
+import { CalendarDays, Clock, ExternalLink, MapPin, UserRound, Video } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 
 import { PsyRendezvousActions } from '@/components/dashboard/psy/PsyRendezvousActions'
@@ -134,7 +134,7 @@ export default async function PsyRendezVousPage() {
                             </div>
                           ) : null}
 
-                          <div className="mt-3 flex flex-wrap gap-2">
+                          <div className="mt-3 flex flex-wrap gap-3">
                             <span
                               className={`student-dream-status student-dream-status-small ${
                                 statusClasses[appointment.status] || 'bg-slate-100 text-slate-600'
@@ -148,14 +148,40 @@ export default async function PsyRendezVousPage() {
                                 ? t('requests.urgencyUrgent')
                                 : t('requests.urgencyNormal')}
                             </span>
+
+                            {appointment.modality === 'presentiel' ? (
+                              <span className="mindly-ui-badge flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                Presentiel
+                              </span>
+                            ) : appointment.modality === 'en_ligne' ? (
+                              <span className="mindly-ui-badge flex items-center gap-1 !border-blue-300 !bg-blue-50 !text-blue-700 dark:!border-blue-700 dark:!bg-blue-950/30 dark:!text-blue-300">
+                                <Video className="h-3 w-3" />
+                                En ligne
+                              </span>
+                            ) : null}
                           </div>
+
+                          {appointment.modality === 'en_ligne' && appointment.teamsJoinUrl ? (
+                            <a
+                              href={appointment.teamsJoinUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/40"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Rejoindre Microsoft Teams
+                            </a>
+                          ) : null}
                         </div>
                       </div>
 
-                      <PsyRendezvousActions
-                        appointmentId={appointment.id}
-                        status={appointment.status}
-                      />
+                      <div className="mt-4">
+                        <PsyRendezvousActions
+                          appointmentId={appointment.id}
+                          status={appointment.status}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>

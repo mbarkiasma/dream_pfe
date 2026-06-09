@@ -144,6 +144,7 @@ export interface Config {
   user: User;
   jobs: {
     tasks: {
+      sendPsyReminder: TaskSendPsyReminder;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -1057,6 +1058,18 @@ export interface RendezVousPsy {
    * Expliquez pourquoi le rendez-vous est refuse afin d'orienter l'etudiant.
    */
   rejectionReason?: string | null;
+  /**
+   * Choisie par le psy lors de la confirmation.
+   */
+  modality?: ('presentiel' | 'en_ligne') | null;
+  /**
+   * Lien de la reunion Microsoft Teams pour le rendez-vous en ligne.
+   */
+  teamsJoinUrl?: string | null;
+  /**
+   * Rempli automatiquement apres envoi du rappel pre-seance.
+   */
+  reminderSentAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1315,7 +1328,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'schedulePublish';
+        taskSlug: 'inline' | 'sendPsyReminder' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1348,7 +1361,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'sendPsyReminder' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -2084,6 +2097,9 @@ export interface RendezVousPsySelect<T extends boolean = true> {
   urgency?: T;
   status?: T;
   rejectionReason?: T;
+  modality?: T;
+  teamsJoinUrl?: T;
+  reminderSentAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2589,6 +2605,21 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSendPsyReminder".
+ */
+export interface TaskSendPsyReminder {
+  input: {
+    appointmentId: string;
+    studentEmail: string;
+    studentName: string;
+    teamsUrl: string;
+    appointmentDate: string;
+    startTime: string;
+  };
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

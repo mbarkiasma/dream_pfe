@@ -134,6 +134,36 @@ export const RendezvousPsy: CollectionConfig = {
         description: "Expliquez pourquoi le rendez-vous est refuse afin d'orienter l'etudiant.",
       },
     },
+    {
+      name: 'modality',
+      type: 'select',
+      label: 'Modalite',
+      options: [
+        { label: 'Presentiel', value: 'presentiel' },
+        { label: 'En ligne', value: 'en_ligne' },
+      ],
+      admin: {
+        description: 'Choisie par le psy lors de la confirmation.',
+      },
+    },
+    {
+      name: 'teamsJoinUrl',
+      type: 'text',
+      label: 'Lien Microsoft Teams',
+      admin: {
+        condition: (_, siblingData) => siblingData?.modality === 'en_ligne',
+        description: 'Lien de la reunion Microsoft Teams pour le rendez-vous en ligne.',
+      },
+    },
+    {
+      name: 'reminderSentAt',
+      type: 'date',
+      label: 'Rappel 10 min envoye le',
+      admin: {
+        readOnly: true,
+        description: 'Rempli automatiquement apres envoi du rappel pre-seance.',
+      },
+    },
   ],
   timestamps: true,
 }

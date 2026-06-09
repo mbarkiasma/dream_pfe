@@ -1021,10 +1021,6 @@
       "intro": "An innovative platform dedicated to student well-being, connecting students with certified professionals while leveraging AI to provide personalized support.",
       "quickBadges": [
         {
-          "icon": "building2",
-          "label": "ESSTHS · Sousse"
-        },
-        {
           "icon": "heart",
           "label": "100% free"
         },
@@ -1120,10 +1116,6 @@
       "journalDesc": "AI-generated illustrated video · Summary of your night",
       "videoBadge": "AI video",
       "quickBadges": [
-        {
-          "icon": "building2",
-          "label": "ESSTHS · Sousse"
-        },
         {
           "icon": "heart",
           "label": "100% free"

@@ -1021,10 +1021,6 @@
       "intro": "Une plateforme innovante dédiée au bien-être étudiant, reliant les étudiants à des professionnels certifiés tout en s'appuyant sur l'intelligence artificielle pour offrir un accompagnement personnalisé.",
       "quickBadges": [
         {
-          "icon": "building2",
-          "label": "ESSTHS · Sousse"
-        },
-        {
           "icon": "heart",
           "label": "100% gratuit"
         },
@@ -1120,10 +1116,6 @@
       "journalDesc": "Vidéo illustrée générée par IA · Résumé de votre nuit",
       "videoBadge": "Vidéo IA",
       "quickBadges": [
-        {
-          "icon": "building2",
-          "label": "ESSTHS · Sousse"
-        },
         {
           "icon": "heart",
           "label": "100% gratuit"

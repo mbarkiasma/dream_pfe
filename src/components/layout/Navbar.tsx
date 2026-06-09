@@ -79,8 +79,8 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-[100] border-b border-[var(--mindly-border)] bg-[var(--mindly-surface-glass)] backdrop-blur-[18px]">
-      <div className="relative mx-auto flex h-[70px] w-full max-w-none items-center justify-between px-5 lg:px-14">
-        <Link href="/home" className="flex items-center lg:translate-x-4" onClick={() => setOpen(false)}>
+      <div className="relative mx-auto flex h-[70px] w-full max-w-[1320px] items-center justify-between px-5">
+        <Link href="/home" className="flex items-center" onClick={() => setOpen(false)}>
           <Logo className="h-12 w-auto" />
         </Link>
 
@@ -93,8 +93,8 @@ export function Navbar() {
                 href={link.href}
                 className={`group relative rounded-[var(--mindly-radius-md)] px-4 py-2 text-[14.5px] font-bold transition-all duration-200 ${
                   active
-                    ? 'border border-transparent bg-[var(--mindly-surface)] text-[var(--mindly-primary)] shadow-[var(--mindly-shadow-xs)]'
-                    : 'border border-transparent text-[var(--mindly-purple-muted)] hover:bg-[var(--mindly-primary-soft-3)] hover:text-[var(--mindly-primary)]'
+                    ? 'border border-transparent bg-[var(--mindly-surface)] text-[var(--mindly-text-strong)] shadow-[var(--mindly-shadow-xs)]'
+                    : 'border border-transparent text-[var(--mindly-text-strong)] hover:bg-[var(--mindly-primary-soft-3)] hover:text-[var(--mindly-primary)]'
                 }`}
               >
                 {link.label}
