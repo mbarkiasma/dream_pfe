@@ -19,8 +19,9 @@ import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from 
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
 import { RowLabel as RowLabel_1f6ff6ff633e3695d348f4f3c58f1466 } from '@/Footer/RowLabel'
 import { default as default_ec6bce7ae98f70c075f59736132afd3a } from '@/components/AdminLogoutButton'
+import { default as default_048abc6671a4fc1f451175ea3afb1836 } from '@/components/Logo/AdminIcon'
+import { default as default_d0335e7a62aec198e4416a8134eda638 } from '@/components/Logo/AdminLogo'
 import { default as default_e63c5fa85993f28b8b83c4f3087a1ed9 } from '@/components/AdminKPI'
-import { default as default_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
 import { default as default_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -47,8 +48,9 @@ export const importMap = {
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
   "@/Footer/RowLabel#RowLabel": RowLabel_1f6ff6ff633e3695d348f4f3c58f1466,
   "@/components/AdminLogoutButton#default": default_ec6bce7ae98f70c075f59736132afd3a,
+  "@/components/Logo/AdminIcon#default": default_048abc6671a4fc1f451175ea3afb1836,
+  "@/components/Logo/AdminLogo#default": default_d0335e7a62aec198e4416a8134eda638,
   "@/components/AdminKPI#default": default_e63c5fa85993f28b8b83c4f3087a1ed9,
-  "@/components/BeforeDashboard#default": default_1a7510af427896d367a49dbf838d2de6,
   "@/components/BeforeLogin#default": default_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

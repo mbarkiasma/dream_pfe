@@ -99,9 +99,12 @@ export default buildConfig({
 
   admin: {
     components: {
+      graphics: {
+        Logo: '@/components/Logo/AdminLogo',
+        Icon: '@/components/Logo/AdminIcon',
+      },
       beforeLogin: ['@/components/BeforeLogin'],
-      beforeDashboard: ['@/components/AdminKPI',
-        '@/components/BeforeDashboard'],
+      beforeDashboard: ['@/components/AdminKPI'],
       logout: {
         Button: '@/components/AdminLogoutButton',
       },
@@ -164,7 +167,7 @@ export default buildConfig({
     PsyOrientations,
     StudentExercices,
   ].map(hideNonAdminManagedCollection),
-  globals: [Header, Footer].map(hideGlobalInAdmin).concat([AccountRetentionSettings]),
+  globals: [Header, Footer, AccountRetentionSettings].map(hideGlobalInAdmin),
   cors: [getServerSideURL()].filter(Boolean),
   plugins: [
     ...plugins,

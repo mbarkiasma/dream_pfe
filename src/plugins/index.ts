@@ -1,5 +1,4 @@
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
-import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
@@ -28,7 +27,8 @@ export const plugins: Plugin[] = [
   redirectsPlugin({
     collections: ['pages'],
     overrides: {
-      // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
+      admin: { hidden: true },
+      
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
           if ('name' in field && field.name === 'from') {
@@ -55,7 +55,11 @@ export const plugins: Plugin[] = [
     fields: {
       payment: false,
     },
+    formSubmissionOverrides: {
+      admin: { hidden: true },
+    },
     formOverrides: {
+      admin: { hidden: true },
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
           if ('name' in field && field.name === 'confirmationMessage') {
@@ -81,6 +85,7 @@ export const plugins: Plugin[] = [
     collections: ['pages'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
+      admin: { hidden: true },
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields]
       },
