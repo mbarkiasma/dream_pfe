@@ -35,7 +35,7 @@ export function CoachStatsCards({
       hint: activeExercisesCount > 0 ? t('exercisesHintActive') : t('exercisesHintEmpty'),
     },
     {
-      href: '/dashboard/coach/rendez_vous',
+      href: '/dashboard/coach/seances',
       icon: CalendarDays,
       label: t('appointments'),
       value: String(upcomingEventsCount),

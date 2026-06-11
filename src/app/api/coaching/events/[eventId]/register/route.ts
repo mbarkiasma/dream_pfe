@@ -50,7 +50,7 @@ async function notifyCoach({
   await createNotification({
     actor: user.id,
     event: 'coaching_event_registration_created',
-    link: '/dashboard/coach/rendez_vous',
+    link: '/dashboard/coach/seances',
     message: details,
     payload,
     recipient: Number(coachId),

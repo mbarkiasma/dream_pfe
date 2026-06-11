@@ -401,28 +401,46 @@ export async function PATCH(request: Request) {
   }
 
   const statusLabels: Record<NonNullable<UpdateAppointmentBody['status']>, string> = {
-    cancelled: 'annule',
-    completed: 'termine',
-    confirmed: 'confirme',
-    rejected: 'refuse',
+    cancelled: 'annulé',
+    completed: 'terminé',
+    confirmed: 'confirmé',
+    rejected: 'refusé',
+  }
+
+  function formatApptDate(dateStr: string) {
+    try {
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC',
+      }).format(new Date(dateStr))
+    } catch {
+      return dateStr
+    }
   }
 
   try {
+    const formattedDate = formatApptDate(appointment.date)
+
     const notifMessage = (() => {
-      if (status === 'rejected') return `Votre rendez-vous psy a ete refuse. Motif: ${rejectionReason}.`
+      if (status === 'rejected') {
+        return `Votre rendez-vous psy a été refusé. Motif : ${rejectionReason}.`
+      }
       if (status === 'confirmed' && modality === 'en_ligne') {
-        return `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est confirme. Il se tiendra en ligne via Microsoft Teams. Vous recevrez le lien par email 10 minutes avant la seance.`
+        return `Votre rendez-vous psy du ${formattedDate} à ${appointment.startTime} est confirmé. Il se tiendra en ligne via Microsoft Teams. Vous recevrez le lien de connexion par email 10 minutes avant la séance.`
       }
       if (status === 'confirmed' && modality === 'presentiel') {
-        return `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est confirme. Il se tiendra en presentiel.`
+        return `Votre rendez-vous psy du ${formattedDate} à ${appointment.startTime} est confirmé. Il se tiendra en présentiel.`
       }
-      return `Votre rendez-vous psy du ${appointment.date} a ${appointment.startTime} est ${statusLabels[status]}.`
+      return `Votre rendez-vous psy du ${formattedDate} à ${appointment.startTime} est ${statusLabels[status]}.`
     })()
 
     await createNotification({
       actor: user.id,
       event: `rendezvous_${status}`,
       link: '/dashboard/student/rendez_vous',
+      linkLabel: 'Voir mes rendez-vous',
       message: notifMessage,
       payload,
       recipient: studentId,

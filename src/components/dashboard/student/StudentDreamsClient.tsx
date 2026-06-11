@@ -548,6 +548,15 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                 <p className="student-dreams-latest-text">
                   {latestDream.summary || latestDream.description || ''}
                 </p>
+                {(latestDream.summary || latestDream.description || '').length > 150 ? (
+                  <button
+                    type="button"
+                    onClick={() => openAnalysisModal(latestDream, latestDream.summary || latestDream.description || '', 'description')}
+                    className="student-dreams-see-more"
+                  >
+                    {t('seeMore')}
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </CardContent>

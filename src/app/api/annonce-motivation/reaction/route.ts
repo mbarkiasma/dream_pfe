@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       await createNotification({
         actor: user.id,
         event: 'motivation_announcement_reacted',
-        link: '/dashboard/coach/annonces',
+        link: '/dashboard/coach/motivation',
         message: `${getUserName(user)} a reagi a votre motivation "${announcement.title}" : ${reactionLabels[reaction]}.`,
         payload,
         recipient: Number(coachId),

@@ -118,7 +118,7 @@ export default buildConfig({
   email: nodemailerAdapter({
     defaultFromAddress:
       process.env.SMTP_FROM_ADDRESS || smtpUser || 'notifications@dream-pfe.local',
-    defaultFromName: process.env.SMTP_FROM_NAME || 'Dream PFE',
+    defaultFromName: process.env.SMTP_FROM_NAME || 'MindBloom',
     transportOptions: smtpHost
       ? {
           host: smtpHost,
@@ -230,6 +230,19 @@ export default buildConfig({
             startTime: string
           }
 
+          const formattedDate = (() => {
+            try {
+              return new Intl.DateTimeFormat('fr-FR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                timeZone: 'UTC',
+              }).format(new Date(appointmentDate))
+            } catch {
+              return appointmentDate
+            }
+          })()
+
           await jobPayload.sendEmail({
             to: studentEmail,
             subject: 'Rappel : votre rendez-vous psy commence dans 10 minutes',
@@ -238,7 +251,7 @@ export default buildConfig({
                 <h2 style="color:#895ef8;margin-bottom:8px;">Votre rendez-vous commence bientôt</h2>
                 <p style="color:#4b5563;margin-bottom:4px;">Bonjour <strong>${studentName}</strong>,</p>
                 <p style="color:#4b5563;margin-bottom:24px;">
-                  Votre rendez-vous avec le psychologue prévu le <strong>${appointmentDate}</strong> à <strong>${startTime}</strong>
+                  Votre rendez-vous avec le psychologue prévu le <strong>${formattedDate}</strong> à <strong>${startTime}</strong>
                   commence dans <strong>10 minutes</strong>.
                 </p>
                 <a href="${teamsUrl}"

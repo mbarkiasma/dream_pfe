@@ -116,7 +116,7 @@ export default async function StudentAppointmentsPage() {
                   {requestAppointments.map((appointment) => (
                     <div key={appointment.id} className="student-appointments-request">
                       <div className="student-appointments-request-header">
-                        <div>
+                        <div className="min-w-0 flex-1">
                           <p className="student-appointments-request-title">
                             {t('timeRange', {
                               date: formatDate(appointment.date),
@@ -128,6 +128,48 @@ export default async function StudentAppointmentsPage() {
                           <p className="student-appointments-request-reason">
                             {appointment.reason}
                           </p>
+
+                          {appointment.status === 'confirmed' && appointment.modality ? (() => {
+                            const apptMs = getAppointmentDateTime(appointment.date, appointment.startTime)
+                            const minutesUntil = (apptMs - now) / 60_000
+                            const joinable = minutesUntil <= 10
+
+                            return (
+                              <div className="mt-2 flex flex-wrap items-center gap-2">
+                                {appointment.modality === 'en_ligne' ? (
+                                  <>
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+                                      🎥 {t('modalityOnline')}
+                                    </span>
+                                    {appointment.teamsJoinUrl ? (
+                                      joinable ? (
+                                        <a
+                                          href={appointment.teamsJoinUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 rounded-full bg-violet-600 px-3 py-1 text-xs font-semibold text-white hover:bg-violet-700 transition-colors"
+                                        >
+                                          {t('joinTeams')}
+                                        </a>
+                                      ) : (
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-400 dark:bg-white/5 dark:text-white/30 cursor-not-allowed">
+                                          🔒 {t('joinTeamsLocked')}
+                                        </span>
+                                      )
+                                    ) : (
+                                      <span className="text-xs text-dream-muted dark:text-white/50">
+                                        {t('linkBeforeSession')}
+                                      </span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                    📍 {t('modalityInPerson')}
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          })() : null}
 
                           {appointment.status === 'rejected' && appointment.rejectionReason ? (
                             <div className="student-appointments-rejection">

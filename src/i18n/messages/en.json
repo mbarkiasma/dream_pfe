@@ -278,6 +278,11 @@
           "cancelled": "Cancelled",
           "completed": "Completed"
         },
+        "modalityOnline": "Online — Microsoft Teams",
+        "modalityInPerson": "In person",
+        "joinTeams": "Join Teams meeting",
+        "joinTeamsLocked": "Available 10 min before the session",
+        "linkBeforeSession": "The link will be sent to you by email 10 min before the session.",
         "rejectionTitle": "Rejection reason",
         "rejectionHelp": "Please choose another available appointment from the calendar.",
         "emptyTitle": "No requests sent",
@@ -666,9 +671,9 @@
         "subtitle": "Coaching",
         "dashboard": "Dashboard",
         "students": "Students",
-        "sessions": "Sessions",
+        "sessions": "Coaching",
         "exercises": "Exercises",
-        "appointments": "Appointments",
+        "appointments": "Sessions",
         "notifications": "Notifications",
         "orientationPsy": "Psy referral",
         "announcements": "Announcements",
@@ -760,7 +765,34 @@
         "statusCompleted": "Completed",
         "statusInProgress": "In progress",
         "statusMissed": "Not done",
-        "statusReviewed": "Reviewed"
+        "statusReviewed": "Reviewed",
+        "progress": "Progress",
+        "exercisesCompleted": "done",
+        "exercisesPending": "pending",
+        "exercisesMissed": "not done",
+        "openDossier": "View dossier"
+      },
+      "studentDossier": {
+        "backToList": "Back to students",
+        "noEmail": "No email provided",
+        "progressTitle": "Exercise progress",
+        "exercisesDone": "exercises completed",
+        "statusDone": "Done",
+        "statusReviewed": "Reviewed",
+        "statusMissed": "Not done",
+        "statusInProgress": "In progress",
+        "statusAssigned": "Assigned",
+        "statusPending": "pending",
+        "dueDate": "Due:",
+        "noDate": "No date",
+        "noExercises": "No exercises assigned yet.",
+        "sessionsTitle": "Coaching sessions",
+        "sessionOpen": "Open",
+        "sessionClosed": "Closed",
+        "noSessions": "No sessions.",
+        "notesTitle": "Follow-up notes",
+        "defaultNote": "Untitled note",
+        "noNotes": "No notes recorded for this student."
       },
       "exercises": {
         "title": "Exercises",
@@ -811,7 +843,7 @@
         "description": "Publish motivational content for students."
       },
       "appointments": {
-        "title": "Appointments",
+        "title": "Sessions",
         "description": "Schedule and manage coaching sessions with students.",
         "scheduledSessions": "Scheduled sessions"
       },
@@ -1103,7 +1135,7 @@
     "hero": {
       "sectionBadge": "Student well-being solution",
       "titleLine1A": "MindBloom",
-      "titleLine1B": ", the platform that",
+      "titleLine1B": "the platform that",
       "titleLine2": "turns listening",
       "titleLine3": "into support",
       "subtitle": "A support platform built for students",
@@ -1125,23 +1157,7 @@
           "label": "AI integrated"
         }
       ],
-      "cards": [
-        {
-          "title": "ESSTHS · Sousse",
-          "desc": "100% encrypted, never shared. Your privacy first.",
-          "badge": "Private"
-        },
-        {
-          "title": "100% free",
-          "desc": "Human or AI, always available.",
-          "badge": "For students"
-        },
-        {
-          "title": "AI integrated",
-          "desc": "A guided conversation to better understand your emotional state.",
-          "badge": "Voice analysis"
-        }
-      ]
+      "cards": []
     }
   },
   "aboutPage": {

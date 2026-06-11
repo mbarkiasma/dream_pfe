@@ -25,10 +25,10 @@ const navKeys = [
   { key: 'students', href: '/dashboard/coach/students', icon: UsersRound },
   { key: 'sessions', href: '/dashboard/coach/coaching', icon: LifeBuoy },
   { key: 'exercises', href: '/dashboard/coach/exercices', icon: BookOpenCheck },
-  { key: 'appointments', href: '/dashboard/coach/rendez_vous', icon: CalendarDays },
+  { key: 'appointments', href: '/dashboard/coach/seances', icon: CalendarDays },
   { key: 'notifications', href: '/dashboard/coach/notifications', icon: Bell },
   { key: 'orientationPsy', href: '/dashboard/coach/orientation_psy', icon: Stethoscope },
-  { key: 'announcements', href: '/dashboard/coach/annonces', icon: Megaphone },
+  { key: 'announcements', href: '/dashboard/coach/motivation', icon: Megaphone },
   { key: 'profile', href: '/dashboard/coach/profil', icon: UserRound },
 ] as const
 
@@ -86,7 +86,7 @@ export function CoachSidebar() {
               <span className="mindly-sidebar-icon">
                 <Icon />
               </span>
-              <span className="truncate">{label}</span>
+              <span className="leading-tight">{label}</span>
             </Link>
           )
         })}

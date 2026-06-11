@@ -460,7 +460,7 @@ export function ActeursFonctionnalites() {
           </button>
         </div>
 
-        <article className="relative mt-10 overflow-hidden rounded-[24px] border border-[var(--mindly-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,245,255,0.88))] p-5 shadow-[var(--mindly-shadow-lg)] sm:p-7">
+        <article className="relative mt-10 overflow-hidden rounded-[24px] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-5 shadow-[var(--mindly-shadow-lg)] sm:p-7">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(137,94,248,0.38),transparent)]" />
 
           <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
@@ -486,7 +486,7 @@ export function ActeursFonctionnalites() {
             {currentFeatures.items.map((item) => (
               <div
                 key={item.number}
-                className="group relative flex min-h-[112px] flex-col justify-between overflow-hidden rounded-[18px] border border-[var(--mindly-border-violet)] bg-white p-4 text-left shadow-[0_10px_26px_rgba(137,94,248,0.06)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--mindly-border-strong)] hover:shadow-[0_18px_34px_rgba(137,94,248,0.14)]"
+                className="group relative flex min-h-[112px] flex-col justify-between overflow-hidden rounded-[18px] border border-[var(--mindly-border-violet)] bg-[var(--mindly-surface)] p-4 text-left shadow-[0_10px_26px_rgba(137,94,248,0.06)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--mindly-border-strong)] hover:shadow-[0_18px_34px_rgba(137,94,248,0.14)]"
               >
                 <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[var(--mindly-primary-soft-3)] opacity-70 transition-transform duration-300 ease-out group-hover:scale-125" />
                 <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[image:var(--mindly-gradient-primary)] text-[16px] font-bold text-white shadow-[0_10px_22px_rgba(137,94,248,0.26)]">

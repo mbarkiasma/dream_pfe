@@ -23,7 +23,7 @@ export default async function CoachAppointmentsPage() {
             equals: user.id,
           },
         },
-        sort: 'scheduledAt',
+        sort: '-scheduledAt',
         depth: 0,
         limit: 20,
       })

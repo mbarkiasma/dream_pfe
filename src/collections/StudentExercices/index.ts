@@ -200,6 +200,12 @@ export const StudentExercices: CollectionConfig = {
       },
     },
     {
+      name: 'checkInEtat',
+      type: 'checkbox',
+      label: 'Check-in effectué',
+      defaultValue: false,
+    },
+    {
       name: 'studentResponse',
       type: 'textarea',
       label: "Reponse de l'etudiant",

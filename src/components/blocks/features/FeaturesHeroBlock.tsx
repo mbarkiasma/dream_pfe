@@ -108,7 +108,7 @@ export default function FeaturesHeroBlock() {
           </div>
         </div>
 
-        <div className="relative lg:max-w-[600px] lg:translate-y-4 lg:justify-self-end">
+        <div className="relative mx-auto w-full lg:max-w-[520px] lg:translate-y-4 lg:justify-self-center">
           <div className="grid gap-3 lg:gap-4">
             <article className="overflow-hidden rounded-[24px] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] shadow-[0_20px_45px_rgba(137,94,248,0.12)]">
               <div className="relative h-[180px] overflow-hidden bg-[var(--mindly-bg-strong)] sm:h-[200px] lg:h-[210px]">

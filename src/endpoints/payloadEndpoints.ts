@@ -191,7 +191,7 @@ export const payloadEndpoints: Endpoint[] = [
       const cleanText = isLoopedApplicationQuestion
         ? interviewLanguage === 'en'
           ? "Thank you for sharing that. Is there anything else you'd like to add before we conclude our interview?"
-          : "Merci pour votre r\u00e9ponse. Y a-t-il quelque chose d\u2019autre que vous souhaiteriez partager avant de conclure notre entretien ?"
+          : "Merci pour votre réponse. Y a-t-il quelque chose d'autre que vous souhaiteriez partager avant de conclure notre entretien ?"
         : rawCleanText
       const interactiveQuestion =
         isFinished

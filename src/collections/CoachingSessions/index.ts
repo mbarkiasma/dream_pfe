@@ -122,6 +122,20 @@ export const CoachingSessions: CollectionConfig = {
       required: true,
     },
     {
+      name: 'objectif',
+      type: 'textarea',
+      label: 'Objectif de la séance',
+    },
+    {
+      name: 'lieu',
+      type: 'text',
+      label: 'Lieu',
+      admin: {
+        condition: (_, siblingData) => siblingData?.mode === 'classic',
+        description: 'Lieu physique si la séance est en présentiel.',
+      },
+    },
+    {
       name: 'startedAt',
       type: 'date',
       defaultValue: () => new Date().toISOString(),

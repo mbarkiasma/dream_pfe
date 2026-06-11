@@ -973,6 +973,11 @@ export interface CoachingSession {
   coach?: (number | null) | User;
   mode: 'smart' | 'classic';
   status: 'open' | 'closed';
+  objectif?: string | null;
+  /**
+   * Lieu physique si la séance est en présentiel.
+   */
+  lieu?: string | null;
   startedAt: string;
   endedAt?: string | null;
   updatedAt: string;
@@ -1184,6 +1189,7 @@ export interface StudentExercice {
   reason?: string | null;
   status: 'assigned' | 'in_progress' | 'completed' | 'reviewed' | 'missed';
   dueDate?: string | null;
+  checkInEtat?: boolean | null;
   studentResponse?: string | null;
   coachFeedback?: string | null;
   assignedAt: string;
@@ -2028,6 +2034,8 @@ export interface CoachingSessionsSelect<T extends boolean = true> {
   coach?: T;
   mode?: T;
   status?: T;
+  objectif?: T;
+  lieu?: T;
   startedAt?: T;
   endedAt?: T;
   updatedAt?: T;
@@ -2207,6 +2215,7 @@ export interface StudentExercicesSelect<T extends boolean = true> {
   reason?: T;
   status?: T;
   dueDate?: T;
+  checkInEtat?: T;
   studentResponse?: T;
   coachFeedback?: T;
   assignedAt?: T;

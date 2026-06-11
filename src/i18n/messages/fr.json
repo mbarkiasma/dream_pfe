@@ -278,6 +278,11 @@
           "cancelled": "Annulé",
           "completed": "Terminé"
         },
+        "modalityOnline": "En ligne — Microsoft Teams",
+        "modalityInPerson": "En présentiel",
+        "joinTeams": "Rejoindre la réunion Teams",
+        "joinTeamsLocked": "Disponible 10 min avant la séance",
+        "linkBeforeSession": "Le lien vous sera envoyé par email 10 min avant la séance.",
         "rejectionTitle": "Cause du refus",
         "rejectionHelp": "Merci de choisir un autre rendez-vous disponible dans le calendrier.",
         "emptyTitle": "Aucune demande envoyée",
@@ -666,12 +671,12 @@
         "subtitle": "Accompagnement",
         "dashboard": "Dashboard",
         "students": "Étudiants",
-        "sessions": "Sessions",
+        "sessions": "Coaching",
         "exercises": "Exercices",
-        "appointments": "Rendez-vous",
+        "appointments": "Séances",
         "notifications": "Notifications",
         "orientationPsy": "Orientation psy",
-        "announcements": "Annonces",
+        "announcements": "Annonces de motivation",
         "profile": "Mon profil",
         "openMenu": "Ouvrir le menu",
         "closeMenu": "Fermer le menu",
@@ -760,7 +765,34 @@
         "statusCompleted": "Terminé",
         "statusInProgress": "En cours",
         "statusMissed": "Non fait",
-        "statusReviewed": "Corrigé"
+        "statusReviewed": "Corrigé",
+        "progress": "Progression",
+        "exercisesCompleted": "faits",
+        "exercisesPending": "en attente",
+        "exercisesMissed": "non faits",
+        "openDossier": "Voir le dossier"
+      },
+      "studentDossier": {
+        "backToList": "Retour aux étudiants",
+        "noEmail": "Email non renseigné",
+        "progressTitle": "Progression des exercices",
+        "exercisesDone": "exercices réalisés",
+        "statusDone": "Fait",
+        "statusReviewed": "Corrigé",
+        "statusMissed": "Non fait",
+        "statusInProgress": "En cours",
+        "statusAssigned": "Attribué",
+        "statusPending": "en attente",
+        "dueDate": "Échéance :",
+        "noDate": "Sans date",
+        "noExercises": "Aucun exercice attribué pour le moment.",
+        "sessionsTitle": "Séances de coaching",
+        "sessionOpen": "Ouverte",
+        "sessionClosed": "Clôturée",
+        "noSessions": "Aucune séance.",
+        "notesTitle": "Notes de suivi",
+        "defaultNote": "Note sans titre",
+        "noNotes": "Aucune note enregistrée pour cet étudiant."
       },
       "exercises": {
         "title": "Exercices",
@@ -811,7 +843,7 @@
         "description": "Publiez des contenus de motivation destinés aux étudiants."
       },
       "appointments": {
-        "title": "Rendez-vous",
+        "title": "Séances",
         "description": "Planifiez et gérez les séances de coaching avec les étudiants.",
         "scheduledSessions": "Séances planifiées"
       },
@@ -1103,7 +1135,7 @@
     "hero": {
       "sectionBadge": "Solution de bien-être étudiant",
       "titleLine1A": "MindBloom",
-      "titleLine1B": ", la plateforme qui",
+      "titleLine1B": "la plateforme qui",
       "titleLine2": "transforme l'écoute",
       "titleLine3": "en accompagnement",
       "subtitle": "Une plateforme d'accompagnement pensée pour les étudiants",
@@ -1125,23 +1157,7 @@
           "label": "IA intégrée"
         }
       ],
-      "cards": [
-        {
-          "title": "ESSTHS · Sousse",
-          "desc": "100% chiffrées, jamais partagées. Votre confidentialité avant tout.",
-          "badge": "Privé"
-        },
-        {
-          "title": "100% gratuit",
-          "desc": "Humain ou IA, toujours disponible.",
-          "badge": "Pour étudiant"
-        },
-        {
-          "title": "IA intégrée",
-          "desc": "Un échange guidé pour mieux comprendre votre état émotionnel.",
-          "badge": "Analyse vocale"
-        }
-      ]
+      "cards": []
     }
   },
   "aboutPage": {
