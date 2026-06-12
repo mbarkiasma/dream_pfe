@@ -160,11 +160,11 @@ export default async function PsyStudentsPage({
   }
 
   return (
-    <div>
+    <div className="w-full overflow-x-hidden">
       <PsyTopbar title={t('title')} description={t('description')} />
 
       <div className="mindly-page-content">
-        <article className="mindly-feature-card">
+        <article className="mindly-feature-card !overflow-visible">
           <div className="mindly-feature-header">
             <h2 className="mindly-feature-title">{d('title')}</h2>
             <div className="flex flex-wrap items-center gap-2">
@@ -201,31 +201,31 @@ export default async function PsyStudentsPage({
                   <Link
                     key={dossier.user.id}
                     href="/dashboard/psy/rendez_vous"
-                    className="student-dreams-latest-box group block transition hover:-translate-y-0.5"
+                    className="group block w-full rounded-[1.15rem] border border-[var(--mindly-border)] bg-white/80 p-4 transition hover:-translate-y-0.5"
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-3">
+                        <div className="flex min-w-0 items-center gap-3">
                           <div className="mindly-feature-icon shrink-0">
                             <UserRound />
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-w-0 overflow-hidden">
                             <div className="flex flex-wrap items-center gap-2">
-                              <p className="mindly-feature-reference">
+                              <p className="mindly-feature-reference truncate">
                                 {getStudentName(dossier.user)}
                               </p>
                               <span className={statusBadge[dossier.status]}>
                                 {statusLabel[dossier.status]}
                               </span>
                             </div>
-                            <p className="mindly-feature-text mt-0.5 flex items-center gap-1">
+                            <p className="mindly-feature-text mt-0.5 flex items-center gap-1 overflow-hidden">
                               <Mail className="h-3.5 w-3.5 shrink-0" />
-                              {dossier.user.email}
+                              <span className="min-w-0 truncate">{dossier.user.email}</span>
                             </p>
                           </div>
                         </div>
 
-                        <div className="mt-3 flex flex-wrap gap-2 pl-12">
+                        <div className="mt-3 flex flex-wrap gap-2 pl-0 sm:pl-12">
                           <span className="mindly-ui-badge">
                             {dossier.totalSessions}{' '}
                             {dossier.totalSessions > 1 ? d('sessionsPlural') : d('sessions')}
@@ -247,7 +247,7 @@ export default async function PsyStudentsPage({
                         </div>
                       </div>
 
-                      <div className="student-dreams-latest-box min-w-[200px] shrink-0">
+                      <div className="w-full rounded-[1.15rem] border border-[var(--mindly-border)] bg-white/80 p-4 sm:w-auto sm:min-w-[200px] sm:shrink-0">
                         <p className="mindly-dashboard-eyebrow flex items-center gap-1">
                           <Clock className="h-3.5 w-3.5" />
                           {d('nextAppointment')}

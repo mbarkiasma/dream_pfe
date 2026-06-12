@@ -390,7 +390,7 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
             })
             const data = await res.json()
             if (data.text) {
-              setDescription((prev) => prev ? `${prev} ${data.text}` : data.text)
+              setDescription(data.text)
             }
           } catch {
             setError(t('errorMic'))

@@ -680,9 +680,7 @@ export const payloadEndpoints: Endpoint[] = [
         return text // all 3 attempts failed — return original as last resort
       }
 
-      // Translate all fields sequentially (2 at a time) to avoid Groq rate-limiting
-      const descriptionFr = await translate(trimmedDescription, 'fr', 2000)
-      const descriptionEn = await translate(trimmedDescription, 'en', 2000)
+      // Description is never translated — always stored exactly as the user wrote it
       const [summaryFr, summaryEn] = await Promise.all([
         translate(summary, 'fr', 2000),
         translate(summary, 'en', 2000),
@@ -692,14 +690,14 @@ export const payloadEndpoints: Endpoint[] = [
         translate(analysis, 'en', 4000),
       ])
 
-      // Save primary locale
+      // Save primary locale — always keep original description unchanged
       await req.payload.update({
         collection: 'dreams',
         id: dream.id,
         req,
         locale: primaryDreamLocale,
         data: {
-          description: primaryDreamLocale === 'fr' ? descriptionFr : descriptionEn,
+          description: trimmedDescription,
           summary: primaryDreamLocale === 'fr' ? summaryFr : summaryEn,
           analysis: primaryDreamLocale === 'fr' ? analysisFr : analysisEn,
           videoStatus,
@@ -707,14 +705,14 @@ export const payloadEndpoints: Endpoint[] = [
         },
       })
 
-      // Save other locale
+      // Save other locale — description translated, summary/analysis translated
       const updatedDream = await req.payload.update({
         collection: 'dreams',
         id: dream.id,
         req,
         locale: otherLocale,
         data: {
-          description: otherLocale === 'fr' ? descriptionFr : descriptionEn,
+          description: trimmedDescription,
           summary: otherLocale === 'fr' ? summaryFr : summaryEn,
           analysis: otherLocale === 'fr' ? analysisFr : analysisEn,
           errorMessage: '',
