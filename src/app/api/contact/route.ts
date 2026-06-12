@@ -8,12 +8,12 @@ type ContactBody = {
   message?: string
 }
 
-const recipientEmail = 'adminpfe0@gmail.com'
+const recipientEmail = 'contact@mindbloom.tn'
 
 const subjectLabels: Record<string, string> = {
-  access: "Probleme d'acces",
+  access: "Problème d'accès",
   bug: 'Bug technique',
-  general: 'Question generale',
+  general: 'Question générale',
   partner: 'Partenariat',
 }
 
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     subject: `MindBloom | ${subjectLabels[subject] ?? subject} | ${prenom} ${nom}`,
     text: [
       'Nouveau message depuis MindBloom',
-      `Envoye le: ${submittedAt}`,
+      `Envoyé le: ${submittedAt}`,
       `Nom: ${prenom} ${nom}`,
       `Email: ${email}`,
       `Sujet: ${subjectLabels[subject] ?? subject}`,
@@ -141,11 +141,11 @@ export async function POST(request: Request) {
               </div>
 
               <a href="${replyHref}" style="display:inline-block; padding:13px 20px; border-radius:999px; background:linear-gradient(135deg,#895ef8,#a987ff); color:#ffffff; text-decoration:none; font-size:14px; font-weight:700;">
-                Repondre a ${safeName}
+                Répondre à ${safeName}
               </a>
 
               <p style="margin:20px 0 0; font-size:12px; line-height:1.6; color:#7b6b9a;">
-                Cet email a ete envoye automatiquement depuis le formulaire de contact MindBloom.
+                Cet email a été envoyé automatiquement depuis le formulaire de contact MindBloom.
               </p>
             </div>
           </div>

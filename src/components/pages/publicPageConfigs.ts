@@ -23,8 +23,8 @@ export const publicPageConfigs = {
     innerClassName:
       'relative mx-auto max-w-[1240px] rounded-[28px] border border-[var(--mindly-contact-border)] bg-[var(--mindly-bg)] px-[clamp(14px,3vw,34px)] pb-8 pt-6',
   },
-  fonctionnalites: {
-    slug: 'fonctionnalites',
+  nosServices: {
+    slug: 'nos_services',
     fallbackLayout: [
       { blockType: 'featuresHero' },
       { blockType: 'featuresTabs' },

@@ -133,7 +133,7 @@ export default function AccompagnementHeroBlock() {
                 </Link>
 
                 <AppBadge asChild size="md" className={`${appBadgeCtaSecondaryClass} !min-h-11 !min-w-0 !whitespace-normal px-3 py-2.5 text-[12px] sm:text-[14px] sm:!whitespace-nowrap sm:!min-w-[200px]`}>
-                  <Link href="/fonctionnalites">
+                  <Link href="/nos_services">
                     {t('ctaSecondary')}
                   </Link>
                 </AppBadge>

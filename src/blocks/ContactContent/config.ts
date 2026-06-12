@@ -35,7 +35,7 @@ export const ContactContent: Block = {
           icon: 'mail',
           tagFr: 'Email direct',
           tagEn: 'Direct email',
-          address: 'adminpfe0@gmail.com',
+          address: 'contact@mindbloom.tn',
           descFr: 'Reponse sous 24h ouvrables',
           descEn: 'Reply within 24 business hours',
         },

@@ -59,7 +59,7 @@ export function Navbar() {
 
   const navLinks = [
     { label: t('home'), href: '/home' },
-    { label: t('features'), href: '/fonctionnalites' },
+    { label: t('features'), href: '/nos_services' },
     { label: t('about'), href: '/a-propos' },
     { label: t('contact'), href: '/contact' },
   ]

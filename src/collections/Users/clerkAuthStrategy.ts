@@ -49,6 +49,7 @@ async function getUserIsActive(payload: Payload, id: string | number): Promise<b
       collection: 'users',
       id: String(id),
       depth: 0,
+      overrideAccess: true,
       select: {
         isActive: true,
       },
@@ -84,6 +85,7 @@ async function getOrCreatePayloadUser({
       collection: 'users',
       depth: 0,
       limit: 1,
+      overrideAccess: true,
       select: {
         id: true,
         clerkUserId: true,
@@ -109,6 +111,7 @@ async function getOrCreatePayloadUser({
         collection: 'users',
         depth: 0,
         limit: 1,
+        overrideAccess: true,
         select: {
           id: true,
           clerkUserId: true,
@@ -141,6 +144,7 @@ async function getOrCreatePayloadUser({
         payload.update({
           collection: 'users',
           id: payloadUser.id,
+          overrideAccess: true,
           data: {
             clerkUserId: userId,
             firstName: clerkUser.firstName || payloadUser.firstName,
@@ -166,6 +170,7 @@ async function getOrCreatePayloadUser({
   const createdUser = await runWithSchemaRepair(() =>
     payload.create({
       collection: 'users',
+      overrideAccess: true,
       data: {
         clerkUserId: userId,
         email,

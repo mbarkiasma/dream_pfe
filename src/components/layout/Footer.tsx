@@ -37,28 +37,28 @@ export function Footer() {
   const nav = isFr
     ? [
         { label: 'Accueil', href: '/' },
-        { label: 'Fonctionnalités', href: '/fonctionnalites' },
+        { label: 'Fonctionnalités', href: '/nos_services' },
         { label: 'A propos', href: '/a-propos' },
         { label: 'Contact', href: '/contact' },
       ]
     : [
         { label: 'Home', href: '/' },
-        { label: 'Features', href: '/fonctionnalites' },
+        { label: 'Features', href: '/nos_services' },
         { label: 'About', href: '/a-propos' },
         { label: 'Contact', href: '/contact' },
       ]
 
   const ressources = isFr
     ? [
-        { label: 'Modèle Big Five', href: '/fonctionnalites' },
-        { label: 'Journal de rêves', href: '/fonctionnalites' },
-        { label: 'Suivi quotidien', href: '/fonctionnalites' },
+        { label: 'Modèle Big Five', href: '/nos_services' },
+        { label: 'Journal de rêves', href: '/nos_services' },
+        { label: 'Suivi quotidien', href: '/nos_services' },
         { label: 'Entretien IA', href: '/login' },
       ]
     : [
-        { label: 'Big Five model', href: '/fonctionnalites' },
-        { label: 'Dream journal', href: '/fonctionnalites' },
-        { label: 'Daily tracking', href: '/fonctionnalites' },
+        { label: 'Big Five model', href: '/nos_services' },
+        { label: 'Dream journal', href: '/nos_services' },
+        { label: 'Daily tracking', href: '/nos_services' },
         { label: 'AI interview', href: '/login' },
       ]
 

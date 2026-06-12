@@ -21,7 +21,7 @@ export const EMAILS: EmailEntry[] = [
   {
     icon: 'mail',
     tag: 'Email direct',
-    address: 'adminpfe0@gmail.com',
+    address: 'contact@mindbloom.tn',
     desc: 'Réponse sous 24h ouvrables',
   },
 ]
@@ -39,7 +39,7 @@ export const FAQ_ITEMS: FaqEntry[] = [
   },
   {
     q: 'Problème technique : que faire ?',
-    a: 'Écrivez à adminpfe0@gmail.com et nous vous répondrons rapidement.',
+    a: 'Écrivez à contact@mindbloom.tn et nous vous répondrons rapidement.',
   },
   {
     q: 'Comment contacter un coach ou psy ?',
