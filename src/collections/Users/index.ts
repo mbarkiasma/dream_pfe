@@ -109,7 +109,7 @@ export const Users: CollectionConfig = {
 
       return null
     },
-    defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isActive', 'isAvailableForCoaching'],
+    defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isActive'],
     useAsTitle: 'email',
   },
   auth: {
@@ -158,6 +158,7 @@ export const Users: CollectionConfig = {
           collection: 'users',
           id,
           depth: 0,
+          overrideAccess: true,
           req,
         })
 
@@ -376,46 +377,21 @@ export const Users: CollectionConfig = {
           req,
         })
 
-        const dreams = await req.payload.find({
+        await req.payload.delete({
           collection: 'dreams',
           where: {
             user: {
               equals: userId,
             },
           },
-          depth: 0,
-          limit: 1000,
           overrideAccess: true,
           req,
         })
-
-        for (const dream of dreams.docs) {
-          await req.payload.update({
-            collection: 'dreams',
-            id: dream.id,
-            overrideAccess: true,
-            req,
-            data: {
-              videoAsset: null,
-            },
-          })
-        }
 
         await req.payload.delete({
           collection: 'media',
           where: {
             owner: {
-              equals: userId,
-            },
-          },
-          overrideAccess: true,
-          req,
-        })
-
-        await req.payload.delete({
-          collection: 'dreams',
-          where: {
-            user: {
               equals: userId,
             },
           },
@@ -593,17 +569,6 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'isAvailableForCoaching',
-      type: 'checkbox',
-      defaultValue: false,
-      label: 'Disponible pour le coaching humain',
-      admin: {
-        condition: (_, siblingData) => siblingData?.role === 'coach',
-        description:
-          "Activez ce champ quand le coach peut recevoir de nouvelles sessions d'accompagnement.",
-      },
-    },
-    {
       name: 'coachingSpecialty',
       type: 'text',
       label: 'Specialite coaching',
@@ -613,22 +578,21 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      name: 'psySpecialty',
+      type: 'text',
+      label: 'Spécialité psy',
+      admin: {
+        condition: (_, siblingData) => siblingData?.role === 'psy',
+        description: 'Exemple : anxiété, thérapie cognitive, dépression.',
+      },
+    },
+    {
       name: 'coachingBio',
       type: 'textarea',
       label: 'Presentation coaching',
       maxLength: 280,
       admin: {
         condition: (_, siblingData) => siblingData?.role === 'coach',
-      },
-    },
-    {
-      name: 'coachTagline',
-      type: 'text',
-      label: 'Accroche coach',
-      maxLength: 120,
-      admin: {
-        condition: (_, siblingData) => siblingData?.role === 'coach',
-        description: "Courte phrase d'accroche, ex: Accompagner, motiver, transformer.",
       },
     },
     {

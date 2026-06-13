@@ -1,19 +1,23 @@
 import { Document, Font, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 
 import type { AnalysePersonnalite } from '@/payload-types'
-import type { ReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
+import type { ReportWellbeingTheme, ReportWellbeingKey } from '@/utilities/getReportWellbeingTheme'
 
 type ReportWellbeing = {
+  key: ReportWellbeingKey
   score: number | null
   theme: ReportWellbeingTheme
   label: string
   description: string
 }
 
+type SupportedLocale = 'fr' | 'en'
+
 type AnalysisPdfDocumentProps = {
   analyse: AnalysePersonnalite
   date: string
   reportWellbeing: ReportWellbeing
+  locale?: SupportedLocale
 }
 
 Font.registerHyphenationCallback((word) => [word])
@@ -62,6 +66,109 @@ const themeColors: Record<
     pill: '#fff1f2',
   },
 }
+
+const pdfLabels = {
+  fr: {
+    kicker: "Rapport d'analyse",
+    generatedOn: 'Généré le',
+    overview: "Vue d'ensemble",
+    conclusion: 'Conclusion',
+    noOverview: "Aucune vue d'ensemble disponible.",
+    noConclusion: 'Aucune conclusion disponible.',
+    balanceIndex: "Indice d'équilibre",
+    balanceScore: "Score d'équilibre",
+    dominantStrengths: 'Forces dominantes',
+    watchPoints: 'Points de vigilance',
+    relationalStyle: 'Style relationnel',
+    notProvided: 'Non renseigné.',
+    notProvidedShort: 'Non renseigné',
+    bigFive: 'Traits Big Five',
+    score: 'Score',
+    observedIndicators: 'Indicateurs observés',
+    analysisUnavailable: 'Analyse non disponible.',
+    emotionalProfile: 'Profil émotionnel',
+    dominantEmotion: 'Émotion dominante',
+    emotionalStability: 'Stabilité émotionnelle',
+    noEmotionalSummary: 'Aucun résumé émotionnel disponible.',
+    recommendations: 'Recommandations',
+    noRecommendations: 'Aucune recommandation disponible.',
+    wellbeing: {
+      pending: {
+        label: "Profil en cours d'évaluation",
+        description: "Les scores Big Five ne sont pas encore suffisants pour calculer un indice fiable.",
+      },
+      balanced: {
+        label: 'Profil globalement équilibré',
+        description: 'Les traits indiquent un bon niveau de ressources personnelles et une stabilité globale encourageante.',
+      },
+      toSupport: {
+        label: 'Profil à accompagner',
+        description: 'Le profil montre des forces utiles, avec certains points à soutenir pour améliorer le confort quotidien.',
+      },
+      sensitive: {
+        label: 'Profil sensible',
+        description: 'Le profil indique plusieurs zones de fragilité qui méritent un accompagnement attentif et progressif.',
+      },
+    },
+    traits: {
+      Ouverture: 'Ouverture',
+      Conscienciosite: 'Conscienciosité',
+      Extraversion: 'Extraversion',
+      Agreabilite: 'Agréabilité',
+      Neuroticisme: 'Neuroticisme',
+    },
+  },
+  en: {
+    kicker: 'Analysis Report',
+    generatedOn: 'Generated on',
+    overview: 'Overview',
+    conclusion: 'Conclusion',
+    noOverview: 'No overview available.',
+    noConclusion: 'No conclusion available.',
+    balanceIndex: 'Balance Index',
+    balanceScore: 'Balance Score',
+    dominantStrengths: 'Dominant Strengths',
+    watchPoints: 'Key Watch Points',
+    relationalStyle: 'Relational Style',
+    notProvided: 'Not provided.',
+    notProvidedShort: 'Not provided',
+    bigFive: 'Big Five Traits',
+    score: 'Score',
+    observedIndicators: 'Observed Indicators',
+    analysisUnavailable: 'Analysis not available.',
+    emotionalProfile: 'Emotional Profile',
+    dominantEmotion: 'Dominant Emotion',
+    emotionalStability: 'Emotional Stability',
+    noEmotionalSummary: 'No emotional summary available.',
+    recommendations: 'Recommendations',
+    noRecommendations: 'No recommendations available.',
+    wellbeing: {
+      pending: {
+        label: 'Profile being evaluated',
+        description: 'Big Five scores are not yet sufficient to calculate a reliable index.',
+      },
+      balanced: {
+        label: 'Overall balanced profile',
+        description: 'Traits indicate a good level of personal resources and encouraging overall stability.',
+      },
+      toSupport: {
+        label: 'Profile to support',
+        description: 'The profile shows useful strengths, with certain areas to support to improve daily comfort.',
+      },
+      sensitive: {
+        label: 'Sensitive profile',
+        description: 'The profile indicates several areas of vulnerability that deserve careful and progressive support.',
+      },
+    },
+    traits: {
+      Ouverture: 'Openness',
+      Conscienciosite: 'Conscientiousness',
+      Extraversion: 'Extraversion',
+      Agreabilite: 'Agreeableness',
+      Neuroticisme: 'Neuroticism',
+    },
+  },
+} as const
 
 const styles = StyleSheet.create({
   page: {
@@ -261,8 +368,13 @@ export function AnalysisPdfDocument({
   analyse,
   date,
   reportWellbeing,
+  locale = 'fr',
 }: AnalysisPdfDocumentProps) {
   const theme = themeColors[reportWellbeing.theme]
+  const L = pdfLabels[locale]
+  const wellbeingText = L.wellbeing[reportWellbeing.key]
+  const traitLabel = (name: string) =>
+    (L.traits as Record<string, string>)[name] ?? name
 
   return (
     <Document title={analyse.reference}>
@@ -274,9 +386,9 @@ export function AnalysisPdfDocument({
           <View style={styles.content}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
-                <Text style={styles.kicker}>Rapport d&apos;analyse</Text>
+                <Text style={styles.kicker}>{L.kicker}</Text>
                 <Text style={styles.title}>{analyse.reference}</Text>
-                <Text style={styles.muted}>Généré le {date}</Text>
+                <Text style={styles.muted}>{L.generatedOn} {date}</Text>
               </View>
 
               <View style={styles.headerRight}>
@@ -289,7 +401,7 @@ export function AnalysisPdfDocument({
                     },
                   ]}
                 >
-                  {formatWellbeingLabel(reportWellbeing.label)}
+                  {wellbeingText.label}
                   {reportWellbeing.score !== null
                     ? `   ${reportWellbeing.score.toFixed(1)}/10`
                     : ''}
@@ -299,65 +411,65 @@ export function AnalysisPdfDocument({
 
             <View style={styles.twoColumns}>
               <View style={[styles.card, styles.cardTall, styles.column]}>
-                <Text style={styles.sectionTitle}>Vue d&apos;ensemble</Text>
+                <Text style={styles.sectionTitle}>{L.overview}</Text>
                 <Text style={styles.body}>
-                  {analyse.overview || 'Aucune vue d’ensemble disponible.'}
+                  {analyse.overview || L.noOverview}
                 </Text>
               </View>
 
               <View style={[styles.card, styles.cardTall, styles.column]}>
-                <Text style={styles.sectionTitle}>Conclusion</Text>
+                <Text style={styles.sectionTitle}>{L.conclusion}</Text>
                 <Text style={styles.body}>
-                  {analyse.conclusion || 'Aucune conclusion disponible.'}
+                  {analyse.conclusion || L.noConclusion}
                 </Text>
               </View>
             </View>
 
             <View style={styles.balanceCard} wrap={false}>
-              <Text style={[styles.miniTitle, { color: theme.accent }]}>Indice d&apos;équilibre</Text>
-              <Text style={styles.sectionTitle}>{formatWellbeingLabel(reportWellbeing.label)}</Text>
-              <Text style={styles.body}>{formatWellbeingText(reportWellbeing.description)}</Text>
+              <Text style={[styles.miniTitle, { color: theme.accent }]}>{L.balanceIndex}</Text>
+              <Text style={styles.sectionTitle}>{wellbeingText.label}</Text>
+              <Text style={styles.body}>{wellbeingText.description}</Text>
               {reportWellbeing.score !== null ? (
                 <Text style={[styles.strong, { marginTop: 10 }]}>
-                  Score d&apos;équilibre : {reportWellbeing.score.toFixed(1)}/10
+                  {L.balanceScore} : {reportWellbeing.score.toFixed(1)}/10
                 </Text>
               ) : null}
             </View>
 
             <View style={styles.threeColumns}>
               <View style={[styles.card, styles.column]} wrap={false}>
-                <Text style={[styles.miniTitle, { color: theme.accent }]}>Forces dominantes</Text>
-                <Text style={styles.body}>{analyse.forcesDominantes || 'Non renseigné.'}</Text>
+                <Text style={[styles.miniTitle, { color: theme.accent }]}>{L.dominantStrengths}</Text>
+                <Text style={styles.body}>{analyse.forcesDominantes || L.notProvided}</Text>
               </View>
 
               <View style={[styles.card, styles.column]} wrap={false}>
-                <Text style={[styles.miniTitle, { color: theme.accent }]}>Points de vigilance</Text>
-                <Text style={styles.body}>{analyse.pointsVigilance || 'Non renseigné.'}</Text>
+                <Text style={[styles.miniTitle, { color: theme.accent }]}>{L.watchPoints}</Text>
+                <Text style={styles.body}>{analyse.pointsVigilance || L.notProvided}</Text>
               </View>
 
               <View style={[styles.card, styles.column]} wrap={false}>
-                <Text style={[styles.miniTitle, { color: theme.accent }]}>Style relationnel</Text>
-                <Text style={styles.body}>{analyse.styleRelationnel || 'Non renseigné.'}</Text>
+                <Text style={[styles.miniTitle, { color: theme.accent }]}>{L.relationalStyle}</Text>
+                <Text style={styles.body}>{analyse.styleRelationnel || L.notProvided}</Text>
               </View>
             </View>
 
-            <Text style={styles.h2}>Traits Big Five</Text>
+            <Text style={styles.h2}>{L.bigFive}</Text>
 
             {analyse.traits?.map((trait, index) => (
               <View key={`${trait.name}-${index}`} style={styles.traitCard} wrap={false}>
                 <View style={styles.traitHeader}>
-                  <Text style={styles.traitName}>{trait.name}</Text>
-                  <Text style={styles.scorePill}>Score : {trait.score}/10</Text>
+                  <Text style={styles.traitName}>{traitLabel(trait.name ?? '')}</Text>
+                  <Text style={styles.scorePill}>{L.score} : {trait.score}/10</Text>
                 </View>
 
                 <Text style={styles.body}>
-                  {trait.analysis || trait.interpretation || 'Analyse non disponible.'}
+                  {trait.analysis || trait.interpretation || L.analysisUnavailable}
                 </Text>
 
                 {trait.observedIndicators && trait.observedIndicators.length > 0 ? (
                   <View style={{ marginTop: 14 }}>
                     <Text style={[styles.miniTitle, { color: theme.accent }]}>
-                      Indicateurs observés
+                      {L.observedIndicators}
                     </Text>
                     {trait.observedIndicators.map((item, indicatorIndex) => (
                       <View key={`${trait.name}-indicator-${indicatorIndex}`} style={styles.bulletRow}>
@@ -372,21 +484,20 @@ export function AnalysisPdfDocument({
 
             <View style={styles.twoColumns}>
               <View style={[styles.card, styles.column]} wrap={false}>
-                <Text style={styles.sectionTitle}>Profil émotionnel</Text>
+                <Text style={styles.sectionTitle}>{L.emotionalProfile}</Text>
                 <Text style={styles.body}>
-                  Émotion dominante : {analyse.profilEmotionnel?.dominantEmotion || 'Non renseigné'}
+                  {L.dominantEmotion} : {analyse.profilEmotionnel?.dominantEmotion || L.notProvidedShort}
                 </Text>
                 <Text style={[styles.body, { marginTop: 5 }]}>
-                  Stabilité émotionnelle : {analyse.profilEmotionnel?.emotionalStability || '--'}/10
+                  {L.emotionalStability} : {analyse.profilEmotionnel?.emotionalStability || '--'}/10
                 </Text>
                 <Text style={[styles.body, { marginTop: 10 }]}>
-                  {analyse.profilEmotionnel?.emotionalSummary ||
-                    'Aucun résumé émotionnel disponible.'}
+                  {analyse.profilEmotionnel?.emotionalSummary || L.noEmotionalSummary}
                 </Text>
               </View>
 
               <View style={[styles.card, styles.column]} wrap={false}>
-                <Text style={styles.sectionTitle}>Recommandations</Text>
+                <Text style={styles.sectionTitle}>{L.recommendations}</Text>
                 {analyse.recommandations && analyse.recommandations.length > 0 ? (
                   analyse.recommandations.map((recommendation, index) => (
                     <View key={`recommendation-${index}`} style={styles.bulletRow}>
@@ -395,7 +506,7 @@ export function AnalysisPdfDocument({
                     </View>
                   ))
                 ) : (
-                  <Text style={styles.body}>Aucune recommandation disponible.</Text>
+                  <Text style={styles.body}>{L.noRecommendations}</Text>
                 )}
               </View>
             </View>
@@ -404,18 +515,4 @@ export function AnalysisPdfDocument({
       </Page>
     </Document>
   )
-}
-
-function formatWellbeingLabel(label: string) {
-  return label
-    .replace('Profil a accompagner', 'Profil à accompagner')
-    .replace('Profil globalement equilibre', 'Profil globalement équilibré')
-    .replace('Profil en cours d evaluation', "Profil en cours d'évaluation")
-}
-
-function formatWellbeingText(text: string) {
-  return text
-    .replace('ameliorer', 'améliorer')
-    .replace('stabilite', 'stabilité')
-    .replace('fragilite', 'fragilité')
 }

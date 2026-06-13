@@ -658,7 +658,7 @@
         "lastName": "Last name",
         "phone": "Phone",
         "location": "Location",
-        "tagline": "Tagline",
+        "specialty": "Specialty",
         "language": "Language",
         "memberSince": "Member since {date}",
         "sectionInfo": "Personal information"
@@ -1165,8 +1165,8 @@
       "cards": [
         {
           "href": "#fondatrices-encadrante",
-          "title": "Founders & supervisor",
-          "description": "Meet the project founders and our academic supervisor."
+          "title": "Founders & specialists",
+          "description": "Meet the project founders and our team of specialists."
         },
         {
           "href": "#equipe-specialistes",

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { FileText, Globe2, Mail, MapPin, Phone, Star } from 'lucide-react'
+import { Mail, MapPin, Phone, Star } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -58,7 +58,7 @@ export default async function PsyProfilPage() {
     { icon: Mail, label: t('email'), value: user.email ?? '' },
     { icon: Phone, label: t('phone'), value: (user as any).phone ?? '' },
     { icon: Star, label: t('role'), value: t('rolePsy') },
-    { icon: FileText, label: t('tagline'), value: (user as any).coachTagline ?? '' },
+    { icon: Star, label: t('specialty'), value: (user as any).psySpecialty ?? '' },
   ]
 
   return (
@@ -87,9 +87,9 @@ export default async function PsyProfilPage() {
                   </span>
                 </div>
 
-                {(user as any).coachTagline ? (
+                {(user as any).psySpecialty ? (
                   <p className="mt-1 text-sm text-[var(--mindly-text-soft)]">
-                    {(user as any).coachTagline}
+                    {(user as any).psySpecialty}
                   </p>
                 ) : null}
 
@@ -117,7 +117,7 @@ export default async function PsyProfilPage() {
                   lastName: user.lastName ?? '',
                   phone: (user as any).phone ?? '',
                   location: (user as any).location ?? '',
-                  coachTagline: (user as any).coachTagline ?? '',
+                  psySpecialty: (user as any).psySpecialty ?? '',
                 }}
               />
               {memberSince ? (

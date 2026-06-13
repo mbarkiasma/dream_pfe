@@ -8,7 +8,7 @@ export async function generateSmartCoachingReply({
 }: {
   history: SmartCoachingHistoryItem[]
 }): Promise<string> {
-  const apiKey = process.env.GROQ_API_KEY?.trim()
+  const apiKey = process.env.GEMINI_API_KEY?.trim()
   const assistantMessagesCount = history.filter((item) => item.senderRole === 'ai').length
 
   if (assistantMessagesCount === 0) {
@@ -22,14 +22,14 @@ export async function generateSmartCoachingReply({
     ].join(' ')
   }
 
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
+      model: process.env.GEMINI_COACHING_MODEL || 'gemini-2.5-flash-lite',
       messages: [
         {
           role: 'system',

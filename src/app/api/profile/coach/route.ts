@@ -23,8 +23,7 @@ export async function PATCH(request: Request) {
       lastName: clean(body.lastName) || undefined,
       phone: clean(body.phone) || null,
       location: clean(body.location) || null,
-      coachTagline: clean(body.coachTagline) || null,
-      coachingSpecialty: clean(body.coachingSpecialty) || null,
+coachingSpecialty: clean(body.coachingSpecialty) || null,
       coachingBio: clean(body.coachingBio) || null,
     },
   })

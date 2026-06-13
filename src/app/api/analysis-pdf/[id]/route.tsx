@@ -14,16 +14,22 @@ type RouteContext = {
   }>
 }
 
-function formatAnalysisDate(value: string) {
-  return new Date(value).toLocaleDateString('fr-FR', {
+type SupportedLocale = 'fr' | 'en'
+
+function formatAnalysisDate(value: string, locale: SupportedLocale) {
+  return new Date(value).toLocaleDateString(locale === 'en' ? 'en-GB' : 'fr-FR', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
   })
 }
 
-export async function GET(_request: Request, { params }: RouteContext) {
+export async function GET(request: Request, { params }: RouteContext) {
   const { id } = await params
+  const url = new URL(request.url)
+  const rawLocale = url.searchParams.get('locale')
+  const locale: SupportedLocale = rawLocale === 'en' ? 'en' : 'fr'
+
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
 
@@ -36,6 +42,8 @@ export async function GET(_request: Request, { params }: RouteContext) {
     id,
     user,
     overrideAccess: false,
+    locale,
+    fallbackLocale: 'fr',
   })
 
   if (!analyse) {
@@ -45,8 +53,9 @@ export async function GET(_request: Request, { params }: RouteContext) {
   const document = (
     <AnalysisPdfDocument
       analyse={analyse}
-      date={formatAnalysisDate(analyse.date)}
+      date={formatAnalysisDate(analyse.date, locale)}
       reportWellbeing={getReportWellbeingTheme(analyse.traits)}
+      locale={locale}
     />
   )
   const stream = await pdf(document).toBuffer()

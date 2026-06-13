@@ -36,14 +36,11 @@ export async function GET() {
       email: true,
       coachingSpecialty: true,
       coachingBio: true,
-      isAvailableForCoaching: true,
     },
   })
 
-  const availableCoaches = coaches.docs.filter((coach) => coach.isAvailableForCoaching === true)
-
   return Response.json({
-    coaches: availableCoaches.map((coach) => ({
+    coaches: coaches.docs.map((coach) => ({
       id: coach.id,
       name: `${coach.firstName ?? ''} ${coach.lastName ?? ''}`.trim() || coach.email || 'Coach',
       email: coach.email,

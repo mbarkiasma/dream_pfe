@@ -47,8 +47,6 @@ export default async function CoachProfilePage() {
   const displayName = getDisplayName(user)
   const initials = getInitials(displayName)
   const memberSince = formatMemberSince((user as any).createdAt, locale)
-  const isAvailable = (user as any).isAvailableForCoaching === true
-
   const avatarUrl =
     user.avatar && typeof user.avatar === 'object' && 'url' in user.avatar
       ? (user.avatar as { url?: string | null }).url ?? null
@@ -75,11 +73,7 @@ export default async function CoachProfilePage() {
                 <div className="h-20 w-20 overflow-hidden rounded-full ring-4 ring-[var(--mindly-primary)]/20">
                   <ProfileAvatar initials={initials} avatarUrl={avatarUrl} size="hero" />
                 </div>
-                <span
-                  className={`absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full ring-2 ring-white dark:ring-[var(--mindly-surface)] ${
-                    isAvailable ? 'bg-emerald-400' : 'bg-slate-400'
-                  }`}
-                />
+                <span className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-[var(--mindly-surface)]" />
               </div>
 
               <div>
@@ -91,12 +85,6 @@ export default async function CoachProfilePage() {
                     {t('coachBadge')}
                   </span>
                 </div>
-
-                {(user as any).coachTagline ? (
-                  <p className="mt-1 text-sm text-[var(--mindly-text-soft)]">
-                    {(user as any).coachTagline}
-                  </p>
-                ) : null}
 
                 <div className="mt-2.5 flex flex-wrap items-center gap-4 text-xs text-[var(--mindly-text-soft)]">
                   {user.email ? (
@@ -122,7 +110,6 @@ export default async function CoachProfilePage() {
                   lastName: user.lastName ?? '',
                   phone: (user as any).phone ?? '',
                   location: (user as any).location ?? '',
-                  coachTagline: (user as any).coachTagline ?? '',
                   coachingSpecialty: (user as any).coachingSpecialty ?? '',
                   coachingBio: (user as any).coachingBio ?? '',
                 }}

@@ -1,5 +1,7 @@
 import type { Payload, PayloadRequest } from 'payload'
 
+import { buildEmailHtml } from './emailHtml'
+
 type NotificationType = 'rendezvous' | 'coaching' | 'analyse' | 'motivation' | 'system'
 
 type CreateNotificationArgs = {
@@ -88,19 +90,12 @@ export async function createNotification({
     await payload.sendEmail({
       to: user.email,
       subject: title,
-      html: [
-        '<div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; color: #24114f; line-height: 1.6;">',
-        '<div style="padding: 24px; border: 1px solid #eee7ff; border-radius: 16px; background: #fbf8ff;">',
-        '<p style="font-size: 12px; margin: 0 0 10px; color: #7b6b9a; text-transform: uppercase; letter-spacing: .08em;">MindBloom</p>',
-        `<h2 style="margin: 0 0 12px; color: #2d1068; font-size: 22px;">${safeTitle}</h2>`,
-        `<p style="font-size: 15px; margin: 0 0 20px;">${safeMessage}</p>`,
-        safeLink
-          ? `<a href="${safeLink}" style="display: inline-block; background: #6d28d9; color: #ffffff; text-decoration: none; padding: 12px 18px; border-radius: 999px; font-weight: 700;">${safeLabel}</a>`
-          : '',
-        '</div>',
-        '<p style="font-size: 12px; color: #7b6b9a; margin-top: 16px;">Cet email a été envoyé automatiquement par MindBloom.</p>',
-        '</div>',
-      ].join(''),
+      html: buildEmailHtml({
+        title: safeTitle,
+        body: safeMessage,
+        ctaHref: safeLink || undefined,
+        ctaLabel: safeLabel,
+      }),
       text: fullLink ? `${message}\n\n${fullLink}` : message,
     })
 

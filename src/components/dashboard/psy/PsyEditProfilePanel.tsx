@@ -10,7 +10,7 @@ type Fields = {
   lastName: string
   phone: string
   location: string
-  coachTagline: string
+  psySpecialty: string
 }
 
 export function PsyEditProfilePanel({ initial }: { initial: Fields }) {
@@ -50,7 +50,7 @@ export function PsyEditProfilePanel({ initial }: { initial: Fields }) {
     { key: 'lastName', label: t('lastName') },
     { key: 'phone', label: t('phone') },
     { key: 'location', label: t('location') },
-    { key: 'coachTagline', label: t('tagline') },
+    { key: 'psySpecialty', label: t('specialty') },
   ]
 
   return (

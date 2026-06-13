@@ -11,10 +11,12 @@ const founderProfiles = [
   {
     nom: 'Oumaima Bouzayen',
     photo: '/fondatrices/oumaima.jpg',
+    email: 'oumaima.bouzayen@mindbloom.tn',
   },
   {
     nom: 'Asma Mbarki',
     photo: '/fondatrices/asma.jpg',
+    email: 'asma.mbarki@mindbloom.tn',
   },
 ]
 
@@ -68,10 +70,6 @@ export default function AboutTeamBlock() {
     specialties: string[]
     note: string
   }>
-  const supervisorBadge = t('supervisorBadge')
-  const supervisorRoleLabel = t('supervisorRoleLabel')
-  const supervisorTitle = t('supervisorTitle')
-  const supervisorDescription = t('supervisorDescription')
   const specialistsTitlePrimary = t('specialistsTitlePrimary')
   const specialistsTitleHighlight = t('specialistsTitleHighlight')
   const specialistsDescription = t('specialistsDescription')
@@ -84,8 +82,6 @@ export default function AboutTeamBlock() {
   const specialistSectionInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }
   const specialistCardInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 34, scale: 0.96 }
   const specialistItemInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
-  const imageInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.08 }
-  const imageAnimate = shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }
   const badgeInsideInitial = shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
   const badgeInsideAnimate = shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }
   const smoothEase = [0.22, 1, 0.36, 1] as const
@@ -164,6 +160,12 @@ export default function AboutTeamBlock() {
                           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--mindly-secondary)]">
                             {profile.role}
                           </p>
+                          <a
+                            href={`mailto:${founder.email}`}
+                            className="text-[13px] text-[var(--mindly-primary)] hover:underline"
+                          >
+                            {founder.email}
+                          </a>
                         </div>
                         <div className="h-[2px] w-7 rounded-full bg-[var(--mindly-primary-soft)]" />
                         <p className="text-[15px] leading-7 text-[var(--mindly-text)]">{profile.description}</p>
@@ -200,32 +202,6 @@ export default function AboutTeamBlock() {
               </motion.div>
             )
           })}
-        </div>
-      </div>
-
-      <div className="scroll-mt-28 space-y-6">
-        <div className="text-left">
-          <AppBadge dot dotClassName={sectionBadgeDotClass} variant="outline" casing="upper" className={sectionBadgeClass}>
-            {supervisorBadge}
-          </AppBadge>
-        </div>
-        <div className="max-w-3xl">
-          <Card className="rounded-[1.4rem] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-6 shadow-[0_16px_38px_rgba(111,77,215,0.10)] transition-all duration-300 hover:-translate-y-[3px] hover:border-[var(--mindly-primary-soft)] hover:shadow-[0_22px_54px_rgba(111,77,215,0.14)]">
-            <CardContent className="space-y-4 p-0">
-              <AppBadge variant="outline" size="sm" casing="upper" className={sectionBadgeClass}>
-                {supervisorRoleLabel}
-              </AppBadge>
-              <div className="space-y-2">
-                <p className="text-[26px] font-bold leading-tight text-[var(--mindly-text-strong)]">Lobna Hlaoua</p>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--mindly-secondary)]">
-                  {supervisorTitle}
-                </p>
-              </div>
-              <p className="text-[15px] leading-7 text-[var(--mindly-text)]">
-                {supervisorDescription}
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
 

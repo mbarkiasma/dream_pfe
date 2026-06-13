@@ -227,10 +227,10 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   const filteredDreams = normalizedQuery
     ? dreams.filter((dream) => {
         const haystack = [
-          dream.description,
+          dream.description ?? '',
           dream.summary ?? '',
           dream.analysis ?? '',
-          dream.videoStatus,
+          dream.videoStatus ?? '',
         ]
           .join(' ')
           .toLowerCase()
@@ -580,6 +580,16 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
               placeholder={t('searchPlaceholder')}
               className="student-dreams-search-input"
             />
+            {query ? (
+              <button
+                type="button"
+                className="student-dreams-search-clear"
+                onClick={() => setQuery('')}
+                aria-label="Effacer la recherche"
+              >
+                <X />
+              </button>
+            ) : null}
           </div>
         </div>
       </section>

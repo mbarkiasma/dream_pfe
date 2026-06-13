@@ -25,7 +25,7 @@ function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-export function PsySidebar() {
+export function PsySidebar({ specialty }: { specialty?: string | null }) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const t = useTranslations('dashboard.psy.sidebar')
@@ -47,7 +47,7 @@ export function PsySidebar() {
           </div>
           <div className="min-w-0">
             <p className="mindly-sidebar-title">{t('title')}</p>
-            <p className="mindly-sidebar-subtitle">{t('subtitle')}</p>
+            <p className="mindly-sidebar-subtitle">{specialty || t('subtitle')}</p>
           </div>
         </div>
 

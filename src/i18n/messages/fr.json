@@ -658,7 +658,7 @@
         "lastName": "Nom",
         "phone": "Téléphone",
         "location": "Localisation",
-        "tagline": "Accroche",
+        "specialty": "Spécialité",
         "language": "Langue",
         "memberSince": "Membre depuis {date}",
         "sectionInfo": "Informations personnelles"
@@ -1165,8 +1165,8 @@
       "cards": [
         {
           "href": "#fondatrices-encadrante",
-          "title": "Les fondatrices & l'encadrante",
-          "description": "Découvrez les fondatrices du projet et notre encadrante académique."
+          "title": "Les fondatrices & les spécialistes",
+          "description": "Découvrez les fondatrices du projet et notre équipe de spécialistes."
         },
         {
           "href": "#equipe-specialistes",

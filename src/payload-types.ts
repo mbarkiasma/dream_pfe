@@ -817,18 +817,14 @@ export interface User {
   onboardingStep: 'profile' | 'interview' | 'completed';
   role: 'admin' | 'etudiant' | 'coach' | 'psy';
   /**
-   * Activez ce champ quand le coach peut recevoir de nouvelles sessions d'accompagnement.
-   */
-  isAvailableForCoaching?: boolean | null;
-  /**
    * Exemple : stress, motivation, orientation, organisation.
    */
   coachingSpecialty?: string | null;
-  coachingBio?: string | null;
   /**
-   * Courte phrase d'accroche, ex: Accompagner, motiver, transformer.
+   * Exemple : anxiété, thérapie cognitive, dépression.
    */
-  coachTagline?: string | null;
+  psySpecialty?: string | null;
+  coachingBio?: string | null;
   phone?: string | null;
   /**
    * Exemple : Paris, France
@@ -1880,10 +1876,9 @@ export interface UsersSelect<T extends boolean = true> {
   studentSpecialty?: T;
   onboardingStep?: T;
   role?: T;
-  isAvailableForCoaching?: T;
   coachingSpecialty?: T;
+  psySpecialty?: T;
   coachingBio?: T;
-  coachTagline?: T;
   phone?: T;
   location?: T;
   coachAvailabilities?:

@@ -10,7 +10,6 @@ type Fields = {
   lastName: string
   phone: string
   location: string
-  coachTagline: string
   coachingSpecialty: string
   coachingBio: string
 }
@@ -76,7 +75,6 @@ export function CoachEditProfilePanel({ initial }: { initial: Fields }) {
                 { key: 'lastName', label: t('lastName') },
                 { key: 'phone', label: t('phone') },
                 { key: 'location', label: t('location') },
-                { key: 'coachTagline', label: t('tagline') },
                 { key: 'coachingSpecialty', label: t('specialty') },
               ] as { key: keyof Fields; label: string }[]).map(({ key, label }) => (
                 <div key={key}>

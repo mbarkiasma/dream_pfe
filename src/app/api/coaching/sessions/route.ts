@@ -44,8 +44,8 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Coach introuvable.' }, { status: 409 })
       }
 
-      if (!coach || coach.role !== 'coach' || coach.isAvailableForCoaching !== true) {
-        return Response.json({ error: 'Coach indisponible pour le moment.' }, { status: 409 })
+      if (!coach || coach.role !== 'coach') {
+        return Response.json({ error: 'Coach introuvable.' }, { status: 409 })
       }
 
       coachId = Number(coach.id)
@@ -54,18 +54,9 @@ export async function POST(request: Request) {
         collection: 'users',
         overrideAccess: true,
         where: {
-          and: [
-            {
-              role: {
-                equals: 'coach',
-              },
-            },
-            {
-              isAvailableForCoaching: {
-                equals: true,
-              },
-            },
-          ],
+          role: {
+            equals: 'coach',
+          },
         },
         depth: 0,
         limit: 1,

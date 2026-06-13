@@ -1557,6 +1557,9 @@ function normalizeLoopText(text: string): string {
 function detectApplicationQuestion(text: string): boolean {
   const n = normalizeLoopText(text)
   return (
+    n.includes('qu avez-vous pense de cet entretien') ||
+    n.includes("qu'avez-vous pense de cet entretien") ||
+    n.includes('what did you think of this interview') ||
     n.includes('exemple concret de ce que vous allez appliquer dans les prochains jours') ||
     n.includes('concrete example of how you will apply')
   )
@@ -1564,8 +1567,9 @@ function detectApplicationQuestion(text: string): boolean {
 
 function detectApplicationLanguage(text: string): boolean {
   const n = normalizeLoopText(text)
-  if (n.length < 25) return false
+  if (n.length < 10) return false
   return (
+    // Old closing question keywords (plan/apply)
     n.includes('planning') ||
     n.includes('creneaux') ||
     n.includes('je vais faire') ||
@@ -1574,7 +1578,24 @@ function detectApplicationLanguage(text: string): boolean {
     n.includes('prochains jours') ||
     n.includes('i will') ||
     n.includes('i plan to') ||
-    n.includes('i am going to')
+    n.includes('i am going to') ||
+    // New closing question keywords (interview feedback)
+    n.includes('entretien') ||
+    n.includes('questions') ||
+    n.includes('clair') ||
+    n.includes('structure') ||
+    n.includes('pertinent') ||
+    n.includes('attentes') ||
+    n.includes('correspond') ||
+    n.includes('interessant') ||
+    n.includes('utile') ||
+    n.includes('bien deroule') ||
+    n.includes('interview') ||
+    n.includes('clear') ||
+    n.includes('relevant') ||
+    n.includes('expectations') ||
+    n.includes('helpful') ||
+    n.includes('useful')
   )
 }
 
