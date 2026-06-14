@@ -27,7 +27,6 @@ export async function GET() {
         equals: 'coach',
       },
     },
-    depth: 0,
     sort: 'firstName',
     limit: 50,
     select: {
@@ -36,7 +35,9 @@ export async function GET() {
       email: true,
       coachingSpecialty: true,
       coachingBio: true,
+      avatar: true,
     },
+    depth: 1,
   })
 
   return Response.json({
@@ -46,6 +47,7 @@ export async function GET() {
       email: coach.email,
       specialty: coach.coachingSpecialty || 'Accompagnement general',
       bio: coach.coachingBio || '',
+      avatarUrl: typeof coach.avatar === 'object' && coach.avatar ? coach.avatar.url ?? null : null,
     })),
   }, {
     headers: {

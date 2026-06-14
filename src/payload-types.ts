@@ -1119,6 +1119,10 @@ export interface AnnonceMotivation {
   id: number;
   title: string;
   content: string;
+  howToAvoid?: string | null;
+  practicalTips?: string | null;
+  simpleExample?: string | null;
+  motivatingMessage?: string | null;
   author: number | User;
   status: 'draft' | 'published';
   publishedAt?: string | null;
@@ -2131,6 +2135,10 @@ export interface NotificationsSelect<T extends boolean = true> {
 export interface AnnonceMotivationSelect<T extends boolean = true> {
   title?: T;
   content?: T;
+  howToAvoid?: T;
+  practicalTips?: T;
+  simpleExample?: T;
+  motivatingMessage?: T;
   author?: T;
   status?: T;
   publishedAt?: T;

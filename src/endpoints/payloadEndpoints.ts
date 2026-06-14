@@ -98,9 +98,16 @@ export const payloadEndpoints: Endpoint[] = [
 
       const prevAiMessages = (Array.isArray(conversationHistory) ? conversationHistory : [])
         .filter((m: any) => m?.role === 'ai')
+      const hasAskedApplicationQuestion = prevAiMessages.some((m: any) =>
+        detectApplicationQuestion(String(m?.content || '')),
+      )
+      // Si l'IA a déjà posé la question de clôture, toute réponse substantielle de l'étudiant suffit.
+      // L'ancienne logique (detectApplicationLanguage) ratait les réponses qui ne contiennent pas
+      // de mots-clés d'action ("je vais", "planning"...), bloquant autorisationFin côté n8n.
       const applicationAnswerDetected =
-        detectApplicationLanguage(userText) &&
-        prevAiMessages.some((m: any) => detectApplicationQuestion(String(m?.content || '')))
+        hasAskedApplicationQuestion
+          ? userText.trim().length >= 10
+          : detectApplicationLanguage(userText) && hasAskedApplicationQuestion
 
       let n8nResponse: Response
 
@@ -176,6 +183,9 @@ export const payloadEndpoints: Endpoint[] = [
       const rawIsFinished = n8nData.isFinished || iaTextNettoye.includes('[FIN]') || false
       const analysisData = rawIsFinished ? extraireAnalysisData(n8nData) : null
       const isPrematureFinish = rawIsFinished && !analysisData
+      if (isPrematureFinish) {
+        console.warn('[chat] isPrematureFinish: n8n returned isFinished=true but no analysisData found. n8n keys:', Object.keys(n8nData))
+      }
       const isFinished = rawIsFinished && Boolean(analysisData)
       const rawCleanText = isPrematureFinish
         ? interviewLanguage === 'en'
@@ -355,101 +365,187 @@ export const payloadEndpoints: Endpoint[] = [
           },
         })
 
-        // Translate and store the other locale automatically
+        // Translate and store the other locale automatically (retry up to 3x).
+        // Fallback: if all retries fail, copy the primary content to the other locale
+        // so the report is never blank — users can still read it in the interview language.
         try {
           const primaryLocale = (locale === 'en' ? 'en' : 'fr') as 'fr' | 'en'
           const otherLocale: 'fr' | 'en' = primaryLocale === 'fr' ? 'en' : 'fr'
-          const groqApiKey = process.env.GROQ_API_KEY?.trim()
+          const geminiApiKey = process.env.GEMINI_API_KEY?.trim()
 
-          if (groqApiKey) {
-            const translateDirection =
-              primaryLocale === 'fr'
-                ? 'Translate all string values from French to English.'
-                : 'Translate all string values from English to French.'
-
-            const textPayload = {
-              overview: resumeExecutif.overview || '',
-              conclusion: analysis?.conclusion || '',
-              forcesDominantes: resumeExecutif.dominant_strengths || '',
-              pointsVigilance: resumeExecutif.watch_points || '',
-              styleRelationnel: resumeExecutif.relational_style || '',
-              traitTexts: normalizedTraits.map((t) => ({
-                analysis: t.analysis || '',
-                interpretation: t.interpretation || '',
-                confidenceReason: t.confidenceReason || '',
-                indicators: t.observedIndicators.map((i) => i.indicator).filter(Boolean),
-              })),
-              dominantEmotion: donneesProfilEmotionnel.dominant_emotion || '',
-              emotionalSummary: donneesProfilEmotionnel.emotional_summary || '',
-              recommandations: recs
-                .map((r: any) => (typeof r === 'string' ? r : r?.text || ''))
-                .filter(Boolean),
-            }
-
-            const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${groqApiKey}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
-                messages: [
-                  {
-                    role: 'system',
-                    content: `You are a professional translator. ${translateDirection} Preserve the exact JSON structure and all keys unchanged. Return valid JSON only — no markdown, no code fences, no explanation.`,
-                  },
-                  { role: 'user', content: JSON.stringify(textPayload) },
-                ],
-                temperature: 0.1,
-                max_tokens: 3000,
+          const otherLocaleTraits = (doc.traits ?? []).map((docTrait: any, i: number) => ({
+            id: docTrait.id,
+            analysis: normalizedTraits[i]?.analysis || '',
+            interpretation: normalizedTraits[i]?.interpretation || '',
+            confidenceReason: normalizedTraits[i]?.confidenceReason || '',
+            observedIndicators: (docTrait.observedIndicators ?? []).map(
+              (docIndicator: any, j: number) => ({
+                id: docIndicator.id,
+                indicator: normalizedTraits[i]?.observedIndicators?.[j]?.indicator || '',
               }),
-            })
+            ),
+          }))
 
-            if (groqResponse.ok) {
-              const groqResult = await groqResponse.json()
-              const raw: string = groqResult?.choices?.[0]?.message?.content?.trim() ?? ''
-              const cleaned = raw.replace(/^```json\s*|\s*```$/g, '').trim()
-              const translated = JSON.parse(cleaned)
+          const otherLocaleRecs = (doc.recommandations ?? []).map((docRec: any, i: number) => ({
+            id: docRec.id,
+            text: (recs[i] && (typeof recs[i] === 'string' ? recs[i] : recs[i]?.text)) || '',
+          }))
 
-              await req.payload.update({
-                collection: 'analyse-personnalite',
-                id: doc.id,
-                req,
-                locale: otherLocale,
-                data: {
-                  overview: translated.overview || '',
-                  forcesDominantes: translated.forcesDominantes || '',
-                  pointsVigilance: translated.pointsVigilance || '',
-                  styleRelationnel: translated.styleRelationnel || '',
-                  conclusion: translated.conclusion || '',
-                  profilEmotionnel: {
-                    dominantEmotion: translated.dominantEmotion || '',
-                    emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
-                    emotionalSummary: translated.emotionalSummary || '',
+          // Fallback data (same language as primary — at least content is never empty)
+          const fallbackLocaleData = {
+            overview: resumeExecutif.overview || '',
+            forcesDominantes: resumeExecutif.dominant_strengths || '',
+            pointsVigilance: resumeExecutif.watch_points || '',
+            styleRelationnel: resumeExecutif.relational_style || '',
+            conclusion: analysis?.conclusion || '',
+            profilEmotionnel: {
+              dominantEmotion: donneesProfilEmotionnel.dominant_emotion || '',
+              emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
+              emotionalSummary: donneesProfilEmotionnel.emotional_summary || '',
+            },
+            recommandations: otherLocaleRecs,
+            traits: otherLocaleTraits,
+          }
+
+          let translationSucceeded = false
+
+          if (geminiApiKey) {
+            const srcLang = primaryLocale === 'fr' ? 'French' : 'English'
+            const tgtLang = primaryLocale === 'fr' ? 'English' : 'French'
+            const geminiModel = process.env.GEMINI_COACHING_MODEL || 'gemini-2.0-flash'
+
+            const recTexts = recs.map((r: any) => (typeof r === 'string' ? r : r?.text || '') as string)
+            const traitIndicatorCounts = normalizedTraits.map((t) => t.observedIndicators.length)
+
+            const allTexts: string[] = [
+              resumeExecutif.overview || '',
+              analysis?.conclusion || '',
+              resumeExecutif.dominant_strengths || '',
+              resumeExecutif.watch_points || '',
+              resumeExecutif.relational_style || '',
+              donneesProfilEmotionnel.dominant_emotion || '',
+              donneesProfilEmotionnel.emotional_summary || '',
+              ...recTexts,
+              ...normalizedTraits.flatMap((t) => [
+                t.analysis || '',
+                ...t.observedIndicators.map((i) => i.indicator || ''),
+              ]),
+            ]
+
+            const numberedInput = allTexts
+              .map((txt, i) => `${i + 1}. ${txt.replace(/\n/g, ' ')}`)
+              .join('\n')
+
+            const geminiPrompt = `You are a professional translator. Translate each numbered item from ${srcLang} to ${tgtLang}. Return ONLY the same numbered format (1. ... 2. ... etc). Same number of items, same order. No extra text.\n\n${numberedInput}`
+
+            for (let attempt = 0; attempt < 3 && !translationSucceeded; attempt++) {
+              if (attempt > 0) await new Promise((r) => setTimeout(r, 800 * attempt))
+              try {
+                const geminiResponse = await fetch(
+                  `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      contents: [{ role: 'user', parts: [{ text: geminiPrompt }] }],
+                      generationConfig: { temperature: 0.1, maxOutputTokens: 4000 },
+                    }),
                   },
-                  recommandations: (doc.recommandations ?? []).map((docRec: any, i: number) => ({
-                    id: docRec.id,
-                    text: (Array.isArray(translated.recommandations) ? translated.recommandations[i] : '') || '',
-                  })),
-                  traits: (doc.traits ?? []).map((docTrait: any, i: number) => ({
-                    id: docTrait.id,
-                    analysis: translated.traitTexts?.[i]?.analysis || '',
-                    interpretation: translated.traitTexts?.[i]?.interpretation || '',
-                    confidenceReason: translated.traitTexts?.[i]?.confidenceReason || '',
-                    observedIndicators: (docTrait.observedIndicators ?? []).map(
-                      (docIndicator: any, j: number) => ({
-                        id: docIndicator.id,
-                        indicator: translated.traitTexts?.[i]?.indicators?.[j] || '',
-                      }),
-                    ),
-                  })),
-                },
-              })
+                )
+
+                if (!geminiResponse.ok) {
+                  const errText = await geminiResponse.text().catch(() => '')
+                  console.warn(`[save-analysis] Gemini attempt ${attempt + 1} HTTP ${geminiResponse.status}: ${errText.slice(0, 200)}`)
+                  continue
+                }
+
+                const geminiResult = await geminiResponse.json()
+                const raw: string = geminiResult?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? ''
+                if (!raw) { console.warn(`[save-analysis] Gemini attempt ${attempt + 1}: empty response`); continue }
+
+                // Parse numbered list back: extract text after "N. "
+                const parsedLines = raw
+                  .split('\n')
+                  .map((line: string) => {
+                    const m = line.match(/^\d+\.\s*(.+)/)
+                    return m ? m[1].trim() : null
+                  })
+                  .filter((l): l is string => l !== null)
+
+                if (parsedLines.length < allTexts.length) {
+                  console.warn(`[save-analysis] Groq attempt ${attempt + 1}: got ${parsedLines.length} lines, expected ${allTexts.length}`)
+                  continue
+                }
+
+                // Map lines back to fields
+                let idx = 0
+                const tOverview = parsedLines[idx++]
+                const tConclusion = parsedLines[idx++]
+                const tForces = parsedLines[idx++]
+                const tVigilance = parsedLines[idx++]
+                const tRelationnel = parsedLines[idx++]
+                const tDominantEmotion = parsedLines[idx++]
+                const tEmotionalSummary = parsedLines[idx++]
+                const tRecs = recTexts.map(() => parsedLines[idx++])
+                const tTraits = normalizedTraits.map((_, ti) => {
+                  const tAnalysis = parsedLines[idx++]
+                  const tIndicators = Array.from({ length: traitIndicatorCounts[ti] }, () => parsedLines[idx++])
+                  return { analysis: tAnalysis, indicators: tIndicators }
+                })
+
+                await req.payload.update({
+                  collection: 'analyse-personnalite',
+                  id: doc.id,
+                  req,
+                  locale: otherLocale,
+                  data: {
+                    overview: tOverview || '',
+                    forcesDominantes: tForces || '',
+                    pointsVigilance: tVigilance || '',
+                    styleRelationnel: tRelationnel || '',
+                    conclusion: tConclusion || '',
+                    profilEmotionnel: {
+                      dominantEmotion: tDominantEmotion || '',
+                      emotionalStability: Number(donneesProfilEmotionnel.emotional_stability || 5),
+                      emotionalSummary: tEmotionalSummary || '',
+                    },
+                    recommandations: (doc.recommandations ?? []).map((docRec: any, i: number) => ({
+                      id: docRec.id,
+                      text: tRecs[i] || '',
+                    })),
+                    traits: (doc.traits ?? []).map((docTrait: any, i: number) => ({
+                      id: docTrait.id,
+                      analysis: tTraits[i]?.analysis || '',
+                      interpretation: tTraits[i]?.analysis || '',
+                      observedIndicators: (docTrait.observedIndicators ?? []).map(
+                        (docIndicator: any, j: number) => ({
+                          id: docIndicator.id,
+                          indicator: tTraits[i]?.indicators?.[j] || '',
+                        }),
+                      ),
+                    })),
+                  },
+                })
+                translationSucceeded = true
+                console.log(`[save-analysis] Translation ${primaryLocale}→${otherLocale} succeeded on attempt ${attempt + 1}`)
+              } catch (attemptErr) {
+                console.warn(`[save-analysis] Groq attempt ${attempt + 1} error:`, attemptErr)
+              }
             }
           }
+
+          if (!translationSucceeded) {
+            console.warn('[save-analysis] Translation failed — copying primary content to other locale as fallback')
+            await req.payload.update({
+              collection: 'analyse-personnalite',
+              id: doc.id,
+              req,
+              locale: otherLocale,
+              data: fallbackLocaleData,
+            })
+          }
         } catch (translationError) {
-          console.error('Auto-translation to other locale failed (non-blocking):', translationError)
+          console.error('[save-analysis] Translation block error (non-blocking):', translationError)
         }
 
         await req.payload.update({
@@ -495,6 +591,145 @@ export const payloadEndpoints: Endpoint[] = [
       } catch (error) {
         const message = error instanceof Error ? error.message : "Erreur lors de l'enregistrement."
 
+        return Response.json({ error: message }, { status: 500 })
+      }
+    },
+  },
+  // Force re-translation of an existing analysis report into the other locale.
+  // Usage: POST /api/retranslate-analysis  { analysisId: "xxx" }
+  {
+    path: '/retranslate-analysis',
+    method: 'post',
+    handler: async (req) => {
+      if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      try {
+        const body: any = await req.json?.()
+        const analysisId = body?.analysisId
+        if (!analysisId) return Response.json({ error: 'analysisId required' }, { status: 400 })
+
+        const geminiApiKey = process.env.GEMINI_API_KEY?.trim()
+        if (!geminiApiKey) return Response.json({ error: 'GEMINI_API_KEY not configured' }, { status: 500 })
+
+        // Fetch the doc in both locales to determine primary
+        const docFr = await req.payload.findByID({ collection: 'analyse-personnalite', id: analysisId, locale: 'fr', overrideAccess: false, req })
+        const docEn = await req.payload.findByID({ collection: 'analyse-personnalite', id: analysisId, locale: 'en', overrideAccess: false, req })
+
+        // Determine which locale has the original content (more populated traits)
+        const primaryLocale: 'fr' | 'en' = (docFr?.overview || '').length > 10 ? 'fr' : 'en'
+        const otherLocale: 'fr' | 'en' = primaryLocale === 'fr' ? 'en' : 'fr'
+        const primaryDoc = primaryLocale === 'fr' ? docFr : docEn
+
+        const srcLang = primaryLocale === 'fr' ? 'French' : 'English'
+        const tgtLang = primaryLocale === 'fr' ? 'English' : 'French'
+
+        const primaryRecs = (primaryDoc.recommandations ?? []) as any[]
+        const primaryTraits = (primaryDoc.traits ?? []) as any[]
+        const traitIndicatorCounts = primaryTraits.map((t: any) => (t.observedIndicators ?? []).length)
+
+        const allTexts: string[] = [
+          primaryDoc.overview || '',
+          primaryDoc.conclusion || '',
+          primaryDoc.forcesDominantes || '',
+          primaryDoc.pointsVigilance || '',
+          primaryDoc.styleRelationnel || '',
+          primaryDoc.profilEmotionnel?.dominantEmotion || '',
+          primaryDoc.profilEmotionnel?.emotionalSummary || '',
+          ...primaryRecs.map((r: any) => r.text || ''),
+          ...primaryTraits.flatMap((t: any) => [
+            t.analysis || '',
+            ...(t.observedIndicators ?? []).map((i: any) => i.indicator || ''),
+          ]),
+        ]
+
+        const numberedInput = allTexts
+          .map((txt, i) => `${i + 1}. ${txt.replace(/\n/g, ' ')}`)
+          .join('\n')
+
+        let parsedLines: string[] | null = null
+        for (let attempt = 0; attempt < 3 && !parsedLines; attempt++) {
+          if (attempt > 0) await new Promise((r) => setTimeout(r, 800 * attempt))
+          try {
+            const geminiModel = process.env.GEMINI_COACHING_MODEL || 'gemini-2.0-flash'
+            const geminiPrompt = `You are a professional translator. Translate each numbered item from ${srcLang} to ${tgtLang}. Return ONLY the same numbered format (1. ... 2. ... etc). Same number of items, same order. No extra text.\n\n${numberedInput}`
+            const res = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ role: 'user', parts: [{ text: geminiPrompt }] }],
+                  generationConfig: { temperature: 0.1, maxOutputTokens: 4000 },
+                }),
+              },
+            )
+            if (!res.ok) { console.warn(`[retranslate] attempt ${attempt + 1} HTTP ${res.status}`); continue }
+            const result = await res.json()
+            const raw: string = result?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? ''
+            if (!raw) continue
+            const lines = raw.split('\n')
+              .map((line: string) => { const m = line.match(/^\d+\.\s*(.+)/); return m ? m[1].trim() : null })
+              .filter((l: string | null): l is string => l !== null)
+            if (lines.length >= allTexts.length) parsedLines = lines
+            else console.warn(`[retranslate] attempt ${attempt + 1}: got ${lines.length}/${allTexts.length} lines`)
+          } catch (e) {
+            console.warn(`[retranslate] attempt ${attempt + 1} error:`, e)
+          }
+        }
+
+        if (!parsedLines) {
+          return Response.json({ error: 'Gemini translation failed after 3 attempts' }, { status: 502 })
+        }
+
+        let idx = 0
+        const tOverview = parsedLines[idx++]
+        const tConclusion = parsedLines[idx++]
+        const tForces = parsedLines[idx++]
+        const tVigilance = parsedLines[idx++]
+        const tRelationnel = parsedLines[idx++]
+        const tDominantEmotion = parsedLines[idx++]
+        const tEmotionalSummary = parsedLines[idx++]
+        const tRecs = primaryRecs.map(() => parsedLines![idx++])
+        const tTraits = primaryTraits.map((_: any, ti: number) => {
+          const tAnalysis = parsedLines![idx++]
+          const tIndicators = Array.from({ length: traitIndicatorCounts[ti] }, () => parsedLines![idx++])
+          return { analysis: tAnalysis, indicators: tIndicators }
+        })
+
+        await req.payload.update({
+          collection: 'analyse-personnalite',
+          id: analysisId,
+          req,
+          locale: otherLocale,
+          data: {
+            overview: tOverview || '',
+            conclusion: tConclusion || '',
+            forcesDominantes: tForces || '',
+            pointsVigilance: tVigilance || '',
+            styleRelationnel: tRelationnel || '',
+            profilEmotionnel: {
+              dominantEmotion: tDominantEmotion || '',
+              emotionalStability: primaryDoc.profilEmotionnel?.emotionalStability || 5,
+              emotionalSummary: tEmotionalSummary || '',
+            },
+            recommandations: primaryRecs.map((r: any, i: number) => ({
+              id: r.id,
+              text: tRecs[i] || '',
+            })),
+            traits: primaryTraits.map((t: any, i: number) => ({
+              id: t.id,
+              analysis: tTraits[i]?.analysis || '',
+              interpretation: tTraits[i]?.analysis || '',
+              observedIndicators: (t.observedIndicators ?? []).map((ind: any, j: number) => ({
+                id: ind.id,
+                indicator: tTraits[i]?.indicators?.[j] || '',
+              })),
+            })),
+          },
+        })
+
+        return Response.json({ ok: true, translatedTo: otherLocale, analysisId })
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Retranslation failed'
         return Response.json({ error: message }, { status: 500 })
       }
     },
@@ -1329,59 +1564,105 @@ async function genererAudioAvecGoogle(
   return data.audioContent || null
 }
 
+function looksLikeAnalysisObject(obj: any): boolean {
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    !Array.isArray(obj) &&
+    (Array.isArray(obj.traits) ||
+      obj.executive_summary !== undefined ||
+      obj.recommendations !== undefined ||
+      obj.emotional_profile !== undefined ||
+      obj.conclusion !== undefined)
+  )
+}
+
+function tryParseAnalysisJson(raw: string): any {
+  const cleaned = raw
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim()
+
+  // Find outermost JSON object
+  const start = cleaned.indexOf('{')
+  const end = cleaned.lastIndexOf('}')
+
+  if (start === -1 || end <= start) return null
+
+  try {
+    const parsed = JSON.parse(cleaned.slice(start, end + 1))
+    if (looksLikeAnalysisObject(parsed)) return parsed
+  } catch {
+    // ignore
+  }
+
+  return null
+}
+
 function extraireAnalysisData(n8nData: any): any {
-  if (n8nData?.analysisData && typeof n8nData.analysisData === 'object') {
-    return n8nData.analysisData
+  if (!n8nData || typeof n8nData !== 'object') return null
+
+  // Root-level traits array means n8nData IS the analysis
+  if (Array.isArray(n8nData.traits)) return n8nData
+
+  // All candidate keys — direct object checks first
+  const directKeys = [
+    'analysisData',
+    'analysis',
+    'result',
+    'data',
+    'report',
+    'bigFive',
+    'bigFiveAnalysis',
+    'bigFiveData',
+    'big_five',
+    'analyse',
+    'rapport',
+    'personality',
+    'personalityAnalysis',
+    'personalite',
+    'profile',
+    'scores',
+    'evaluation',
+  ]
+
+  for (const key of directKeys) {
+    const val = n8nData[key]
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      if (looksLikeAnalysisObject(val)) return val
+    }
   }
 
-  if (n8nData?.analysis && typeof n8nData.analysis === 'object') {
-    return n8nData.analysis
+  // String fields that might contain embedded JSON — includes output/text/message
+  const stringKeys = [
+    ...directKeys,
+    'output',
+    'text',
+    'message',
+    'response',
+    'texte',
+    'content',
+    'json',
+    'payload',
+  ]
+
+  for (const key of stringKeys) {
+    const val = n8nData[key]
+    if (typeof val === 'string' && val.includes('{')) {
+      const parsed = tryParseAnalysisJson(val)
+      if (parsed) return parsed
+    }
   }
 
-  if (n8nData?.result && typeof n8nData.result === 'object') {
-    return n8nData.result
-  }
-
-  if (n8nData?.data && typeof n8nData.data === 'object') {
-    return n8nData.data
-  }
-
-  if (n8nData?.report && typeof n8nData.report === 'object') {
-    return n8nData.report
-  }
-
-  if (Array.isArray(n8nData?.traits)) {
-    return n8nData
-  }
-
-  const clesPossibles = ['analysisData', 'analysis', 'result', 'data', 'report']
-
-  for (const cle of clesPossibles) {
-    const valeur = n8nData?.[cle]
-
-    if (typeof valeur === 'string') {
-      try {
-        const nettoye = valeur
-          .replace(/^```json\s*/i, '')
-          .replace(/^```\s*/i, '')
-          .replace(/\s*```$/i, '')
-          .trim()
-
-        const premiereAccolade = nettoye.indexOf('{')
-        const derniereAccolade = nettoye.lastIndexOf('}')
-
-        if (premiereAccolade !== -1 && derniereAccolade > premiereAccolade) {
-          const parse = JSON.parse(nettoye.slice(premiereAccolade, derniereAccolade + 1))
-          if (
-            parse &&
-            (Array.isArray(parse.traits) || parse.analysisData || parse.executive_summary)
-          ) {
-            return parse
-          }
-        }
-      } catch {
-        // ignore parse failures and continue probing
-      }
+  // Deep scan: any top-level value that looks like an analysis object
+  for (const key of Object.keys(n8nData)) {
+    if (directKeys.includes(key) || stringKeys.includes(key)) continue
+    const val = n8nData[key]
+    if (looksLikeAnalysisObject(val)) return val
+    if (typeof val === 'string' && val.includes('{')) {
+      const parsed = tryParseAnalysisJson(val)
+      if (parsed) return parsed
     }
   }
 

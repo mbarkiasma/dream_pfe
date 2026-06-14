@@ -66,6 +66,7 @@ type CoachOption = {
   email?: string
   specialty: string
   bio?: string
+  avatarUrl?: string | null
 }
 
 type StudentCoachingClientProps = {
@@ -619,13 +620,20 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                       className={`student-choice-card ${String(selectedCoachId) === String(coach.id) ? 'student-choice-card-active' : ''}`}
                     >
                       <span className="student-media-row">
-                        <span className="student-choice-icon"><UserRound /></span>
+                        <span className="student-choice-icon">
+                          {coach.avatarUrl ? (
+                            <img
+                              src={coach.avatarUrl}
+                              alt={coach.name}
+                              className="h-full w-full rounded-full object-cover"
+                            />
+                          ) : (
+                            <UserRound />
+                          )}
+                        </span>
                         <span className="student-flex-content">
                           <span className="block truncate text-sm font-semibold">{coach.name}</span>
                           <span className="mindly-ui-badge mt-1">{coach.specialty}</span>
-                          {coach.bio ? (
-                            <span className="student-choice-description-clamped">{coach.bio}</span>
-                          ) : null}
                         </span>
                       </span>
                     </button>

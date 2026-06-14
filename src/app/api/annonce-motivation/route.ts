@@ -6,7 +6,11 @@ import { createNotification } from '@/utilities/createNotification'
 
 type CreateAnnouncementBody = {
   content?: string
+  howToAvoid?: string
   id?: string | number
+  motivatingMessage?: string
+  practicalTips?: string
+  simpleExample?: string
   status?: 'draft' | 'published'
   title?: string
 }
@@ -52,11 +56,11 @@ async function notifyStudentsAboutMotivation({
         actor: user.id,
         event: 'motivation_announcement_published',
         link: '/dashboard/student/motivation',
-        message: `${getUserName(user)} a publie une nouvelle motivation : ${title}.`,
+        message: `${getUserName(user)} a publié une nouvelle motivation : ${title}.`,
         payload,
         recipient: student.id,
         sendEmail: true,
-        title: 'Nouvelle motivation publiee',
+        title: 'Nouvelle motivation publiée',
         type: 'motivation',
       }),
     ),
@@ -112,6 +116,10 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as CreateAnnouncementBody
   const title = body.title?.trim()
   const content = body.content?.trim()
+  const howToAvoid = body.howToAvoid?.trim() || undefined
+  const practicalTips = body.practicalTips?.trim() || undefined
+  const simpleExample = body.simpleExample?.trim() || undefined
+  const motivatingMessage = body.motivatingMessage?.trim() || undefined
   const status = body.status === 'draft' ? 'draft' : 'published'
 
   if (!title || !content) {
@@ -125,6 +133,10 @@ export async function POST(request: Request) {
     data: {
       title,
       content,
+      howToAvoid,
+      practicalTips,
+      simpleExample,
+      motivatingMessage,
       status,
       author: user.id,
       publishedAt: status === 'published' ? new Date().toISOString() : undefined,
@@ -158,6 +170,10 @@ export async function PATCH(request: Request) {
   const id = body.id
   const title = body.title?.trim()
   const content = body.content?.trim()
+  const howToAvoid = body.howToAvoid?.trim() || undefined
+  const practicalTips = body.practicalTips?.trim() || undefined
+  const simpleExample = body.simpleExample?.trim() || undefined
+  const motivatingMessage = body.motivatingMessage?.trim() || undefined
   const status = body.status === 'draft' ? 'draft' : 'published'
 
   if (!id || !title || !content) {
@@ -172,6 +188,10 @@ export async function PATCH(request: Request) {
     data: {
       title,
       content,
+      howToAvoid,
+      practicalTips,
+      simpleExample,
+      motivatingMessage,
       status,
       publishedAt: status === 'published' ? new Date().toISOString() : undefined,
     },

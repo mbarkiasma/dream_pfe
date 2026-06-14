@@ -1,8 +1,23 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
-import { Check, Eye, Heart, Megaphone, Pencil, Send, Trash2, UsersRound, X } from 'lucide-react'
+import {
+  BookOpen,
+  Check,
+  Eye,
+  Heart,
+  Lightbulb,
+  Megaphone,
+  MessageSquareHeart,
+  Pencil,
+  Send,
+  ShieldAlert,
+  Trash2,
+  UsersRound,
+  X,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,6 +28,10 @@ type Announcement = {
   id: string | number
   title: string
   content: string
+  howToAvoid?: string | null
+  practicalTips?: string | null
+  simpleExample?: string | null
+  motivatingMessage?: string | null
   status: 'draft' | 'published'
   publishedAt?: string
   createdAt?: string
@@ -41,6 +60,10 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [howToAvoid, setHowToAvoid] = useState('')
+  const [practicalTips, setPracticalTips] = useState('')
+  const [simpleExample, setSimpleExample] = useState('')
+  const [motivatingMessage, setMotivatingMessage] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
   const [error, setError] = useState('')
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null)
@@ -49,12 +72,32 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
     null,
   )
   const [announcementToDelete, setAnnouncementToDelete] = useState<Announcement | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
   const [pending, startTransition] = useTransition()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const activeModal = selectedLikesAnnouncement ?? selectedAnnouncement ?? announcementToDelete
+
+  useEffect(() => {
+    if (!activeModal) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [activeModal])
 
   function resetForm() {
     setEditingAnnouncement(null)
     setTitle('')
     setContent('')
+    setHowToAvoid('')
+    setPracticalTips('')
+    setSimpleExample('')
+    setMotivatingMessage('')
   }
 
   function submitAnnouncement(event: React.FormEvent<HTMLFormElement>) {
@@ -81,6 +124,10 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
             id: editingAnnouncement?.id,
             title: cleanTitle,
             content: cleanContent,
+            howToAvoid: howToAvoid.trim() || undefined,
+            practicalTips: practicalTips.trim() || undefined,
+            simpleExample: simpleExample.trim() || undefined,
+            motivatingMessage: motivatingMessage.trim() || undefined,
             status: 'published',
           }),
         })
@@ -106,6 +153,10 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
     setEditingAnnouncement(announcement)
     setTitle(announcement.title)
     setContent(announcement.content)
+    setHowToAvoid(announcement.howToAvoid ?? '')
+    setPracticalTips(announcement.practicalTips ?? '')
+    setSimpleExample(announcement.simpleExample ?? '')
+    setMotivatingMessage(announcement.motivatingMessage ?? '')
     setStatusMessage('')
     setError('')
   }
@@ -173,7 +224,7 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                 </h2>
                 <p className="dream-text-form-description">
                   {editingAnnouncement
-                    ? 'Ajustez le titre ou le contenu déjà publié.'
+                    ? 'Ajustez les champs déjà publiés.'
                     : 'Publiez un message de motivation visible par les étudiants.'}
                 </p>
               </div>
@@ -189,20 +240,45 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
               <Textarea
                 value={content}
                 onChange={(event) => setContent(event.target.value)}
-                placeholder="Écrivez votre message de motivation..."
+                placeholder="Contenu principal du message de motivation..."
                 className="dream-textarea-field"
+                rows={3}
+              />
+              <Textarea
+                value={howToAvoid}
+                onChange={(event) => setHowToAvoid(event.target.value)}
+                placeholder="Comment éviter ce problème ou cette situation..."
+                className="dream-textarea-field"
+                rows={3}
+              />
+              <Textarea
+                value={practicalTips}
+                onChange={(event) => setPracticalTips(event.target.value)}
+                placeholder="Conseils pratiques à mettre en œuvre..."
+                className="dream-textarea-field"
+                rows={3}
+              />
+              <Textarea
+                value={simpleExample}
+                onChange={(event) => setSimpleExample(event.target.value)}
+                placeholder="Exemple simple et concret pour illustrer..."
+                className="dream-textarea-field"
+                rows={3}
+              />
+              <Textarea
+                value={motivatingMessage}
+                onChange={(event) => setMotivatingMessage(event.target.value)}
+                placeholder="Message motivant pour encourager les étudiants..."
+                className="dream-textarea-field"
+                rows={2}
               />
             </div>
 
             {error ? (
-              <p className="dream-text-status dream-status-failed">
-                {error}
-              </p>
+              <p className="dream-text-status dream-status-failed">{error}</p>
             ) : null}
             {statusMessage ? (
-              <p className="dream-text-status dream-status-ready">
-                {statusMessage}
-              </p>
+              <p className="dream-text-status dream-status-ready">{statusMessage}</p>
             ) : null}
 
             <div className="dream-flex-button-group">
@@ -267,12 +343,8 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                   {initialAnnouncements.map((announcement) => (
                     <tr key={announcement.id} className="dream-surface">
                       <td className="max-w-[360px] px-5 py-4">
-                        <p className="dream-text-table-title">
-                          {announcement.title}
-                        </p>
-                        <p className="dream-text-table-content">
-                          {announcement.content}
-                        </p>
+                        <p className="dream-text-table-title">{announcement.title}</p>
+                        <p className="dream-text-table-content">{announcement.content}</p>
                       </td>
                       <td className="px-4 py-4">
                         <span
@@ -339,209 +411,264 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
         </CardContent>
       </Card>
 
-      {selectedLikesAnnouncement ? (
-        <div
-          className="dream-modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelectedLikesAnnouncement(null)}
-        >
-          <Card className="dream-modal-card">
-            <CardContent className="p-0">
-              <div className="dream-modal-header">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="dream-text-section-header">
-                      Réactions
-                    </p>
-                    <h3 className="dream-text-modal-title">
-                      {selectedLikesAnnouncement.title}
-                    </h3>
-                    <p className="dream-text-modal-subtitle">
-                      {selectedLikesAnnouncement.reactions?.likeCount ?? 0} J&apos;aime
-                    </p>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => setSelectedLikesAnnouncement(null)}
-                    variant="dreamOutline"
-                    size="iconLg"
-                    className="shrink-0 shadow-dream-card"
-                    aria-label="Fermer les réactions"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="dream-modal-content">
-                {selectedLikesAnnouncement.reactions?.students.length ? (
-                  <div className="space-y-3">
-                    {selectedLikesAnnouncement.reactions.students.map((reaction) => (
-                      <div
-                        key={reaction.id}
-                        className="dream-surface flex items-center justify-between gap-4 rounded-[22px] border p-4 shadow-dream-card"
-                      >
-                        <div className="flex min-w-0 items-center gap-3">
-                          <div className="dream-icon-soft flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
-                            <UsersRound className="h-5 w-5" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="dream-text-reaction-name">
-                              {getStudentName(reaction.student)}
-                            </p>
-                            {reaction.student?.email ? (
-                              <p className="dream-text-reaction-email">
-                                {reaction.student.email}
-                              </p>
-                            ) : null}
-                          </div>
-                        </div>
-                        <span className="dream-badge shrink-0 rounded-full border px-3 py-1 text-xs font-semibold">
-                          {formatDate(reaction.createdAt)}
-                        </span>
+      {isMounted && selectedLikesAnnouncement
+        ? createPortal(
+            <div
+              className="dream-modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              onClick={() => setSelectedLikesAnnouncement(null)}
+            >
+              <Card className="dream-modal-card" onClick={(e) => e.stopPropagation()}>
+                <CardContent className="p-0">
+                  <div className="dream-modal-header">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="dream-text-section-header">Réactions</p>
+                        <h3 className="dream-text-modal-title">{selectedLikesAnnouncement.title}</h3>
+                        <p className="dream-text-modal-subtitle">
+                          {selectedLikesAnnouncement.reactions?.likeCount ?? 0} J&apos;aime
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="dream-card-dashed rounded-[26px] border p-6 text-center dream-text-form-description">
-                    Aucun étudiant n'a encore aimé cette motivation.
-                  </div>
-                )}
-              </div>
 
-              <div className="dream-modal-footer">
-                <Button
-                  type="button"
-                  onClick={() => setSelectedLikesAnnouncement(null)}
-                  variant="dream"
-                  size="pill"
-                  className="w-full sm:w-auto"
-                >
-                  Fermer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      ) : null}
-
-      {selectedAnnouncement ? (
-        <div
-          className="dream-modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelectedAnnouncement(null)}
-        >
-          <Card className="dream-modal-card">
-            <CardContent className="p-0">
-              <div className="dream-modal-header">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="dream-text-section-header">
-                      Annonce de motivation
-                    </p>
-                    <h3 className="dream-text-modal-title">
-                      {selectedAnnouncement.title}
-                    </h3>
-                    <p className="dream-text-modal-subtitle">
-                      {selectedAnnouncement.status === 'published' ? 'Publiée' : 'Brouillon'}
-                    </p>
+                      <Button
+                        type="button"
+                        onClick={() => setSelectedLikesAnnouncement(null)}
+                        variant="dreamOutline"
+                        size="iconLg"
+                        className="shrink-0 shadow-dream-card"
+                        aria-label="Fermer les réactions"
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
+                    </div>
                   </div>
 
-                  <Button
-                    type="button"
-                    onClick={() => setSelectedAnnouncement(null)}
-                    variant="dreamOutline"
-                    size="iconLg"
-                    className="shrink-0 shadow-dream-card"
-                    aria-label="Fermer l'annonce"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="dream-modal-content">
-                <div className="dream-surface rounded-[26px] border p-5 shadow-dream-card">
-                  <p className="whitespace-pre-line dream-text-body-lg dream-text-heading">
-                    {selectedAnnouncement.content}
-                  </p>
-                </div>
-              </div>
-
-              <div className="dream-modal-footer">
-                <Button
-                  type="button"
-                  onClick={() => setSelectedAnnouncement(null)}
-                  variant="dream"
-                  size="pill"
-                  className="w-full sm:w-auto"
-                >
-                  Fermer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      ) : null}
-
-      {announcementToDelete ? (
-        <div className="dream-modal-backdrop fixed inset-0 z-50 flex items-center justify-center px-4">
-          <Card className="w-full max-w-md rounded-[30px] border dream-panel-bg shadow-dream-card-lg">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="dream-status-failed rounded-2xl border p-3">
-                  <Trash2 className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="dream-text-confirmation-header">
-                    Confirmation
-                  </p>
-                  <h3 className="dream-text-confirmation-title">
-                    Supprimer cette annonce ?
-                  </h3>
-                  <p className="dream-spacing-top-sm dream-text-body-muted">
-                    Elle ne sera plus visible par les étudiants. Cette action ne pourra pas être
-                    annulée.
-                  </p>
-                  <div className="dream-surface dream-spacing-top-md rounded-[20px] border p-4">
-                    <p className="dream-text-form-title">
-                      {announcementToDelete.title}
-                    </p>
-                    <p className="dream-text-confirmation-content">
-                      {announcementToDelete.content}
-                    </p>
+                  <div className="dream-modal-content">
+                    {selectedLikesAnnouncement.reactions?.students.length ? (
+                      <div className="space-y-3">
+                        {selectedLikesAnnouncement.reactions.students.map((reaction) => (
+                          <div
+                            key={reaction.id}
+                            className="dream-surface flex items-center justify-between gap-4 rounded-[22px] border p-4 shadow-dream-card"
+                          >
+                            <div className="flex min-w-0 items-center gap-3">
+                              <div className="dream-icon-soft flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
+                                <UsersRound className="h-5 w-5" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="dream-text-reaction-name">
+                                  {getStudentName(reaction.student)}
+                                </p>
+                                {reaction.student?.email ? (
+                                  <p className="dream-text-reaction-email">
+                                    {reaction.student.email}
+                                  </p>
+                                ) : null}
+                              </div>
+                            </div>
+                            <span className="dream-badge shrink-0 rounded-full border px-3 py-1 text-xs font-semibold">
+                              {formatDate(reaction.createdAt)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="dream-card-dashed rounded-[26px] border p-6 text-center dream-text-form-description">
+                        Aucun étudiant n&apos;a encore aimé cette motivation.
+                      </div>
+                    )}
                   </div>
-                </div>
-              </div>
 
-              <div className="dream-flex-end">
-                <Button
-                  type="button"
-                  onClick={() => setAnnouncementToDelete(null)}
-                  variant="dreamOutline"
-                  size="pill"
-                  className="rounded-2xl"
-                >
-                  Annuler
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => deleteAnnouncement(announcementToDelete)}
-                  disabled={pending}
-                  variant="destructive"
-                  size="pill"
-                  className="rounded-2xl"
-                >
-                  Supprimer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      ) : null}
+                  <div className="dream-modal-footer">
+                    <Button
+                      type="button"
+                      onClick={() => setSelectedLikesAnnouncement(null)}
+                      variant="dream"
+                      size="pill"
+                      className="w-full sm:w-auto"
+                    >
+                      Fermer
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>,
+            document.body,
+          )
+        : null}
+
+      {isMounted && selectedAnnouncement
+        ? createPortal(
+            <div
+              className="dream-modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              onClick={() => setSelectedAnnouncement(null)}
+            >
+              <Card className="dream-modal-card" onClick={(e) => e.stopPropagation()}>
+                <CardContent className="p-0">
+                  <div className="dream-modal-header">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="dream-text-section-header">Annonce de motivation</p>
+                        <h3 className="dream-text-modal-title">{selectedAnnouncement.title}</h3>
+                        <p className="dream-text-modal-subtitle">
+                          {selectedAnnouncement.status === 'published' ? 'Publiée' : 'Brouillon'}
+                        </p>
+                      </div>
+
+                      <Button
+                        type="button"
+                        onClick={() => setSelectedAnnouncement(null)}
+                        variant="dreamOutline"
+                        size="iconLg"
+                        className="shrink-0 shadow-dream-card"
+                        aria-label="Fermer l'annonce"
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="dream-modal-content space-y-4">
+                    <div className="dream-surface rounded-[22px] border p-4 shadow-dream-card">
+                      <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-dream-muted">
+                        <Megaphone className="h-3.5 w-3.5" />
+                        Contenu
+                      </div>
+                      <p className="whitespace-pre-line dream-text-body-lg dream-text-heading">
+                        {selectedAnnouncement.content}
+                      </p>
+                    </div>
+
+                    {selectedAnnouncement.howToAvoid ? (
+                      <div className="dream-surface rounded-[22px] border p-4 shadow-dream-card">
+                        <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-dream-muted">
+                          <ShieldAlert className="h-3.5 w-3.5" />
+                          Comment éviter
+                        </div>
+                        <p className="whitespace-pre-line dream-text-body-lg dream-text-heading">
+                          {selectedAnnouncement.howToAvoid}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {selectedAnnouncement.practicalTips ? (
+                      <div className="dream-surface rounded-[22px] border p-4 shadow-dream-card">
+                        <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-dream-muted">
+                          <Lightbulb className="h-3.5 w-3.5" />
+                          Conseils pratiques
+                        </div>
+                        <p className="whitespace-pre-line dream-text-body-lg dream-text-heading">
+                          {selectedAnnouncement.practicalTips}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {selectedAnnouncement.simpleExample ? (
+                      <div className="dream-surface rounded-[22px] border p-4 shadow-dream-card">
+                        <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-dream-muted">
+                          <BookOpen className="h-3.5 w-3.5" />
+                          Exemple simple
+                        </div>
+                        <p className="whitespace-pre-line dream-text-body-lg dream-text-heading">
+                          {selectedAnnouncement.simpleExample}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {selectedAnnouncement.motivatingMessage ? (
+                      <div className="dream-surface rounded-[22px] border p-4 shadow-dream-card">
+                        <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-dream-muted">
+                          <MessageSquareHeart className="h-3.5 w-3.5" />
+                          Message motivant
+                        </div>
+                        <p className="whitespace-pre-line dream-text-body-lg dream-text-heading">
+                          {selectedAnnouncement.motivatingMessage}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="dream-modal-footer">
+                    <Button
+                      type="button"
+                      onClick={() => setSelectedAnnouncement(null)}
+                      variant="dream"
+                      size="pill"
+                      className="w-full sm:w-auto"
+                    >
+                      Fermer
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>,
+            document.body,
+          )
+        : null}
+
+      {isMounted && announcementToDelete
+        ? createPortal(
+            <div
+              className="dream-modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              onClick={() => setAnnouncementToDelete(null)}
+            >
+              <Card
+                className="w-full max-w-md rounded-[30px] border dream-panel-bg shadow-dream-card-lg"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="dream-status-failed rounded-2xl border p-3">
+                      <Trash2 className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="dream-text-confirmation-header">Confirmation</p>
+                      <h3 className="dream-text-confirmation-title">Supprimer cette annonce ?</h3>
+                      <p className="dream-spacing-top-sm dream-text-body-muted">
+                        Elle ne sera plus visible par les étudiants. Cette action ne pourra pas être
+                        annulée.
+                      </p>
+                      <div className="dream-surface dream-spacing-top-md rounded-[20px] border p-4">
+                        <p className="dream-text-form-title">{announcementToDelete.title}</p>
+                        <p className="dream-text-confirmation-content">
+                          {announcementToDelete.content}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="dream-flex-end">
+                    <Button
+                      type="button"
+                      onClick={() => setAnnouncementToDelete(null)}
+                      variant="dreamOutline"
+                      size="pill"
+                      className="rounded-2xl"
+                    >
+                      Annuler
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => deleteAnnouncement(announcementToDelete)}
+                      disabled={pending}
+                      variant="destructive"
+                      size="pill"
+                      className="rounded-2xl"
+                    >
+                      Supprimer
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   )
 }

@@ -81,6 +81,30 @@ export const AnnonceMotivation: CollectionConfig = {
       localized: true,
     },
     {
+      name: 'howToAvoid',
+      type: 'textarea',
+      label: 'Comment éviter',
+      localized: true,
+    },
+    {
+      name: 'practicalTips',
+      type: 'textarea',
+      label: 'Conseils pratiques',
+      localized: true,
+    },
+    {
+      name: 'simpleExample',
+      type: 'textarea',
+      label: 'Exemple simple',
+      localized: true,
+    },
+    {
+      name: 'motivatingMessage',
+      type: 'textarea',
+      label: 'Message motivant',
+      localized: true,
+    },
+    {
       name: 'author',
       type: 'relationship',
       relationTo: 'users',

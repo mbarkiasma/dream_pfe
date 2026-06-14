@@ -234,11 +234,16 @@
         "badge": "Motivation",
         "publishedBy": "Published by {name} - {date}",
         "dateNotSpecified": "Date not specified",
-        "seeMore": "See more",
+        "seeMore": "See details",
         "close": "Close",
         "closeAriaLabel": "Close post",
         "errorReaction": "Unable to react at the moment.",
-        "empty": "No motivation post is available at the moment."
+        "empty": "No motivation post is available at the moment.",
+        "sectionContent": "Content",
+        "sectionHowToAvoid": "How to avoid",
+        "sectionPracticalTips": "Practical tips",
+        "sectionSimpleExample": "Simple example",
+        "sectionMotivatingMessage": "Motivating message"
       },
       "psyOrientation": {
         "pageTitle": "Psychological orientation",

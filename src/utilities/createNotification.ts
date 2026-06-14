@@ -87,16 +87,20 @@ export async function createNotification({
     const safeLink = fullLink ? escapeHtml(fullLink) : ''
     const safeLabel = escapeHtml(linkLabel ?? 'Ouvrir la plateforme')
 
-    await payload.sendEmail({
+    const emailResult = buildEmailHtml({
+      title: safeTitle,
+      body: safeMessage,
+      ctaHref: safeLink || undefined,
+      ctaLabel: safeLabel,
+    })
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (payload.sendEmail as any)({
       to: user.email,
       subject: title,
-      html: buildEmailHtml({
-        title: safeTitle,
-        body: safeMessage,
-        ctaHref: safeLink || undefined,
-        ctaLabel: safeLabel,
-      }),
+      html: emailResult.html,
       text: fullLink ? `${message}\n\n${fullLink}` : message,
+      attachments: emailResult.attachments,
     })
 
     await payload.update({

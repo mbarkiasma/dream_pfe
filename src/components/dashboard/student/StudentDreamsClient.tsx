@@ -1,6 +1,6 @@
 'use client'
 
-import { useDeferredValue, useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 import {
   CheckCircle2,
@@ -11,7 +11,6 @@ import {
   Moon,
   Plus,
   RefreshCw,
-  Search,
   Sparkles,
   Square,
   Trash2,
@@ -24,7 +23,6 @@ import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import type { Dream } from '@/payload-types'
 
@@ -56,7 +54,6 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   const t = useTranslations('dashboard.student.dreams')
 
   const [description, setDescription] = useState('')
-  const [query, setQuery] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
   const [isRecording, setIsRecording] = useState(false)
@@ -72,7 +69,6 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
     type: 'analysis' | 'description'
   } | null>(null)
   const [pending, startTransition] = useTransition()
-  const deferredQuery = useDeferredValue(query)
   const hasDreamInProgress = dreams.some(
     (dream) => dream.videoStatus === 'pending' || dream.videoStatus === 'generating',
   )
@@ -223,23 +219,8 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
   }, [hasDreamInProgress, router])
 
   const remaining = Math.max(weeklyLimit - weeklyUsed, 0)
-  const normalizedQuery = deferredQuery.trim().toLowerCase()
-  const filteredDreams = normalizedQuery
-    ? dreams.filter((dream) => {
-        const haystack = [
-          dream.description ?? '',
-          dream.summary ?? '',
-          dream.analysis ?? '',
-          dream.videoStatus ?? '',
-        ]
-          .join(' ')
-          .toLowerCase()
 
-        return haystack.includes(normalizedQuery)
-      })
-    : dreams
-
-  const latestDream = filteredDreams[0] ?? dreams[0] ?? null
+  const latestDream = dreams[0] ?? null
   const latestDreamVideoUrl = latestDream ? getDreamVideoUrl(latestDream) : null
 
   async function submitDream(event: React.FormEvent<HTMLFormElement>) {
@@ -568,35 +549,16 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
           <div>
             <p className="student-dreams-small-label">{t('journalLabel')}</p>
             <h2 className="student-dreams-journal-title">
-              {t('journalCount', { count: filteredDreams.length })}
+              {t('journalCount', { count: dreams.length })}
             </h2>
           </div>
 
-          <div className="student-dreams-search-box">
-            <Search />
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={t('searchPlaceholder')}
-              className="student-dreams-search-input"
-            />
-            {query ? (
-              <button
-                type="button"
-                className="student-dreams-search-clear"
-                onClick={() => setQuery('')}
-                aria-label="Effacer la recherche"
-              >
-                <X />
-              </button>
-            ) : null}
-          </div>
         </div>
       </section>
 
       <div className="student-dreams-timeline">
-        {filteredDreams.length > 0 ? (
-          filteredDreams.map((dream, index) => {
+        {dreams.length > 0 ? (
+          dreams.map((dream, index) => {
             const statusCopy = getStatusCopy(dream.videoStatus)
             const StatusIcon = statusCopy.icon
             const dreamVideoUrl = getDreamVideoUrl(dream)

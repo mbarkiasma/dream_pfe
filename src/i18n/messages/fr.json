@@ -234,11 +234,16 @@
         "badge": "Motivation",
         "publishedBy": "Publiée par {name} - {date}",
         "dateNotSpecified": "Date non précisée",
-        "seeMore": "Voir plus",
+        "seeMore": "Voir les détails",
         "close": "Fermer",
         "closeAriaLabel": "Fermer l'annonce",
         "errorReaction": "Réaction impossible pour le moment.",
-        "empty": "Aucune annonce de motivation n'est disponible pour le moment."
+        "empty": "Aucune annonce de motivation n'est disponible pour le moment.",
+        "sectionContent": "Contenu",
+        "sectionHowToAvoid": "Comment éviter",
+        "sectionPracticalTips": "Conseils pratiques",
+        "sectionSimpleExample": "Exemple simple",
+        "sectionMotivatingMessage": "Message motivant"
       },
       "psyOrientation": {
         "pageTitle": "Orientation psychologique",

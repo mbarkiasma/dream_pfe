@@ -6,8 +6,6 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { PrintPdfButton } from '@/components/dashboard/student/PrintPdfButton'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 import { getReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
-import { translateAnalysisToEnglish } from '@/utilities/translateAnalysis'
-
 type PageProps = {
   params: Promise<{
     id: string
@@ -25,12 +23,15 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
     notFound()
   }
 
+  // fallbackLocale: if the target locale is empty (translation failed at save time),
+  // Payload returns the other locale's content automatically — no runtime API call needed.
   const analyse = await payload.findByID({
     collection: 'analyse-personnalite',
     id,
     user,
     overrideAccess: false,
     locale: locale as 'fr' | 'en',
+    fallbackLocale: locale === 'en' ? 'fr' : 'en',
   })
 
   if (!analyse) {
@@ -53,28 +54,24 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
   const wellbeingLabel = wellbeingKeyMap[reportWellbeing.key].label
   const wellbeingDescription = wellbeingKeyMap[reportWellbeing.key].description
 
-  const needsFallbackTranslation =
-    locale === 'en' && !analyse.overview && !analyse.conclusion && !analyse.forcesDominantes
-
-  const tx = needsFallbackTranslation
-    ? await translateAnalysisToEnglish(analyse.id, analyse)
-    : null
-
+  // Translation is handled at save-analysis time (Groq with 3 retries).
+  // Here we just read what Payload stored — no external API call at view time.
   const display = {
-    overview: tx?.overview ?? analyse.overview,
-    conclusion: tx?.conclusion ?? analyse.conclusion,
-    forcesDominantes: tx?.forcesDominantes ?? analyse.forcesDominantes,
-    pointsVigilance: tx?.pointsVigilance ?? analyse.pointsVigilance,
-    styleRelationnel: tx?.styleRelationnel ?? analyse.styleRelationnel,
-    traits: tx?.traits ?? analyse.traits?.map((trait: { name: string; analysis?: string | null; interpretation?: string | null; observedIndicators?: Array<{ indicator?: string | null }> | null }) => ({
+    overview: analyse.overview,
+    conclusion: analyse.conclusion,
+    forcesDominantes: analyse.forcesDominantes,
+    pointsVigilance: analyse.pointsVigilance,
+    styleRelationnel: analyse.styleRelationnel,
+    traits: (analyse.traits ?? []).map((trait: any) => ({
       name: trait.name,
+      score: trait.score,
       analysis: trait.analysis,
       interpretation: trait.interpretation,
-      indicators: (trait.observedIndicators ?? []).map((i: { indicator?: string | null }) => i.indicator ?? '').filter(Boolean),
-    })) ?? [],
-    dominantEmotion: tx?.dominantEmotion ?? analyse.profilEmotionnel?.dominantEmotion,
-    emotionalSummary: tx?.emotionalSummary ?? analyse.profilEmotionnel?.emotionalSummary,
-    recommandations: tx?.recommandations ?? (analyse.recommandations ?? []).map((r: { text?: string | null }) => r.text),
+      indicators: (trait.observedIndicators ?? []).map((i: any) => i.indicator ?? '').filter(Boolean),
+    })),
+    dominantEmotion: analyse.profilEmotionnel?.dominantEmotion,
+    emotionalSummary: analyse.profilEmotionnel?.emotionalSummary,
+    recommandations: (analyse.recommandations ?? []).map((r: any) => r.text).filter(Boolean),
   }
 
   return (
@@ -185,42 +182,38 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
           </h2>
 
           <div className="mt-4 grid gap-4">
-            {display.traits.map((trait, index) => {
-              const originalTrait = analyse.traits?.[index]
-              return (
-                <article
-                  key={`${trait.name}-${index}`}
-                  className="report-trait-card rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
-                >
-                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                    <h3 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
-                      {trait.name}
-                    </h3>
+            {display.traits.map((trait: { name: string; score: number; analysis?: string | null; interpretation?: string | null; indicators: string[] }, index: number) => (
+              <article
+                key={`${trait.name}-${index}`}
+                className="report-trait-card rounded-[var(--mindly-radius-lg)] border border-[var(--mindly-border)] bg-[var(--mindly-surface-soft)] p-5 shadow-[var(--mindly-shadow-xs)] print:bg-white print:shadow-none"
+              >
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <h3 className="text-lg font-bold text-[var(--mindly-text-strong)] print:text-slate-900">
+                    {trait.name}
+                  </h3>
+                  <span className="report-trait-score inline-flex w-fit rounded-full border border-[#c4b5fd] bg-white px-3 py-1 text-sm font-bold !text-[#1f114f] print:!bg-white print:!text-slate-900">
+                    {t('pdf.traitScore', { score: trait.score })}
+                  </span>
+                </div>
 
-                    <span className="report-trait-score inline-flex w-fit rounded-full border border-[#c4b5fd] bg-white px-3 py-1 text-sm font-bold !text-[#1f114f] print:!bg-white print:!text-slate-900">
-                      {t('pdf.traitScore', { score: originalTrait?.score })}
-                    </span>
+                <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
+                  {trait.analysis || trait.interpretation || t('pdf.traitAnalysisEmpty')}
+                </p>
+
+                {trait.indicators.length > 0 ? (
+                  <div className="mt-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-400">
+                      {t('pdf.observedIndicators')}
+                    </p>
+                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
+                      {trait.indicators.map((indicator: string, indicatorIndex: number) => (
+                        <li key={`${trait.name}-indicator-${indicatorIndex}`}>{indicator}</li>
+                      ))}
+                    </ul>
                   </div>
-
-                  <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[var(--mindly-text-soft)] print:text-slate-700">
-                    {trait.analysis || trait.interpretation || t('pdf.traitAnalysisEmpty')}
-                  </p>
-
-                  {trait.indicators.length > 0 ? (
-                    <div className="mt-4">
-                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--mindly-primary-muted)] print:text-slate-400">
-                        {t('pdf.observedIndicators')}
-                      </p>
-                      <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--mindly-text-soft)] print:text-slate-700">
-                        {trait.indicators.map((indicator, indicatorIndex) => (
-                          <li key={`${trait.name}-indicator-${indicatorIndex}`}>{indicator}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                </article>
-              )
-            })}
+                ) : null}
+              </article>
+            ))}
           </div>
         </section>
 

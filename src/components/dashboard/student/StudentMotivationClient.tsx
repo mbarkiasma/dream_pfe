@@ -2,17 +2,29 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Heart, Megaphone, X } from 'lucide-react'
+import {
+  BookOpen,
+  ChevronRight,
+  Heart,
+  Lightbulb,
+  Megaphone,
+  MessageSquareHeart,
+  ShieldAlert,
+  X,
+} from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 type MotivationAnnouncement = {
   id: string | number
   title: string
   content: string
+  howToAvoid?: string | null
+  practicalTips?: string | null
+  simpleExample?: string | null
+  motivatingMessage?: string | null
   publishedAt?: string | null
   createdAt?: string | null
   author?: {
@@ -34,9 +46,7 @@ type ReactionValue = 'like'
 
 function getAuthorName(author: MotivationAnnouncement['author']) {
   if (!author) return 'Coach'
-
   const fullName = `${author.firstName ?? ''} ${author.lastName ?? ''}`.trim()
-
   return fullName || author.email || 'Coach'
 }
 
@@ -53,7 +63,6 @@ export function StudentMotivationClient({ announcements }: Props) {
 
   function formatDate(value?: string | null) {
     if (!value) return t('dateNotSpecified')
-
     return new Intl.DateTimeFormat(locale, {
       day: '2-digit',
       month: 'long',
@@ -92,13 +101,8 @@ export function StudentMotivationClient({ announcements }: Props) {
     try {
       const response = await fetch('/api/annonce-motivation/reaction', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          announcementId,
-          reaction,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ announcementId, reaction }),
       })
       const data = await response.json()
 
@@ -118,75 +122,76 @@ export function StudentMotivationClient({ announcements }: Props) {
   return (
     <div className="student-motivation-root">
       {announcements.length === 0 ? (
-        <Card className="student-motivation-empty-card">
-          <CardContent className="student-motivation-empty-content">
-            {t('empty')}
-          </CardContent>
-        </Card>
+        <div className="student-motivation-empty-card">
+          <div className="student-motivation-empty-content">{t('empty')}</div>
+        </div>
       ) : null}
 
-      {announcements.map((announcement) => (
-        <article key={announcement.id} className="student-motivation-card">
-          <div className="student-motivation-header">
-            <div className="student-motivation-heading">
-              <div className="student-motivation-icon">
-                <Megaphone />
-              </div>
+      {announcements.map((announcement) => {
+        const isActive = announcement.reactions?.myReaction === 'like'
+        const count = announcement.reactions?.counts?.like ?? 0
 
-              <div>
-                <h2 className="student-motivation-title">{announcement.title}</h2>
-                <p className="student-motivation-meta">
-                  {t('publishedBy', {
-                    name: getAuthorName(announcement.author),
-                    date: formatDate(announcement.publishedAt || announcement.createdAt),
-                  })}
-                </p>
-              </div>
-            </div>
-
-            <span className="student-motivation-badge">{t('badge')}</span>
-          </div>
-
-          <div className="student-motivation-content-box">
-            <p className="student-motivation-text">{announcement.content}</p>
-          </div>
-
-          <div className="student-motivation-actions">
-            <Button
+        return (
+          <article key={announcement.id} className="student-motivation-card">
+            <button
               type="button"
               onClick={() => setSelectedAnnouncement(announcement)}
-              variant="dreamGhost"
-              size="xs"
-              className="student-motivation-action-button"
+              className="student-motivation-card-clickable"
+              aria-label={`Voir les détails : ${announcement.title}`}
             >
-              {t('seeMore')}
-            </Button>
+              <div className="student-motivation-header">
+                <div className="student-motivation-heading">
+                  <div className="student-motivation-icon">
+                    <Megaphone />
+                  </div>
+                  <div className="min-w-0 flex-1 text-left">
+                    <h2 className="student-motivation-title">{announcement.title}</h2>
+                    <p className="student-motivation-meta">
+                      {t('publishedBy', {
+                        name: getAuthorName(announcement.author),
+                        date: formatDate(announcement.publishedAt || announcement.createdAt),
+                      })}
+                    </p>
+                  </div>
+                </div>
 
-            {(() => {
-              const isActive = announcement.reactions?.myReaction === 'like'
-              const count = announcement.reactions?.counts?.like ?? 0
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="student-motivation-badge">{t('badge')}</span>
+                  <ChevronRight className="h-4 w-4 text-dream-muted" />
+                </div>
+              </div>
+            </button>
 
-              return (
-                <Button
-                  type="button"
-                  onClick={() => void reactToAnnouncement(announcement.id, 'like')}
-                  disabled={pendingReactionId === announcement.id}
-                  variant={isActive ? 'success' : 'dreamGhost'}
-                  size="xs"
-                  className={
-                    isActive
-                      ? 'student-motivation-like-button student-motivation-like-button-active'
-                      : 'student-motivation-like-button'
-                  }
-                >
-                  <Heart />
-                  <span>{count}</span>
-                </Button>
-              )
-            })()}
-          </div>
-        </article>
-      ))}
+            <div className="student-motivation-actions">
+              <Button
+                type="button"
+                onClick={() => setSelectedAnnouncement(announcement)}
+                variant="dreamGhost"
+                size="xs"
+                className="student-motivation-action-button"
+              >
+                {t('seeMore')}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={() => void reactToAnnouncement(announcement.id, 'like')}
+                disabled={pendingReactionId === announcement.id}
+                variant={isActive ? 'success' : 'dreamGhost'}
+                size="xs"
+                className={
+                  isActive
+                    ? 'student-motivation-like-button student-motivation-like-button-active'
+                    : 'student-motivation-like-button'
+                }
+              >
+                <Heart />
+                <span>{count}</span>
+              </Button>
+            </div>
+          </article>
+        )
+      })}
 
       {error ? <p className="student-motivation-error">{error}</p> : null}
 
@@ -204,7 +209,7 @@ export function StudentMotivationClient({ announcements }: Props) {
               >
                 <div className="student-motivation-modal-header">
                   <div className="student-motivation-modal-heading">
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <p className="student-motivation-modal-label">{t('badge')}</p>
                       <h3 className="student-motivation-modal-title">
                         {selectedAnnouncement.title}
@@ -231,9 +236,60 @@ export function StudentMotivationClient({ announcements }: Props) {
                 </div>
 
                 <div className="student-motivation-modal-body">
-                  <div className="student-motivation-modal-content">
-                    <p className="student-motivation-modal-text">{selectedAnnouncement.content}</p>
+                  {/* Contenu principal */}
+                  <div className="motivation-section motivation-section-content">
+                    <div className="motivation-section-label">
+                      <Megaphone className="motivation-section-icon" />
+                      <span>{t('sectionContent')}</span>
+                    </div>
+                    <p className="motivation-section-text">{selectedAnnouncement.content}</p>
                   </div>
+
+                  {/* Comment éviter */}
+                  {selectedAnnouncement.howToAvoid ? (
+                    <div className="motivation-section motivation-section-avoid">
+                      <div className="motivation-section-label">
+                        <ShieldAlert className="motivation-section-icon" />
+                        <span>{t('sectionHowToAvoid')}</span>
+                      </div>
+                      <p className="motivation-section-text">{selectedAnnouncement.howToAvoid}</p>
+                    </div>
+                  ) : null}
+
+                  {/* Conseils pratiques */}
+                  {selectedAnnouncement.practicalTips ? (
+                    <div className="motivation-section motivation-section-tips">
+                      <div className="motivation-section-label">
+                        <Lightbulb className="motivation-section-icon" />
+                        <span>{t('sectionPracticalTips')}</span>
+                      </div>
+                      <p className="motivation-section-text">{selectedAnnouncement.practicalTips}</p>
+                    </div>
+                  ) : null}
+
+                  {/* Exemple simple */}
+                  {selectedAnnouncement.simpleExample ? (
+                    <div className="motivation-section motivation-section-example">
+                      <div className="motivation-section-label">
+                        <BookOpen className="motivation-section-icon" />
+                        <span>{t('sectionSimpleExample')}</span>
+                      </div>
+                      <p className="motivation-section-text">{selectedAnnouncement.simpleExample}</p>
+                    </div>
+                  ) : null}
+
+                  {/* Message motivant */}
+                  {selectedAnnouncement.motivatingMessage ? (
+                    <div className="motivation-section motivation-section-message">
+                      <div className="motivation-section-label">
+                        <MessageSquareHeart className="motivation-section-icon" />
+                        <span>{t('sectionMotivatingMessage')}</span>
+                      </div>
+                      <p className="motivation-section-text motivation-section-message-text">
+                        {selectedAnnouncement.motivatingMessage}
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="student-motivation-modal-footer">
@@ -247,8 +303,8 @@ export function StudentMotivationClient({ announcements }: Props) {
                 </div>
               </div>
             </div>,
-          document.body,
-        )
+            document.body,
+          )
         : null}
     </div>
   )
