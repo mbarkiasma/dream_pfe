@@ -1,10 +1,8 @@
 import type { Access, CollectionConfig, Where } from 'payload'
 
-import { isAdmin } from '@/access/roles'
 
 const canReadPsyOrientation: Access = ({ req: { user } }) => {
   if (!user) return false
-  if (isAdmin(user)) return true
 
   if (user.role === 'coach') {
     const where: Where = {
@@ -40,12 +38,11 @@ const canReadPsyOrientation: Access = ({ req: { user } }) => {
 }
 
 const canCreatePsyOrientation: Access = ({ req: { user } }) => {
-  return Boolean(user && (isAdmin(user) || user.role === 'coach'))
+  return Boolean(user && user.role === 'coach')
 }
 
 const canUpdatePsyOrientation: Access = ({ req: { user } }) => {
   if (!user) return false
-  if (isAdmin(user)) return true
 
   if (user.role === 'coach') {
     const where: Where = {
@@ -85,7 +82,7 @@ export const PsyOrientations: CollectionConfig = {
     read: canReadPsyOrientation,
     create: canCreatePsyOrientation,
     update: canUpdatePsyOrientation,
-    delete: ({ req: { user } }) => isAdmin(user),
+    delete: () => false,
   },
   fields: [
     {

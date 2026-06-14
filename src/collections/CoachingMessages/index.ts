@@ -1,10 +1,9 @@
 import type { Access, CollectionConfig, Where } from 'payload'
 
-import { isAdmin } from '@/access/roles'
 
 const canReadMessage: Access = ({ req: { user } }) => {
   if (!user) return false
-  if (isAdmin(user) || user.role === 'psy') return true
+  if (user.role === 'psy') return true
 
   if (user.role === 'coach') {
     const where: Where = {
@@ -39,8 +38,8 @@ export const CoachingMessages: CollectionConfig = {
   access: {
     read: canReadMessage,
     create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => isAdmin(user),
-    delete: ({ req: { user } }) => isAdmin(user),
+    update: () => false,
+    delete: () => false,
   },
   fields: [
     {

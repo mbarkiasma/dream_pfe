@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Bot,
   CalendarDays,
@@ -110,6 +111,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   const audioChunksRef = useRef<Blob[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const composerRef = useRef<HTMLTextAreaElement | null>(null)
 
   const selectedSession = useMemo(
     () => sessions.find((session) => String(session.id) === String(selectedSessionId)) ?? null,
@@ -154,6 +156,15 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [messages, isLoading, isAiTyping, editingMessageId])
+
+  useEffect(() => {
+    const el = composerRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    const maxHeight = 200
+    el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`
+    el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden'
+  }, [message])
 
   useEffect(() => {
     if (mode !== 'classic') return
@@ -764,7 +775,11 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           <div className="student-chat-header-inner">
             <div>
               <h2 className="student-chat-title">
-                {selectedSession?.title ?? t('noSessionSelected')}
+                {selectedSession
+                  ? selectedSession.mode === 'classic'
+                    ? `${t('humanCoachLabel')} - ${selectedCoachName || t('humanCoach')}`
+                    : selectedSession.title
+                  : t('noSessionSelected')}
               </h2>
             </div>
             <div className="student-chat-icon"><MessageCircle /></div>
@@ -841,7 +856,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                           : t('you')}
                     </p>
 
-                    {isEditingMessage ? (
+                    {isEditingMessage && mode !== 'smart' ? (
                       <div className="student-edit-stack">
                         <textarea
                           value={editingMessageContent}
@@ -968,7 +983,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                     )}
                   </div>
 
-                  {isMine ? (
+                  {isMine && mode !== 'smart' ? (
                     <button
                       type="button"
                       onClick={() => { setEditingMessageId(item.id); setEditingMessageContent(item.content) }}
@@ -1066,6 +1081,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
             </button>
 
             <textarea
+              ref={composerRef}
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               onKeyDown={(event) => {
@@ -1093,7 +1109,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         </div>
       </section>
 
-      {sessionToDelete ? (
+      {sessionToDelete ? createPortal(
         <div className="mindly-modal-backdrop">
           <div className="student-delete-modal-card">
             <div className="student-media-row">
@@ -1122,7 +1138,8 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </div>
   )

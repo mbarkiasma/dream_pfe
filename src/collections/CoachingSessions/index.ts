@@ -28,12 +28,12 @@ const canReadCoachingSession: Access = ({ req: { user } }) => {
 const canCreateCoachingSession: Access = ({ req: { user } }) => {
   if (!user) return false
 
-  return isAdmin(user) || user.role === 'etudiant'
+  return user.role === 'etudiant'
 }
 
 const canUpdateCoachingSession: Access = ({ req: { user } }) => {
   if (!user) return false
-  if (isAdmin(user) || user.role === 'psy') return true
+  if (user.role === 'psy') return true
 
   if (user.role === 'coach') {
     const where: Where = {
@@ -69,7 +69,7 @@ export const CoachingSessions: CollectionConfig = {
     read: canReadCoachingSession,
     create: canCreateCoachingSession,
     update: canUpdateCoachingSession,
-    delete: ({ req: { user } }) => isAdmin(user),
+    delete: () => false,
   },
   fields: [
     {

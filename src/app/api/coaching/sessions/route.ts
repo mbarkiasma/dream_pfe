@@ -28,6 +28,7 @@ export async function POST(request: Request) {
   const mode: CoachingMode = body.mode === 'classic' ? 'classic' : 'smart'
   const requestedTitle = sanitizeCoachingMessage(body.title)
   let coachId: number | undefined
+  let coachDisplayName = ''
 
   if (mode === 'classic') {
     if (body.coachId) {
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
       }
 
       coachId = Number(coach.id)
+      coachDisplayName = getDisplayName(coach)
     } else {
       const coaches = await payload.find({
         collection: 'users',
@@ -62,7 +64,9 @@ export async function POST(request: Request) {
         limit: 1,
       })
 
-      coachId = coaches.docs[0]?.id ? Number(coaches.docs[0].id) : undefined
+      const firstCoach = coaches.docs[0]
+      coachId = firstCoach?.id ? Number(firstCoach.id) : undefined
+      coachDisplayName = firstCoach ? getDisplayName(firstCoach as any) : ''
     }
 
     if (!coachId) {
@@ -79,7 +83,7 @@ export async function POST(request: Request) {
         requestedTitle ||
         (mode === 'smart'
           ? `Smart coaching - ${getDisplayName(user)}`
-          : `Coaching classique - ${getDisplayName(user)}`),
+          : `Coaching réel - ${coachDisplayName || getDisplayName(user)}`),
       student: user.id,
       coach: coachId,
       mode,
@@ -94,7 +98,7 @@ export async function POST(request: Request) {
         actor: user.id,
         event: 'coaching_session_created',
         link: '/dashboard/coach/coaching',
-        message: `${getDisplayName(user)} a demarre une session de coaching classique.`,
+        message: `${getDisplayName(user)} a demarre une session de coaching réel.`,
         payload,
         recipient: coachId,
         sendEmail: true,

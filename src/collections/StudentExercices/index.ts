@@ -1,12 +1,10 @@
 import type { Access, CollectionConfig, Where } from 'payload'
 
-import { isAdmin } from '@/access/roles'
 import { getRelationId } from '@/lib/coaching'
 
 
 const canReadStudentExercice: Access = async ({ req: { payload, user } }) => {
   if (!user) return false
-  if (isAdmin(user)) return true
 
   if (user.role === 'coach') {
     const sessions = await payload.find({
@@ -66,12 +64,11 @@ const canReadStudentExercice: Access = async ({ req: { payload, user } }) => {
   return false
 }
 const canCreateStudentExercice: Access = ({ req: { user } }) => {
-  return Boolean(user && (isAdmin(user) || user.role === 'coach'))
+  return Boolean(user && user.role === 'coach')
 }
 
 const canUpdateStudentExercice: Access = ({ req: { user } }) => {
   if (!user) return false
-  if (isAdmin(user)) return true
 
   if (user.role === 'coach') {
     const where: Where = {
@@ -98,7 +95,6 @@ const canUpdateStudentExercice: Access = ({ req: { user } }) => {
 
 const canDeleteStudentExercice: Access = ({ req: { user } }) => {
   if (!user) return false
-  if (isAdmin(user)) return true
 
   if (user.role === 'coach') {
     const where: Where = {

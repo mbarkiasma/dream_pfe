@@ -1,11 +1,10 @@
 import type { Access, CollectionConfig, Where } from 'payload'
 
-import { isAdmin } from '@/access/roles'
 import { getRelationId } from '@/lib/coaching'
 
 const canReadCoachNote: Access = async ({ req: { payload, user } }) => {
   if (!user) return false
-  if (isAdmin(user) || user.role === 'psy') return true
+  if (user.role === 'psy') return true
 
   if (user.role !== 'coach') return false
 
@@ -69,7 +68,6 @@ export const CoachNotes: CollectionConfig = {
     create: ({ req: { user } }) => user?.role === 'coach',
     update: ({ req: { user } }) => {
       if (!user) return false
-      if (isAdmin(user)) return true
 
       return {
         coach: {
@@ -79,7 +77,6 @@ export const CoachNotes: CollectionConfig = {
     },
     delete: ({ req: { user } }) => {
       if (!user) return false
-      if (isAdmin(user)) return true
 
       return {
         coach: {

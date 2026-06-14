@@ -29,7 +29,7 @@ export const AnalysePersonnalite: CollectionConfig = {
     },
     create: ({ req: { user } }) => Boolean(user),
     update: () => false,
-    delete: ({ req: { user } }) => isAdmin(user),
+    delete: () => false,
   },
   fields: [
     {

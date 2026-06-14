@@ -425,7 +425,9 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                   onClick={() => setSelectedSessionId(session.id)}
                   className={`coach-session-pill w-full text-left${isActive ? ' coach-session-pill-active' : ''}`}
                 >
-                  <p className="min-w-0 flex-1 truncate text-sm font-medium">{session.title}</p>
+                  <p className="min-w-0 flex-1 truncate text-sm font-medium">
+                    {session.mode === 'classic' ? `Coaching réel - ${studentName}` : session.title}
+                  </p>
                   {hasNew ? (
                     <span className="mindly-ui-badge mindly-ui-badge-danger shrink-0">{t('badgeNew')}</span>
                   ) : null}
