@@ -114,9 +114,15 @@ async function getSlotsForDate({
     limit: 20,
   })
 
-  const allSlots = availabilities.docs.flatMap((availability) =>
-    generateSlots(availability.startTime, availability.endTime, availability.slotDuration || 30),
-  )
+  const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+  const allSlots =
+    availabilities.docs.length > 0
+      ? availabilities.docs.flatMap((availability) =>
+          generateSlots(availability.startTime, availability.endTime, availability.slotDuration || 30),
+        )
+      : weekdays.includes(dayOfWeek)
+        ? generateSlots('09:00', '13:00', 30)
+        : []
 
   const appointments = await payload.find({
     collection: 'rendez-vous-psy',

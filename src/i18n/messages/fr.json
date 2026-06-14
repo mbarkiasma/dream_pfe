@@ -296,8 +296,8 @@
         "noNextSession": "Aucune séance n'est encore confirmée pour le moment.",
         "noAppointmentBadge": "Aucun rendez-vous",
         "infoTitle": "Informations",
-        "infoText": "Les créneaux affichés viennent directement de l'agenda du psychologue. Une fois la demande envoyée, elle reste en attente jusqu'à confirmation.",
-        "scheduleBadge": "Agenda du psychologue",
+        "infoText": "Les créneaux disponibles sont de 09h00 à 13h00, du lundi au vendredi. Une fois la demande envoyée, elle reste en attente jusqu'à confirmation.",
+        "scheduleBadge": "Lundi - Vendredi : 09:00 - 13:00",
         "form": {
           "agendaLabel": "Agenda",
           "agendaTitle": "Prochains jours",

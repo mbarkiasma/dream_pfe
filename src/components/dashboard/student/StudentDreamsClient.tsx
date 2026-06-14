@@ -614,16 +614,6 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
                             </p>
                           </div>
 
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="student-dreams-delete-button"
-                            onClick={() => deleteDream(dream.id)}
-                            disabled={pending}
-                          >
-                            <Trash2 />
-                            {t('delete')}
-                          </Button>
                         </div>
 
                         {dream.videoStatus === 'waiting_validation' ? (

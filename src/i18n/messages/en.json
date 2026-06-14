@@ -296,8 +296,8 @@
         "noNextSession": "No session has been confirmed yet.",
         "noAppointmentBadge": "No appointment",
         "infoTitle": "Information",
-        "infoText": "The displayed slots come directly from the psychologist's schedule. Once the request is sent, it stays pending until confirmed.",
-        "scheduleBadge": "Psychologist's schedule",
+        "infoText": "Available slots are from 09:00 to 13:00, Monday to Friday. Once the request is sent, it stays pending until confirmed.",
+        "scheduleBadge": "Mon - Fri : 09:00 - 13:00",
         "form": {
           "agendaLabel": "Schedule",
           "agendaTitle": "Upcoming days",
