@@ -4,6 +4,7 @@ import config from '@payload-config'
 import { getLocale, getTranslations } from 'next-intl/server'
 
 import { PrintPdfButton } from '@/components/dashboard/student/PrintPdfButton'
+import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { getAuthenticatedDashboardUser } from '@/utilities/getAuthenticatedDashboardUser'
 import { getReportWellbeingTheme } from '@/utilities/getReportWellbeingTheme'
 type PageProps = {
@@ -76,6 +77,9 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
   return (
     <main className={`report-print-page report-print-page-${reportWellbeing.theme} min-h-screen bg-[var(--mindly-bg)] px-4 py-8 text-[var(--mindly-text-strong)] print:px-0 print:py-0 print:text-slate-900`}>
+      <div className="print:hidden">
+        <StudentTopbar title={analyse.reference} description={t('pdf.generatedOn', { date })} />
+      </div>
       <div className={`report-pdf-card report-theme-card report-theme-${reportWellbeing.theme} mx-auto max-w-4xl rounded-[var(--mindly-radius-2xl)] border border-[var(--mindly-border)] bg-[var(--mindly-surface)] p-6 shadow-[var(--mindly-shadow-xl)] print:max-w-none print:rounded-none print:border-0 print:shadow-none md:p-10`}>
         <div className="report-print-header mb-8 flex flex-col gap-4 border-b border-[var(--mindly-border)] pb-6 md:flex-row md:items-center md:justify-between">
           <div>

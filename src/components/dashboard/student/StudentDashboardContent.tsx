@@ -5,16 +5,17 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import { StudentTopbar } from '@/components/dashboard/student/StudentTopbar'
 import { StudentStatsCards } from '@/components/dashboard/student/StudentStatsCards'
+import type { Dream } from '@/payload-types'
 
 type DreamSummary = {
-  id: string
-  summary?: string
+  id: number
+  summary?: string | null
   description?: string
-  videoStatus?: string
+  videoStatus?: Dream['videoStatus']
 }
 
 type AnalysisSummary = {
-  id: string
+  id: number
   reference?: string
   overview?: string
   niveauConfiance?: string

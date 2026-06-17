@@ -112,6 +112,7 @@ export const Users: CollectionConfig = {
     defaultColumns: ['firstName', 'lastName', 'email', 'role', 'isActive'],
     useAsTitle: 'email',
   },
+  defaultSort: '-createdAt',
   auth: {
     strategies: [clerkAuthStrategy],
   },

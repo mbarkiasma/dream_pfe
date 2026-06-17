@@ -164,7 +164,7 @@ export default async function PsyStudentsPage({
       <PsyTopbar title={t('title')} description={t('description')} />
 
       <div className="mindly-page-content">
-        <article className="mindly-feature-card !overflow-visible">
+        <article className="mindly-feature-card" style={{ overflowX: 'clip', overflowY: 'visible' }}>
           <div className="mindly-feature-header">
             <h2 className="mindly-feature-title">{d('title')}</h2>
             <div className="flex flex-wrap items-center gap-2">

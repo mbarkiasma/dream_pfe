@@ -99,6 +99,8 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
   const [messageCountBySession, setMessageCountBySession] = useState<Record<string, number>>({})
   const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  const [showAllNotes, setShowAllNotes] = useState(false)
+  const [expandedNoteIds, setExpandedNoteIds] = useState<Set<string | number>>(new Set())
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
@@ -268,7 +270,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: selectedSessionId,
-          title: selectedSession?.title ? `Suivi - ${selectedSession.title}` : 'Note de suivi',
+          title: selectedStudentName ? `Suivi - ${selectedStudentName}` : 'Note de suivi',
           content: note,
         }),
       })
@@ -667,7 +669,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                     <span className="mindly-ui-badge">{savedNotes.length}</span>
                   </div>
                   <div className="mt-3 space-y-3">
-                    {savedNotes.map((savedNote) => (
+                    {(showAllNotes ? savedNotes : savedNotes.slice(0, 3)).map((savedNote) => (
                       <article key={savedNote.id} className="coach-note-card">
                         <div className="flex items-start justify-between gap-1">
                           <p className="mindly-feature-reference min-w-0 truncate text-xs">{savedNote.title}</p>
@@ -691,11 +693,40 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                               <Button type="button" onClick={() => { setEditingNoteId(null); setEditingNoteContent('') }} variant="dreamOutline" size="iconSm" className="h-6 w-6" title="Annuler"><X className="h-3 w-3" /></Button>
                             </div>
                           </div>
-                        ) : (
-                          <p className="mindly-feature-text mt-1 whitespace-pre-wrap text-xs">{savedNote.content}</p>
-                        )}
+                        ) : (() => {
+                          const isExpanded = expandedNoteIds.has(savedNote.id)
+                          const isLong = savedNote.content.length > 150
+                          const displayed = isLong && !isExpanded ? `${savedNote.content.slice(0, 150)}…` : savedNote.content
+                          return (
+                            <div>
+                              <p className="mindly-feature-text mt-1 whitespace-pre-wrap text-xs">{displayed}</p>
+                              {isLong ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedNoteIds((prev) => {
+                                    const next = new Set(prev)
+                                    if (next.has(savedNote.id)) { next.delete(savedNote.id) } else { next.add(savedNote.id) }
+                                    return next
+                                  })}
+                                  className="mindly-feature-text mt-1 text-xs underline underline-offset-2 hover:opacity-70"
+                                >
+                                  {isExpanded ? t('notesCollapseNote') : t('notesExpandNote')}
+                                </button>
+                              ) : null}
+                            </div>
+                          )
+                        })()}
                       </article>
                     ))}
+                    {savedNotes.length > 3 ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllNotes((prev) => !prev)}
+                        className="mindly-feature-text mt-1 w-full text-center text-xs underline underline-offset-2 hover:opacity-70"
+                      >
+                        {showAllNotes ? t('notesSeeLess') : t('notesSeeMore', { count: savedNotes.length - 3 })}
+                      </button>
+                    ) : null}
                   </div>
                 </div>
               ) : null}

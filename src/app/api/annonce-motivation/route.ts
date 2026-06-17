@@ -126,10 +126,13 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Titre et contenu requis.' }, { status: 400 })
   }
 
+  const requestLocale = (request.headers.get('x-next-intl-locale') ?? 'fr') as 'fr' | 'en'
+
   const announcement = await payload.create({
     collection: 'annonce-motivation',
     user,
     overrideAccess: false,
+    locale: requestLocale,
     data: {
       title,
       content,
@@ -180,11 +183,14 @@ export async function PATCH(request: Request) {
     return Response.json({ error: 'Annonce, titre et contenu requis.' }, { status: 400 })
   }
 
+  const patchLocale = (request.headers.get('x-next-intl-locale') ?? 'fr') as 'fr' | 'en'
+
   const announcement = await payload.update({
     collection: 'annonce-motivation',
     id,
     user,
     overrideAccess: false,
+    locale: patchLocale,
     data: {
       title,
       content,

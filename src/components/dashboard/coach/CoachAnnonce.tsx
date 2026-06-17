@@ -328,35 +328,108 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
           {initialAnnouncements.length === 0 ? (
             <p className="p-6 dream-text-form-description">Aucune annonce publiée pour le moment.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[820px] border-collapse text-left">
-                <thead>
-                  <tr className="dream-surface-muted border-b border-border text-xs font-bold uppercase tracking-[0.12em] text-dream-muted">
-                    <th className="px-5 py-4">Annonce</th>
-                    <th className="px-4 py-4">Statut</th>
-                    <th className="px-4 py-4">J&apos;aime</th>
-                    <th className="px-4 py-4">Date</th>
-                    <th className="px-5 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {initialAnnouncements.map((announcement) => (
-                    <tr key={announcement.id} className="dream-surface">
-                      <td className="max-w-[360px] px-5 py-4">
-                        <p className="dream-text-table-title">{announcement.title}</p>
-                        <p className="dream-text-table-content">{announcement.content}</p>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${getAnnouncementStatusClass(
-                            announcement.status,
-                          )}`}
-                        >
-                          <span className="h-2 w-2 rounded-full bg-current" />
-                          {announcement.status === 'published' ? 'Publiée' : 'Brouillon'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
+            <>
+              {/* Desktop table (md+) */}
+              <div className="hidden overflow-x-auto md:block">
+                <table className="w-full min-w-[820px] border-collapse text-left">
+                  <thead>
+                    <tr className="dream-surface-muted border-b border-border text-xs font-bold uppercase tracking-[0.12em] text-dream-muted">
+                      <th className="px-5 py-4">Annonce</th>
+                      <th className="px-4 py-4">Statut</th>
+                      <th className="px-4 py-4">J&apos;aime</th>
+                      <th className="px-4 py-4">Date</th>
+                      <th className="px-5 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {initialAnnouncements.map((announcement) => (
+                      <tr key={announcement.id} className="dream-surface">
+                        <td className="max-w-[360px] px-5 py-4">
+                          <p className="dream-text-table-title">{announcement.title}</p>
+                          <p className="dream-text-table-content">{announcement.content}</p>
+                        </td>
+                        <td className="px-4 py-4">
+                          <span
+                            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${getAnnouncementStatusClass(
+                              announcement.status,
+                            )}`}
+                          >
+                            <span className="h-2 w-2 rounded-full bg-current" />
+                            {announcement.status === 'published' ? 'Publiée' : 'Brouillon'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <Button
+                            type="button"
+                            onClick={() => setSelectedLikesAnnouncement(announcement)}
+                            variant="dreamSoft"
+                            size="pill"
+                            className="font-bold shadow-sm"
+                          >
+                            <Heart className="h-4 w-4" />
+                            <span>{announcement.reactions?.likeCount ?? 0}</span>
+                          </Button>
+                        </td>
+                        <td className="px-4 py-4 dream-text-table-date">
+                          {formatDate(announcement.publishedAt || announcement.createdAt)}
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="dream-flex-actions">
+                            <Button
+                              type="button"
+                              onClick={() => setSelectedAnnouncement(announcement)}
+                              variant="dreamOutline"
+                              size="iconSm"
+                              title="Voir"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => startEditing(announcement)}
+                              variant="dreamSoft"
+                              size="iconSm"
+                              title="Modifier"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => setAnnouncementToDelete(announcement)}
+                              variant="destructive"
+                              size="iconSm"
+                              title="Supprimer"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile cards (< md) */}
+              <div className="divide-y divide-border md:hidden">
+                {initialAnnouncements.map((announcement) => (
+                  <div key={announcement.id} className="dream-surface flex flex-col gap-3 px-4 py-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="dream-text-table-title min-w-0 flex-1">{announcement.title}</p>
+                      <span
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold ${getAnnouncementStatusClass(
+                          announcement.status,
+                        )}`}
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                        {announcement.status === 'published' ? 'Publiée' : 'Brouillon'}
+                      </span>
+                    </div>
+
+                    <p className="dream-text-table-content line-clamp-2">{announcement.content}</p>
+
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
                         <Button
                           type="button"
                           onClick={() => setSelectedLikesAnnouncement(announcement)}
@@ -367,46 +440,46 @@ export function CoachAnnouncementsClient({ initialAnnouncements }: Props) {
                           <Heart className="h-4 w-4" />
                           <span>{announcement.reactions?.likeCount ?? 0}</span>
                         </Button>
-                      </td>
-                      <td className="px-4 py-4 dream-text-table-date">
-                        {formatDate(announcement.publishedAt || announcement.createdAt)}
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="dream-flex-actions">
-                          <Button
-                            type="button"
-                            onClick={() => setSelectedAnnouncement(announcement)}
-                            variant="dreamOutline"
-                            size="iconSm"
-                            title="Voir"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={() => startEditing(announcement)}
-                            variant="dreamSoft"
-                            size="iconSm"
-                            title="Modifier"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={() => setAnnouncementToDelete(announcement)}
-                            variant="destructive"
-                            size="iconSm"
-                            title="Supprimer"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <span className="dream-text-table-date text-xs">
+                          {formatDate(announcement.publishedAt || announcement.createdAt)}
+                        </span>
+                      </div>
+
+                      <div className="dream-flex-actions">
+                        <Button
+                          type="button"
+                          onClick={() => setSelectedAnnouncement(announcement)}
+                          variant="dreamOutline"
+                          size="iconSm"
+                          title="Voir"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => startEditing(announcement)}
+                          variant="dreamSoft"
+                          size="iconSm"
+                          title="Modifier"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => setAnnouncementToDelete(announcement)}
+                          variant="destructive"
+                          size="iconSm"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+
           )}
         </CardContent>
       </Card>

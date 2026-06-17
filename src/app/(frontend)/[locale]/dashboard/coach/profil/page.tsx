@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { FileText, Globe2, Mail, MapPin, Phone, Star } from 'lucide-react'
+import { FileText, Mail, MapPin, Phone, Star } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -134,12 +134,12 @@ export default async function CoachProfilePage() {
 
           <div className="divide-y divide-[var(--mindly-border)]">
             {infoRows.map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-center justify-between py-3">
+              <div key={label} className="flex flex-col gap-0.5 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3 text-sm text-[var(--mindly-text-soft)]">
                   <Icon className="h-4 w-4 shrink-0 text-[var(--mindly-primary)]" />
                   {label}
                 </div>
-                <span className="max-w-[220px] truncate text-right text-sm font-medium text-[var(--mindly-text-strong)]">
+                <span className="break-words pl-7 text-sm font-medium text-[var(--mindly-text-strong)] sm:max-w-[220px] sm:truncate sm:pl-0 sm:text-right">
                   {value || t('notSet')}
                 </span>
               </div>

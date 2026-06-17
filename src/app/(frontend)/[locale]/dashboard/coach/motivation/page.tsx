@@ -1,6 +1,6 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 import { CoachAnnouncementsClient } from '@/components/dashboard/coach/CoachAnnonce'
 import { CoachTopbar } from '@/components/dashboard/coach/CoachTopbar'
@@ -10,6 +10,7 @@ export default async function CoachAnnouncementsPage() {
   const payload = await getPayload({ config })
   const { user } = await getAuthenticatedDashboardUser()
   const t = await getTranslations('dashboard.coach.announcements')
+  const locale = await getLocale()
 
   const announcements = user
     ? await payload.find({
@@ -23,6 +24,8 @@ export default async function CoachAnnouncementsPage() {
         },
         sort: '-createdAt',
         limit: 30,
+        locale: locale as 'fr' | 'en',
+        fallbackLocale: locale === 'en' ? 'fr' : 'en',
       })
     : { docs: [] }
 

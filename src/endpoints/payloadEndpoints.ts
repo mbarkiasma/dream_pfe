@@ -473,7 +473,7 @@ export const payloadEndpoints: Endpoint[] = [
                   .filter((l): l is string => l !== null)
 
                 if (parsedLines.length < allTexts.length) {
-                  console.warn(`[save-analysis] Groq attempt ${attempt + 1}: got ${parsedLines.length} lines, expected ${allTexts.length}`)
+                  console.warn(`[save-analysis] Gemini attempt ${attempt + 1}: got ${parsedLines.length} lines, expected ${allTexts.length}`)
                   continue
                 }
 
@@ -529,7 +529,7 @@ export const payloadEndpoints: Endpoint[] = [
                 translationSucceeded = true
                 console.log(`[save-analysis] Translation ${primaryLocale}→${otherLocale} succeeded on attempt ${attempt + 1}`)
               } catch (attemptErr) {
-                console.warn(`[save-analysis] Groq attempt ${attempt + 1} error:`, attemptErr)
+                console.warn(`[save-analysis] Gemini attempt ${attempt + 1} error:`, attemptErr)
               }
             }
           }
@@ -670,7 +670,7 @@ export const payloadEndpoints: Endpoint[] = [
               .map((line: string) => { const m = line.match(/^\d+\.\s*(.+)/); return m ? m[1].trim() : null })
               .filter((l: string | null): l is string => l !== null)
             if (lines.length >= allTexts.length) parsedLines = lines
-            else console.warn(`[retranslate] attempt ${attempt + 1}: got ${lines.length}/${allTexts.length} lines`)
+            else console.warn(`[retranslate] Gemini attempt ${attempt + 1}: got ${lines.length}/${allTexts.length} lines`)
           } catch (e) {
             console.warn(`[retranslate] attempt ${attempt + 1} error:`, e)
           }
@@ -869,7 +869,7 @@ export const payloadEndpoints: Endpoint[] = [
         n8nData?.videoStatus === 'waiting_validation' ? 'waiting_validation' : 'pending'
 
       const otherLocale: 'fr' | 'en' = primaryDreamLocale === 'fr' ? 'en' : 'fr'
-      const groqKeyDesc = process.env.GROQ_API_KEY?.trim()
+      const geminiApiKey = process.env.GEMINI_API_KEY?.trim()
 
       // Unified translation function with retry (up to 3 attempts, exponential backoff)
       async function translate(
@@ -877,40 +877,46 @@ export const payloadEndpoints: Endpoint[] = [
         targetLang: 'fr' | 'en',
         maxTokens = 1000,
       ): Promise<string> {
-        if (!groqKeyDesc || !text.trim()) return text
+        if (!geminiApiKey || !text.trim()) return text
         const instruction =
           targetLang === 'fr'
             ? `Translate the following text to French. Rules: (1) If already entirely in French, return it EXACTLY unchanged. (2) Translate EVERY sentence — do NOT omit or summarize any part. (3) Preserve ALL emojis exactly where they are. (4) Preserve ALL line breaks exactly. (5) Return ONLY the translated text, nothing else.`
             : `Translate the following text to English. Rules: (1) If already entirely in English, return it EXACTLY unchanged. (2) Translate EVERY sentence — do NOT omit or summarize any part. (3) Preserve ALL emojis exactly where they are. (4) Preserve ALL line breaks exactly. (5) Return ONLY the translated text, nothing else.`
         // Use a stronger model for long texts (analysis)
-        const model =
-          maxTokens > 1000 ? 'llama-3.3-70b-versatile' : 'llama-3.3-70b-versatile'
+        const geminiModel = process.env.GEMINI_COACHING_MODEL || 'gemini-2.0-flash'
 
         for (let attempt = 0; attempt < 3; attempt++) {
           if (attempt > 0) await new Promise((r) => setTimeout(r, 600 * attempt))
           try {
-            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${groqKeyDesc}`,
-                'Content-Type': 'application/json',
+            const res = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  contents: [
+                    {
+                      role: 'user',
+                      parts: [{ text: `${instruction}\n\nText to translate:\n${text}` }],
+                    },
+                  ],
+                  generationConfig: {
+                    temperature: 0.1,
+                    maxOutputTokens: maxTokens,
+                  },
+                }),
               },
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: 'system', content: instruction },
-                  { role: 'user', content: text },
-                ],
-                temperature: 0.1,
-                max_tokens: maxTokens,
-              }),
-            })
+            )
             if (res.ok) {
               const r = await res.json()
-              const result = r?.choices?.[0]?.message?.content?.trim()
+              const result = r?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
               if (result) return result
             }
-          } catch { /* retry */ }
+          } catch {
+            /* retry */
+          }
         }
         return text // all 3 attempts failed — return original as last resort
       }
@@ -1102,51 +1108,67 @@ export const payloadEndpoints: Endpoint[] = [
 
       // Translate summary/analysis FR→EN automatically
       try {
-        const groqApiKey = process.env.GROQ_API_KEY?.trim()
+        const geminiApiKey = process.env.GEMINI_API_KEY?.trim()
+        const geminiModel = process.env.GEMINI_COACHING_MODEL || 'gemini-2.0-flash'
         const callbackSummary = typeof summary === 'string' ? summary : ''
         const callbackAnalysis = typeof analysis === 'string' ? analysis : ''
 
-        // Translate summary (plain text) and analysis (JSON) separately for reliability
         let enSummary: string | undefined
         let enAnalysis: string | undefined
 
-        if (groqApiKey && callbackSummary) {
-          const sumRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
-              messages: [
-                { role: 'system', content: 'Translate the following text from French to English. Return only the translated text, no explanation, no preamble.' },
-                { role: 'user', content: callbackSummary },
-              ],
-              temperature: 0.1,
-              max_tokens: 800,
-            }),
-          })
+        if (geminiApiKey && callbackSummary.trim()) {
+          const sumRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    role: 'user',
+                    parts: [
+                      {
+                        text: `Translate the following text from French to English. Return ONLY the translation, no preamble:\n\n${callbackSummary}`,
+                      },
+                    ],
+                  },
+                ],
+                generationConfig: { temperature: 0.1, maxOutputTokens: 1000 },
+              }),
+            },
+          )
+
           if (sumRes.ok) {
             const r = await sumRes.json()
-            enSummary = r?.choices?.[0]?.message?.content?.trim() || undefined
+            enSummary = r?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || undefined
           }
         }
 
-        if (groqApiKey && callbackAnalysis) {
-          const anaRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: process.env.GROQ_COACHING_MODEL || 'llama-3.1-8b-instant',
-              messages: [
-                { role: 'system', content: 'Translate the following text from French to English. Return only the translated text. Preserve ALL emojis exactly as-is. Preserve ALL line breaks exactly as-is. No explanation, no preamble.' },
-                { role: 'user', content: callbackAnalysis },
-              ],
-              temperature: 0.1,
-              max_tokens: 4000,
-            }),
-          })
+        if (geminiApiKey && callbackAnalysis.trim()) {
+          const anaRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    role: 'user',
+                    parts: [
+                      {
+                        text: `Translate the following text from French to English. Preserve all emojis and formatting. Return ONLY the translation:\n\n${callbackAnalysis}`,
+                      },
+                    ],
+                  },
+                ],
+                generationConfig: { temperature: 0.1, maxOutputTokens: 4000 },
+              }),
+            },
+          )
+
           if (anaRes.ok) {
             const r = await anaRes.json()
-            enAnalysis = r?.choices?.[0]?.message?.content?.trim() || undefined
+            enAnalysis = r?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || undefined
           }
         }
 
@@ -1909,10 +1931,7 @@ function normalizeVideoSourceURL(source: string): string {
   const bucket = withoutProtocol.slice(0, slashIndex)
   const objectPath = withoutProtocol.slice(slashIndex + 1)
 
-  return `https://storage.googleapis.com/${bucket}/${objectPath
-    .split('/')
-    .map((part) => encodeURIComponent(part))
-    .join('/')}`
+  return `/api/gcs-video?bucket=${encodeURIComponent(bucket)}&path=${encodeURIComponent(objectPath)}`
 }
 
 async function fetchRemoteFile({
@@ -1941,4 +1960,3 @@ async function fetchRemoteFile({
     size: arrayBuffer.byteLength,
   }
 }
-

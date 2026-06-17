@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        DATABASE_URL: ${DATABASE_URL}
+        SQL_DATABASE_URL: ${SQL_DATABASE_URL}
+        PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+    container_name: dream-pfe
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    network_mode: host
+    restart: unless-stopped

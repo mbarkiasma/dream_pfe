@@ -624,12 +624,14 @@
 
   html {
     background-color: var(--background);
+    overflow-x: clip;
   }
 
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
     font-family: var(--font-zain), var(--font-geist-sans), sans-serif;
     font-weight: 400;
+    overflow-x: clip;
   }
 
   main {
@@ -1804,7 +1806,7 @@
 
   @media (width >= 64rem) {
     .student-psy-grid {
-      grid-template-columns: 330px 1fr;
+      grid-template-columns: minmax(260px, 320px) 1fr;
     }
   }
 
@@ -4904,6 +4906,7 @@
   .student-coaching-layout {
     flex-direction: column;
     height: auto;
+    min-height: 0;
     overflow: visible;
   }
 
@@ -4925,9 +4928,9 @@
   }
 }
 
-  .student-coaching-sidebar {
-    min-height: 0;
-  }
+.student-coaching-sidebar {
+  min-height: 0;
+}
 
   .student-coaching-sidebar > * + * {
     margin-top: 1.25rem;
@@ -5276,7 +5279,6 @@
   }
 
   .student-chat-badges {
-    margin-top: 0.5rem;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -6524,9 +6526,15 @@
   .mindly-dashboard-page {
     min-height: 100vh;
     width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
     background: var(--mindly-page-gradient);
-    padding: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  @media (width >= 30rem) {
+    .mindly-dashboard-page {
+      padding: 0.75rem;
+    }
   }
 
   @media (width >= 48rem) {
@@ -6543,6 +6551,7 @@
     height: auto;
     gap: 1rem;
     flex-direction: column;
+    overflow-x: clip;
   }
 
   @media (width >= 64rem) {
@@ -6564,6 +6573,7 @@
     flex-direction: column;
     flex: 1 1 0%;
     overflow: visible;
+    overflow-x: clip;
     border: 1px solid var(--mindly-border);
     border-radius: var(--mindly-radius-2xl);
     background: rgb(255 255 255 / 0.72);
@@ -6652,7 +6662,6 @@
   @media (width >= 48rem) {
     .mindly-dashboard-description {
       font-size: 1rem;
-      white-space: nowrap;
     }
   }
 
@@ -6823,9 +6832,10 @@
   }
 
   .mindly-sidebar-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     font-size: 0.72rem;
     color: var(--mindly-text-soft);
   }
@@ -7225,14 +7235,14 @@
   .mindly-select {
     min-height: 3rem;
     padding-inline: 1rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
   }
 
   .mindly-textarea {
     min-height: 8rem;
     resize: vertical;
     padding: 0.875rem 1rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     line-height: 1.6;
   }
 
@@ -7349,7 +7359,7 @@
     align-self: stretch;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
 
   @media (width >= 48rem) {
@@ -11409,7 +11419,7 @@ html[data-static='true'] {
   outline: 0;
   background: transparent;
   color: var(--mindly-text-strong);
-  font-size: 0.92rem;
+  font-size: 1rem;
   line-height: 1.7;
 }
 
@@ -12272,8 +12282,8 @@ html[data-static='true'] {
 .student-chat-badges {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.55rem;
-  margin-top: 0.65rem;
 }
 
 .student-chat-scroll {
@@ -13638,6 +13648,7 @@ html[data-static='true'] {
   .student-coaching-layout {
     flex-direction: column;
     height: auto;
+    min-height: 0;
     overflow: visible;
   }
 
@@ -13655,5 +13666,86 @@ html[data-static='true'] {
 
   .student-chat-content {
     overflow: visible;
+  }
+}
+
+/* ===================================================== */
+/* MOBILE POLISH — ALL DASHBOARD PAGES                   */
+/* ===================================================== */
+
+/* Very small phones (< 480px): tighter title + padding */
+@media (width < 30rem) {
+  .mindly-dashboard-title {
+    font-size: 1.35rem;
+  }
+
+  .mindly-dashboard-topbar {
+    padding: 0.75rem;
+  }
+
+  .mindly-dashboard-page {
+    padding: 0.5rem;
+  }
+
+  .mindly-feature-header {
+    padding: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .mindly-feature-content {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .mindly-feature-search {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Coaching panels: reduce padding on tiny screens */
+  .student-coaching-panel,
+  .student-coaching-panel-compact {
+    padding: 0.75rem;
+  }
+
+  /* Psy student row: tighter on tiny screens */
+  .psy-student-row {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .psy-student-avatar {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Chat shell: reasonable minimum on tiny phones */
+  .student-chat-shell {
+    min-height: 32rem;
+  }
+}
+
+/* Phones (< 48rem): coaching sidebar max-height so chat is reachable */
+@media (width < 48rem) {
+  .student-coaching-sidebar {
+    max-height: 28rem;
+    overflow-y: auto;
+  }
+
+  /* Reduce coaching layout gap when stacked */
+  .student-coaching-layout {
+    gap: 0.75rem;
+  }
+
+  /* Stat cards: tighter padding on phones */
+  .mindly-stat-card {
+    padding: 1rem;
+  }
+
+  /* Feature header: allow wrapping on all phones so badges don't overflow */
+  .mindly-feature-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 }

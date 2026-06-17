@@ -13,7 +13,6 @@ import {
   RefreshCw,
   Sparkles,
   Square,
-  Trash2,
   Video,
   Wand2,
   X,
@@ -32,12 +31,24 @@ type Props = {
   weeklyLimit: number
 }
 
-function getDreamVideoUrl(dream: Dream) {
-  if (dream.videoAsset && typeof dream.videoAsset === 'object' && 'url' in dream.videoAsset) {
-    return dream.videoAsset.url || dream.videoUrl || null
+function toProxyVideoUrl(url: string | null | undefined): string | null {
+  if (!url) return null
+  if (url.startsWith('/api/gcs-video')) return url
+  const gcsMatch = url.match(/^https:\/\/storage\.googleapis\.com\/([^/]+)\/(.+)$/)
+  if (gcsMatch) {
+    return `/api/gcs-video?bucket=${encodeURIComponent(gcsMatch[1])}&path=${encodeURIComponent(gcsMatch[2])}`
   }
+  return url
+}
 
-  return dream.videoUrl || null
+function getDreamVideoUrl(dream: Dream) {
+  let url: string | null | undefined
+  if (dream.videoAsset && typeof dream.videoAsset === 'object' && 'url' in dream.videoAsset) {
+    url = dream.videoAsset.url || dream.videoUrl
+  } else {
+    url = dream.videoUrl
+  }
+  return toProxyVideoUrl(url)
 }
 
 function formatDate(value: string, locale: string) {
@@ -260,30 +271,6 @@ export function StudentDreamsClient({ dreams, weeklyUsed, weeklyLimit }: Props) 
         router.refresh()
       } catch {
         setError(t('submitErrorFetch'))
-      }
-    })
-  }
-
-  function deleteDream(id: string | number) {
-    setError('')
-    setFeedback('')
-
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/dreams-delete/${id}`, {
-          method: 'DELETE',
-        })
-
-        if (!response.ok) {
-          const data = await response.json().catch(() => null)
-          setError(data?.message || data?.error || t('deleteError'))
-          return
-        }
-
-        setFeedback(t('deleteSuccess'))
-        router.refresh()
-      } catch {
-        setError(t('deleteErrorFetch'))
       }
     })
   }
