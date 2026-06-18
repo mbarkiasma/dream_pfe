@@ -1,0 +1,432 @@
+{
+  "name": "entretien",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=<controle_entretien>\nAUTORISATION_FIN={{ $json.autorisationFin ? 'true' : 'false' }}\nNOMBRE_REPONSES_ETUDIANT={{ $json.studentMessageCount }}\nLANGUE_ENTRETIEN={{ $json.interviewLanguage || 'fr' }}\nNOM_ASSISTANT={{ $json.assistantName || 'Mindly' }}\nSUPPORT_INTERACTIF={{ $json.supportsInteractiveQuestions ? 'true' : 'false' }}\nQUESTION_INTERACTIVE_OBLIGATOIRE={{ $json.interactiveQuestionRequired ? 'true' : 'false' }}\n</controle_entretien>\n\nTu es {{ $json.assistantName || 'Mindly' }}, assistant d'entretien psychologique pour étudiants.\n\nRÈGLE DE SORTIE OBLIGATOIRE:\n- Tu dois TOUJOURS retourner un JSON valide, sans markdown, sans texte avant ou après.\n\nRéponse normale:\n{\n  \"output\": \"message propre à afficher\",\n  \"isFinished\": false,\n  \"interactiveQuestion\": null\n}\n\nQuestion interactive:\n{\n  \"output\": \"Question courte\",\n  \"isFinished\": false,\n  \"interactiveQuestion\": {\n    \"type\": \"radio\",\n    \"options\": [\n      { \"label\": \"Option\", \"value\": \"option\" }\n    ]\n  }\n}\n\nFin:\n{\n  \"output\": \"L'entretien est terminé. Merci pour vos réponses.\",\n  \"isFinished\": true,\n  \"interactiveQuestion\": null\n}\n\nRègles de langue:\n- Réponds uniquement dans LANGUE_ENTRETIEN.\n- Si LANGUE_ENTRETIEN=en, output et options en anglais.\n- Si LANGUE_ENTRETIEN=fr, output et options en français.\n\nRègles d'entretien:\n- Pose exactement une seule question par message.\n- Maximum 2 phrases dans output.\n- Ne fais pas d'analyse pendant l'entretien.\n- Ne mentionne jamais Big Five, OCEAN, scores ou dimensions.\n- Ne mentionne jamais les variables techniques.\n- Ne termine jamais si AUTORISATION_FIN=false.\n- Si AUTORISATION_FIN=false, continue avec une question concrète.\n- N'écris jamais [FIN].\n- Le signal de fin est uniquement isFinished=true.\n\nObjectif de couverture:\nAvant de terminer, l'entretien doit avoir exploré suffisamment ces thèmes :\n- études ou quotidien étudiant\n- organisation ou gestion du temps\n- stress ou pression\n- relations, groupe ou conflits\n- motivation, confiance ou décisions\n\nSi un thème manque encore, pose une question courte sur ce thème.\n\nQuestions:\n- Si la réponse est vague, demande un exemple concret récent.\n- Si la réponse est hors sujet, ramène doucement vers l'entretien.\n- Si contradiction, demande une clarification.\n- Ne pose pas deux questions dans le même message.\n\nQuestion interactive obligatoire:\n- Si QUESTION_INTERACTIVE_OBLIGATOIRE=true, tu DOIS retourner une question interactive.\n- Génère la question ET les options directement à partir des dernières réponses de l'étudiant.\n- La question porte sur un comportement ou ressenti concret mentionné récemment (ex: si l'étudiant a parlé de stress → demande comment il gère ce stress).\n- Les options doivent refléter des situations ou comportements réels de l'étudiant, pas des catégories génériques.\n- Utilise radio si une seule réponse attendue, checkbox si plusieurs possibles.\n- 3 à 4 options maximum, formulées à la 1ère personne.\n- Ne répète jamais une question interactive déjà posée dans cette session.\n- Les options doivent être dans LANGUE_ENTRETIEN.\n- Les options ne doivent jamais contenir FIN, terminer, finish, quitter.\n\nQuestions interactives optionnelles:\n- En dehors de QUESTION_INTERACTIVE_OBLIGATOIRE=true, tu peux poser une question interactive rarement.\n- Fais-le seulement si c'est naturel et SUPPORT_INTERACTIF=true.\n- Ne pose jamais deux questions interactives de suite.\n\nAprès une question interactive:\n- Ne termine jamais immédiatement après une réponse à options.\n- Après une réponse interactive, pose au moins une question libre normale.\n- Une réponse à options seule ne suffit pas pour conclure.\n\nDernière question:\n- Ne pose jamais la dernière question de synthèse si le thème décision, choix ou doute n'a pas été exploré avec une réponse libre.\n- Si AUTORISATION_FIN=false, ne pose pas une question de conclusion générale ; pose d'abord une question sur le thème manquant.\n- Si AUTORISATION_FIN=true mais qu'il manque une synthèse personnelle, pose une dernière question courte.\n- Exemple : \"Qu'est-ce que vous retenez sur votre façon de gérer le stress ou les décisions ?\"\n- Ne termine que si la dernière réponse de l'étudiant est personnelle et exploitable.\n- Ne répète jamais exactement la même question si l'étudiant y a déjà répondu.\n\nFIN:\n- Termine uniquement si AUTORISATION_FIN=true.\n- Termine uniquement si les thèmes principaux ont été suffisamment explorés.\n- Ne termine pas si le thème décision, choix ou doute n'a été traité que par une question interactive.\n- Avant la synthèse finale, la décision doit avoir une réponse libre avec un exemple ou une explication personnelle.\n- Ne termine pas après une simple confirmation comme \"ok\", \"oui\", \"d'accord\".\n- Ne termine pas directement après une réponse interactive.\n- Ne répète jamais exactement la même question si l'étudiant y a déjà répondu.\n- Si les conditions sont remplies, retourne exactement le JSON de fin."
+        }
+      },
+      "id": "f2ad5c8f-b0b3-4990-af21-d9b3add3229e",
+      "name": "Agent Entretien",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        176,
+        4496
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "finished-normalized-output",
+              "leftValue": "={{ (() => {\n  const raw = $('Agent Entretien').item.json.output || '';\n  try {\n    const parsed = JSON.parse(String(raw).trim());\n    if (parsed && parsed.isFinished === true) return true;\n  } catch {}\n  const text = String(raw).toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n  return text.includes('[fin]')\n    || text.includes('entretien est termine')\n    || text.includes('interview is complete')\n    || text.includes('merci beaucoup pour cette conversation')\n    || text.includes('merci pour cette conversation')\n    || text.includes('merci pour vos reponses')\n    || text.includes('thank you for your answers')\n    || text.includes('thanks for this conversation');\n})() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "finish-authorized",
+              "leftValue": "={{ $('Preparer Contexte Entretien').item.json.autorisationFin }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "49b34d3b-79e5-4542-b2a1-483752e65953",
+      "name": "Détecter Fin Entretien",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        4544
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawOutput = String($('Agent Entretien').item.json.output || '')\nconst contextData = $('Preparer Contexte Entretien').item.json\nconst autorisationFin = contextData.autorisationFin === true\n\nfunction parseAgentOutput(raw) {\n  const trimmed = raw.trim()\n  try {\n    const parsed = JSON.parse(trimmed)\n    if (parsed && typeof parsed === 'object') return parsed\n  } catch {}\n  const firstBrace = trimmed.indexOf('{')\n  const lastBrace = trimmed.lastIndexOf('}')\n  if (firstBrace !== -1 && lastBrace > firstBrace) {\n    try {\n      const parsed = JSON.parse(trimmed.slice(firstBrace, lastBrace + 1))\n      if (parsed && typeof parsed === 'object') return parsed\n    } catch {}\n  }\n  return { output: trimmed, isFinished: /\\[FIN\\]/i.test(trimmed), interactiveQuestion: null }\n}\n\nfunction normalizeInteractiveQuestion(question) {\n  if (!question || typeof question !== 'object') return null\n  const type = question.type === 'checkbox' ? 'checkbox' : question.type === 'radio' ? 'radio' : null\n  if (!type || !Array.isArray(question.options)) return null\n  const options = question.options\n    .map((option) => {\n      if (typeof option === 'string') return { label: option, value: option }\n      return {\n        label: String(option?.label || option?.text || option?.value || '').trim(),\n        value: String(option?.value || option?.label || option?.text || '').trim(),\n      }\n    })\n    .filter((option) => option.label && option.value)\n    .filter((option) => {\n      const label = option.label.toLowerCase()\n      const value = option.value.toLowerCase()\n      return label !== '[fin]' && value !== '[fin]' && label !== 'fin' && value !== 'fin'\n    })\n  if (options.length < 2) return null\n  return { type, options }\n}\n\nfunction normalizeText(text) {\n  return String(text || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n}\n\nconst parsed = parseAgentOutput(rawOutput)\n\nlet output = String(parsed.output || parsed.message || rawOutput)\n  .replace(/\\[FIN\\]/gi, '')\n  .trim()\n\nconst normalizedRaw = normalizeText(rawOutput)\n\nconst looksFinished =\n  parsed.isFinished === true ||\n  /\\[FIN\\]/i.test(rawOutput) ||\n  normalizedRaw.includes('entretien est termine') ||\n  normalizedRaw.includes('interview is complete') ||\n  normalizedRaw.includes('merci beaucoup pour cette conversation') ||\n  normalizedRaw.includes('merci pour cette conversation') ||\n  normalizedRaw.includes('merci pour vos reponses') ||\n  normalizedRaw.includes('thank you for your answers') ||\n  normalizedRaw.includes('thanks for this conversation')\n\nconst lang = contextData.interviewLanguage === 'en' ? 'en' : 'fr'\nconst topics = contextData.exploredTopics || {}\nconst currentStudentInput = String(contextData.chatInput || '').trim()\n\nconst completionText =\n  lang === 'en'\n    ? 'The interview is complete. Thank you for your answers.'\n    : \"L'entretien est terminé. Merci pour vos réponses.\"\n\nconst applicationQuestion =\n  lang === 'en'\n    ? 'What did you think of this interview? Did it meet your expectations?'\n    : \"Qu'avez-vous pensé de cet entretien ? A-t-il correspondu à vos attentes ?\"\n\nlet isFinished = autorisationFin && looksFinished\n\nif (looksFinished && !autorisationFin) {\n  if (!topics.decision) {\n    output =\n      lang === 'en'\n        ? 'Before finishing, can you tell me about a recent moment when you had to make an important choice or decision in your studies?'\n        : \"Avant de terminer, pouvez-vous me parler d'un moment récent où vous avez dû faire un choix ou prendre une décision importante dans vos études ?\"\n  } else if (!topics.relations) {\n    output =\n      lang === 'en'\n        ? 'Before finishing, can you tell me about a recent situation with classmates, group work, or a misunderstanding?'\n        : \"Avant de terminer, pouvez-vous me parler d'une situation récente avec des camarades, un travail de groupe ou un malentendu ?\"\n  } else if (!topics.stress) {\n    output =\n      lang === 'en'\n        ? 'Before finishing, can you describe a recent moment when you felt stress or pressure in your studies?'\n        : \"Avant de terminer, pouvez-vous décrire un moment récent où vous avez ressenti du stress ou de la pression dans vos études ?\"\n  } else {\n    output = applicationQuestion\n  }\n}\n\n// Detection generique : si l agent genere une question deja posee et deja repondue, on redirige\n// Fonctionne quelque soit la reponse de l etudiant, sans correspondance de mots-cles\nconst rawHistory = $('Webhook').item.json.body.conversationHistory || []\n\nfunction questionKey(text) {\n  return normalizeText(String(text || '')).replace(/[^a-z0-9 ]/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 70)\n}\n\nconst currentKey = questionKey(output)\nlet agentRepeatedAnsweredQuestion = false\n\nif (currentKey.length > 20) {\n  for (let i = 0; i < rawHistory.length; i++) {\n    const msg = rawHistory[i]\n    const msgType = msg.role === 'ai' || msg.type === 'ai' ? 'ai' : 'human'\n    const msgContent = String(msg.content || msg.message || msg.text || '')\n    if (msgType === 'ai' && questionKey(msgContent) === currentKey) {\n      const nextMsg = rawHistory[i + 1]\n      const hasHistoryReply =\n        nextMsg &&\n        nextMsg.role !== 'ai' && nextMsg.type !== 'ai' &&\n        String(nextMsg.content || nextMsg.message || nextMsg.text || '').trim().length > 3\n      const hasCurrentReply = i === rawHistory.length - 1 && currentStudentInput.length > 3\n      if (hasHistoryReply || hasCurrentReply) {\n        agentRepeatedAnsweredQuestion = true\n        break\n      }\n    }\n  }\n}\n\nif (agentRepeatedAnsweredQuestion) {\n  if (autorisationFin) {\n    return [{\n      json: {\n        output: completionText,\n        isFinished: true,\n        interactiveQuestion: null,\n        analysisData: null,\n      },\n    }]\n  }\n  if (!topics.decision) {\n    output =\n      lang === 'en'\n        ? 'Before finishing, can you tell me about a recent moment when you had to make an important choice in your studies?'\n        : \"Avant de terminer, pouvez-vous me parler d'un moment récent où vous avez dû faire un choix important dans vos études ?\"\n  } else if (!topics.relations) {\n    output =\n      lang === 'en'\n        ? 'Before finishing, can you tell me about a recent situation with classmates or group work?'\n        : \"Avant de terminer, pouvez-vous me parler d'une situation récente avec des camarades ou un travail de groupe ?\"\n  } else if (!topics.stress) {\n    output =\n      lang === 'en'\n        ? 'Before finishing, can you describe a recent moment when you felt stress or pressure?'\n        : \"Avant de terminer, pouvez-vous décrire un moment récent où vous avez ressenti du stress ou de la pression ?\"\n  } else {\n    return [{\n      json: {\n        output: completionText,\n        isFinished: autorisationFin,\n        interactiveQuestion: null,\n        analysisData: null,\n      },\n    }]\n  }\n}\n\nreturn [{\n  json: {\n    output,\n    isFinished,\n    interactiveQuestion: isFinished ? null : normalizeInteractiveQuestion(parsed.interactiveQuestion),\n    analysisData: null,\n  },\n}]"
+      },
+      "id": "6ead5ef7-812f-4011-93a6-c0ff0c3891c7",
+      "name": "Réponse Entretien",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        4432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sessionId = $('Webhook').item.json.body.sessionId || 'default'\nconst bodyHistory = $('Webhook').item.json.body.conversationHistory\n\nlet conversationHistory = []\n\nif (Array.isArray(bodyHistory) && bodyHistory.length > 0) {\n  conversationHistory = bodyHistory\n    .map((message) => ({\n      type: message.role === 'ai' ? 'ai' : message.type === 'ai' ? 'ai' : 'human',\n      content: String(message.content || message.message || message.text || '').trim(),\n    }))\n    .filter((message) => message.content)\n}\n\ntry {\n  const chatInput = $('Webhook').item.json.body.chatInput\n  const agentOutput = $('Agent Entretien').item.json.output\n  const parsedOutput = (() => {\n    try {\n      const parsed = JSON.parse(String(agentOutput || '').trim())\n      return parsed?.output || agentOutput\n    } catch {\n      return agentOutput\n    }\n  })()\n\n  if (chatInput && !conversationHistory.some((msg) => msg.type === 'human' && msg.content === chatInput)) {\n    conversationHistory.push({ type: 'human', content: chatInput })\n  }\n  if (parsedOutput && !conversationHistory.some((msg) => msg.type === 'ai' && msg.content === parsedOutput)) {\n    conversationHistory.push({ type: 'ai', content: String(parsedOutput).replace(/\\[FIN\\]/gi, '').trim() })\n  }\n} catch (error) {\n  console.log('Current turn extraction error:', error.message)\n}\n\nif (conversationHistory.length === 0) {\n  try {\n    const memoryNode = $('Memoire Conversation')\n    if (memoryNode && memoryNode.all) {\n      const memoryItems = memoryNode.all()\n      for (const item of memoryItems) {\n        if (item.json && item.json.chatHistory) {\n          for (const message of item.json.chatHistory) {\n            conversationHistory.push({\n              type: message.type || message.role,\n              content: message.content || message.text,\n            })\n          }\n        }\n      }\n    }\n  } catch (error) {\n    console.log('Memory extraction error:', error.message)\n  }\n}\n\nconst formattedConversation = conversationHistory\n  .filter((msg) => msg.content)\n  .map((msg) => {\n    const role = msg.type === 'ai' ? 'Assistant' : 'Etudiant'\n    return role + ': ' + msg.content\n  })\n  .join('\\n\\n')\n\nreturn [{\n  json: {\n    formattedConversation,\n    conversationHistory,\n    sessionId,\n  },\n}]\n"
+      },
+      "id": "df35ce4d-ff72-4ef7-b5b2-551151ca689e",
+      "name": "Extraire Historique",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        4672
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.formattedConversation }}",
+        "options": {
+          "systemMessage": "=Tu es expert en psychologie Big Five (OCEAN) pour un rapport etudiant.\n\nAnalyse uniquement l'historique fourni. Retourne UNIQUEMENT un JSON valide, sans markdown, sans texte avant ou apres.\n\nRegles anti-invention:\n- N'invente jamais un comportement, une difficulte, une emotion ou une motivation qui n'a pas ete explicitement mentionne par l'etudiant.\n- Ne dis jamais que l'etudiant a du mal a s'ouvrir, a exprimer ses emotions, a faire confiance, a prendre des risques ou a se connecter aux autres sauf si l'etudiant l'a dit clairement.\n- Ne transforme jamais une absence d'information en faiblesse.\n- Ne transforme jamais une strategie positive en symptome negatif.\n- Si une dimension manque de preuve directe, garde un score modere et une confidence faible ou moyen.\n- Chaque observed_indicator doit etre verifiable dans une phrase reelle de l'etudiant.\n- Les recommandations doivent venir des besoins reellement observes, pas de traits supposes.\n- Pour Extraversion, ne conclus pas a une reserve sociale sans preuve explicite. Si l'etudiant parle de relations respectueuses, entraide, camarades ou support sans difficulte sociale explicite, score entre 5 et 7.\n- Pour Neuroticisme, ne parle pas de nervosite sociale, difficulte relationnelle ou instabilite emotionnelle sauf preuve directe. Si le stress est academique et gere par organisation, calme, pauses ou etapes, score entre 5 et 6.\n\nObjectif qualite:\n- Le rapport doit etre specifique a l'etudiant, pas generique.\n- N'ecris jamais \"pas de preuve concrete\" si l'historique contient un exemple, une phrase ou un comportement observable.\n- Chaque trait doit avoir exactement 3 observed_indicators, bases sur des elements differents de l'entretien.\n- Chaque evidence doit reprendre une citation courte ou une paraphrase precise de l'etudiant.\n- Les analyses doivent expliquer le lien entre la preuve et le score.\n- Evite les formules vagues comme \"semble etre\" sans preuve.\n\nIndices importants a detecter:\n- Stress, pression, fatigue mentale, suranalyse, peur de l'erreur, peur du jugement, doute de soi => Neuroticisme eleve.\n- Reserve sociale, besoin de temps avant de faire confiance, peur d'etre mal compris ou juge => Extraversion basse a moderee.\n- Organiser les taches une par une, planifier, ralentir le rythme, reprendre des habitudes, eviter de tout penser d'un coup => Conscienciosite moderee a elevee.\n- Reflexion sur soi, envie de comprendre son fonctionnement, ouverture a explorer stress/confiance/relations => Ouverture moderee a elevee.\n- Respect des autres, prudence relationnelle, recherche de comprehension, eviter de blesser ou d'etre juge => Agreabilite moderee a elevee.\n\nRegles fortes de scoring:\n- Si l'etudiant mentionne stress ou pression mais explique aussi qu'il reste calme, s'organise, respire, fait des pauses ou avance par etapes: Neuroticisme = 5 ou 6.\n- Neuroticisme = 7 seulement si le stress est frequent ou clairement genantmalgre les strategies.\n- Neuroticisme = 8 ou 9 seulement si l'historique contient plusieurs preuves fortes: panique, anxiete intense, peur du jugement, peur de l'echec, fatigue mentale, blocage, perte de controle ou suranalyse repetee.\n- Si l'etudiant dit explicitement avoir besoin de temps avant de faire confiance ou de s'exprimer: Extraversion = 3 ou 4, sauf preuve forte contraire.\n- Si aucune preuve directe de reserve sociale n'existe: Extraversion ne doit pas descendre sous 5.\n- Si l'etudiant parle positivement de camarades, entraide, travail avec les autres ou demande d'aide: Extraversion = 5, 6 ou 7 selon l'intensite.\n- Si l'etudiant donne au moins deux strategies d'organisation ou de regulation: Conscienciosite = 6 ou 7.\n- Si l'etudiant accepte d'explorer son comportement et formule des liens entre passe et present: Ouverture = 7 ou 8.\n- Les scores ne doivent pas tous etre moyens. L'ecart min/max doit etre au moins 2, mais ne force pas artificiellement un score extreme sans preuve.\n\nContraintes de coherence:\n- Ne mets jamais un indicateur d'organisation dans Neuroticisme sauf s'il est relie explicitement a une tension ou a une inquietude.\n- Ne mets jamais un indicateur relationnel dans Neuroticisme sauf si l'etudiant parle explicitement de peur, nervosite ou inconfort relationnel.\n- Ne mets jamais \"difficulte a exprimer ses emotions\", \"prendre du temps avant de s'ouvrir\", \"peur de faire confiance\" ou \"prendre des risques\" si ces mots ou idees ne sont pas presents dans l'historique.\n- Les watch_points doivent etre prudents et bases sur des preuves directes.\n- Si le profil est globalement positif, les points de vigilance peuvent etre formules comme des axes de maintien ou de consolidation, pas comme des faiblesses.\n\nSchema JSON obligatoire:\n{\n  \"reference\": \"BIG5-2026-0001\",\n  \"confidence_level\": \"moyen|eleve|faible\",\n  \"executive_summary\": {\n    \"overview\": \"string\",\n    \"dominant_strengths\": \"string\",\n    \"watch_points\": \"string\",\n    \"relational_style\": \"string\"\n  },\n  \"traits\": [\n    {\n      \"name\": \"Ouverture\",\n      \"score\": 0,\n      \"analysis\": \"string\",\n      \"interpretation\": \"string\",\n      \"confidence\": \"eleve|moyen|faible\",\n      \"confidence_reason\": \"string\",\n      \"observed_indicators\": [\"string\", \"string\", \"string\"],\n      \"evidence\": \"string\"\n    },\n    {\n      \"name\": \"Conscienciosite\",\n      \"score\": 0,\n      \"analysis\": \"string\",\n      \"interpretation\": \"string\",\n      \"confidence\": \"eleve|moyen|faible\",\n      \"confidence_reason\": \"string\",\n      \"observed_indicators\": [\"string\", \"string\", \"string\"],\n      \"evidence\": \"string\"\n    },\n    {\n      \"name\": \"Extraversion\",\n      \"score\": 0,\n      \"analysis\": \"string\",\n      \"interpretation\": \"string\",\n      \"confidence\": \"eleve|moyen|faible\",\n      \"confidence_reason\": \"string\",\n      \"observed_indicators\": [\"string\", \"string\", \"string\"],\n      \"evidence\": \"string\"\n    },\n    {\n      \"name\": \"Agreabilite\",\n      \"score\": 0,\n      \"analysis\": \"string\",\n      \"interpretation\": \"string\",\n      \"confidence\": \"eleve|moyen|faible\",\n      \"confidence_reason\": \"string\",\n      \"observed_indicators\": [\"string\", \"string\", \"string\"],\n      \"evidence\": \"string\"\n    },\n    {\n      \"name\": \"Neuroticisme\",\n      \"score\": 0,\n      \"analysis\": \"string\",\n      \"interpretation\": \"string\",\n      \"confidence\": \"eleve|moyen|faible\",\n      \"confidence_reason\": \"string\",\n      \"observed_indicators\": [\"string\", \"string\", \"string\"],\n      \"evidence\": \"string\"\n    }\n  ],\n  \"score_validation\": {\n    \"min_score\": 0,\n    \"max_score\": 0,\n    \"spread\": 0,\n    \"coherence_notes\": \"string\"\n  },\n  \"emotional_profile\": {\n    \"dominant_emotion\": \"string\",\n    \"emotional_stability\": 0,\n    \"emotional_summary\": \"string\"\n  },\n  \"global_synthesis\": {\n    \"general_functioning_style\": \"string\",\n    \"main_strengths\": [\"string\", \"string\", \"string\"],\n    \"watch_points\": [\"string\", \"string\", \"string\"],\n    \"development_potential\": \"string\"\n  },\n  \"recommendations\": [\"string\", \"string\", \"string\"],\n  \"conclusion\": \"string\"\n}\n\nRegles finales:\n- scores entiers entre 1 et 10.\n- 5 traits exactement dans l'ordre du schema.\n- 3 observed_indicators par trait, pas moins.\n- 3 recommendations concretes et actionnables.\n- {{ $('Webhook').item.json.body.interviewLanguage === 'en' ? 'Respond in English. Every string value in the JSON (analysis, interpretation, overview, dominant_strengths, watch_points, relational_style, emotional_summary, dominant_emotion, observed_indicators, evidence, confidence_reason, recommendations, conclusion, etc.) must be written in English.' : 'Repondre en francais. Tous les textes du JSON doivent etre en francais.' }}\n- Retourner uniquement le JSON."
+        }
+      },
+      "id": "b6607e2b-c268-43e3-8c2a-60fe19591f4c",
+      "name": "Générer Analyse Big Five",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        4640
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all()\n\nif (!items || items.length === 0) {\n  return [{ json: { output: \"L'entretien est termine. Merci pour vos reponses.\", isFinished: true, interactiveQuestion: null, analysisData: null } }]\n}\n\nlet analysisData = null\nconst rawReport = items[0].json.output || ''\nconst validationErrors = items[0].json.validationErrors || []\nconst validationWarnings = items[0].json.validationWarnings || []\n\nfunction parseJsonObject(raw) {\n  let cleaned = String(raw || '')\n    .replace(/^[\\s\\S]*?```json\\s*/i, '')\n    .replace(/^[\\s\\S]*?```\\s*/i, '')\n    .replace(/\\s*```[\\s\\S]*$/i, '')\n    .trim()\n  const firstBrace = cleaned.indexOf('{')\n  const lastBrace = cleaned.lastIndexOf('}')\n  if (firstBrace !== -1 && lastBrace > firstBrace) cleaned = cleaned.slice(firstBrace, lastBrace + 1)\n  cleaned = cleaned.replace(/[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]/g, '')\n  return JSON.parse(cleaned)\n}\n\ntry {\n  analysisData = parseJsonObject(rawReport)\n  if (!analysisData || typeof analysisData !== 'object') throw new Error('Resultat JSON non-objet')\n  if (!analysisData.traits || !Array.isArray(analysisData.traits)) {\n    if (analysisData.big_five && Array.isArray(analysisData.big_five)) analysisData.traits = analysisData.big_five\n    else if (analysisData.scores && Array.isArray(analysisData.scores)) analysisData.traits = analysisData.scores\n    else throw new Error('Pas de tableau traits trouve')\n  }\n  const validTraits = analysisData.traits.filter((t) => t && typeof t === 'object' && t.name && (t.score !== undefined || t.value !== undefined))\n  if (validTraits.length === 0) throw new Error('Aucun trait valide trouve')\n  analysisData.traits = validTraits.map((t) => ({\n    name: t.name || t.trait || t.label || 'Trait',\n    score: Math.max(1, Math.min(10, Math.round(Number(t.score || t.value || t.note || 5)))),\n    analysis: t.analysis || t.description || '',\n    interpretation: t.interpretation || '',\n    confidence: t.confidence || 'moyen',\n    confidence_reason: t.confidence_reason || '',\n    evidence: t.evidence || '',\n    observed_indicators: Array.isArray(t.observed_indicators) ? t.observed_indicators : [],\n  }))\n  if (!analysisData.executive_summary) {\n    analysisData.executive_summary = {\n      overview: analysisData.overview || '',\n      dominant_strengths: analysisData.dominant_strengths || '',\n      watch_points: analysisData.watch_points_summary || '',\n      relational_style: analysisData.relational_style || '',\n    }\n  }\n  if (!analysisData.emotional_profile) {\n    analysisData.emotional_profile = {\n      dominant_emotion: 'neutre',\n      emotional_stability: 5,\n      emotional_summary: '',\n    }\n  }\n  if (!analysisData.global_synthesis) {\n    analysisData.global_synthesis = {\n      general_functioning_style: '',\n      main_strengths: [],\n      watch_points: [],\n      development_potential: '',\n    }\n  }\n  if (!Array.isArray(analysisData.recommendations)) analysisData.recommendations = []\n  const scores = analysisData.traits.map((t) => Number(t.score))\n  if (!analysisData.score_validation) {\n    analysisData.score_validation = {\n      min_score: Math.min(...scores),\n      max_score: Math.max(...scores),\n      spread: Math.max(...scores) - Math.min(...scores),\n      coherence_notes: 'Scores normalises.',\n      validation_passed: validationErrors.length === 0,\n      errors: validationErrors,\n      warnings: validationWarnings,\n    }\n  } else {\n    analysisData.score_validation.validation_passed = validationErrors.length === 0\n    analysisData.score_validation.errors = validationErrors\n    analysisData.score_validation.warnings = validationWarnings\n  }\n} catch (e) {\n  console.log('Erreur parsing/validation JSON:', e.message)\n  console.log('Reponse brute:', String(rawReport).slice(0, 500))\n  analysisData = null\n}\n\nconst hasUsableAnalysis =\n  analysisData &&\n  Array.isArray(analysisData.traits) &&\n  analysisData.traits.length >= 5\n\nreturn [{\n  json: {\n    output: hasUsableAnalysis\n      ? \"L'entretien est terminé. Merci pour vos réponses.\"\n      : \"Merci, j'ai bien noté votre réponse. Le rapport n'a pas pu être généré correctement, je vais relancer l'analyse.\",\n    isFinished: hasUsableAnalysis,\n    interactiveQuestion: null,\n    analysisData: hasUsableAnalysis ? analysisData : null,\n  }\n}]"
+      },
+      "id": "6fb095e0-5270-4616-bdbc-ee8c5754457a",
+      "name": "Préparer Réponse Finale",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        4704
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "7a642ebf-076a-4702-a385-5569901f0698",
+      "name": "Respond Entretien",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1104,
+        4432
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "119b188b-8d94-4b6d-a726-e0ea2aa791a2",
+      "name": "Respond Final",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1984,
+        4592
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.sessionId }}",
+        "contextWindowLength": 30
+      },
+      "id": "cd0f7f1c-e4d6-4e48-94d6-b60a0cbb23bc",
+      "name": "Memoire Conversation",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        4800
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "37ca67a2-4866-486c-a943-5283183e90a7",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        4528
+      ],
+      "id": "9e92074d-6e57-42e9-b09c-be4ee21bc084",
+      "name": "Webhook",
+      "webhookId": "90403860-2912-4b24-a85c-be0b269b27fd"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (!items || items.length === 0) {\n  return [{ json: { output: '{}', validationPassed: false, validationErrors: ['Aucune entrée'] } }];\n}\n\n// Detect interview language from context\nlet interviewLanguage = 'fr';\ntry {\n  interviewLanguage = $('Preparer Contexte Entretien').item.json.interviewLanguage === 'en' ? 'en' : 'fr';\n} catch (e) {}\nconst isEN = interviewLanguage === 'en';\n\nconst rawOutput = items[0].json.output || '{}';\nlet analysisData = null;\n\nfunction cleanAndParseJson(raw) {\n  let cleaned = String(raw || '')\n    .replace(/^[\\s\\S]*?```json\\s*/i, '')\n    .replace(/^[\\s\\S]*?```\\s*/i, '')\n    .replace(/\\s*```[\\s\\S]*$/i, '')\n    .trim();\n  const firstBrace = cleaned.indexOf('{');\n  const lastBrace = cleaned.lastIndexOf('}');\n  if (firstBrace !== -1 && lastBrace > firstBrace) {\n    cleaned = cleaned.substring(firstBrace, lastBrace + 1);\n  }\n  cleaned = cleaned.replace(/[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]/g, '');\n  return JSON.parse(cleaned);\n}\n\ntry {\n  analysisData = cleanAndParseJson(rawOutput);\n} catch (e) {\n  console.log('[VALIDATION] Impossible de parser le JSON:', e.message);\n  return [{ json: { output: rawOutput, validationPassed: false, validationErrors: ['JSON invalide'] } }];\n}\n\nif (!analysisData || !Array.isArray(analysisData.traits)) {\n  return [{ json: { output: rawOutput, validationPassed: false, validationErrors: ['Pas de tableau traits'] } }];\n}\n\nconst errors = [];\nconst warnings = [];\nconst traits = analysisData.traits;\n\nlet conversationText = '';\ntry {\n  conversationText = $('Extraire Historique').item.json.formattedConversation || '';\n} catch (e) {\n  conversationText = '';\n}\n\nconst normalizedConversationText = conversationText\n  .toLowerCase()\n  .normalize('NFD')\n  .replace(/[̀-ͯ]/g, '');\n\nconversationText = conversationText.toLowerCase();\n\nconst anxietyMarkers = [\n  'anxious', 'anxiety', 'nervous', 'worried', 'worry', 'overthink', 'overthinking',\n  'scared', 'fear', 'afraid', 'judged', 'not good enough', 'self-doubt',\n  'stress', 'stressed', 'panic', 'mistake', 'mistakes', 'embarrassed',\n  'too sensitive', 'hide my feelings', 'kept it to myself', 'reassurance',\n  'anxieux', 'anxieuse', 'anxiete', 'nerveux', 'nerveuse', 'inquiet', 'inquiete',\n  'inquietude', 'je m inquiete', 'peur', 'j ai peur',\n  'effrayé', 'effrayee', 'juge', 'jugee', 'jugement', 'pas assez bien',\n  'doute', 'je doute', 'doute de soi', 'stress', 'stresse', 'stressée',\n  'panique', 'erreur', 'erreurs', 'honte', 'embarrasse', 'embarrassee',\n  'trop sensible', 'je reflechis trop', 'je suranalyse', 'besoin d etre rassure',\n  'je garde pour moi', 'je cache mes emotions',\n  'pression', 'tension', 'charge', 'chargé', 'chargee',\n];\n\nconst strongAnxietyMarkers = [\n  'panic', 'panic attack', 'intense anxiety', 'lose control', 'blocked',\n  'mental fatigue', 'fear of failure', 'fear of judgment', 'overthinking',\n  'panique', 'crise de panique', 'anxiete intense', 'angoisse',\n  'perte de controle', 'bloque', 'bloquee',\n  'fatigue mentale', 'peur de l echec',\n  'peur du jugement', 'je suranalyse', 'je reflechis trop',\n];\n\nconst regulationMarkers = [\n  'calm', 'stay calm', 'breathe', 'breathing', 'pause', 'break',\n  'organize', 'organized', 'step by step', 'small steps', 'plan',\n  'calme', 'rester calme', 'respire', 'respirer', 'pause', 'pauses',\n  'organise', 'organise', 'etape par etape', 'petites etapes',\n  'planning', 'liste de taches', 'liste', 'priorisation', 'prioriser',\n  'je fais de mon mieux', 'demander conseil', 'demande conseil',\n  'corrige mes erreurs', 'je recommence', 'je m adapte',\n];\n\nconst introversionMarkers = [\n  'alone', 'prefer working alone', 'working alone', 'quiet', 'shy',\n  'stay quiet', 'less attention', 'dont want attention',\n  'hard to speak',\n  'je prefere travailler seul', 'je prefere travailler seule',\n  'je prefere rester seul', 'je prefere rester seule',\n  'timide', 'je reste silencieux', 'je reste silencieuse', 'je parle peu',\n  'difficile de parler', 'pas attirer l attention',\n  'rester discret', 'rester discrete',\n];\n\nconst socialPositiveMarkers = [\n  'group', 'team', 'classmates', 'friends', 'share ideas', 'help others',\n  'work with others', 'support', 'supervisor',\n  'groupe', 'camarades', 'amis', 'encadrant', 'partager les idees',\n  'aider les autres', 'travailler en groupe', 'voir mes amis', 'solution',\n  'dialogue', 'dialoguer', 'conseil', 'conseils',\n];\n\nconst organizationMarkers = [\n  'organize', 'organized', 'schedule', 'plan', 'planning', 'priorities',\n  'step by step', 'small tasks', 'deadline', 'urgent',\n  'organiser', 'organise', 'planning', 'planifier', 'planification',\n  'priorites', 'priorite', 'etape par etape', 'petites etapes',\n  'liste', 'liste de taches', 'urgent', 'devoirs', 'pfe',\n];\n\nconst agreeablenessMarkers = [\n  'listen', 'supportive', 'calmly', 'without judgment', 'not judge',\n  'understand', 'compromise', 'help others', 'solution', 'advice',\n  'ecouter', 'j ecoute', 'soutien', 'sans juger', 'ne pas juger',\n  'comprendre', 'compromis', 'calmement', 'respectueux', 'respectueuse',\n  'aider les autres', 'trouver une solution', 'conseil', 'dialogue',\n];\n\nconst opennessMarkers = [\n  'curious', 'curiosity', 'learn', 'understand', 'new ideas', 'explore',\n  'reflect', 'thoughts', 'practical', 'solutions',\n  'curieux', 'curieuse', 'curiosite', 'apprendre', 'comprendre',\n  'nouvelles idees', 'explorer', 'reflechir', 'pensees',\n  'cours pratique', 'chercher des solutions', 'progres', 'competences',\n];\n\nfunction countMarkers(markers) {\n  return markers.filter((marker) => {\n    const raw = marker.toLowerCase();\n    const normalized = raw.normalize('NFD').replace(/[̀-ͯ]/g, '');\n    return conversationText.includes(raw) || normalizedConversationText.includes(normalized);\n  }).length;\n}\n\nconst anxietyCount = countMarkers(anxietyMarkers);\nconst strongAnxietyCount = countMarkers(strongAnxietyMarkers);\nconst regulationCount = countMarkers(regulationMarkers);\nconst introversionCount = countMarkers(introversionMarkers);\nconst socialPositiveCount = countMarkers(socialPositiveMarkers);\nconst organizationCount = countMarkers(organizationMarkers);\nconst agreeablenessCount = countMarkers(agreeablenessMarkers);\nconst opennessCount = countMarkers(opennessMarkers);\n\nfunction normalizeName(name) {\n  return String(name || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[̀-ͯ]/g, '');\n}\n\nfunction isTrait(t, target) {\n  const n = normalizeName(t.name);\n  const targetNorm = normalizeName(target);\n  return n === targetNorm || n.includes(targetNorm);\n}\n\nfunction cleanTechnicalText(value) {\n  return String(value || '')\n    .replace(/Correction automatique\\s*:[^.]*\\./gi, '')\n    .replace(/correction automatique\\s*:[^.]*\\./gi, '')\n    .replace(/marqueurs detectes[^.]*\\./gi, '')\n    .replace(/regles de scoring[^.]*\\./gi, '')\n    .trim();\n}\n\nconst unsupportedPhrases = [\n  'difficulte a s ouvrir',\n  'prendre du temps avant de s ouvrir',\n  'difficulte a exprimer ses emotions',\n  'difficulte a exprimer ses emotions',\n  'etre ouvert a la relation',\n  'etre ouvert a la relation',\n  'peur de faire confiance',\n  'prendre des risques',\n  'nervosite dans ses interactions sociales',\n  'nervosite dans ses interactions sociales',\n  'retenue dans ses interactions sociales',\n  'difficulte a se connecter aux autres',\n  'difficulte a se connecter aux autres',\n  'peur du jugement et a la suranalyse',\n  'peur du jugement',\n  'suranalyse',\n];\n\nfunction removeUnsupportedText(text) {\n  let next = String(text || '');\n  for (const phrase of unsupportedPhrases) {\n    next = next.replace(new RegExp(phrase, 'gi'), '').trim();\n  }\n  return cleanTechnicalText(next);\n}\n\nif (traits.length !== 5) {\n  errors.push(`Attendu 5 traits, recu ${traits.length}`);\n}\n\nfor (const t of traits) {\n  const score = Number(t.score || 0);\n  if (!Number.isFinite(score) || score < 1 || score > 10) {\n    errors.push(`${t.name}: score ${score} hors limites (1-10)`);\n    t.score = Math.max(1, Math.min(10, Math.round(score || 5)));\n  } else {\n    t.score = Math.max(1, Math.min(10, Math.round(score)));\n  }\n  if (!t.analysis && !t.evidence) {\n    warnings.push(`${t.name}: pas d'analyse ni d'evidence - confidence mise a faible`);\n    t.confidence = 'faible';\n    t.confidence_reason = isEN\n      ? 'No direct usable data in the student responses.'\n      : 'Aucune donnee directe exploitable dans les reponses';\n  }\n  t.analysis = removeUnsupportedText(t.analysis || '');\n  t.interpretation = removeUnsupportedText(t.interpretation || '');\n  t.evidence = removeUnsupportedText(t.evidence || '');\n  if (!Array.isArray(t.observed_indicators)) {\n    t.observed_indicators = [];\n  }\n  t.observed_indicators = t.observed_indicators\n    .map((indicator) => removeUnsupportedText(indicator))\n    .filter((indicator) => indicator.length > 0)\n    .slice(0, 3);\n  while (t.observed_indicators.length < 3) {\n    t.observed_indicators.push(isEN\n      ? 'Indicator to be confirmed with further concrete examples.'\n      : 'Indicateur a confirmer par davantage d exemples concrets.');\n  }\n}\n\nfor (const t of traits) {\n  if (isTrait(t, 'Neuroticisme')) {\n    const currentScore = Number(t.score);\n    if (strongAnxietyCount >= 2 && anxietyCount >= 4) {\n      t.score = Math.max(7, Math.min(8, currentScore));\n      t.confidence = 'moyen';\n      t.confidence_reason = isEN\n        ? 'Signs of more marked stress are present, but the score remains limited to explicitly observed elements.'\n        : 'Des signes de stress plus marques sont presents, mais le score reste limite aux elements explicitement observes.';\n      warnings.push(`Neuroticisme limite entre 7 et 8 : ${strongAnxietyCount} marqueurs forts detectes.`);\n    } else if (anxietyCount >= 2 && regulationCount >= 2) {\n      t.score = Math.min(6, currentScore);\n      t.confidence = 'moyen';\n      t.confidence_reason = isEN\n        ? 'Stress is occasionally present, but the student describes several effective regulation strategies.'\n        : 'Le stress est present de facon ponctuelle, mais l etudiant decrit plusieurs strategies de regulation efficaces.';\n      warnings.push(`Neuroticisme limite a 6 : stress ponctuel avec ${regulationCount} marqueurs de regulation.`);\n    } else if (anxietyCount >= 2) {\n      t.score = Math.min(7, Math.max(5, currentScore));\n      t.confidence = 'moyen';\n      t.confidence_reason = isEN\n        ? 'Some pressure indicators are present, without evidence of intense or lasting anxiety.'\n        : 'Quelques indices de pression sont presents, sans preuve d anxiete intense ou durable.';\n      warnings.push(`Neuroticisme ajuste entre 5 et 7 : ${anxietyCount} marqueurs de stress detectes.`);\n    } else {\n      t.score = Math.min(5, currentScore);\n      t.confidence = 'faible';\n      t.confidence_reason = isEN\n        ? 'Few direct indicators of stress or emotional instability are present in the interview.'\n        : 'Peu d indices directs de stress ou d instabilite emotionnelle sont presents dans l entretien.';\n    }\n    if (\n      anxietyCount >= 1 ||\n      normalizedConversationText.includes('charge') ||\n      normalizedConversationText.includes('pfe') ||\n      normalizedConversationText.includes('pression')\n    ) {\n      t.score = Math.max(4, Number(t.score));\n    }\n    if (Number(t.score) <= 6) {\n      t.analysis = isEN\n        ? 'The student describes occasional academic pressure, but also demonstrates strong regulation capacity through calmness, organization, and solution-seeking.'\n        : 'L etudiant decrit une pression ponctuelle liee aux etudes, mais il montre aussi une bonne capacite de regulation grace au calme, a l organisation et a la recherche de solutions.';\n      t.interpretation = isEN\n        ? 'The observed level corresponds more to a low-to-moderate stress sensitivity than to high anxiety.'\n        : 'Le niveau observe correspond davantage a une sensibilite faible a moderee au stress qu a une anxiete elevee.';\n      t.observed_indicators = isEN\n        ? [\n            'Work period described as busy, with many tasks to organize.',\n            'Good adaptation to unforeseen events: the student indicates easy adaptation or maintaining control.',\n            'Regulation through organization: lists, prioritization of urgent tasks, and planned breaks.',\n          ]\n        : [\n            'Periode de travail decrite comme chargee, avec beaucoup de taches a organiser.',\n            'Bonne adaptation face aux imprevus : l etudiant indique qu il s adapte facilement ou qu il garde le controle.',\n            'Regulation par l organisation : listes, priorisation des taches urgentes et pauses planifiees.',\n          ];\n    }\n  }\n  if (isTrait(t, 'Extraversion')) {\n    if (introversionCount >= 3 && Number(t.score) > 5) {\n      t.score = 5;\n      t.confidence = 'moyen';\n      t.confidence_reason = isEN\n        ? 'Some reserve indicators are present, but insufficient to conclude strong introversion.'\n        : 'Quelques indices de reserve sont presents, mais ils ne suffisent pas a conclure a une forte introversion.';\n      warnings.push(`Extraversion ajustee a 5 : ${introversionCount} marqueurs d introversion detectes.`);\n    }\n    if (socialPositiveCount >= 2 && Number(t.score) < 5) {\n      t.score = 5;\n      t.confidence = 'moyen';\n      t.confidence_reason = isEN\n        ? 'The student mentions positive interactions with peers or the group.'\n        : 'L etudiant mentionne des interactions positives avec les pairs ou le groupe.';\n      warnings.push(`Extraversion remontee a 5 : ${socialPositiveCount} marqueurs sociaux positifs detectes.`);\n    }\n  }\n  if (isTrait(t, 'Conscienciosite') && organizationCount >= 3 && Number(t.score) < 6) {\n    t.score = 6;\n    warnings.push(`Conscienciosite ajustee a 6 : ${organizationCount} marqueurs d organisation detectes.`);\n  }\n  if (isTrait(t, 'Agreabilite') && agreeablenessCount >= 3 && Number(t.score) < 6) {\n    t.score = 6;\n    warnings.push(`Agreabilite ajustee a 6 : ${agreeablenessCount} marqueurs relationnels positifs detectes.`);\n  }\n  if (isTrait(t, 'Ouverture') && opennessCount >= 3 && Number(t.score) < 6) {\n    t.score = 6;\n    warnings.push(`Ouverture ajustee a 6 : ${opennessCount} marqueurs d ouverture/introspection detectes.`);\n  }\n}\n\nlet scores = traits.map(t => Number(t.score));\nlet minScore = Math.min(...scores);\nlet maxScore = Math.max(...scores);\nlet spread = maxScore - minScore;\n\nif (spread < 2) {\n  warnings.push(`Spread trop faible (${spread}). Accentuation legere et prudente des ecarts.`);\n  const conscientiousness = traits.find(t => isTrait(t, 'Conscienciosite'));\n  const neuroticism = traits.find(t => isTrait(t, 'Neuroticisme'));\n  if (conscientiousness) conscientiousness.score = Math.min(10, Number(conscientiousness.score) + 1);\n  if (neuroticism) neuroticism.score = Math.max(1, Number(neuroticism.score) - 1);\n}\n\nscores = traits.map(t => Number(t.score));\nminScore = Math.min(...scores);\nmaxScore = Math.max(...scores);\nspread = maxScore - minScore;\n\nconst neuro = traits.find(t => isTrait(t, 'Neuroticisme'));\nif (neuro && analysisData.emotional_profile) {\n  const neuroScore = Number(neuro.score);\n  analysisData.emotional_profile.emotional_stability = Math.max(1, Math.min(10, 11 - neuroScore));\n  if (neuroScore >= 8) {\n    analysisData.emotional_profile.dominant_emotion = isEN ? 'anxiety / worry' : 'anxiete / inquietude';\n    analysisData.emotional_profile.emotional_summary = isEN\n      ? 'The profile shows high emotional sensitivity, supported by several explicit signs of intense stress.'\n      : 'Le profil montre une sensibilite emotionnelle elevee, appuyee par plusieurs signes explicites de stress intense.';\n  } else if (neuroScore >= 6) {\n    analysisData.emotional_profile.dominant_emotion = isEN ? 'moderate pressure' : 'pression moderee';\n    analysisData.emotional_profile.emotional_summary = isEN\n      ? 'The student occasionally feels pressure, but uses effective strategies such as organization, calmness, error correction, and seeking advice.'\n      : 'L etudiant ressent parfois de la pression, mais il utilise des strategies efficaces comme l organisation, le calme, la correction des erreurs et la demande de conseil.';\n  } else {\n    analysisData.emotional_profile.dominant_emotion = isEN ? 'relative stability' : 'stabilite relative';\n    analysisData.emotional_profile.emotional_summary = isEN\n      ? 'The student shows relatively stable emotional regulation, with the ability to manage difficulties without major emotional overflow observed.'\n      : 'L etudiant montre une regulation emotionnelle plutot stable, avec une capacite a gerer les difficultes sans debordement majeur observe.';\n  }\n}\n\nanalysisData.score_validation = {\n  min_score: minScore,\n  max_score: maxScore,\n  spread,\n  coherence_notes: warnings.length > 0 ? warnings.join(' | ') : 'Scores coherents.',\n  validation_passed: errors.length === 0,\n  errors,\n  warnings,\n  detected_markers: {\n    anxietyCount,\n    strongAnxietyCount,\n    regulationCount,\n    introversionCount,\n    socialPositiveCount,\n    organizationCount,\n    agreeablenessCount,\n    opennessCount,\n  },\n};\n\nconsole.log('[VALIDATION] Scores:', traits.map(t => `${t.name}:${t.score}`).join(', '));\nconsole.log('[VALIDATION] Marqueurs:', JSON.stringify(analysisData.score_validation.detected_markers));\nconsole.log('[VALIDATION] Spread:', spread);\nconsole.log('[VALIDATION] Erreurs:', errors.length, '| Warnings:', warnings.length);\n\nreturn [{\n  json: {\n    output: JSON.stringify(analysisData),\n    validationPassed: errors.length === 0,\n    validationErrors: errors,\n    validationWarnings: warnings,\n  },\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        4592
+      ],
+      "id": "6550d5d3-7272-43e6-930e-be3b49c279e5",
+      "name": "valider-scores-n8n"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const body = $json.body || {}\n\nconst chatInput = body.chatInput || ''\nconst sessionId = body.sessionId || 'default'\nconst assistantName = body.assistantName || 'Mindly'\nconst studentMessageCount = Number(body.studentMessageCount || 0)\nconst applicationAnswerDetected = body.applicationAnswerDetected === true\n\nconst historyText = JSON.stringify(body.conversationHistory || [])\n  .toLowerCase()\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n\nconst currentText = String(chatInput || '')\n  .toLowerCase()\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n\nconst fullText = `${historyText} ${currentText}`\n\nconst exploredTopics = {\n  stress:\n    fullText.includes('stress') ||\n    fullText.includes('pressure') ||\n    fullText.includes('overwhelmed') ||\n    fullText.includes('anxious') ||\n    fullText.includes('anxiety') ||\n    fullText.includes('pression') ||\n    fullText.includes('anxieux') ||\n    fullText.includes('anxiete') ||\n    fullText.includes('tension') ||\n    fullText.includes('charge') ||\n    fullText.includes('serein') ||\n    fullText.includes('serenite') ||\n    fullText.includes('calme'),\n\n  organisation:\n    fullText.includes('organization') ||\n    fullText.includes('organisation') ||\n    fullText.includes('organize') ||\n    fullText.includes('organized') ||\n    fullText.includes('organise') ||\n    fullText.includes('time management') ||\n    fullText.includes('tasks') ||\n    fullText.includes('planning') ||\n    fullText.includes('plan') ||\n    fullText.includes('priorities') ||\n    fullText.includes('priorite') ||\n    fullText.includes('step by step') ||\n    fullText.includes('small steps') ||\n    fullText.includes('etape par etape') ||\n    fullText.includes('petites etapes') ||\n    fullText.includes('liste') ||\n    fullText.includes('temps') ||\n    fullText.includes('planifier'),\n\n  relations:\n    fullText.includes('classmates') ||\n    fullText.includes('friends') ||\n    fullText.includes('professors') ||\n    fullText.includes('supervisor') ||\n    fullText.includes('support') ||\n    fullText.includes('group') ||\n    fullText.includes('team') ||\n    fullText.includes('misunderstanding') ||\n    fullText.includes('relationship') ||\n    fullText.includes('relationships') ||\n    fullText.includes('camarade') ||\n    fullText.includes('camarades') ||\n    fullText.includes('amis') ||\n    fullText.includes('encadrant') ||\n    fullText.includes('professeurs') ||\n    fullText.includes('soutien') ||\n    fullText.includes('groupe') ||\n    fullText.includes('conflit') ||\n    fullText.includes('relation') ||\n    fullText.includes('equipe') ||\n    fullText.includes('dialogue') ||\n    fullText.includes('dialoguer') ||\n    fullText.includes('discussion') ||\n    fullText.includes('compromis') ||\n    fullText.includes('collectif'),\n\n  motivation:\n    fullText.includes('motivation') ||\n    fullText.includes('motivated') ||\n    fullText.includes('goals') ||\n    fullText.includes('goal') ||\n    fullText.includes('future') ||\n    fullText.includes('confidence') ||\n    fullText.includes('confident') ||\n    fullText.includes('progress') ||\n    fullText.includes('improve') ||\n    fullText.includes('family') ||\n    fullText.includes('confiance') ||\n    fullText.includes('confiant') ||\n    fullText.includes('objectif') ||\n    fullText.includes('objectifs') ||\n    fullText.includes('avenir') ||\n    fullText.includes('progres') ||\n    fullText.includes('famille') ||\n    fullText.includes('motive') ||\n    fullText.includes('motivation'),\n\n  decision:\n    fullText.includes('decision') ||\n    fullText.includes('decisions') ||\n    fullText.includes('choice') ||\n    fullText.includes('choose') ||\n    fullText.includes('choosing') ||\n    fullText.includes('decide') ||\n    fullText.includes('deciding') ||\n    fullText.includes('unsure') ||\n    fullText.includes('not sure') ||\n    fullText.includes('priority') ||\n    fullText.includes('prioritize') ||\n    fullText.includes('urgent') ||\n    fullText.includes('deadlines') ||\n    fullText.includes('deadline') ||\n    fullText.includes('which task') ||\n    fullText.includes('what to do first') ||\n    fullText.includes('choix') ||\n    fullText.includes('choisir') ||\n    fullText.includes('decider') ||\n    fullText.includes('doute') ||\n    fullText.includes('incertitude') ||\n    fullText.includes('trancher') ||\n    fullText.includes('direction') ||\n    fullText.includes('logique') ||\n    fullText.includes('priorite') ||\n    fullText.includes('echeance') ||\n    fullText.includes('urgent'),\n}\n\nconst exploredCount = Object.values(exploredTopics).filter(Boolean).length\n\nconst hasFinalApplication =\n  fullText.includes('dans les prochains jours') ||\n  fullText.includes('je vais') ||\n  fullText.includes('je veux retenir') ||\n  fullText.includes('je retiens') ||\n  fullText.includes('je vais continuer') ||\n  fullText.includes('je suis capable') ||\n  fullText.includes('i will') ||\n  fullText.includes('i want to remember') ||\n  fullText.includes('i learned') ||\n  fullText.includes('take away')\n\nconst allRequiredTopicsExplored =\n  exploredTopics.stress &&\n  exploredTopics.organisation &&\n  exploredTopics.relations &&\n  exploredTopics.motivation &&\n  exploredTopics.decision\n\nconst autorisationFin =\n  applicationAnswerDetected ||\n  (allRequiredTopicsExplored &&\n    (\n      studentMessageCount >= 9 ||\n      (studentMessageCount >= 7 && hasFinalApplication)\n    )\n  )\n\nconst coverageCount = exploredCount\nconst hasAskedRequiredInteractive = body.hasAskedRequiredInteractive === true\n\nconst interactiveQuestionRequired =\n  body.supportsInteractiveQuestions === true &&\n  (studentMessageCount === 4 || studentMessageCount === 7)\n\nreturn {\n  chatInput,\n  sessionId,\n  history: [],\n  assistantName,\n  interviewLanguage: body.interviewLanguage === 'en' ? 'en' : 'fr',\n  interviewerGender: body.interviewerGender === 'male' ? 'male' : 'female',\n  supportsInteractiveQuestions: body.supportsInteractiveQuestions === true,\n  interactiveQuestionMode: body.interactiveQuestionMode || 'text',\n\n  hasAskedRequiredInteractive,\n  interactiveQuestionRequired,\n\n  studentMessageCount,\n  coverageCount,\n  exploredTopics,\n  exploredCount,\n  hasFinalApplication,\n  allRequiredTopicsExplored,\n  applicationAnswerDetected,\n  autorisationFin,\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        4656
+      ],
+      "id": "4c177941-2b0c-4900-a2c9-cb9f8c2e64d9",
+      "name": "Preparer Contexte Entretien"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {
+          "maxOutputTokens": 6000,
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        4832
+      ],
+      "id": "d218892c-ad2a-4da7-867e-7f4cb47528a2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "n673ZoDfu2L5x0XI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {
+          "maxOutputTokens": 6000,
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        4912
+      ],
+      "id": "8b729752-e6a4-47c7-afc2-8e738ec5090a",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "n673ZoDfu2L5x0XI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Agent Entretien": {
+      "main": [
+        [
+          {
+            "node": "Détecter Fin Entretien",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Détecter Fin Entretien": {
+      "main": [
+        [
+          {
+            "node": "Extraire Historique",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Réponse Entretien",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Réponse Entretien": {
+      "main": [
+        [
+          {
+            "node": "Respond Entretien",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraire Historique": {
+      "main": [
+        [
+          {
+            "node": "Générer Analyse Big Five",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Générer Analyse Big Five": {
+      "main": [
+        [
+          {
+            "node": "valider-scores-n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Préparer Réponse Finale": {
+      "main": [
+        [
+          {
+            "node": "Respond Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoire Conversation": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent Entretien",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Preparer Contexte Entretien",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valider-scores-n8n": {
+      "main": [
+        [
+          {
+            "node": "Préparer Réponse Finale",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparer Contexte Entretien": {
+      "main": [
+        [
+          {
+            "node": "Agent Entretien",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent Entretien",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Générer Analyse Big Five",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "bef6e38a-c25a-42d9-8794-e458a7e01baa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6c84b76b4ca1df4290005d1cd04902c6887858a1991e26ed9d552857ea0b9414"
+  },
+  "id": "H1PtzelRS6v6qFnI",
+  "tags": []
+}

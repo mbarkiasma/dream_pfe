@@ -1,0 +1,210 @@
+{
+  "name": "clerk magic link email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "clerk-email-link",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        304,
+        1264
+      ],
+      "id": "9d4a025b-eb8e-4a83-a6f0-9989669a43b4",
+      "name": "Webhook",
+      "webhookId": "b57c2d83-ede9-42ca-9759-45c75be9a10c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eeb794bc-7ad9-4b67-aeed-eed430183145",
+              "name": "email",
+              "value": "={{$json.body.data.to_email_address}}",
+              "type": "string"
+            },
+            {
+              "id": "35758ac0-b891-4d28-815f-873f621808c9",
+              "name": "magicLink",
+              "value": "={{$json.body.data.data.magic_link}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        1264
+      ],
+      "id": "615d8baf-4dad-477e-ac5a-288dcf9586ee",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f863a910-9367-472c-8504-27ebd75a972c",
+              "leftValue": "={{$json.email}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        1264
+      ],
+      "id": "d98a6824-8fc7-443d-9ec0-7da9645ee03d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": false,\n  \"message\": \"Email manquant\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        928,
+        1360
+      ],
+      "id": "fd0e7d62-34d7-4bc2-9ce2-b6df6112de53",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "fromEmail": "contact@mindbloom.tn",
+        "toEmail": "={{$json.email}}",
+        "subject": "Connexion à MindBloom",
+        "html": "=<div style=\"margin:0; padding:0; background:#f8f5ff; font-family:Arial, Helvetica, sans-serif;\">\n  <div style=\"padding:12px 16px;\">\n    <div style=\"max-width:796px; margin:0 auto; background:#ffffff; border:1px solid #e9e5f5; border-radius:10px; overflow:hidden; box-shadow:0 16px 38px rgba(111,77,215,0.10);\">\n\n      <div style=\"padding:20px 24px; text-align:center; border-bottom:1px solid #e9e5f5; background:#faf8ff;\">\n        <img\n          src=\"https://cdn.jsdelivr.net/gh/mbarkiasma/dream_pfe@main/public/mindbloom-logo.svg\"\n          width=\"210\"\n          height=\"56\"\n          alt=\"MindBloom\"\n          style=\"display:block; margin:0 auto; border:0;\"\n        />\n      </div>\n\n      <div style=\"padding:28px 28px 20px; text-align:center;\">\n\n        <h1 style=\"margin:0 0 12px; color:#1f0a4e; font-size:31px; line-height:1.2; font-weight:400;\">\n          Connexion sécurisée\n        </h1>\n\n        <p style=\"max-width:470px; margin:0 auto; color:#777096; font-size:16px; line-height:1.6;\">\n          Vous avez demandé à vous connecter à votre espace MindBloom. Cliquez sur le bouton ci-dessous pour y accéder.\n        </p>\n\n        <div style=\"margin:24px 0 28px;\">\n          <a href=\"{{$json.magicLink}}\" style=\"display:inline-block; min-width:280px; background:linear-gradient(90deg,#895ef8,#a987ff); color:#ffffff; text-decoration:none; padding:18px 26px; border-radius:8px; font-size:20px; font-weight:400;\">\n            Accéder à mon espace\n          </a>\n        </div>\n\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:500px; margin:0 auto 26px;\">\n          <tr>\n            <td style=\"border-top:1px solid #e9e5f5; width:45%;\"></td>\n            <td style=\"width:10%; text-align:center;\">\n              <img src=\"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f512.png\" width=\"24\" height=\"24\" alt=\"\" style=\"vertical-align:middle; border:0;\" />\n            </td>\n            <td style=\"border-top:1px solid #e9e5f5; width:45%;\"></td>\n          </tr>\n        </table>\n\n        <p style=\"margin:0 0 26px; color:#777096; font-size:16px; line-height:1.6;\">\n          Si le bouton ne fonctionne pas,\n          <a href=\"{{$json.magicLink}}\" style=\"color:#895ef8; font-weight:700; text-decoration:none;\">cliquez ici</a>.\n        </p>\n\n        <div style=\"max-width:556px; margin:0 auto; padding:22px 24px; background:#f8f5ff; border:1px solid #e9e5f5; border-radius:7px; text-align:left;\">\n          <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n            <tr>\n              <td style=\"width:48px; vertical-align:top;\">\n                <img src=\"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/23f1.png\" width=\"34\" height=\"34\" alt=\"\" style=\"display:block; border:0;\" />\n              </td>\n              <td style=\"vertical-align:top; padding-bottom:22px;\">\n                <p style=\"margin:0 0 6px; color:#1f0a4e; font-size:15px; font-weight:800;\">Ce lien expire dans 10 minutes</p>\n                <p style=\"margin:0; color:#777096; font-size:13px; line-height:1.5;\">Pour des raisons de sécurité, le lien ne peut être utilisé qu'une seule fois.</p>\n              </td>\n            </tr>\n            <tr>\n              <td style=\"width:48px; vertical-align:top;\">\n                <img src=\"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f6e1.png\" width=\"34\" height=\"34\" alt=\"\" style=\"display:block; border:0;\" />\n              </td>\n              <td style=\"vertical-align:top;\">\n                <p style=\"margin:0 0 4px; color:#1f0a4e; font-size:15px; font-weight:800;\">Vous n'êtes pas à l'origine de cette demande ?</p>\n                <p style=\"margin:0; color:#777096; font-size:13px; line-height:1.5;\">Ignorez simplement cet email. Votre compte reste sécurisé.</p>\n              </td>\n            </tr>\n          </table>\n        </div>\n\n        <p style=\"margin:26px 0 16px; color:#6b7280; font-size:14px; line-height:1.5;\">\n          <img src=\"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2754.png\" width=\"18\" height=\"18\" alt=\"\" style=\"vertical-align:-4px; margin-right:4px; border:0;\" />\n          Besoin d'aide ?\n          <a href=\"mailto:contact@mindbloom.tn\" style=\"color:#895ef8; font-weight:700; text-decoration:none;\">Contactez notre support</a>\n        </p>\n\n        <div style=\"max-width:604px; margin:0 auto; border-top:1px solid #e9e5f5;\"></div>\n\n        <p style=\"margin:18px 0 0; color:#777096; font-size:13px; line-height:1.5;\">\n          © 2026 MindBloom. Tous droits réservés.\n        </p>\n      </div>\n    </div>\n  </div>\n</div>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        1168
+      ],
+      "id": "b256ae7c-81c0-4e13-b665-8dbd888c271f",
+      "name": "Send a message",
+      "webhookId": "c2b59ab7-bc79-48c5-88da-388ff56ef7dd",
+      "credentials": {
+        "smtp": {
+          "id": "OdTA6ppvxCekPjmP",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Lien magique envoyé\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        1168
+      ],
+      "id": "aeae2463-75ab-4f28-a4f8-79dd29a2ed14",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "55c404ef-0b5a-4f46-98fb-e777c622cdbe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6c84b76b4ca1df4290005d1cd04902c6887858a1991e26ed9d552857ea0b9414"
+  },
+  "id": "L7b2CKEaXCWntuxu",
+  "tags": []
+}

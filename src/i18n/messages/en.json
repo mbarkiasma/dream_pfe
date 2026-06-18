@@ -517,7 +517,10 @@
         },
         "analysisFailedError": "The analysis could not be generated for this dream. You can start another one whenever you want.",
         "analysisNotAvailable": "The analysis is not yet available for this dream.",
-        "analysisEmpty": "No analysis available at the moment."
+        "analysisEmpty": "No analysis available at the moment.",
+        "deleteTitle": "Delete this dream?",
+        "deleteWarning": "This action will also delete the associated video if it exists. It cannot be undone.",
+        "cancel": "Cancel"
       }
     },
     "psy": {

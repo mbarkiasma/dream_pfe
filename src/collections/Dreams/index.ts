@@ -94,15 +94,7 @@ export const Dreams: CollectionConfig = {
     //create: ({ req: { user } }) => user?.role === 'etudiant',
     create: ({ req: { user } }) => Boolean(user),
     update: () => false,
-    delete: ({ req: { user } }) => {
-      if (!user) return false
-
-      return {
-        user: {
-          equals: user.id,
-        },
-      }
-    },
+    delete: () => false,
   },
   fields: [
     {

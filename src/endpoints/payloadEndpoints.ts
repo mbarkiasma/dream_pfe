@@ -118,7 +118,7 @@ export const payloadEndpoints: Endpoint[] = [
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            assistantName: 'MindBloom',
+            assistantName: 'assistant MindBloom',
             chatInput: userText,
             sessionId: sessionId || `session-${req.user.id}`,
             interviewLanguage: interviewLanguage === 'en' ? 'en' : 'fr',
@@ -307,6 +307,29 @@ export const payloadEndpoints: Endpoint[] = [
         const recs = Array.isArray(analysis?.recommendations) ? analysis.recommendations : []
         const resumeExecutif = analysis?.executive_summary || {}
         const donneesProfilEmotionnel = analysis?.emotional_profile || {}
+        const hasDetailedReportContent = [
+          resumeExecutif.overview,
+          resumeExecutif.dominant_strengths,
+          resumeExecutif.watch_points,
+          resumeExecutif.relational_style,
+          analysis?.conclusion,
+          donneesProfilEmotionnel.emotional_summary,
+          ...traits.map((trait: any) => trait?.analysis || trait?.interpretation),
+          ...recs.map((recommendation: any) =>
+            typeof recommendation === 'string' ? recommendation : recommendation?.text,
+          ),
+        ].some((value) => typeof value === 'string' && value.trim().length > 20)
+
+        if (!hasDetailedReportContent) {
+          return Response.json(
+            {
+              error:
+                "Rapport Big Five incomplet: l'analyse contient les scores, mais pas les textes du rapport.",
+            },
+            { status: 400 },
+          )
+        }
+
         const now = new Date()
         const reference = `BIG5-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Date.now().toString(36).toUpperCase()}`
         const normalizedTraits: NormalizedBigFiveTrait[] = traits.map((trait: any) => ({
@@ -813,23 +836,44 @@ export const payloadEndpoints: Endpoint[] = [
       const callbackSecret = process.env.N8N_CALLBACK_SECRET?.trim()
       const callbackUrl = getDreamsVideoCallbackUrl()
 
-      const n8nResponse = await fetch(n8nDreamWebhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dreamId: dream.id,
-          dream: trimmedDescription,
-          description: trimmedDescription,
-          text: trimmedDescription,
-          input: trimmedDescription,
-          userId: req.user.id,
-          locale: primaryDreamLocale,
-          callbackUrl,
-          callbackSecret,
-        }),
-      })
+      let n8nResponse: Response
+      try {
+        n8nResponse = await fetch(n8nDreamWebhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dreamId: dream.id,
+            dream: trimmedDescription,
+            description: trimmedDescription,
+            text: trimmedDescription,
+            input: trimmedDescription,
+            userId: req.user.id,
+            locale: primaryDreamLocale,
+            callbackUrl,
+            callbackSecret,
+          }),
+        })
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Impossible de contacter le workflow n8n."
+        console.error('Erreur appel n8n dreams-submit:', message)
+
+        await req.payload.update({
+          collection: 'dreams',
+          id: dream.id,
+          req,
+          data: {
+            videoStatus: 'failed',
+            errorMessage: `Erreur de connexion n8n: ${message}`,
+          },
+        })
+
+        return Response.json(
+          { error: "Le serveur d'analyse (n8n) est injoignable. Veuillez vérifier s'il est actif." },
+          { status: 502 },
+        )
+      }
 
       if (!n8nResponse.ok) {
         await req.payload.update({
@@ -1444,7 +1488,7 @@ export const payloadEndpoints: Endpoint[] = [
     },
   },
 
-  // Supprime un reve de l'etudiant ainsi que la video associee si elle existe.
+  // La suppression des reves est desactivee cote etudiant.
   {
     path: '/dreams-delete/:id',
     method: 'delete',
@@ -1453,52 +1497,10 @@ export const payloadEndpoints: Endpoint[] = [
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
-      const dreamId = typeof req.routeParams?.id === 'string' ? req.routeParams.id : undefined
-
-      if (!dreamId) {
-        return Response.json({ error: 'dreamId requis.' }, { status: 400 })
-      }
-
-      let dream: Awaited<ReturnType<typeof req.payload.findByID<'dreams'>>> | null = null
-      try {
-        dream = await req.payload.findByID({
-          collection: 'dreams',
-          id: dreamId,
-          overrideAccess: true,
-          depth: 0,
-        })
-      } catch {
-        return Response.json({ error: 'Rêve introuvable.' }, { status: 404 })
-      }
-
-      if (!dream) {
-        return Response.json({ error: 'Rêve introuvable.' }, { status: 404 })
-      }
-
-      const ownerId = typeof dream.user === 'object' ? dream.user.id : dream.user
-      if (String(ownerId) !== String(req.user.id)) {
-        return Response.json({ error: 'Forbidden' }, { status: 403 })
-      }
-
-      const currentVideoAssetId =
-        dream.videoAsset && typeof dream.videoAsset === 'object'
-          ? dream.videoAsset.id
-          : dream.videoAsset || null
-
-      if (currentVideoAssetId) {
-        try {
-          await req.payload.delete({ collection: 'media', id: currentVideoAssetId, req })
-        } catch { /* non-blocking */ }
-      }
-
-      await req.payload.delete({
-        collection: 'dreams',
-        id: dreamId,
-        overrideAccess: true,
-        req,
-      })
-
-      return Response.json({ success: true })
+      return Response.json(
+        { error: 'Suppression des reves desactivee.' },
+        { status: 403 },
+      )
     },
   },
 ]
@@ -1801,8 +1803,8 @@ function creerQuestionInteractiveSecours({}: {
 function normaliserTexteAssistant(texte: string, langue: 'fr' | 'en' = 'fr'): string {
   const remplacement =
     langue === 'en'
-      ? 'I am your assistant from the MindBloom platform.'
-      : 'Je suis votre assistant de la plateforme MindBloom.'
+      ? 'I am the MindBloom assistant.'
+      : "Je suis l'assistant de MindBloom."
 
   if (langue === 'en' && /L'entretien est termin|Merci pour vos r(?:e|é)ponses/i.test(texte)) {
     return 'The interview is complete. Thank you for your answers.'
@@ -1812,10 +1814,13 @@ function normaliserTexteAssistant(texte: string, langue: 'fr' | 'en' = 'fr'): st
     langue === 'en' &&
     /Je suis votre assistant de la plateforme MindBloom|Pouvons-nous commencer/i.test(texte)
   ) {
-    return 'I am your assistant from the MindBloom platform. I am happy to share this moment with you. Can we start with a short introduction? What do you like to do to relax and feel well?'
+    return 'I am the MindBloom assistant. I am happy to share this moment with you. Can we start with a short introduction? What do you like to do to relax and feel well?'
   }
 
   return texte
+    .replace(/Bonjour[,.]?\s*je suis MindBloom[,.]?/gi, remplacement)
+    .replace(/\bje suis MindBloom[,.]?/gi, remplacement)
+    .replace(/\b(?:I am|I'm) MindBloom[,.]?/gi, remplacement)
     .replace(
       /Je m'appelle MindBloom[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
       remplacement,

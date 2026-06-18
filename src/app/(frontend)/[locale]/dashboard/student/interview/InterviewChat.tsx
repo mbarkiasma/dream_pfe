@@ -47,8 +47,8 @@ type ReponseChat = {
 function normalizeAssistantText(text: string, language: InterviewLanguage = 'fr') {
   const replacement =
     language === 'en'
-      ? 'I am your assistant from the MindBloom platform.'
-      : 'Je suis votre assistant de la plateforme MindBloom.'
+      ? 'I am the MindBloom assistant.'
+      : "Je suis l'assistant de MindBloom."
 
   if (language === 'en' && /L'entretien est termin|Merci pour vos reponses/i.test(text)) {
     return 'The interview is complete. Thank you for your answers.'
@@ -58,10 +58,13 @@ function normalizeAssistantText(text: string, language: InterviewLanguage = 'fr'
     language === 'en' &&
     /Je suis votre assistant de la plateforme MindBloom|Pouvons-nous commencer/i.test(text)
   ) {
-    return 'I am your assistant from the MindBloom platform. I am happy to share this moment with you. Can we start with a short introduction? What do you like to do to relax and feel well?'
+    return 'I am the MindBloom assistant. I am happy to share this moment with you. Can we start with a short introduction? What do you like to do to relax and feel well?'
   }
 
   return text
+    .replace(/Bonjour[,.]?\s*je suis MindBloom[,.]?/gi, replacement)
+    .replace(/\bje suis MindBloom[,.]?/gi, replacement)
+    .replace(/\b(?:I am|I'm) MindBloom[,.]?/gi, replacement)
     .replace(
       /Je m'appelle MindBloom[,.]?\s*(?:Je suis|je suis)\s+(?:un|votre)\s+assistant d'entretien psychologique(?:\s+pour etudiants|\s+pour étudiants)?[,.]?/gi,
       replacement,

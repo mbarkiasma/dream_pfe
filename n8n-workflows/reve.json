@@ -1,0 +1,1083 @@
+{
+  "name": "reve",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://us-central1-aiplatform.googleapis.com/v1/projects/project-d70a3d47-6b25-4979-a56/locations/us-central1/publishers/google/models/veo-3.1-fast-generate-001:predictLongRunning\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  instances: [\n    {\n      prompt: $json.prompt\n    }\n  ],\n  parameters: {\n    storageUri: \"gs://reve-n8n-veo-output-new/veo-output/\",\n    sampleCount: 1,\n    aspectRatio: \"16:9\",\n    durationSeconds: 8,\n    resolution: \"720p\"\n  }\n}) }}",
+        "options": {}
+      },
+      "id": "1e645bbb-0815-4585-b8d8-77c8dadaa4f9",
+      "name": "Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        51968,
+        32944
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "bW5y6ruwjJhbtnU6",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const operationName = $json.name ?? $json.body?.name ?? $json.data?.name;\n\nif (!operationName) {\n  throw new Error(`No operation name returned. Keys: ${Object.keys($json).join(', ')}`);\n}\n\nreturn {\n  json: {\n    operationName,\n    dreamId: $('Set Inputs').first().json.dreamId,\n    summary: $('Set Inputs').first().json.summary,\n  },\n};\n"
+      },
+      "id": "0f2740c6-2308-4b13-a48a-a21bad1138b9",
+      "name": "Normalize Operation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        52144,
+        32944
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 8
+      },
+      "id": "4141bdbd-8a52-45ea-9c62-0acf5d76fa08",
+      "name": "Wait 15s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        52336,
+        32944
+      ],
+      "webhookId": "16ee7e47-a927-4202-8129-acc8b3025164"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://us-central1-aiplatform.googleapis.com/v1/projects/project-d70a3d47-6b25-4979-a56/locations/us-central1/publishers/google/models/veo-3.1-fast-generate-001:fetchPredictOperation\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "operationName",
+              "value": "={{$json.operationName}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c6f2e905-58fc-4152-b0dc-c502ec1bbcd5",
+      "name": "Get Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        52528,
+        32784
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "bW5y6ruwjJhbtnU6",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = $json.body ?? $json;\nconst done = Boolean(raw.done ?? false);\n\n// If done=true but API returned an error (e.g. RESOURCE_EXHAUSTED code 8)\nconst apiError = raw.error ?? null;\nconst apiErrorMessage = apiError?.message ?? null;\n\nconst response = raw.response ?? {};\n\nconst videosList =\n  response.videos ??\n  response.generatedSamples ??\n  response.generateVideoResponse?.generatedSamples ??\n  [];\n\nconst gcsUri =\n  videosList[0]?.gcsUri ??\n  videosList[0]?.video?.uri ??\n  videosList[0]?.uri ??\n  null;\n\nconst operationName =\n  raw.operationName ??\n  raw.name ??\n  $('Normalize Operation').first().json.operationName;\n\nreturn {\n  json: {\n    done,\n    apiError: apiErrorMessage,\n    videos: videosList,\n    gcsUri,\n    operationName,\n    dreamId: $('Normalize Operation').first().json.dreamId,\n    summary: $('Normalize Operation').first().json.summary,\n  },\n};\n"
+      },
+      "id": "dec3c579-886b-4511-9c74-10f551016c8f",
+      "name": "Normalize Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        52704,
+        32784
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "8cc4ae87-2501-41ac-9cea-dbba5c58d084",
+              "leftValue": "={{$json.done}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "eb32eaf1-7b1e-4864-ad9a-31bb91ee732e",
+      "name": "Done?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        52880,
+        32896
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "dream",
+              "value": "={{ ($json.body?.description || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "4d067483-ac06-4c07-9e85-4de215ad6fbf",
+              "name": "dreamId",
+              "value": "={{ ($json.body?.dreamId || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "name": "locale",
+              "value": "={{ ($json.body?.locale || 'fr').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1900f4b3-9c8b-4e8b-8218-267030c7c08c",
+      "name": "Extraction Texte Rêve",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        50640,
+        32272
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.dream }}",
+        "options": {
+          "systemMessage": "Ton rôle est de lire le rêve fourni par l’utilisateur et de décider s’il doit être analysé comme un rêve simple ou comme un rêve complexe.\n\nRègles de décision :\n\n1. Si le rêve est positif, heureux, calme, neutre, simple, ou ne contient pas de signe clair de stress, peur, anxiété, pression, tristesse, panique, surcharge mentale ou malaise émotionnel :\n- route_analyse = \"simple\"\n\n2. Si le rêve contient des signes de stress, anxiété, peur, pression, panique, échec, poursuite, perte de contrôle, blocage, honte, fatigue mentale, sentiment d’être dépassé, examen, retard, danger, isolement ou malaise émotionnel :\n- route_analyse = \"complexe\"\n\n3. Tu ne dois pas exagérer l’analyse.\n4. Tu ne dois pas ajouter des détails qui ne sont pas présents dans le rêve.\n5. Tu dois seulement classifier le rêve selon son contenu réel.\n\nRéponds uniquement avec un JSON valide, sans texte avant ni après.\n\nFormat obligatoire :\n\n{\n  \"route_analyse\": \"simple ou complexe\",\n  \"stress_detected\": true ou false,\n  \"emotion_principale\": \"heureux, calme, neutre, stress, anxieux, peur, triste, confus\",\n  \"raison_classification\": \"phrase courte expliquant la décision\"\n}"
+        }
+      },
+      "id": "3c5b0b66-f1bf-4f00-b117-300e81a22ace",
+      "name": "Analyse Initiale Rêve",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        51088,
+        32048
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.is_complexe }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "99d11738-3cae-4229-9c0d-3bb3a52f30b0",
+      "name": "Stress Détecté?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        51536,
+        32048
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "=CRITICAL RULE: locale={{ $('Extraction Texte Rêve').item.json.locale }}. If locale is \"en\" write your ENTIRE response in English. If locale is \"fr\" write your ENTIRE response in French. This applies to ALL text including section headers.\n\nAnalyze this dream as a simple, calm, positive, or non-stressful dream.\n\nDream to analyze:\n{{ $('Extraction Texte Rêve').item.json.dream }}\n\nClassification details:\n- Analysis type: {{ $json.route_analyse }}\n- Stress detected: {{ $json.stress_detected }}\n- Main emotion: {{ $json.emotion_principale }}\n- Reason: {{ $json.raison_classification }}\n\nProduce only the final analysis according to the system message instructions.",
+        "options": {
+          "systemMessage": "=Tu es un expert en analyse des rêves pour les étudiants. Tes analyses sont claires, accessibles et bienveillantes.\n\nTon rôle : analyser un rêve positif, calme ou neutre en utilisant EXACTEMENT les 6 titres de section ci-dessous, dans cet ordre.\n\nStandards de qualité :\n- Chaque paragraphe : 2 à 3 phrases courtes et claires, adaptées à un étudiant.\n- Ancre chaque section dans le contenu réel du rêve fourni.\n- Vocabulaire simple, chaleureux, sans jargon psychologique complexe.\n- Ne jamais donner de diagnostic médical, ne jamais inventer des éléments absents du rêve.\n\nSTRUCTURE OBLIGATOIRE (titres fixes, dans cet ordre) :\n\n🌊 Introduction au rêve\n\n[2 à 3 phrases — présenter le rêve et son ambiance générale]\n\n🧭 Analyse symbolique\n\n[2 à 3 phrases — expliquer la signification des symboles présents dans le rêve]\n\n🔮 Aspects psychologiques\n\n[2 à 3 phrases — ce que le rêve révèle sur l'état émotionnel ou mental]\n\n💙 Conseils et réflexions\n\n[2 à 3 phrases — conseils pratiques et bienveillants pour l'étudiant]\n\n✨ Conclusion\n\n[2 à 3 phrases — synthèse positive et encourageante]\n\n🌿 Perspectives d'avenir\n\n[2 à 3 phrases — message d'espoir et de croissance personnelle]\n\nRéponds UNIQUEMENT avec l'analyse. Pas de JSON, pas de préambule.\n\nRÈGLES DE FORMATAGE (obligatoires) :\n- Chaque titre sur sa propre ligne\n- Ligne vide entre le titre et le paragraphe\n- Ligne vide entre les sections\n\n⚠️ RÈGLE ABSOLUE : Si locale=fr → réponds ENTIÈREMENT en français (titres inclus). Si locale=en → traduis les titres en anglais et réponds ENTIÈREMENT en anglais."
+        }
+      },
+      "id": "d58812f2-f8c1-4598-a437-e5f65f98275a",
+      "name": "Analyse Simple Rêve",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        51776,
+        32192
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-2",
+              "name": "original_dream",
+              "value": "={{ $('Extraction Texte Rêve').item.json.dream }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "dream_analysis",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "locale-field-001",
+              "name": "locale",
+              "value": "={{ $json.locale || $('Extraction Texte Rêve').item.json.locale || 'fr' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "47f03952-8b32-4b44-bdfc-f60fc3df8d5d",
+      "name": "Préparer pour Résumé",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        52112,
+        32032
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=CRITICAL RULE: locale={{ $('Extraction Texte Rêve').item.json.locale }}. If locale is \"en\" write your ENTIRE response in English. If locale is \"fr\" write your ENTIRE response in French. This applies to ALL text including section headers.\n\nOriginal dream:\n{{ $json.original_dream }}",
+        "options": {
+          "systemMessage": "=Tu es un résumeur de rêves. Ton rôle est de reformuler le rêve de manière naturelle et fluide, à la troisième personne, en restant fidèle au contenu original.\n\nRÈGLES ABSOLUES :\n- Utilise UNIQUEMENT les éléments présents dans le rêve original. N'invente rien.\n- N'ajoute JAMAIS de commentaires méta comme \"il n'y a pas d'autres détails\", \"le rêve est court\", \"aucune information supplémentaire\" — ces phrases sont INTERDITES.\n- N'interprète pas, ne psychologise pas.\n- Reformule à la troisième personne (\"La personne...\", \"Il/Elle...\") de manière naturelle.\n- Si le rêve est très court, le résumé est court aussi — 1 à 2 phrases suffisent.\n- Maximum 3 phrases. Un seul paragraphe, sans titre.\n\nEXEMPLES :\n- Rêve : \"je cours en arrière\" → Résumé : \"Dans ce rêve, la personne se retrouve à courir en arrière.\"\n- Rêve : \"je nage dans la plage avec mon chien\" → Résumé : \"La personne nage à la plage en compagnie de son chien.\"\n- Résumé INTERDIT : \"Il n'y a pas d'autres détails fournis. Le mouvement est effectué en sens inverse.\" ← méta-commentaire, interdit.\n\nSOURCE : uniquement le rêve original fourni.\nSORTIE : Commence immédiatement, sans introduction.\n\n⚠️ RÈGLE ABSOLUE : Si locale=fr → réponds en français. Si locale=en → réponds en anglais."
+        }
+      },
+      "id": "d83f82ba-cf4d-4d4b-b19e-5d2702761edf",
+      "name": "Résumé du Rêve",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        52800,
+        31920
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.dream.length }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1bfed22b-b756-488f-ab62-5ee913101d0b",
+      "name": "Validation Entrée Rêve",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        50864,
+        32272
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "output",
+              "value": "Bonjour ! 👋 Pour analyser votre rêve, j'ai besoin que vous me le racontiez en détail. Décrivez ce qui s'est passé, les émotions ressenties, les personnes ou objets présents. Plus vous me donnerez de détails, plus mon analyse sera précise et utile pour vous.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b6ad5a27-a216-4f2f-9b55-972c3d4a8d05",
+      "name": "Message Entrée Invalide",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        50672,
+        32512
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e25e7dfc-ec64-4a61-aadc-724f0ccb9024",
+      "name": "Formater Réponse Chat",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        52832,
+        32224
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        51408,
+        32528
+      ],
+      "id": "bdcf8400-c31d-4e2d-8351-528defb5bd82",
+      "name": "Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "n673ZoDfu2L5x0XI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        52544,
+        32256
+      ],
+      "id": "3b64b1ab-0064-4833-8342-09424eeef1f0",
+      "name": "Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "n673ZoDfu2L5x0XI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dream-analysis",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        50448,
+        32272
+      ],
+      "id": "dbb73682-f380-43e0-ad15-ade288d1adcb",
+      "name": "Webhook",
+      "webhookId": "345e87e7-3eec-4745-ab84-e227641f88d5"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  success: true,\n  output: $json.summary_primary,\n  summary: $json.summary_primary,\n  analysis: $json.analysis_primary,\n  description_other: $json.description_other,\n  summary_other: $json.summary_other,\n  analysis_other: $json.analysis_other,\n  locale: $json.locale,\n  videoStatus: \"waiting_validation\"\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        53840,
+        32032
+      ],
+      "id": "c3ad5dbf-ea9e-49d2-b937-196fb3fe9bf6",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ output: $json.output }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        50880,
+        32512
+      ],
+      "id": "ec09a803-b411-4289-b045-518415802719",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst dreamId =\n  data.dreamId ||\n  $('Set Inputs').item.json.dreamId ||\n  $('Prepare Video Input').item.json.dreamId ||\n  null;\n\nconst summary =\n  data.summary ||\n  $('Set Inputs').item.json.summary ||\n  $('Prepare Video Input').item.json.summary ||\n  null;\n\nconst operationName =\n  data.operationName ||\n  data.name ||\n  $('Set Inputs').item.json.operationName ||\n  null;\n\nif (!dreamId) {\n  throw new Error('dreamId manquant : impossible de sauvegarder la vidéo.');\n}\n\n// Veo API returned an error (ex: RESOURCE_EXHAUSTED code 8)\nif (data.apiError) {\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://host.docker.internal:3000/api/dreams-video-callback',\n    headers: {\n      Authorization: 'Bearer 8f4d9c2a7b1e5m3q9x6k2p7z1h4r8t0',\n      'Content-Type': 'application/json',\n    },\n    body: { dreamId, status: 'failed', errorMessage: data.apiError },\n    json: true,\n  });\n  return [{ json: { saved: false, dreamId, status: 'failed', error: data.apiError } }];\n}\n\nconst gcsUri =\n  data.gcsUri ||\n  data.videos?.[0]?.gcsUri ||\n  data.videos?.[0]?.video?.uri ||\n  data.videos?.[0]?.uri ||\n  null;\n\nif (!gcsUri) {\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://host.docker.internal:3000/api/dreams-video-callback',\n    headers: {\n      Authorization: 'Bearer 8f4d9c2a7b1e5m3q9x6k2p7z1h4r8t0',\n      'Content-Type': 'application/json',\n    },\n    body: { dreamId, status: 'failed', errorMessage: 'No gcsUri found' },\n    json: true,\n  });\n  return [{ json: { saved: false, dreamId, status: 'failed', error: 'No gcsUri found' } }];\n}\n\nconst videoUrl = gcsUri.replace('gs://', 'https://storage.googleapis.com/');\n\nconst response = await this.helpers.httpRequest({\n  method: 'POST',\n  url: 'http://host.docker.internal:3000/api/dreams-video-callback',\n  headers: {\n    Authorization: 'Bearer 8f4d9c2a7b1e5m3q9x6k2p7z1h4r8t0',\n    'Content-Type': 'application/json',\n  },\n  body: { dreamId, summary, videoUrl, gcsUri, operationName, status: 'ready' },\n  json: true,\n});\n\nreturn [{ json: { saved: true, dreamId, videoUrl, gcsUri, operationName, status: 'ready', callbackResponse: response } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        53248,
+        32880
+      ],
+      "id": "e60dbab3-2fe8-46e7-a03e-1e48741368fa",
+      "name": "sauver video "
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dream-video-start",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        51440,
+        32784
+      ],
+      "id": "f0972cb9-9e08-419c-905e-4c89195c7e62",
+      "name": "Webhook1",
+      "webhookId": "075a089e-2a56-4eef-82da-2e8d406b8677"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f6b0fc4-4a35-489e-8aa6-28b11d331ad4",
+              "name": "dreamId",
+              "value": "={{ $json.body.dreamId }}",
+              "type": "string"
+            },
+            {
+              "id": "f6bc2f8e-3ab3-40e5-88db-814a0a8045b5",
+              "name": "summary",
+              "value": "={{ $json.body.summary }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        51616,
+        32784
+      ],
+      "id": "53242e0f-9bb7-464f-a468-6efad711f665",
+      "name": "Prepare Video Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2a6df495-f223-4fae-bf7a-4524f1ffbc58",
+              "name": "prompt",
+              "value": "={{ `Create a cinematic, dreamlike video based on this dream summary:\\n\\n${$('Prepare Video Input').item.json.summary}\\n\\nVisual direction:\\n- one continuous coherent scene\\n- surreal and immersive atmosphere\\n- cinematic lighting\\n- realistic and fluid motion\\n- emotionally evocative tone\\n- detailed environment inspired by the dream\\n\\nAvoid:\\n- text\\n- subtitles\\n- logos\\n- split screens\\n- disconnected scenes` }}\n",
+              "type": "string"
+            },
+            {
+              "id": "b533153f-f6fe-4bd8-a227-bb4e4ae1cfee",
+              "name": "dreamId",
+              "value": "={{ $('Prepare Video Input').item.json.dreamId }}",
+              "type": "string"
+            },
+            {
+              "id": "5cbf1be2-3c66-435b-9bae-c3fc9157a9ce",
+              "name": "summary",
+              "value": "={{ $('Prepare Video Input').item.json.summary }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a0cbc36-5be0-44e0-be77-e108c7d28c6d",
+      "name": "Set Inputs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        51792,
+        32784
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const originalDream = String($json.original_dream || \"\");\nconst dreamAnalysis = String($json.dream_analysis || \"\");\n\nconst sentences = originalDream\n  .split(/[.!?\\n]+/)\n  .map(s => s.trim())\n  .filter(s => s.length > 0);\n\nconst sentenceCount = sentences.length;\nconst routeResume = \"resume\";\n\nreturn [\n  {\n    json: {\n      ...$json,\n      locale: $json.locale || $('Extraction Texte Rêve').first().json.locale || 'fr',\n      original_dream: originalDream,\n      dream_analysis: dreamAnalysis,\n      sentence_count: sentenceCount,\n      route_resume: routeResume,\n      output: \"\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        52288,
+        32032
+      ],
+      "id": "081bd78f-3238-4a76-9e1c-271d5c57a517",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ec4a1e7b-be6a-4b70-8fed-3bdfcbe4b4b1",
+              "leftValue": "={{ $json.route_resume }}",
+              "rightValue": "resume",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        52464,
+        32032
+      ],
+      "id": "0f7e9d77-2756-4d07-9db3-04759d643fc2",
+      "name": "short/long"
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "=CRITICAL RULE: locale={{ $('Extraction Texte Rêve').item.json.locale }}. If locale is \"en\" write your ENTIRE response in English. If locale is \"fr\" write your ENTIRE response in French. This applies to ALL text including section headers.\n\nAnalyze this dream as a complex, stressful, or anxious dream.\n\nDream to analyze:\n{{ $('Extraction Texte Rêve').item.json.dream }}\n\nClassification details:\n- Analysis type: {{ $json.route_analyse }}\n- Stress detected: {{ $json.stress_detected }}\n- Main emotion: {{ $json.emotion_principale }}\n- Reason: {{ $json.raison_classification }}\n\nProduce only the final analysis according to the system message instructions.",
+        "options": {
+          "systemMessage": "=Tu es un expert en analyse psychologique des rêves pour les étudiants, spécialisé dans les rêves de stress et d'anxiété. Tes analyses sont empathiques, bienveillantes et toujours constructives.\n\nTon rôle : analyser un rêve stressant ou anxieux en utilisant EXACTEMENT les 6 titres de section ci-dessous, dans cet ordre.\n\nStandards de qualité :\n- Chaque paragraphe : 2 à 3 phrases courtes et claires, adaptées à un étudiant.\n- Valider l'émotion, expliquer le symbole, proposer une piste constructive.\n- Vocabulaire simple et accessible, sans jargon psychologique complexe.\n- Ne jamais donner de diagnostic médical, ne jamais dramatiser, ne jamais inventer des éléments absents du rêve.\n\nSTRUCTURE OBLIGATOIRE (titres fixes, dans cet ordre) :\n\n🌊 Introduction au rêve\n\n[2 à 3 phrases — présenter le rêve et valider l'émotion ressentie]\n\n🧭 Analyse symbolique\n\n[2 à 3 phrases — expliquer la signification des symboles de stress présents dans le rêve]\n\n🔮 Aspects psychologiques\n\n[2 à 3 phrases — ce que le rêve révèle sur les tensions ou préoccupations actuelles]\n\n💙 Conseils et réflexions\n\n[2 à 3 phrases — conseils pratiques et bienveillants pour gérer ce stress]\n\n✨ Conclusion\n\n[2 à 3 phrases — synthèse rassurante et encourageante]\n\n🌿 Perspectives d'avenir\n\n[2 à 3 phrases — message d'espoir et de résilience pour l'étudiant]\n\nRéponds UNIQUEMENT avec l'analyse. Pas de JSON, pas de préambule.\n\nRÈGLES DE FORMATAGE (obligatoires) :\n- Chaque titre sur sa propre ligne\n- Ligne vide entre le titre et le paragraphe\n- Ligne vide entre les sections\n\n⚠️ RÈGLE ABSOLUE : Si locale=fr → réponds ENTIÈREMENT en français (titres inclus). Si locale=en → traduis les titres en anglais et réponds ENTIÈREMENT en anglais."
+        }
+      },
+      "id": "fcb1601a-26b1-4aea-8078-c06692c6a245",
+      "name": "analyse reve complexe",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        51776,
+        31920
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawOutput = $json.output || \"{}\";\n\nconst cleanedOutput = rawOutput\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(cleanedOutput);\n} catch (error) {\n  parsed = {\n    route_analyse: \"simple\",\n    stress_detected: false,\n    emotion_principale: \"neutre\",\n    raison_classification: \"Erreur de lecture de la sortie de l'agent.\"\n  };\n}\n\nconst locale = $('Extraction Texte Rêve').item.json.locale || 'fr';\n\nconst routeAnalyse = String(parsed.route_analyse || \"simple\")\n  .trim()\n  .toLowerCase();\n\nconst isComplexe = routeAnalyse === \"complexe\";\n\nreturn [\n  {\n    json: {\n      ...$json,\n      locale,\n      route_analyse: routeAnalyse,\n      is_complexe: isComplexe,\n      stress_detected: parsed.stress_detected === true,\n      emotion_principale: parsed.emotion_principale || \"neutre\",\n      raison_classification: parsed.raison_classification || \"\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        51360,
+        31904
+      ],
+      "id": "6938c1e3-c611-44ea-b28f-dab99befc8f9",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const locale = $('Extraction Texte Rêve').item.json.locale || 'fr';\nconst otherLocale = locale === 'en' ? 'fr' : 'en';\nconst summary = $json.output || '';\nconst analysis = $('Code in JavaScript').item.json.dream_analysis || '';\nconst description = $('Extraction Texte Rêve').item.json.dream || '';\nconst targetLang = otherLocale === 'en' ? 'English' : 'French';\nconst sourceLang = locale === 'en' ? 'English' : 'French';\n\nreturn [{ json: { locale, otherLocale, summary, analysis, description, sourceLang, targetLang } }];"
+      },
+      "id": "a2e86eee-addb-46a9-babd-c803fc424776",
+      "name": "Set Translation Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        53088,
+        32256
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Translate these 3 texts from {{ $json.sourceLang }} to {{ $json.targetLang }}.\n\nTEXT 1 (description):\n{{ $json.description }}\n\nTEXT 2 (summary):\n{{ $json.summary }}\n\nTEXT 3 (analysis):\n{{ $json.analysis }}\n\nReturn ONLY this JSON (no markdown, no explanation):\n{\"d\":\"<translation of TEXT 1>\",\"s\":\"<translation of TEXT 2>\",\"a\":\"<translation of TEXT 3>\"}",
+        "options": {
+          "systemMessage": "You are a professional translator. You receive texts and return ONLY a JSON object. Never add explanations or extra text outside the JSON. CRITICAL RULES: 1) Preserve ALL emojis exactly as-is (🌊 🧭 🔮 💙 🌿 ✨ 🌙 ⭐ 🎯 🔑 and any others). 2) Preserve ALL line breaks (\\n) exactly as-is. 3) Preserve the exact formatting structure of each text. Only translate the words, never remove emojis or newlines."
+        }
+      },
+      "id": "ebfbf7fb-d4af-409d-bc9b-4132e32a06a0",
+      "name": "Translate Content",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        53296,
+        32016
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        53392,
+        32320
+      ],
+      "id": "07e5194c-d416-45d9-81ef-15650325e58f",
+      "name": "Gemini Chat Model (Translate)",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "n673ZoDfu2L5x0XI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output || '{}';\n// Try to extract JSON even if wrapped in markdown\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\nconst cleaned = match ? match[0] : '{}';\nlet parsed = {};\ntry { parsed = JSON.parse(cleaned); } catch {}\n\nconst inp = $('Set Translation Input').item.json;\n\nreturn [{ json: {\n  locale: inp.locale,\n  otherLocale: inp.otherLocale,\n  description_primary: inp.description,\n  summary_primary: inp.summary,\n  analysis_primary: inp.analysis,\n  description_other: (parsed.d || '').trim() || inp.description,\n  summary_other: (parsed.s || '').trim() || inp.summary,\n  analysis_other: (parsed.a || '').trim() || inp.analysis\n} }];"
+      },
+      "id": "4e916a8f-baef-41ab-86e6-531d86800a8e",
+      "name": "Parse Translation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        53616,
+        32288
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Generate Video": {
+      "main": [
+        [
+          {
+            "node": "Normalize Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Operation": {
+      "main": [
+        [
+          {
+            "node": "Wait 15s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15s": {
+      "main": [
+        [
+          {
+            "node": "Get Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Status": {
+      "main": [
+        [
+          {
+            "node": "Normalize Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Status": {
+      "main": [
+        [
+          {
+            "node": "Done?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done?": {
+      "main": [
+        [
+          {
+            "node": "sauver video ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 15s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraction Texte Rêve": {
+      "main": [
+        [
+          {
+            "node": "Validation Entrée Rêve",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyse Initiale Rêve": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stress Détecté?": {
+      "main": [
+        [
+          {
+            "node": "analyse reve complexe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyse Simple Rêve",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyse Simple Rêve": {
+      "main": [
+        [
+          {
+            "node": "Préparer pour Résumé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Préparer pour Résumé": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Résumé du Rêve": {
+      "main": [
+        [
+          {
+            "node": "Formater Réponse Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation Entrée Rêve": {
+      "main": [
+        [
+          {
+            "node": "Analyse Initiale Rêve",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message Entrée Invalide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Entrée Invalide": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formater Réponse Chat": {
+      "main": [
+        [
+          {
+            "node": "Set Translation Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyse Initiale Rêve",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "analyse reve complexe",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Analyse Simple Rêve",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Résumé du Rêve",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extraction Texte Rêve",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Video Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Video Input": {
+      "main": [
+        [
+          {
+            "node": "Set Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Inputs": {
+      "main": [
+        [
+          {
+            "node": "Generate Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "short/long",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "short/long": {
+      "main": [
+        [
+          {
+            "node": "Résumé du Rêve",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Formater Réponse Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyse reve complexe": {
+      "main": [
+        [
+          {
+            "node": "Préparer pour Résumé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Stress Détecté?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Translation Input": {
+      "main": [
+        [
+          {
+            "node": "Translate Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Content": {
+      "main": [
+        [
+          {
+            "node": "Parse Translation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Translation": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model (Translate)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Translate Content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9f80249e-4310-46ed-968e-f93f5b784dd9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6c84b76b4ca1df4290005d1cd04902c6887858a1991e26ed9d552857ea0b9414"
+  },
+  "id": "LLe2YJpKoCqjpcW6",
+  "tags": []
+}

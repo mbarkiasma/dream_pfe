@@ -9,24 +9,20 @@ type RouteContext = {
 }
 
 export async function DELETE(_: Request, context: RouteContext) {
-  const { id } = await context.params
+  await context.params
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await getHeaders() })
 
   if (!user) {
-    return Response.json({ error: 'Non autorisé' }, { status: 401 })
+    return Response.json({ error: 'Non autorise' }, { status: 401 })
   }
 
   if (!hasRole(user, ['admin'])) {
-    return Response.json({ error: 'Accès réservé aux administrateurs' }, { status: 403 })
+    return Response.json({ error: 'Acces reserve aux administrateurs' }, { status: 403 })
   }
 
-  await payload.delete({
-    collection: 'users',
-    id,
-    overrideAccess: false,
-    user,
-  })
-
-  return Response.json({ success: true })
+  return Response.json(
+    { error: "Suppression des comptes desactivee pour les administrateurs." },
+    { status: 403 },
+  )
 }

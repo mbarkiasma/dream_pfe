@@ -517,7 +517,10 @@
         },
         "analysisFailedError": "L'analyse n'a pas pu être générée pour ce rêve. Vous pouvez en relancer un autre quand vous voulez.",
         "analysisNotAvailable": "L'analyse n'est pas encore disponible pour ce rêve.",
-        "analysisEmpty": "Aucune analyse disponible pour le moment."
+        "analysisEmpty": "Aucune analyse disponible pour le moment.",
+        "deleteTitle": "Supprimer ce r\u00eave ?",
+        "deleteWarning": "Cette action supprimera aussi la vid\u00e9o associ\u00e9e si elle existe. Elle ne pourra pas \u00eatre annul\u00e9e.",
+        "cancel": "Annuler"
       }
     },
     "psy": {

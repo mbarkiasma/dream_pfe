@@ -13,6 +13,63 @@ type PageProps = {
   }>
 }
 
+function isFilledText(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+function preferText(primary: unknown, fallback: unknown) {
+  return isFilledText(primary) ? primary : isFilledText(fallback) ? fallback : primary
+}
+
+function mergeLocalizedAnalysis(primary: any, fallback: any) {
+  if (!fallback) return primary
+
+  return {
+    ...primary,
+    overview: preferText(primary.overview, fallback.overview),
+    conclusion: preferText(primary.conclusion, fallback.conclusion),
+    forcesDominantes: preferText(primary.forcesDominantes, fallback.forcesDominantes),
+    pointsVigilance: preferText(primary.pointsVigilance, fallback.pointsVigilance),
+    styleRelationnel: preferText(primary.styleRelationnel, fallback.styleRelationnel),
+    profilEmotionnel: {
+      ...primary.profilEmotionnel,
+      dominantEmotion: preferText(
+        primary.profilEmotionnel?.dominantEmotion,
+        fallback.profilEmotionnel?.dominantEmotion,
+      ),
+      emotionalSummary: preferText(
+        primary.profilEmotionnel?.emotionalSummary,
+        fallback.profilEmotionnel?.emotionalSummary,
+      ),
+    },
+    recommandations: (primary.recommandations ?? fallback.recommandations ?? []).map(
+      (recommendation: any, index: number) => ({
+        ...recommendation,
+        text: preferText(recommendation?.text, fallback.recommandations?.[index]?.text),
+      }),
+    ),
+    traits: (primary.traits ?? fallback.traits ?? []).map((trait: any, index: number) => {
+      const fallbackTrait = fallback.traits?.[index]
+
+      return {
+        ...trait,
+        analysis: preferText(trait?.analysis, fallbackTrait?.analysis),
+        interpretation: preferText(trait?.interpretation, fallbackTrait?.interpretation),
+        confidenceReason: preferText(trait?.confidenceReason, fallbackTrait?.confidenceReason),
+        observedIndicators: (trait?.observedIndicators ?? fallbackTrait?.observedIndicators ?? []).map(
+          (indicator: any, indicatorIndex: number) => ({
+            ...indicator,
+            indicator: preferText(
+              indicator?.indicator,
+              fallbackTrait?.observedIndicators?.[indicatorIndex]?.indicator,
+            ),
+          }),
+        ),
+      }
+    }),
+  }
+}
+
 export default async function StudentAnalysisPdfPage({ params }: PageProps) {
   const { id } = await params
   const payload = await getPayload({ config })
@@ -26,18 +83,31 @@ export default async function StudentAnalysisPdfPage({ params }: PageProps) {
 
   // fallbackLocale: if the target locale is empty (translation failed at save time),
   // Payload returns the other locale's content automatically — no runtime API call needed.
-  const analyse = await payload.findByID({
+  const targetLocale = locale as 'fr' | 'en'
+  const fallbackLocale = targetLocale === 'en' ? 'fr' : 'en'
+  const analysePrimary = await payload.findByID({
     collection: 'analyse-personnalite',
     id,
     user,
     overrideAccess: false,
-    locale: locale as 'fr' | 'en',
-    fallbackLocale: locale === 'en' ? 'fr' : 'en',
+    locale: targetLocale,
+    fallbackLocale,
   })
 
-  if (!analyse) {
+  if (!analysePrimary) {
     notFound()
   }
+
+  const analyseFallback = await payload.findByID({
+    collection: 'analyse-personnalite',
+    id,
+    user,
+    overrideAccess: false,
+    locale: fallbackLocale,
+    fallbackLocale: targetLocale,
+  }).catch(() => null)
+
+  const analyse = mergeLocalizedAnalysis(analysePrimary, analyseFallback)
 
   const date = new Date(analyse.date).toLocaleDateString(locale, {
     day: '2-digit',
