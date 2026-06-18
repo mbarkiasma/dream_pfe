@@ -30,3 +30,11 @@ labsuser.pem.txt
 
 # Generated TypeScript build cache
 *.tsbuildinfo
+
+# Local/private keys and credentials
+labsuser.pem.txt
+*.pem
+*.pem.txt
+
+# Generated TypeScript build cache
+*.tsbuildinfo
