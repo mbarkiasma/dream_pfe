@@ -1506,7 +1506,7 @@ export const payloadEndpoints: Endpoint[] = [
 ]
 
 async function transcrireAudioAvecGoogle(audioBase64: string, cleApi: string): Promise<string> {
-  const contenuAudio = audioBase64.replace(/^data:audio\/[^;]+;base64,/, '')
+  const contenuAudio = extraireContenuAudioBase64(audioBase64)
 
   const response = await fetch(`https://speech.googleapis.com/v1/speech:recognize?key=${cleApi}`, {
     method: 'POST',
@@ -1542,6 +1542,10 @@ async function transcrireAudioAvecGoogle(audioBase64: string, cleApi: string): P
   }
 
   return transcription
+}
+
+function extraireContenuAudioBase64(audioBase64: string): string {
+  return audioBase64.replace(/^data:[^,]+;base64,/, '')
 }
 
 async function genererAudioAvecGoogle(

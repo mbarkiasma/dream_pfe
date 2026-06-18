@@ -57,54 +57,93 @@ export async function POST(request: Request) {
 }
 
 async function transcribeAudioWithGoogle(audioBase64: string, apiKey: string): Promise<string> {
-  const audioContent = audioBase64.replace(/^data:audio\/[^;]+;base64,/, '')
+  const mimeType = getAudioMimeType(audioBase64)
+  const audioContent = getAudioBase64Content(audioBase64)
   const models = ['latest_long', 'latest_short', 'default']
+  const encoding = getGoogleSpeechEncoding(mimeType)
+  const baseConfig = {
+    languageCode: 'fr-FR',
+    alternativeLanguageCodes: ['en-US', 'ar-SA'],
+    enableAutomaticPunctuation: true,
+  }
 
   for (const model of models) {
-    try {
-      const response = await fetchWithRetry(
-        `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+    const configs: Record<string, unknown>[] = [
+      {
+        ...baseConfig,
+        ...(encoding ? { encoding } : {}),
+        model,
+        useEnhanced: true,
+      },
+      {
+        ...baseConfig,
+        ...(encoding ? { encoding } : {}),
+        audioChannelCount: 1,
+        model,
+        sampleRateHertz: 48000,
+        useEnhanced: true,
+      },
+      {
+        ...baseConfig,
+        model,
+      },
+    ]
+
+    for (const recognitionConfig of configs) {
+      try {
+        const response = await fetchWithRetry(
+          `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              config: recognitionConfig,
+              audio: {
+                content: audioContent,
+              },
+            }),
           },
-          body: JSON.stringify({
-            config: {
-              encoding: 'WEBM_OPUS',
-              sampleRateHertz: 48000,
-              audioChannelCount: 1,
-              languageCode: 'fr-FR',
-              alternativeLanguageCodes: ['en-US', 'ar-SA'],
-              enableAutomaticPunctuation: true,
-              model,
-              useEnhanced: true,
-            },
-            audio: {
-              content: audioContent,
-            },
-          }),
-        },
-        { maxRetries: 0, timeoutMs: 15000 },
-      )
+          { maxRetries: 1, timeoutMs: 30000 },
+        )
 
-      if (!response.ok) {
-        continue
+        if (!response.ok) {
+          continue
+        }
+
+        const data = await response.json()
+        const text = data.results
+          ?.map((item: any) => item.alternatives?.[0]?.transcript || '')
+          .join(' ')
+          .trim()
+
+        if (text) return text
+      } catch {
+        // Try the next Google STT configuration.
       }
-
-      const data = await response.json()
-      const text = data.results
-        ?.map((item: any) => item.alternatives?.[0]?.transcript || '')
-        .join(' ')
-        .trim()
-
-      if (text) return text
-    } catch {
-      // Try the next Google STT model.
     }
   }
 
   return ''
+}
+
+function getAudioMimeType(audioBase64: string) {
+  return audioBase64.match(/^data:([^;,]+)(?:;[^,]+)*;base64,/)?.[1] ?? 'audio/webm'
+}
+
+function getAudioBase64Content(audioBase64: string) {
+  return audioBase64.replace(/^data:[^,]+;base64,/, '')
+}
+
+function getGoogleSpeechEncoding(mimeType: string): string | undefined {
+  if (mimeType.includes('webm')) return 'WEBM_OPUS'
+  if (mimeType.includes('ogg')) return 'OGG_OPUS'
+  if (mimeType.includes('mpeg') || mimeType.includes('mp3')) return 'MP3'
+  if (mimeType.includes('wav')) return 'LINEAR16'
+  if (mimeType.includes('flac')) return 'FLAC'
+
+  return undefined
 }
 
 async function synthesizeSpeechWithGoogle(text: string, apiKey: string): Promise<string | null> {

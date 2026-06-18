@@ -991,7 +991,10 @@ export interface CoachingMessage {
   content?: string | null;
   attachments?:
     | {
-        media: number | Media;
+        media?: (number | null) | Media;
+        fileUrl?: string | null;
+        filename?: string | null;
+        mimeType?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -2053,6 +2056,9 @@ export interface CoachingMessagesSelect<T extends boolean = true> {
     | T
     | {
         media?: T;
+        fileUrl?: T;
+        filename?: T;
+        mimeType?: T;
         id?: T;
       };
   audioUrl?: T;

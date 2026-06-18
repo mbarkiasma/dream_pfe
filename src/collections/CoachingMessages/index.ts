@@ -76,7 +76,18 @@ export const CoachingMessages: CollectionConfig = {
           name: 'media',
           type: 'relationship',
           relationTo: 'media',
-          required: true,
+        },
+        {
+          name: 'fileUrl',
+          type: 'text',
+        },
+        {
+          name: 'filename',
+          type: 'text',
+        },
+        {
+          name: 'mimeType',
+          type: 'text',
         },
       ],
     },

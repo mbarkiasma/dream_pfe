@@ -33,9 +33,18 @@ type CoachingSession = {
 }
 
 type MessageAttachment = {
+  fileUrl?: string | null
+  filename?: string | null
   id: string | number
-  media:
-    | { id: string | number; filename?: string | null; mimeType?: string | null; url?: string | null }
+  mimeType?: string | null
+  media?:
+    | {
+        id: string | number
+        filename?: string | null
+        mimeType?: string | null
+        sourceUrl?: string | null
+        url?: string | null
+      }
     | string
     | number
 }
@@ -236,7 +245,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
         body: JSON.stringify({
           sessionId: selectedSessionId,
           content: message,
-          attachments: attachmentsSnapshot.map((a) => a.id),
+          attachments: attachmentsSnapshot,
         }),
       })
       const data = await response.json()
@@ -350,8 +359,14 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
     }
 
     try {
+      if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+        setStatusMessage("Impossible d'accÃ©der au microphone.")
+        return
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      const mimeType = getSupportedAudioMimeType()
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
 
       audioChunksRef.current = []
       mediaRecorderRef.current = recorder
@@ -365,7 +380,9 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
           setIsLoading(true)
           setStatusMessage('Transcription en cours...')
 
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+          const audioBlob = new Blob(audioChunksRef.current, {
+            type: recorder.mimeType || mimeType || 'audio/webm',
+          })
           const audioBase64 = await convertBlobToBase64(audioBlob)
           const response = await fetch('/api/coaching/voice', {
             method: 'POST',
@@ -503,18 +520,27 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                       <div className="coaching-message-files">
                         {item.attachments.map((att) => {
                           const media = typeof att.media === 'object' && att.media !== null
-                            ? att.media as { id: string | number; filename?: string | null; mimeType?: string | null; url?: string | null }
+                            ? att.media as {
+                                id: string | number
+                                filename?: string | null
+                                mimeType?: string | null
+                                sourceUrl?: string | null
+                                url?: string | null
+                              }
                             : null
-                          if (!media?.url) return null
-                          const isImage = media.mimeType?.startsWith('image/')
+                          const mediaUrl = att.fileUrl || media?.url || media?.sourceUrl
+                          const filename = att.filename || media?.filename
+                          const mimeType = att.mimeType || media?.mimeType
+                          if (!mediaUrl) return null
+                          const isImage = mimeType?.startsWith('image/')
                           return isImage ? (
-                            <a key={att.id} href={media.url} target="_blank" rel="noopener noreferrer" className="coaching-message-img-link">
-                              <img src={media.url} alt={media.filename ?? 'image'} className="coaching-message-img" />
+                            <a key={att.id} href={mediaUrl} target="_blank" rel="noopener noreferrer" className="coaching-message-img-link">
+                              <img src={mediaUrl} alt={filename ?? 'image'} className="coaching-message-img" />
                             </a>
                           ) : (
-                            <a key={att.id} href={media.url} target="_blank" rel="noopener noreferrer" className="coaching-message-file-link">
+                            <a key={att.id} href={mediaUrl} target="_blank" rel="noopener noreferrer" className="coaching-message-file-link">
                               <FileText className="h-4 w-4 shrink-0" />
-                              <span className="truncate">{media.filename ?? 'Fichier'}</span>
+                              <span className="truncate">{filename ?? 'Fichier'}</span>
                             </a>
                           )
                         })}
@@ -695,11 +721,17 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                           </div>
                         ) : (() => {
                           const isExpanded = expandedNoteIds.has(savedNote.id)
-                          const isLong = savedNote.content.length > 150
-                          const displayed = isLong && !isExpanded ? `${savedNote.content.slice(0, 150)}…` : savedNote.content
+                          const previewLimit = 180
+                          const isLong = savedNote.content.length > previewLimit
+                          const displayed =
+                            isLong && !isExpanded
+                              ? `${savedNote.content.slice(0, previewLimit).trimEnd()}...`
+                              : savedNote.content
                           return (
                             <div>
-                              <p className="mindly-feature-text mt-1 whitespace-pre-wrap text-xs">{displayed}</p>
+                              <p className="coach-note-text mt-1 whitespace-pre-wrap text-xs">
+                                {displayed}
+                              </p>
                               {isLong ? (
                                 <button
                                   type="button"
@@ -708,7 +740,7 @@ export function CoachCoachingClient({ initialSessions }: CoachCoachingClientProp
                                     if (next.has(savedNote.id)) { next.delete(savedNote.id) } else { next.add(savedNote.id) }
                                     return next
                                   })}
-                                  className="mindly-feature-text mt-1 text-xs underline underline-offset-2 hover:opacity-70"
+                                  className="coach-note-toggle mt-1 text-xs underline underline-offset-2 hover:opacity-70"
                                 >
                                   {isExpanded ? t('notesCollapseNote') : t('notesExpandNote')}
                                 </button>
@@ -801,6 +833,20 @@ function convertBlobToBase64(blob: Blob): Promise<string> {
     reader.onerror = () => reject(new Error('Lecture audio impossible.'))
     reader.readAsDataURL(blob)
   })
+}
+
+function getSupportedAudioMimeType() {
+  if (typeof MediaRecorder === 'undefined') return ''
+
+  const supportedTypes = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+    'audio/ogg',
+    'audio/mp4',
+  ]
+
+  return supportedTypes.find((type) => MediaRecorder.isTypeSupported(type)) ?? ''
 }
 
 function getStudentName(session: CoachingSession | null | undefined): string {

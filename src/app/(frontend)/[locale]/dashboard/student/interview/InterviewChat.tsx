@@ -34,6 +34,45 @@ type InteractiveQuestion = {
 
 const OTHER_INTERACTIVE_VALUE = '__other__'
 
+function createSessionId() {
+  const randomUuid = globalThis.crypto?.randomUUID?.()
+
+  if (randomUuid) {
+    return `session-${randomUuid}`
+  }
+
+  const randomPart = Math.random().toString(36).slice(2)
+  return `session-${Date.now().toString(36)}-${randomPart}`
+}
+
+async function copyTextToClipboard(text: string) {
+  if (navigator.clipboard?.writeText && window.isSecureContext) {
+    await navigator.clipboard.writeText(text)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', '')
+  textarea.style.left = '-9999px'
+  textarea.style.position = 'fixed'
+  textarea.style.top = '0'
+
+  document.body.appendChild(textarea)
+  textarea.focus()
+  textarea.select()
+
+  try {
+    const copied = document.execCommand('copy')
+
+    if (!copied) {
+      throw new Error('Copy command failed')
+    }
+  } finally {
+    document.body.removeChild(textarea)
+  }
+}
+
 type ReponseChat = {
   userText?: string
   iaText?: string
@@ -91,7 +130,7 @@ export function InterviewChat() {
   const [interactiveOtherAnswers, setInteractiveOtherAnswers] = useState<Record<number, string>>({})
   const [hasAskedRequiredInteractive, setHasAskedRequiredInteractive] = useState(false)
   const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null)
-  const [sessionId] = useState(() => `session-${crypto.randomUUID()}`)
+  const [sessionId] = useState(createSessionId)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -370,7 +409,7 @@ export function InterviewChat() {
 
   const handleCopyMessage = async (messageIndex: number, content: string) => {
     try {
-      await navigator.clipboard.writeText(content)
+      await copyTextToClipboard(content)
       setCopiedMessageIndex(messageIndex)
       window.setTimeout(() => setCopiedMessageIndex(null), 1400)
     } catch {

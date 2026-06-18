@@ -7,9 +7,40 @@ import { generateSmartCoachingReply } from '@/lib/smart-coaching'
 import { createNotification } from '@/utilities/createNotification'
 
 type SendMessageBody = {
-  attachments?: (string | number)[]
+  attachments?: AttachmentInput[]
   content?: string
   sessionId?: string
+}
+
+type AttachmentInput =
+  | string
+  | number
+  | {
+      filename?: string
+      id?: string | number
+      mimeType?: string
+      url?: string
+    }
+
+function normalizeAttachment(attachment: AttachmentInput) {
+  if (typeof attachment === 'string' || typeof attachment === 'number') {
+    return { media: attachment }
+  }
+
+  const fileUrl = typeof attachment.url === 'string' ? attachment.url.trim() : ''
+
+  if (!fileUrl.startsWith('/api/coaching/files/')) {
+    return null
+  }
+
+  return {
+    fileUrl,
+    filename: typeof attachment.filename === 'string' ? attachment.filename.slice(0, 255) : 'Fichier',
+    mimeType:
+      typeof attachment.mimeType === 'string'
+        ? attachment.mimeType.slice(0, 120)
+        : 'application/octet-stream',
+  }
 }
 
 export async function POST(request: Request) {
@@ -22,9 +53,11 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => ({}))) as SendMessageBody
   const content = sanitizeCoachingMessage(body.content)
-  const attachmentIds = Array.isArray(body.attachments) ? body.attachments : []
+  const attachments = Array.isArray(body.attachments)
+    ? body.attachments.map(normalizeAttachment).filter((item): item is NonNullable<typeof item> => Boolean(item))
+    : []
 
-  if (!body.sessionId || (!content && attachmentIds.length === 0)) {
+  if (!body.sessionId || (!content && attachments.length === 0)) {
     return Response.json({ error: 'Session et message requis.' }, { status: 400 })
   }
 
@@ -59,7 +92,7 @@ export async function POST(request: Request) {
       senderRole,
       senderUser: user.id,
       content: content || '',
-      attachments: attachmentIds.map((mediaId) => ({ media: mediaId })),
+      attachments,
     },
   })
 

@@ -9,6 +9,10 @@ import { Link, usePathname, useRouter, type Locale } from '@/i18n/routing'
 import { useTheme } from '@/providers/Theme'
 import { Logo } from '@/components/Logo/Logo'
 
+function toUnlocalizedPath(path: string) {
+  return path.replace(/^\/(fr|en)(?=\/|$)/, '') || '/'
+}
+
 export function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
@@ -41,7 +45,7 @@ export function Navbar() {
         const data = (await response.json()) as { path?: string }
 
         if (!cancelled && response.ok && data.path) {
-          setAccountHref(data.path)
+          setAccountHref(toUnlocalizedPath(data.path))
         }
       } catch {
         if (!cancelled) {
@@ -236,4 +240,3 @@ export function Navbar() {
     </nav>
   )
 }
-

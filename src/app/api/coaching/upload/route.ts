@@ -1,10 +1,27 @@
 import { headers as getHeaders } from 'next/headers'
-import { getPayload } from 'payload'
-import config from '@payload-config'
+import { randomUUID } from 'node:crypto'
+import { mkdir, writeFile } from 'node:fs/promises'
+import path from 'node:path'
 
 const MAX_SIZE = 10 * 1024 * 1024 // 10 Mo
+const UPLOAD_DIR = process.env.COACHING_UPLOAD_DIR || '/tmp/mindbloom-coaching-uploads'
+
+function sanitizeFilename(filename: string) {
+  const extension = path.extname(filename).toLowerCase().slice(0, 12)
+  const basename = path
+    .basename(filename, extension)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9-_]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+
+  return `${basename || 'fichier'}-${randomUUID()}${extension || '.bin'}`
+}
 
 export async function POST(request: Request) {
+  const { getPayload } = await import('payload')
+  const { default: config } = await import('@payload-config')
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await getHeaders() })
 
@@ -29,25 +46,17 @@ export async function POST(request: Request) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer())
+  const storedFilename = sanitizeFilename(file.name)
+  const diskPath = path.join(UPLOAD_DIR, storedFilename)
+  const publicUrl = `/api/coaching/files/${encodeURIComponent(storedFilename)}`
 
-  const media = await payload.create({
-    collection: 'media',
-    data: {
-      alt: file.name,
-      owner: user.id,
-    },
-    file: {
-      data: buffer,
-      mimetype: file.type || 'application/octet-stream',
-      name: file.name,
-      size: file.size,
-    },
-  })
+  await mkdir(UPLOAD_DIR, { recursive: true })
+  await writeFile(diskPath, buffer)
 
   return Response.json({
-    id: media.id,
-    filename: media.filename,
-    mimeType: media.mimeType,
-    url: media.url,
+    id: storedFilename,
+    filename: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    url: publicUrl,
   })
 }

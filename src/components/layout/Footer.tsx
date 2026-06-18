@@ -1,6 +1,7 @@
 'use client'
 
 import { Heart, Lock } from 'lucide-react'
+import { FaFacebookF, FaLinkedinIn, FaYoutube } from 'react-icons/fa'
 import { Logo } from '@/components/Logo/Logo'
 import { useLocale } from 'next-intl'
 
@@ -17,6 +18,7 @@ export function Footer() {
         navTitle: 'Navigation',
         resourcesTitle: 'Ressources',
         legalTitle: 'Legal',
+        socialTitle: 'Reseaux sociaux',
         rights: 'Tous droits reserves',
         madeWith: 'Fait avec',
         madeFor: 'pour le bien-être mental - Tunis, Tunisie',
@@ -29,6 +31,7 @@ export function Footer() {
         navTitle: 'Navigation',
         resourcesTitle: 'Resources',
         legalTitle: 'Legal',
+        socialTitle: 'Social links',
         rights: 'All rights reserved',
         madeWith: 'Made with',
         madeFor: 'for mental wellness - Tunis, Tunisia',
@@ -76,6 +79,24 @@ export function Footer() {
         { label: 'Cookies', href: '#' },
       ]
 
+  const socials = [
+    {
+      label: 'LinkedIn',
+      href: 'http://linkedin.com/in/mindbloom-tn-68207a416',
+      icon: FaLinkedinIn,
+    },
+    {
+      label: 'YouTube',
+      href: 'https://www.youtube.com/@MindBloom-tn',
+      icon: FaYoutube,
+    },
+    {
+      label: 'Facebook',
+      href: 'https://www.facebook.com/share/p/1Duv9qLq3F/',
+      icon: FaFacebookF,
+    },
+  ]
+
   return (
     <footer className="border-t border-[var(--mindly-lavender-700)]/35 bg-[var(--mindly-bg)] backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-5 py-12">
@@ -94,6 +115,26 @@ export function Footer() {
               <span className="text-[12px] font-bold leading-[1.35] text-[var(--mindly-primary-light)]">
                 {copy.privacy}
               </span>
+            </div>
+            <div className="space-y-3 pt-1">
+              <p className="text-[13px] font-bold leading-[1.35] tracking-normal text-[var(--mindly-primary-light)]">
+                {copy.socialTitle}
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                {socials.map(({ href, icon: Icon, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    title={label}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--mindly-lavender-700)]/45 bg-white/75 text-[var(--mindly-primary-light)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--mindly-primary)] hover:bg-[var(--mindly-primary)] hover:text-white hover:shadow-md"
+                  >
+                    <Icon className="h-[18px] w-[18px]" />
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 

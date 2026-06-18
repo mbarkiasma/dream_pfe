@@ -44,6 +44,11 @@ const enableMediaGCSStorage = Boolean(
   process.env.GCS_PROJECT_ID &&
   (hasInlineGCSCredentials || hasRuntimeGCSCredentials),
 )
+
+const getSanitizedGCSPrivateKey = () =>
+  process.env.GCS_PRIVATE_KEY?.trim()
+    .replace(/^['"]|['"]$/g, '')
+    .replace(/\\n/g, '\n')
 const databaseURL = process.env.DATABASE_URL || ''
 const sanitizedDatabaseURL = (() => {
   if (!databaseURL) return ''
@@ -184,7 +189,7 @@ export default buildConfig({
           process.env.GCS_CLIENT_EMAIL && process.env.GCS_PRIVATE_KEY
             ? {
                 client_email: process.env.GCS_CLIENT_EMAIL,
-                private_key: process.env.GCS_PRIVATE_KEY.replace(/\\n/g, '\n'),
+                private_key: getSanitizedGCSPrivateKey() || '',
               }
             : undefined,
         projectId: process.env.GCS_PROJECT_ID,

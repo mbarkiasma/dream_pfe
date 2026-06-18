@@ -19,3 +19,14 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# Local/private keys and credentials
+labsuser.pem.txt
+*.pem
+*.pem.txt
+
+# Generated TypeScript build cache
+*.tsbuildinfo

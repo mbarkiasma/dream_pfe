@@ -201,7 +201,7 @@ export default async function PsyStudentsPage({
                   <Link
                     key={dossier.user.id}
                     href="/dashboard/psy/rendez_vous"
-                    className="group block w-full rounded-[1.15rem] border border-[var(--mindly-border)] bg-white/80 p-4 transition hover:-translate-y-0.5"
+                    className="psy-dossier-row group block w-full rounded-[1.15rem] border border-[var(--mindly-border)] bg-white/80 p-4 transition hover:-translate-y-0.5"
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                       <div className="min-w-0 flex-1">
@@ -247,7 +247,7 @@ export default async function PsyStudentsPage({
                         </div>
                       </div>
 
-                      <div className="w-full rounded-[1.15rem] border border-[var(--mindly-border)] bg-white/80 p-4 sm:w-auto sm:min-w-[200px] sm:shrink-0">
+                      <div className="psy-dossier-next w-full rounded-[1.15rem] border border-[var(--mindly-border)] bg-white/80 p-4 sm:w-auto sm:min-w-[200px] sm:shrink-0">
                         <p className="mindly-dashboard-eyebrow flex items-center gap-1">
                           <Clock className="h-3.5 w-3.5" />
                           {d('nextAppointment')}

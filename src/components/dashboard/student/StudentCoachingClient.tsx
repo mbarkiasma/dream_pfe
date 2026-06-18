@@ -39,9 +39,18 @@ type CoachingSession = {
 }
 
 type MessageAttachment = {
+  fileUrl?: string | null
+  filename?: string | null
   id: string | number
-  media:
-    | { id: string | number; filename?: string | null; mimeType?: string | null; url?: string | null }
+  mimeType?: string | null
+  media?:
+    | {
+        id: string | number
+        filename?: string | null
+        mimeType?: string | null
+        sourceUrl?: string | null
+        url?: string | null
+      }
     | string
     | number
 }
@@ -310,7 +319,7 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
         body: JSON.stringify({
           sessionId: selectedSessionId,
           content: cleanMessage,
-          attachments: attachmentsSnapshot.map((a) => a.id),
+          attachments: attachmentsSnapshot,
         }),
       })
 
@@ -463,8 +472,14 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
     }
 
     try {
+      if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+        setStatusMessage(t('errorMic'))
+        return
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      const mimeType = getSupportedAudioMimeType()
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
 
       audioChunksRef.current = []
       mediaRecorderRef.current = recorder
@@ -478,7 +493,9 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
           setIsLoading(true)
           setStatusMessage(t('statusTranscribing'))
 
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+          const audioBlob = new Blob(audioChunksRef.current, {
+            type: recorder.mimeType || mimeType || 'audio/webm',
+          })
           const audioBase64 = await convertBlobToBase64(audioBlob)
           const response = await fetch('/api/coaching/voice', {
             method: 'POST',
@@ -894,33 +911,44 @@ export function StudentCoachingClient({ initialSessions }: StudentCoachingClient
                         {item.attachments && item.attachments.length > 0 ? (
                           <div className="coaching-message-files">
                             {item.attachments.map((att) => {
-                              const media = typeof att.media === 'object' && att.media !== null ? att.media as { id: string | number; filename?: string | null; mimeType?: string | null; url?: string | null } : null
-                              if (!media?.url) return null
-                              const isImage = media.mimeType?.startsWith('image/')
+                              const media = typeof att.media === 'object' && att.media !== null
+                                ? att.media as {
+                                    id: string | number
+                                    filename?: string | null
+                                    mimeType?: string | null
+                                    sourceUrl?: string | null
+                                    url?: string | null
+                                  }
+                                : null
+                              const mediaUrl = att.fileUrl || media?.url || media?.sourceUrl
+                              const filename = att.filename || media?.filename
+                              const mimeType = att.mimeType || media?.mimeType
+                              if (!mediaUrl) return null
+                              const isImage = mimeType?.startsWith('image/')
                               return isImage ? (
                                 <a
                                   key={att.id}
-                                  href={media.url}
+                                  href={mediaUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="coaching-message-img-link"
                                 >
                                   <img
-                                    src={media.url}
-                                    alt={media.filename ?? 'image'}
+                                    src={mediaUrl}
+                                    alt={filename ?? 'image'}
                                     className="coaching-message-img"
                                   />
                                 </a>
                               ) : (
                                 <a
                                   key={att.id}
-                                  href={media.url}
+                                  href={mediaUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="coaching-message-file-link"
                                 >
                                   <FileText className="h-4 w-4 shrink-0" />
-                                  <span className="truncate">{media.filename ?? 'Fichier'}</span>
+                                  <span className="truncate">{filename ?? 'Fichier'}</span>
                                 </a>
                               )
                             })}
@@ -1155,6 +1183,20 @@ function convertBlobToBase64(blob: Blob): Promise<string> {
     reader.onerror = () => reject(new Error('Lecture audio impossible.'))
     reader.readAsDataURL(blob)
   })
+}
+
+function getSupportedAudioMimeType() {
+  if (typeof MediaRecorder === 'undefined') return ''
+
+  const supportedTypes = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+    'audio/ogg',
+    'audio/mp4',
+  ]
+
+  return supportedTypes.find((type) => MediaRecorder.isTypeSupported(type)) ?? ''
 }
 
 type MultipleChoiceOption = { label: string; text: string }
